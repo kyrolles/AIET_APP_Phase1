@@ -1,2 +1,2 @@
-# AIET_APP_Phase1
-Graduation Project
+# AIET-App
+## Design and implementation for digitalization of Educational Systems and Corporates
