@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/map_screen.dart';
 import 'package:graduation_project/screens/splash_screen.dart';
 
 void main() {
@@ -10,9 +11,12 @@ class AIET extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+      ),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: const MapScreen(),
     );
   }
 }
