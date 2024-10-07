@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:graduation_project/screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -34,11 +35,23 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
+    return Scaffold(
+      backgroundColor: Color(0XFF3DB2FF),
       body: Center(
-        child: Image(
-          image: AssetImage('assets/images/small-logo.png'),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Center(
+              child: SvgPicture.asset('assets/images/LogoSplash3.svg'),
+            ),
+            Center(
+              child: Image.asset(
+                'assets/images/smalllogo.png',
+                height: 190,
+                width: 190,
+              ),
+            ),
+          ],
         ),
       ),
     );
