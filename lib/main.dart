@@ -16,7 +16,7 @@ class AIET extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MapScreen(),
+      home: const SplashScreen(),
     );
   }
 }
