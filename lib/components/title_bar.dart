@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/constants.dart';
 
 class TitleBar extends StatelessWidget {
   const TitleBar(
@@ -13,20 +14,12 @@ class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 30.0),
       padding: const EdgeInsets.all(10.0),
-      height: 75.0,
+      height: 64.0,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
-        boxShadow: [
-          //this boxShadow handle the shadow around the hole bar
-          BoxShadow(
-            color: const Color(0XFF263238)
-                .withOpacity(0.2), //the color of the shadow
-            blurRadius: 10,
-            offset: const Offset(
-                4, 8), //this numbers specify the location of the shadow
-          )
-        ],
+        boxShadow: kShadow,
         color: Colors.white,
       ),
       child: Row(
@@ -35,16 +28,7 @@ class TitleBar extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(left: 20),
             decoration: BoxDecoration(
-              boxShadow: [
-                //this boxShadow handle the shadow around the button on the left
-                BoxShadow(
-                  color: const Color(0XFF263238)
-                      .withOpacity(0.2), //the color of the shadow
-                  blurRadius: 10,
-                  offset: const Offset(
-                      0, 0), //this numbers specify the location of the shadow
-                )
-              ],
+              boxShadow: kShadow,
               color: Colors.white,
               borderRadius: BorderRadius.circular(13.0),
             ),
