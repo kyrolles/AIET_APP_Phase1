@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:graduation_project/components/title_bar.dart';
+import 'package:graduation_project/components/building_b.dart';
+import 'package:graduation_project/components/building_a.dart';
+import 'package:graduation_project/components/building_selection.dart';
+import 'package:graduation_project/components/my_app_bar.dart';
+import 'package:graduation_project/components/search_bar.dart';
+import 'package:graduation_project/constants.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -10,99 +14,58 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  void Function(int)? onTabChange;
+  int _selectedindex = 0;
+
+//this method will update our selected index
+//when the user taps on the bottom bar
+  void navigateBottomBar(int index) {
+    setState(() {
+      _selectedindex = index;
+    });
+  }
+
+//Building pages to display
+  final List<Widget> _widgetOptions = const [BuildingA(), BuildingB()];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const PreferredSize(
+        preferredSize:
+            Size.fromHeight(kToolbarHeight), // Standard AppBar height
+        child: DecoratedBox(
+          decoration: BoxDecoration(boxShadow: kShadow),
+          child: MyAppBar(title: 'Map'),
+        ),
+      ),
+      //////////////////////////////////////////////////////////////////////////
       body: SafeArea(
         child: ListView(
           children: [
-            const TitleBar(
-              title: 'Map',
-              rightSpace: 5,
-              leftSpace: 3,
+            const SizedBox(
+              height: 35,
             ),
             Row(
               children: [
                 Expanded(
                   flex: 1,
-                  child: GNav(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 15.0),
-                    iconSize: 18,
-                    color: Colors.grey[400], // unselected icon color
-                    activeColor:
-                        const Color(0XFFFF7648), // selected icon and text color
-                    tabActiveBorder: Border.all(color: Colors.white),
-                    tabBackgroundColor: Colors.grey.shade100,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    tabBorderRadius: 20,
-                    // onTabChange: (value) {},
-                    tabs: const [
-                      GButton(
-                        icon: Icons.apartment,
-                        text: 'A',
-                        textStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                            color: Color(0XFFFF7648)),
-                      ),
-                      GButton(
-                        icon: Icons.apartment,
-                        text: 'B',
-                        textStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                            color: Color(0XFFFF7648)),
-                      )
-                    ],
+                  child: BuildingSelection(
+                    onTabChange: (index) => navigateBottomBar(index),
                   ),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: TextField(
-                      style: const TextStyle(
-                        color: Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          //border color
-                          borderSide: const BorderSide(
-                              color: Color(0XFF888C94), width: 2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          //border color when search is pressed
-                          borderSide: const BorderSide(
-                            color: Color(0XFF888C94),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        fillColor: Colors.white, //background color
-                        filled: true,
-                        suffixIcon: const Icon(Icons.search),
-                        suffixIconColor: const Color(0XFF888C94), //icon color
-                        hintText: 'Search',
-                        hintStyle: const TextStyle(
-                          color:
-                              Color(0XFF888C94), // text color in the textfield
-                        ),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
-                          ),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                  ),
-                ),
+                const Expanded(flex: 2, child: MySearchBar()),
               ],
             ),
+            const Padding(
+              padding: EdgeInsets.all(14.0),
+              child: Text(
+                'Floor',
+                style: kTextStyleNormal,
+              ),
+            ),
+            Center(
+              child: _widgetOptions.elementAt(_selectedindex),
+            )
           ],
         ),
       ),

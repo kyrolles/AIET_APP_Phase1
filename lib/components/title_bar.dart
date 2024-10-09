@@ -20,7 +20,7 @@ class TitleBar extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
         boxShadow: kShadow,
-        color: Colors.white,
+        color: Colors.blue,
       ),
       child: Row(
         // mainAxisSize: MainAxisSize.max,
