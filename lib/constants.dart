@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 Color kPrimary = const Color(0XFF3DB2FF);
 Color kGrey = const Color(0XFF888C94);
-Color kMapColor = const Color(0XFFE5E5E5);
+Color kGreyLight = const Color(0XFFE5E5E5);
+Color kOrange = const Color(0XFFFF7648);
 
 const kTextStyleBold = TextStyle(
   fontFamily: 'Lexend',
@@ -19,7 +20,7 @@ const kTextStyleNormal = TextStyle(
 const kTextStyleNumber = TextStyle(
   fontFamily: 'Lexend',
   fontWeight: FontWeight.w600,
-  fontSize: 28,
+  fontSize: 24,
 );
 
 const kShadow = [

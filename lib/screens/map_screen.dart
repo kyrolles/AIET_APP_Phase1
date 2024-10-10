@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/building_b.dart';
-import 'package:graduation_project/components/building_a.dart';
-import 'package:graduation_project/components/building_selection.dart';
+import 'package:graduation_project/components/map_building_b.dart';
+import 'package:graduation_project/components/map_building_a.dart';
+import 'package:graduation_project/components/map_building_selection.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/search_bar.dart';
 import 'package:graduation_project/constants.dart';
