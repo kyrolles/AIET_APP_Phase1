@@ -47,16 +47,19 @@ class FloorContainer extends StatelessWidget {
                       BorderRadius.circular(10), // Optional: Rounded corners
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(
-                        'Lec',
-                        style: TextStyle(
-                          fontFamily: 'Lexend',
-                          // fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: kGrey,
+                      child: Center(
+                        child: Text(
+                          'Lec',
+                          style: TextStyle(
+                            fontFamily: 'Lexend',
+                            // fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: kGrey,
+                          ),
                         ),
                       ),
                     ),
@@ -66,7 +69,9 @@ class FloorContainer extends StatelessWidget {
                       color: kGreyLight,
                       height: 0,
                     ),
-                    Row(
+                    Wrap(
+                      spacing: 0.0, // Space between components horizontally
+                      runSpacing: 0.0, // Space between components vertically
                       children: [
                         LecContainer(
                           lec: 'M1',
@@ -82,13 +87,15 @@ class FloorContainer extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text(
-                      'Section',
-                      style: TextStyle(
-                        fontFamily: 'Lexend',
-                        // fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: kGrey,
+                    Center(
+                      child: Text(
+                        'Section',
+                        style: TextStyle(
+                          fontFamily: 'Lexend',
+                          // fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: kGrey,
+                        ),
                       ),
                     ),
                     Divider(
@@ -97,7 +104,9 @@ class FloorContainer extends StatelessWidget {
                       color: kGreyLight,
                       height: 0,
                     ),
-                    Row(
+                    Wrap(
+                      spacing: 0.0, // Space between components horizontally
+                      runSpacing: 0.0, // Space between components vertically
                       children: [
                         LecContainer(
                           lec: 'CR1',
@@ -115,18 +124,21 @@ class FloorContainer extends StatelessWidget {
                           lec: 'CR4',
                           isEmpty: kOrange,
                         ),
+                        LecContainer(
+                          lec: 'DH',
+                          isEmpty: kGreyLight,
+                        ),
                       ],
                     ),
-                    Row(
-                      children: [LecContainer(lec: 'DH', isEmpty: kGreyLight)],
-                    ),
-                    Text(
-                      'Lab',
-                      style: TextStyle(
-                        fontFamily: 'Lexend',
-                        // fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: kGrey,
+                    Center(
+                      child: Text(
+                        'Lab',
+                        style: TextStyle(
+                          fontFamily: 'Lexend',
+                          // fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: kGrey,
+                        ),
                       ),
                     ),
                     Divider(
@@ -135,7 +147,9 @@ class FloorContainer extends StatelessWidget {
                       color: kGreyLight,
                       height: 0,
                     ),
-                    Row(
+                    Wrap(
+                      spacing: 0.0, // Space between components horizontally
+                      runSpacing: 0.0, // Space between components vertically
                       children: [
                         LecContainer(
                           lec: 'B1',
@@ -153,10 +167,6 @@ class FloorContainer extends StatelessWidget {
                           lec: 'B23',
                           isEmpty: kGreyLight,
                         ),
-                      ],
-                    ),
-                    Row(
-                      children: [
                         LecContainer(
                           lec: 'B24',
                           isEmpty: kGreyLight,
