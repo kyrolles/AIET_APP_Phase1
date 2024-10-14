@@ -9,7 +9,7 @@ class MySearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(right: 10.0),
+      padding: const EdgeInsets.only(right: 10.0, left: 10.0),
       child: TextField(
         style: const TextStyle(
           color: Colors.black,

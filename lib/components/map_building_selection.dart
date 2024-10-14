@@ -9,8 +9,8 @@ class BuildingSelection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GNav(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-      iconSize: 18,
+      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+      iconSize: 24,
       color: Colors.grey[400], // unselected icon color
       activeColor: kOrange, // selected icon and text color
       tabActiveBorder: Border.all(color: Colors.white),
@@ -23,13 +23,13 @@ class BuildingSelection extends StatelessWidget {
           icon: Icons.apartment,
           text: 'A',
           textStyle: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 24, color: kOrange),
+              fontWeight: FontWeight.bold, fontSize: 20, color: kOrange),
         ),
         GButton(
           icon: Icons.apartment,
           text: 'B',
           textStyle: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 24, color: kOrange),
+              fontWeight: FontWeight.bold, fontSize: 20, color: kOrange),
         )
       ],
     );

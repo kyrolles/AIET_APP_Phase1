@@ -10,7 +10,7 @@ class LecContainer extends StatelessWidget {
     return Container(
       decoration:
           BoxDecoration(color: isEmpty, borderRadius: BorderRadius.circular(3)),
-      margin: const EdgeInsets.only(left: 8, bottom: 8, top: 8),
+      margin: const EdgeInsets.only(bottom: 8, top: 8, left: 8),
       height: 35,
       width: 56,
       child: Center(

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 class MyAppBar extends StatelessWidget {
-  const MyAppBar({
+  MyAppBar({
     super.key,
     required this.title,
+    this.actions,
   });
 
   final String title;
+  List<Widget>? actions;
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      surfaceTintColor: Colors.white,
       leading: IconButton(
         onPressed: () {},
         icon: const Image(
@@ -20,6 +23,7 @@ class MyAppBar extends StatelessWidget {
       title: Text(
         title,
       ),
+      actions: actions,
     );
   }
 }
