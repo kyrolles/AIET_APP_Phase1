@@ -6,41 +6,48 @@ import 'package:graduation_project/constants.dart';
 class ServicesScreen extends StatelessWidget {
   ServicesScreen({super.key});
 
-  final List<ServiceItemData> _serviceItems = [
-    ServiceItemData(
+  final List<ServiceItem> _serviceItems = [
+    ServiceItem(
       title: 'Clinic',
       imageUrl: 'assets/project_image/health-clinic.png',
-      backgroundColor: Color(0xFFFFDD29),
+      backgroundColor: const Color(0xFFFFDD29),
+      onPressed: () {},
     ),
-    ServiceItemData(
+    ServiceItem(
       title: 'Student Training',
       imageUrl: 'assets/project_image/analysis.png',
-      backgroundColor: Color(0xFFED1C24),
+      backgroundColor: const Color(0xFFED1C24),
+      onPressed: () {},
     ),
-    ServiceItemData(
+    ServiceItem(
       title: 'Moodle',
       imageUrl: 'assets/project_image/education.png',
-      backgroundColor: Color(0xFFFF9811),
+      backgroundColor: const Color(0xFFFF9811),
+      onPressed: () {},
     ),
-    ServiceItemData(
+    ServiceItem(
       title: 'Unofficial Transcript',
       imageUrl: 'assets/project_image/transcription.png',
-      backgroundColor: Color(0xFF0ED290),
+      backgroundColor: const Color(0xFF0ED290),
+      onPressed: () {},
     ),
-    ServiceItemData(
+    ServiceItem(
       title: 'GPA Calculator',
       imageUrl: 'assets/project_image/gpa.png',
-      backgroundColor: Color(0xFF006DF0),
+      backgroundColor: const Color(0xFF006DF0),
+      onPressed: () {},
     ),
-    ServiceItemData(
+    ServiceItem(
       title: 'Invoices',
       imageUrl: 'assets/project_image/invoice.png',
-      backgroundColor: Color(0xFF8AC9FE),
+      backgroundColor: const Color(0xFF8AC9FE),
+      onPressed: () {},
     ),
-    ServiceItemData(
+    ServiceItem(
       title: 'E-Payment',
       imageUrl: 'assets/project_image/e-wallet.png',
-      backgroundColor: Color(0xFFFFBCAB),
+      backgroundColor: const Color(0xFFFFBCAB),
+      onPressed: () {},
     ),
     // Add more service items here
   ];
@@ -87,16 +94,4 @@ class ServicesScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class ServiceItemData {
-  final String title;
-  final String imageUrl;
-  final Color backgroundColor;
-
-  ServiceItemData({
-    required this.title,
-    required this.imageUrl,
-    required this.backgroundColor,
-  });
 }
