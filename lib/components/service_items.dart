@@ -19,10 +19,10 @@ class ServiceItem extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        width: 360,
+        width: 340,
         height: 92,
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-        margin: const EdgeInsets.all(6),
+        margin: const EdgeInsets.all(7),
         decoration: ShapeDecoration(
           color: backgroundColor,
           shape: RoundedRectangleBorder(
