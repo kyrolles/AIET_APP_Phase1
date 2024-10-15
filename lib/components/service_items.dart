@@ -19,10 +19,9 @@ class ServiceItem extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        width: 340,
         height: 92,
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-        margin: const EdgeInsets.all(7),
+        margin: const EdgeInsets.only(top: 7, bottom: 7, left: 17, right: 17),
         decoration: ShapeDecoration(
           color: backgroundColor,
           shape: RoundedRectangleBorder(
@@ -75,8 +74,6 @@ class ServiceItem extends StatelessWidget {
                   fontSize: 20,
                   fontFamily: 'Lexend',
                   fontWeight: FontWeight.w900,
-                  // height: 0.08,
-                  // letterSpacing: -1,
                 ),
               ),
             ),

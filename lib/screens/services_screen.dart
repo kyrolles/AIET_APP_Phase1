@@ -69,30 +69,13 @@ class ServicesScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Container(
-            width: 375,
-            height: 788,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: _serviceItems
-                  .map((item) => ServiceItem(
-                        title: item.title,
-                        imageUrl: item.imageUrl,
-                        backgroundColor: item.backgroundColor,
-                        onPressed: item.onPressed,
-                        // onPressed: () {
-                        //   // Handle the button press here
-                        //   // print('Button pressed: ${item.title}');
-                        // },
-                      ))
-                  .toList(),
-            ),
-          ),
+          const SizedBox(height: 18),
+          ..._serviceItems.map((item) => ServiceItem(
+                title: item.title,
+                imageUrl: item.imageUrl,
+                backgroundColor: item.backgroundColor,
+                onPressed: item.onPressed,
+              )),
         ],
       ),
     );
