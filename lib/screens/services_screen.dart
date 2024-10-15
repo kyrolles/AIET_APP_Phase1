@@ -11,7 +11,9 @@ class ServicesScreen extends StatelessWidget {
       title: 'Clinic',
       imageUrl: 'assets/project_image/health-clinic.png',
       backgroundColor: const Color(0xFFFFDD29),
-      onPressed: () {},
+      onPressed: () {
+        print('Button pressed:');
+      },
     ),
     ServiceItem(
       title: 'Student Training',
@@ -82,10 +84,11 @@ class ServicesScreen extends StatelessWidget {
                         title: item.title,
                         imageUrl: item.imageUrl,
                         backgroundColor: item.backgroundColor,
-                        onPressed: () {
-                          // Handle the button press here
-                          // print('Button pressed: ${item.title}');
-                        },
+                        onPressed: item.onPressed,
+                        // onPressed: () {
+                        //   // Handle the button press here
+                        //   // print('Button pressed: ${item.title}');
+                        // },
                       ))
                   .toList(),
             ),
