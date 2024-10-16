@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/components/activities_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/map_screen.dart';
+import 'package:graduation_project/screens/result_screen.dart';
 import 'package:graduation_project/screens/services_screen.dart';
 
 class ActivitiesListView extends StatelessWidget {
@@ -13,7 +14,16 @@ class ActivitiesListView extends StatelessWidget {
       ActivitiesContainer(
         image: 'assets/project_image/result.png',
         title: 'Result',
-        onpressed: () {},
+        onpressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const ResultPage();
+              },
+            ),
+          );
+        },
       ),
       ActivitiesContainer(
         image: 'assets/project_image/customer-service.png',

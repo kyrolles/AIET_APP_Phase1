@@ -4,6 +4,7 @@ Color kPrimary = const Color(0XFF3DB2FF);
 Color kGrey = const Color(0XFF888C94);
 Color kGreyLight = const Color(0XFFE5E5E5);
 Color kOrange = const Color(0XFFFF7648);
+const Color kLightGrey = Color(0xFFE1E8ED);
 
 const kTextStyleBold = TextStyle(
   fontFamily: 'Lexend',
