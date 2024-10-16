@@ -34,7 +34,7 @@ class AIET extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MapScreen(),
+      home: const HomeScreen(),
     );
   }
 }

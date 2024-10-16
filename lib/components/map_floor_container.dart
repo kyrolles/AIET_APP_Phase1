@@ -13,7 +13,7 @@ class FloorContainer extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //the blue contianer
+            //* the blue Box with the floor number
             Container(
               margin: const EdgeInsets.only(left: 15, right: 5),
               height: 45,
@@ -24,31 +24,35 @@ class FloorContainer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Center(
-                  child: Text(
-                floor,
-                style: kTextStyleNumber,
-              )),
+                child: Text(
+                  floor,
+                  style: kTextStyleNumber,
+                ),
+              ),
             ),
             const SizedBox(
               height: 325,
               child: VerticalDivider(),
             ),
-            //The big container with all the lec & sec & lab
+            //* The big container with all the lec & sec & lab
             Expanded(
               child: Container(
+                //* the specifications of the container
                 margin: const EdgeInsets.only(right: 10),
                 decoration: BoxDecoration(
-                  color: Colors.white, // Background color of the container
+                  color: Colors.white, //* Background color of the container
                   border: Border.all(
-                    color: kGrey, // Border color
-                    width: 2.0, // Border width
+                    color: kGrey, //* Border color
+                    width: 2.0, //* Border width
                   ),
                   borderRadius:
-                      BorderRadius.circular(10), // Optional: Rounded corners
+                      BorderRadius.circular(10), //* Optional: Rounded corners
                 ),
                 child: Column(
+                  //* the content in the container
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    //* the lectures part
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Center(
@@ -70,8 +74,9 @@ class FloorContainer extends StatelessWidget {
                       height: 0,
                     ),
                     Wrap(
-                      spacing: 0.0, // Space between components horizontally
-                      runSpacing: 0.0, // Space between components vertically
+                      //! Wrap: This widget arranges its children in a horizontal or vertical wrap. When the space is not enough for the next child, it moves it to the next "line."
+                      spacing: 0.0, //* Space between components horizontally
+                      runSpacing: 0.0, //* Space between components vertically
                       children: [
                         LecContainer(
                           lec: 'M1',
@@ -87,6 +92,7 @@ class FloorContainer extends StatelessWidget {
                         ),
                       ],
                     ),
+                    //* the sections part
                     Center(
                       child: Text(
                         'Section',
@@ -105,8 +111,8 @@ class FloorContainer extends StatelessWidget {
                       height: 0,
                     ),
                     Wrap(
-                      spacing: 0.0, // Space between components horizontally
-                      runSpacing: 0.0, // Space between components vertically
+                      spacing: 0.0, //* Space between components horizontally
+                      runSpacing: 0.0, //* Space between components vertically
                       children: [
                         LecContainer(
                           lec: 'CR1',
@@ -130,6 +136,7 @@ class FloorContainer extends StatelessWidget {
                         ),
                       ],
                     ),
+                    //* the lab part
                     Center(
                       child: Text(
                         'Lab',
@@ -148,8 +155,8 @@ class FloorContainer extends StatelessWidget {
                       height: 0,
                     ),
                     Wrap(
-                      spacing: 0.0, // Space between components horizontally
-                      runSpacing: 0.0, // Space between components vertically
+                      spacing: 0.0, //* Space between components horizontally
+                      runSpacing: 0.0, //* Space between components vertically
                       children: [
                         LecContainer(
                           lec: 'B1',

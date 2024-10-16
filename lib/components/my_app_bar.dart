@@ -12,12 +12,13 @@ class MyAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      surfaceTintColor: Colors.white,
+      surfaceTintColor:
+          Colors.white, //* make the color of the appBar white while scrolling
       leading: IconButton(
         onPressed: () {},
         icon: const Image(
           image: AssetImage('assets/images/Back Button.png'),
-          fit: BoxFit.contain, // Ensure the image fits without distortion
+          fit: BoxFit.contain, //* Ensure the image fits without distortion
         ),
       ),
       title: Text(

@@ -7,6 +7,7 @@ class LecContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //* the small container that holds the name of the place. for ex: M1 or CR2
     return Container(
       decoration:
           BoxDecoration(color: isEmpty, borderRadius: BorderRadius.circular(3)),
@@ -15,6 +16,7 @@ class LecContainer extends StatelessWidget {
       width: 56,
       child: Center(
         child: Text(
+          //* the name that will be in the container
           lec,
           style: const TextStyle(
             fontFamily: 'Lexend',
