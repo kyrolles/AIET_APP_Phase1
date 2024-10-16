@@ -19,12 +19,14 @@ class BuildingSelection extends StatelessWidget {
       tabBorderRadius: 20,
       onTabChange: (value) => onTabChange!(value),
       tabs: [
+        //* the button of the building A
         GButton(
           icon: Icons.apartment,
           text: 'A',
           textStyle: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 20, color: kOrange),
         ),
+        //* the button of the building B
         GButton(
           icon: Icons.apartment,
           text: 'B',
