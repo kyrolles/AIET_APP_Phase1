@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/activities_list_view.dart';
 import 'package:graduation_project/components/text_link.dart';
 import 'package:graduation_project/constants.dart';
 
@@ -57,23 +58,16 @@ class HomeScreen extends StatelessWidget {
             text: 'Activities',
             textLink: 'see more',
           ),
-          const SizedBox(
-            height: 180,
-          ),
+          const ActivitiesListView(),
           const TextLink(
             text: 'Announcements',
             textLink: 'View All',
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  blurRadius: 1,
-                ),
-              ],
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              boxShadow: kShadow,
             ),
             margin: const EdgeInsets.all(12.0),
             padding: const EdgeInsets.all(22.0),
