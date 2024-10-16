@@ -80,12 +80,12 @@ class HomeScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 28,
                         backgroundImage:
-                            AssetImage('assets/images/1704502172296.jfif'),
+                            AssetImage('assets/images/dr-sheshtawey.jpg'),
                       ),
                       Padding(
                         padding: EdgeInsets.all(14.0),
                         child: Text(
-                          'DR.Mohamed',
+                          'DR.Reda El-Sheshtawy',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

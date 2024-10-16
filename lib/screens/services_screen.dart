@@ -64,6 +64,9 @@ class ServicesScreen extends StatelessWidget {
           decoration: const BoxDecoration(boxShadow: kShadow),
           child: MyAppBar(
             title: 'Services',
+            onpressed: () {
+              Navigator.pop(context);
+            },
           ),
         ),
       ),
