@@ -37,6 +37,7 @@ class _MapScreenState extends State<MapScreen> {
           decoration: const BoxDecoration(boxShadow: kShadow),
           child: MyAppBar(
             title: 'Map',
+            onpressed: () => Navigator.pop(context),
             actions: [
               BuildingSelection(
                 onTabChange: (index) => navigateBottomBar(index),
