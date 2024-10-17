@@ -364,11 +364,11 @@ class _ResultPageState extends State<ResultPage> {
         children: [
           Container(
             padding:
-                const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 20),
+            const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(20)),
+              const BorderRadius.vertical(bottom: Radius.circular(20)),
               boxShadow: [
                 BoxShadow(
                     color: Colors.black.withOpacity(0.2),
@@ -556,98 +556,119 @@ class _ResultPageState extends State<ResultPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                    child: Text(smallTitle,
-                        style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange))),
-                Center(
-                    child: Text(title.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Colors.black),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis)),
-                const SizedBox(
-                    width: 302,
-                    child: Divider(thickness: 1.75, color: kLightGrey)),
-                const SizedBox(height: 5),
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Flexible(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List.generate(scores.length, (index) {
-                        List<Widget> scoreWidgets = [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 2.0),
-                                child: SizedBox(
-                                    width: 55,
-                                    child: Text(
-                                        "${scores[index]['score'].toStringAsFixed(2)}",
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold))),
-                              ),
-                              const SizedBox(height: 0),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 2.0),
-                                child: SizedBox(
-                                    width: 60,
-                                    child: Text(scores[index]['label'],
-                                        style: const TextStyle(
-                                            color: Colors.lightBlue,
-                                            fontSize: 8),
-                                        textAlign: TextAlign.center)),
-                              ),
-                            ],
-                          ),
-                        ];
-
-                        if (index < scores.length - 1) {
-                          scoreWidgets.add(const SizedBox(
-                              width: 13,
-                              height: 30,
-                              child: VerticalDivider(
-                                  color: kLightGrey, thickness: 2.5)));
-                        }
-
-                        return Row(children: scoreWidgets);
-                      }),
-                    ),
+                  child: Text(
+                    smallTitle,
+                    style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange),
                   ),
-                ]),
-                const SizedBox(height: 10),
+                ),
+                Center(
+                  child: Text(
+                    title.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.black),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(height: 10), // Add spacing above the divider
+
+                // Adjusted Divider with reduced length on the right side
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        thickness: 1.75,
+                        color: kLightGrey,
+                      ),
+                    ),
+                    SizedBox(width: 73), // Adjust this to control the shortening on the right
+                  ],
+                ),
+
+                const SizedBox(height: 5), // Add spacing below the divider if needed
+
+                // Scores Row (horizontal layout)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(scores.length, (index) {
+                    List<Widget> scoreWidgets = [
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Text(
+                              "${scores[index]['score'].toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontSize: MediaQuery.of(context).size.width * 0.04, // Scale font size with screen width
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Text(
+                              scores[index]['label'],
+                              style: const TextStyle(
+                                  color: Colors.lightBlue, fontSize: 8),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ];
+
+                    if (index < scores.length - 1) {
+                      scoreWidgets.add(const SizedBox(
+                        width: 13,
+                        height: 30,
+                        child: VerticalDivider(
+                          color: kLightGrey,
+                          thickness: 2.5,
+                        ),
+                      ));
+                    }
+
+                    return Row(children: scoreWidgets);
+                  }),
+                ),
+                const SizedBox(height: 7),
               ],
             ),
           ),
         ),
         Positioned(
-          bottom: 7,
+          bottom: 8, // Align to the bottom of the card
           right: 0,
           child: Container(
-            height: 72,
-            width: 72,
+            height: MediaQuery.of(context).size.width * 0.18, // Scale height with screen width
+            width: MediaQuery.of(context).size.width * 0.18,  // Scale width with screen width
             decoration: BoxDecoration(
-                color: gradeColor,
-                borderRadius:
-                    const BorderRadius.only(bottomRight: Radius.circular(10))),
+              color: gradeColor,
+              borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(10),
+              ),
+            ),
             child: Center(
-                child: Text(grade,
-                    style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black))),
+              child: Text(
+                grade,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.1, // Scale font size with screen width
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
+
 }
