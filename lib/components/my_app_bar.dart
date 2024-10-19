@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class MyAppBar extends StatelessWidget {
-  MyAppBar(
+  const MyAppBar(
       {super.key, required this.title, this.actions, required this.onpressed});
 
   final String title;
-  List<Widget>? actions;
-  VoidCallback onpressed;
+  final List<Widget>? actions;
+  final VoidCallback onpressed;
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -14,10 +14,11 @@ class MyAppBar extends StatelessWidget {
           Colors.white, //* make the color of the appBar white while scrolling
       leading: IconButton(
         onPressed: onpressed,
-        icon: const Image(
-          image: AssetImage('assets/images/Back Button.png'),
-          fit: BoxFit.contain, //* Ensure the image fits without distortion
-        ),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        // icon: const Image(
+        //   image: AssetImage('assets/images/Back Button.png'),
+        //   fit: BoxFit.contain, //* Ensure the image fits without distortion
+        // ),
       ),
       title: Text(
         title,
