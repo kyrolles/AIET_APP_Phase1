@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/screens/home_screen.dart';
+import 'package:graduation_project/screens/login_screen.dart';
 // import 'package:graduation_project/screens/map_screen.dart';
 // import 'package:graduation_project/screens/services_screen.dart';
 // import 'package:graduation_project/screens/splash_screen.dart';
@@ -35,7 +36,7 @@ class AIET extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      home: const LoginScreen(),
     );
   }
 }
