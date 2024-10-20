@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:graduation_project/screens/home_screen.dart';
 import'package:firebase_core/firebase_core.dart';
 // import 'package:graduation_project/screens/map_screen.dart';
 // import 'package:graduation_project/screens/services_screen.dart';
 import 'package:graduation_project/screens/splash_screen.dart';
 
-Future <void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const AIET());
