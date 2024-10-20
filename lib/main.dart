@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-// import 'package:graduation_project/screens/home_screen.dart';
-import 'package:graduation_project/screens/login_screen.dart';
+import 'package:graduation_project/screens/home_screen.dart';
+import'package:firebase_core/firebase_core.dart';
 // import 'package:graduation_project/screens/map_screen.dart';
 // import 'package:graduation_project/screens/services_screen.dart';
 import 'package:graduation_project/screens/splash_screen.dart';
 
-void main() {
+Future <void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const AIET());
 }
 

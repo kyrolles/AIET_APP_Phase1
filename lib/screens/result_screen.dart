@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 
 class ResultPage extends StatefulWidget {
-  const ResultPage({Key? key}) : super(key: key);
+  const ResultPage({super.key});
 
   @override
   _ResultPageState createState() => _ResultPageState();
@@ -579,7 +579,7 @@ class _ResultPageState extends State<ResultPage> {
                 const SizedBox(height: 10), // Add spacing above the divider
 
                 // Adjusted Divider with reduced length on the right side
-                Row(
+                const Row(
                   children: [
                     Expanded(
                       child: Divider(
