@@ -1,21 +1,40 @@
 {
   "project_info": {
-    "project_number": "1083589570730",
-    "project_id": "aiet-application",
-    "storage_bucket": "aiet-application.appspot.com"
+    "project_number": "56186030576",
+    "project_id": "aiet-application-7d58d",
+    "storage_bucket": "aiet-application-7d58d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1083589570730:android:028d1fcd950665a0b4e0d3",
+        "mobilesdk_app_id": "1:56186030576:android:894186301d792ec6ba3535",
         "android_client_info": {
-          "package_name": "com.example.graduation_project"
+          "package_name": "com.app.graduation"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyClcqTUv75f_o2KLACOXqF1AWREggIx7NI"
+          "current_key": "AIzaSyBLUSBzfA-eMfTaeYPdh62Z5zBskqP_x1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56186030576:android:b7d83456958ec519ba3535",
+        "android_client_info": {
+          "package_name": "com.example.graduation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLUSBzfA-eMfTaeYPdh62Z5zBskqP_x1Y"
         }
       ],
       "services": {

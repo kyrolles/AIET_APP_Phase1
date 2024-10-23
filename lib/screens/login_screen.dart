@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graduation_project/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,28 +27,27 @@ class _LoginScreenState extends State<LoginScreen> {
     return isValid;
   }
 
-  // Simulated login function (replace with actual authentication logic)
-  void _performLogin() {
+  // Perform login using Firebase Authentication
+  void _performLogin() async {
     if (_validateInputs()) {
-      String email = _emailController.text;
-      String password = _passwordController.text;
-
-      // Simulated authentication logic (replace with your logic)
-      if (email == "test@example.com" && password == "password123") {
-        print('Login successful');
-        setState(() {
-          _hasError = false; // Reset error state on successful login
-        });
-
-        // Navigate to HomeScreen after successful login
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+        // Navigate to home screen on successful login
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
-      } else {
+      } on FirebaseAuthException catch (e) {
+        // Handle login errors
         setState(() {
-          _hasError = true; // Set error state on failed login
+          _hasError = true;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'Login failed')),
+        );
       }
     }
   }
