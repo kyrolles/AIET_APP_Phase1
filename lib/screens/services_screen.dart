@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_items.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/calculator_screen.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
@@ -39,7 +40,16 @@ class ServicesScreen extends StatelessWidget {
         title: 'GPA Calculator',
         imageUrl: 'assets/project_image/gpa.png',
         backgroundColor: const Color(0xFF006DF0),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const GPACalculatorScreen();
+              },
+            ),
+          );
+        },
       ),
       ServiceItem(
         title: 'Invoices',
