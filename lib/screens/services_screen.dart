@@ -65,6 +65,12 @@ class ServicesScreen extends StatelessWidget {
         );},
       ),
       ServiceItem(
+        title: 'IT-Invoices',
+        imageUrl: 'assets/project_image/invoice.png',
+        backgroundColor: const Color(0xFF8AC9FE),
+        onPressed: () {},
+      ),
+      ServiceItem(
         title: 'E-Payment',
         imageUrl: 'assets/project_image/e-wallet.png',
         backgroundColor: const Color(0xFFFFBCAB),
