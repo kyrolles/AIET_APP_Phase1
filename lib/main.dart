@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/screens/calculator_screen.dart';
+import 'package:graduation_project/screens/it_invoice_screen.dart';
 import 'package:graduation_project/screens/login_screen.dart';
 import 'package:graduation_project/screens/splash_screen.dart';
 
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const ItInvoiceScreen(),
     );
   }
 }
