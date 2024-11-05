@@ -3,7 +3,8 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_items.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/calculator_screen.dart';
-
+import 'package:graduation_project/screens/tuition_fees_request.dart';
+import 'package:graduation_project/screens/tuition_fees_download.dart';
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
 
@@ -55,7 +56,13 @@ class ServicesScreen extends StatelessWidget {
         title: 'Invoices',
         imageUrl: 'assets/project_image/invoice.png',
         backgroundColor: const Color(0xFF8AC9FE),
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return TuitionFeesPreview();
+          },
+        );},
       ),
       ServiceItem(
         title: 'E-Payment',
