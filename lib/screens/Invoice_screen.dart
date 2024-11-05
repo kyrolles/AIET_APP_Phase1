@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/my_app_bar.dart';
+import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/tuition_fees_request.dart';
 
-class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key});
+class InvoiceScreen extends StatelessWidget {
+  const InvoiceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Invoice'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
+        child: DecoratedBox(
+          decoration: const BoxDecoration(boxShadow: kShadow),
+          child: MyAppBar(
+            title: 'Invoice',
+            onpressed: () => Navigator.pop(context),
+          ),
         ),
       ),
       body: Padding(
@@ -18,148 +25,175 @@ class PaymentScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Status',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            Container(
+              height: 350,
+              padding: const EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15.0),
+                color: const Color(0XFFE5E5E5),
               ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView(
-                children: [
-                  statusTile(
-                    imagePath:
-                        'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                    label: 'Proof of enrollment',
-                    status: 'Done',
-                    statusColor: Colors.green,
-                  ),
-                  statusTile(
-                    imagePath:
-                        'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
-                    label: 'Tuition fees',
-                    status: 'Done',
-                    statusColor: Colors.green,
-                  ),
-                  statusTile(
-                    imagePath:
-                        'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                    label: 'Proof of enrollment',
-                    status: 'Rejected',
-                    statusColor: Colors.orange,
-                  ),
-                  statusTile(
-                    imagePath:
-                        'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                    label: 'Proof of enrollment',
-                    status: 'Pending',
-                    statusColor: Colors.yellow,
-                  ),
-                  statusTile(
-                    imagePath:
-                        'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                    label: 'Proof of enrollment',
-                    status: 'No Status',
-                    statusColor: Colors.grey,
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {},
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Ask for',
+                    'Status',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  Expanded(
+                    child: ListView(
                       children: [
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: const EdgeInsets.all(10),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              const Text(
-                                'Tuition fees',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
+                        statusTile(
+                          imagePath:
+                              'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                          label: 'Proof of enrollment',
+                          status: 'Done',
+                          statusColor: Colors.green,
                         ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: const EdgeInsets.all(10),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              const Text(
-                                'Proof of enrollment',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
+                        statusTile(
+                          imagePath:
+                              'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
+                          label: 'Tuition fees',
+                          status: 'Done',
+                          statusColor: Colors.green,
+                        ),
+                        statusTile(
+                          imagePath:
+                              'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                          label: 'Proof of enrollment',
+                          status: 'Rejected',
+                          statusColor: Colors.orange,
+                        ),
+                        statusTile(
+                          imagePath:
+                              'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                          label: 'Proof of enrollment',
+                          status: 'Pending',
+                          statusColor: Colors.yellow,
+                        ),
+                        statusTile(
+                          imagePath:
+                              'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                          label: 'Proof of enrollment',
+                          status: 'No Status',
+                          statusColor: Colors.grey,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                const Text(
+                  'Ask for',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return TuitionFeesPreview();
+                          },
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(2),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            const Text(
+                              'Tuition fees',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return TuitionFeesPreview();
+                          },
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(2),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            const Text(
+                              'Proof of enrollment',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
