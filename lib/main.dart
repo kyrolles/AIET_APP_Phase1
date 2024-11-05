@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const ItInvoiceScreen(),
+      home: const LoginScreen(),
     );
   }
 }
