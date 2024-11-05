@@ -87,6 +87,31 @@ class InvoiceScreen extends StatelessWidget {
                 ],
               ),
             ),
+            TextButton(
+  onPressed: () {
+    // Handle archive button press
+    print('Archive button pressed');
+  },
+  style: TextButton.styleFrom(
+    backgroundColor: Colors.grey[300],
+    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 20), // Custom padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Icon(Icons.archive, color: Colors.grey),
+      SizedBox(width: 10),
+      Text(
+        'Archive',
+        style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+      ),
+    ],
+  ),
+),
+
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
