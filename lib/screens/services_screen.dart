@@ -60,12 +60,6 @@ class ServicesScreen extends StatelessWidget {
         imageUrl: 'assets/project_image/invoice.png',
         backgroundColor: const Color(0xFF8AC9FE),
         onPressed: () {
-          // showModalBottomSheet(
-          //   context: context,
-          //   builder: (BuildContext context) {
-          //     return TuitionFeesPreview();
-          //   },
-          // );
           Navigator.push(
             context,
             MaterialPageRoute(

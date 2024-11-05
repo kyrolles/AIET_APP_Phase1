@@ -30,13 +30,13 @@ class InvoiceScreen extends StatelessWidget {
               padding: const EdgeInsets.all(5.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15.0),
-                color: const Color(0XFFE5E5E5),
+                color: const Color(0XFFFAFAFA),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Status',
+                    ' Status',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -102,7 +102,7 @@ class InvoiceScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
@@ -209,8 +209,8 @@ Widget statusTile({
   required Color statusColor,
 }) {
   return Container(
-    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-    margin: EdgeInsets.symmetric(vertical: 5),
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+    margin: const EdgeInsets.symmetric(vertical: 5),
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(10),
@@ -225,11 +225,11 @@ Widget statusTile({
             height: 24,
           ),
         ),
-        SizedBox(width: 15),
+        const SizedBox(width: 15),
         Expanded(
           child: Text(
             label,
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16),
           ),
         ),
         Text(
@@ -239,7 +239,7 @@ Widget statusTile({
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         CircleAvatar(
           radius: 8,
           backgroundColor: statusColor,
