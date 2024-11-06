@@ -7,6 +7,7 @@ import 'package:graduation_project/screens/calculator_screen.dart';
 import 'package:graduation_project/screens/it_invoice_screen.dart';
 import 'package:graduation_project/screens/tuition_fees_request.dart';
 import 'package:graduation_project/screens/tuition_fees_download.dart';
+import 'package:graduation_project/screens/tuition_fees_upload.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
@@ -82,6 +83,23 @@ class ServicesScreen extends StatelessWidget {
                 return const ItInvoiceScreen();
               },
             ),
+          );
+        },
+      ),
+      ServiceItem(
+        title: 'IT Tuition Fees Upload',
+        imageUrl: 'assets/project_image/invoice.png',
+        backgroundColor: const Color(0xFF8AC9FE),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            builder: (BuildContext context) {
+              return const TuitionFeesSheet();
+            },
           );
         },
       ),
