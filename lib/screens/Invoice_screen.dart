@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/tuition_fees_download.dart';
 import 'package:graduation_project/screens/tuition_fees_request.dart';
 
 class InvoiceScreen extends StatelessWidget {
@@ -107,7 +108,7 @@ class InvoiceScreen extends StatelessWidget {
                         showModalBottomSheet(
                           context: context,
                           builder: (BuildContext context) {
-                            return TuitionFeesPreview();
+                            return TuitionFeesDownload();
                           },
                         );
                       },
