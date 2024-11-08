@@ -8,9 +8,44 @@ import 'package:graduation_project/screens/it_invoice_screen.dart';
 import 'package:graduation_project/screens/tuition_fees_request.dart';
 import 'package:graduation_project/screens/tuition_fees_download.dart';
 import 'package:graduation_project/screens/tuition_fees_upload.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ServicesScreen extends StatelessWidget {
+class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
+
+  @override
+  _ServicesScreenState createState() => _ServicesScreenState();
+}
+
+class _ServicesScreenState extends State<ServicesScreen> {
+  bool isStaff = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfStaff();
+  }
+
+  Future<void> checkIfStaff() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('staffs')
+            .where('email', isEqualTo: email)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          setState(() {
+            isStaff = true;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error checking staff status: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +164,7 @@ class ServicesScreen extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 18),
-          ...serviceItems.map((item) => ServiceItem(
+          ...serviceItems.where((item) => item.title != 'IT-Invoices' || isStaff).map((item) => ServiceItem(
                 title: item.title,
                 imageUrl: item.imageUrl,
                 backgroundColor: item.backgroundColor,
