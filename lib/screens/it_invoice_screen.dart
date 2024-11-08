@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/components/it_invoice_request_contanier.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/constants.dart';
@@ -15,15 +17,38 @@ enum Status { pending, rejected, done }
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
   bool? isChecked = false;
-  // Color? statusColor;
-  // String status = "No Status";
-  // Color circleColor = const Color(0XFFE5E5E5);
+  bool isStaff = false;
 
-  // void updateContainer(Color newColor) {
-  //   setState(() {
-  //     circleColor = newColor;
-  //   });
-  // }
+  @override
+  void initState() {
+    super.initState();
+    checkIfStaff();
+  }
+
+  Future<void> checkIfStaff() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('staffs')
+            .where('email', isEqualTo: email)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          setState(() {
+            isStaff = true;
+          });
+        } else {
+          // Redirect to another screen or show a message
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => NotAuthorizedScreen()),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error checking staff status: $e');
+    }
+  }
 
   List<RequestContainer> requests = [
     RequestContainer(),
@@ -48,6 +73,14 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!isStaff) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize:
@@ -290,6 +323,24 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class NotAuthorizedScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: MyAppBar(
+          title: 'Not Authorized',
+          onpressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Text('You are not authorized to view this screen.'),
       ),
     );
   }
