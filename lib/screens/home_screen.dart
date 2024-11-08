@@ -1,10 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/components/activities_list_view.dart';
 import 'package:graduation_project/components/text_link.dart';
 import 'package:graduation_project/constants.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserName();
+  }
+
+  Future<void> fetchUserName() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        await checkCollectionForUser('users', email);
+        if (userName.isEmpty) {
+          await checkCollectionForUser('staffs', email);
+        }
+        if (userName.isEmpty) {
+          await checkCollectionForUser('teaching_staff', email);
+        }
+      }
+    } catch (e) {
+      print('Error fetching user name: $e');
+    }
+  }
+
+  Future<void> checkCollectionForUser(String collection, String email) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(collection)
+        .where('email', isEqualTo: email)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentSnapshot userDoc = querySnapshot.docs.first;
+      setState(() {
+        userName = userDoc['name'][0]; // Get the first character of the name
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +68,11 @@ class HomeScreen extends StatelessWidget {
             // Define the action for when the icon is tapped
           },
         ),
-        title: const Row(
+        title: Row(
           children: [
             Spacer(), // This pushes the content to the center from the start
             Text(
-              'Hi, Youssef!',
+              userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
             ),
             SizedBox(
