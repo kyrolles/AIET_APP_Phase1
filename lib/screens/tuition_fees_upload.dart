@@ -10,7 +10,6 @@ class TuitionFeesSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -19,15 +18,12 @@ class TuitionFeesSheet extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               IconButton(
-                icon: Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-
-          SizedBox(height: 10),
-
+          const SizedBox(height: 20),
           Container(
             height: 200,
             width: double.infinity,
@@ -38,8 +34,8 @@ class TuitionFeesSheet extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.cloud_upload, size: 50, color: Colors.grey),
-                SizedBox(height: 10),
+                const Icon(Icons.cloud_upload, size: 50, color: Colors.grey),
+                const SizedBox(height: 10),
                 const Text(
                   'Select a file or drag and drop here',
                   textAlign: TextAlign.center,
@@ -50,16 +46,15 @@ class TuitionFeesSheet extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () {
-
-                  },
-                  child: Text('SELECT FILE'),
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.blueAccent, backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.blueAccent),
+                    foregroundColor: Colors.blueAccent,
+                    backgroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.blueAccent),
                   ),
+                  child: const Text('SELECT FILE'),
                 ),
               ],
             ),
@@ -69,7 +64,10 @@ class TuitionFeesSheet extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               'File added',
-              style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600,color: Colors.black),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black),
             ),
           ),
           const SizedBox(height: 10),
@@ -89,20 +87,15 @@ class TuitionFeesSheet extends StatelessWidget {
                   ],
                 ),
               ),
-
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.grey),
-                onPressed: () {
-
-                },
+                onPressed: () {},
               ),
             ],
           ),
           const SizedBox(height: 20),
-
           ElevatedButton(
-            onPressed: () {
-            },
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF34C759),
               minimumSize: const Size(double.infinity, 50),
@@ -110,7 +103,11 @@ class TuitionFeesSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Done',style: TextStyle(fontSize: 21.7, fontWeight: FontWeight.w700 ,color: Color(0xFFFFFFFF))),
+            child: const Text('Done',
+                style: TextStyle(
+                    fontSize: 21.7,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFFFFFF))),
           ),
         ],
       ),

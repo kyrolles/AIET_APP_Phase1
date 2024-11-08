@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_items.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/Invoice_screen.dart';
+import 'package:graduation_project/screens/invoice_screen.dart';
 import 'package:graduation_project/screens/calculator_screen.dart';
 import 'package:graduation_project/screens/it_invoice_screen.dart';
 import 'package:graduation_project/screens/tuition_fees_request.dart';
@@ -87,7 +87,7 @@ class ServicesScreen extends StatelessWidget {
         },
       ),
       ServiceItem(
-        title: 'IT Tuition Fees Upload',
+        title: 'Tuition Fees Upload',
         imageUrl: 'assets/project_image/invoice.png',
         backgroundColor: const Color(0xFF8AC9FE),
         onPressed: () {

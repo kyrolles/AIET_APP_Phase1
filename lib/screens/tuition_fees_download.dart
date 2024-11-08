@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class TuitionFeesDownload extends StatelessWidget {
+  const TuitionFeesDownload({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 400,
       child: Column(
         children: [
@@ -14,8 +16,10 @@ class TuitionFeesDownload extends StatelessWidget {
                 const Center(
                   child: Text(
                     'Tuition Fees',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700 ,color: Color(0xFF6C7072)),
-
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF6C7072)),
                   ),
                 ),
                 Positioned(
@@ -40,15 +44,17 @@ class TuitionFeesDownload extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () {
-
-              },
+              onPressed: () {},
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 70), backgroundColor: Color(0xFF0693F1),
+                minimumSize: const Size(double.infinity, 70),
+                backgroundColor: const Color(0xFF0693F1),
               ),
               child: const Text(
                 'Download as PDF',
-              style: TextStyle(fontSize: 21.7, fontWeight: FontWeight.w700 ,color: Color(0xFFFFFFFF)),
+                style: TextStyle(
+                    fontSize: 21.7,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFFFFFF)),
               ),
             ),
           ),

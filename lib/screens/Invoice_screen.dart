@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
+import 'package:graduation_project/components/proof_of_enrollment.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/tuition_fees_download.dart';
-import 'package:graduation_project/screens/tuition_fees_request.dart';
 
 class InvoiceScreen extends StatelessWidget {
   const InvoiceScreen({super.key});
@@ -105,10 +105,11 @@ class InvoiceScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
-                        showModalBottomSheet(
+                        showModalBottomSheet<void>(
+                          backgroundColor: const Color(0XFFF1F1F2),
                           context: context,
                           builder: (BuildContext context) {
-                            return TuitionFeesDownload();
+                            return const TuitionFeesDownload();
                           },
                         );
                       },
@@ -151,9 +152,10 @@ class InvoiceScreen extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
+                          backgroundColor: const Color(0XFFF1F1F2),
                           context: context,
                           builder: (BuildContext context) {
-                            return TuitionFeesPreview();
+                            return const ProofOfEnrollment();
                           },
                         );
                       },
