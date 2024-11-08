@@ -152,6 +152,7 @@ class InvoiceScreen extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
+                          backgroundColor: const Color(0XFFF1F1F2),
                           context: context,
                           builder: (BuildContext context) {
                             return const ProofOfEnrollment();
