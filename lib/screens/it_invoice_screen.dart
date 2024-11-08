@@ -14,6 +14,7 @@ class ItInvoiceScreen extends StatefulWidget {
 enum Status { pending, rejected, done }
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
+  bool? isChecked = false;
   // Color? statusColor;
   // String status = "No Status";
   // Color circleColor = const Color(0XFFE5E5E5);
@@ -83,49 +84,165 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                   return InkWell(
                     onTap: () {
                       showModalBottomSheet<void>(
+                        backgroundColor: const Color(0XFFF1F1F2),
                         context: context,
                         builder: (BuildContext context) {
                           return SizedBox(
-                            height: 200,
-                            child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  const Text('Modal BottomSheet'),
+                                  const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          'اثبات القيد',
+                                          style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0XFF6C7072)),
+                                        ),
+                                      ]),
+                                  const SizedBox(height: 20),
+                                  const SizedBox(
+                                    width: double.infinity,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'كيرلس رافت لمعي ابراهيم',
+                                          textAlign: TextAlign.right,
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                        Text(
+                                          '   : الاسم',
+                                          textAlign: TextAlign.right,
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const SizedBox(
+                                    width: double.infinity,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'مصلحة الضرائب',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                        Text(
+                                          '   : الجهة الموجه إليها',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Checkbox(
+                                          value: isChecked,
+                                          activeColor: kPrimary,
+                                          onChanged: (newBool) {
+                                            setState(() {
+                                              isChecked = newBool ?? false;
+                                            });
+                                          },
+                                        ),
+                                        const Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              'هل تريد ختم النسر ؟',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                            Text(
+                                              '(!ملحوظة: سيأخذ الكثير من الوقت)',
+                                              style: TextStyle(fontSize: 12),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          requests[index].status = "Done";
-                                          requests[index].statusColor =
-                                              const Color(0XFF34C759);
-                                          // Remove the item from the source list and add it to the destination list
-                                          transferRequest(index);
-                                          // transferRequest();
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Done'),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0XFFFF7648),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            requests[index].status = "Rejected";
+                                            requests[index].statusColor =
+                                                const Color(0XFFFF7648);
+                                            transferRequest(index);
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Rejected',
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                        ),
                                       ),
                                       const SizedBox(width: 3),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          requests[index].status = "Rejected";
-                                          requests[index].statusColor =
-                                              const Color(0XFFFF7648);
-                                          transferRequest(index);
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Rejected'),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0XFFFFDD29),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          child: const Text('Pending',
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                          onPressed: () {
+                                            updatePending(index);
+                                            Navigator.pop(context);
+                                          },
+                                        ),
                                       ),
                                       const SizedBox(width: 3),
-                                      ElevatedButton(
-                                        child: const Text('Pending'),
-                                        onPressed: () {
-                                          updatePending(index);
-                                          Navigator.pop(context);
-                                        },
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF34C759),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            requests[index].status = "Done";
+                                            requests[index].statusColor =
+                                                const Color(0XFF34C759);
+                                            // Remove the item from the source list and add it to the destination list
+                                            transferRequest(index);
+                                            // transferRequest();
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Done',
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                        ),
                                       ),
                                     ],
                                   )
