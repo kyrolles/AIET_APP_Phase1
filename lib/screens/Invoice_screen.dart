@@ -3,7 +3,6 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/proof_of_enrollment.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/tuition_fees_download.dart';
-
 class InvoiceScreen extends StatelessWidget {
   const InvoiceScreen({super.key});
 
@@ -85,6 +84,36 @@ class InvoiceScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                   TextButton(
+  onPressed: () {
+  
+   Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ArchiveScreen()),
+   );
+     },
+  style: TextButton.styleFrom(
+    backgroundColor: Colors.grey[300],
+    padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  child: const Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Icon(
+        Icons.archive,
+        color: Colors.grey,
+      ),
+      SizedBox(width: 10), 
+      Text(
+        'Archive',
+        style: TextStyle(
+          color: Colors.grey,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
                 ],
               ),
             ),
@@ -201,6 +230,9 @@ class InvoiceScreen extends StatelessWidget {
           ],
         ),
       ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -250,4 +282,121 @@ Widget statusTile({
       ],
     ),
   );
+}
+class ArchiveScreen extends StatelessWidget {
+  const ArchiveScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Archive'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Status',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                children: [
+                  // Item 1
+                  ListTile(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.white,
+                      child: Image.asset(
+                        'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    title: const Text('Proof of enrollment'),
+                    trailing: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Done', style: TextStyle(color: Colors.green)),
+                        SizedBox(width: 8),
+                        Icon(Icons.circle, color: Colors.green, size: 16),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  // Item 2
+                  ListTile(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.white,
+                      child: Image.asset(
+                        'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    title: const Text('Tuition fees'),
+                    trailing: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Done', style: TextStyle(color: Colors.green)),
+                        SizedBox(width: 8),
+                        Icon(Icons.circle, color: Colors.green, size: 16),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.white,
+                      child: Image.asset(
+                        'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    title: const Text('Proof of enrollment'),
+                    trailing: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Rejected', style: TextStyle(color: Colors.orange)),
+                        SizedBox(width: 8),
+                        Icon(Icons.circle, color: Colors.orange, size: 16),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.white,
+                      child: Image.asset(
+                        'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    title: const Text('Tuition fees'),
+                    trailing: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Rejected', style: TextStyle(color: Colors.orange)),
+                        SizedBox(width: 8),
+                        Icon(Icons.circle, color: Colors.orange, size: 16),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
