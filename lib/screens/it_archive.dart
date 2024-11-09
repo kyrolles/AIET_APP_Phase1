@@ -5,15 +5,33 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/it_invoice_screen.dart';
 
 class ItArchiveScreen extends StatefulWidget {
-  const ItArchiveScreen({super.key, required this.itArchive});
+  const ItArchiveScreen(
+      {super.key, required this.itArchive, required this.requests});
 
   final List<RequestContainer> itArchive;
+  final List<RequestContainer> requests;
 
   @override
   State<ItArchiveScreen> createState() => _ItArchiveScreenState();
 }
 
 class _ItArchiveScreenState extends State<ItArchiveScreen> {
+  void updateArchiveList() {
+    //!archive list
+    for (var i = 0; i < widget.itArchive.length; i++) {
+      if (widget.itArchive[i].status == 'Pending') {
+        setState(() {
+          //* add it to the requests list
+          widget.requests.add(widget.itArchive[i]);
+        });
+      }
+    }
+    setState(() {
+      //*Remove the item from the archive list
+      widget.itArchive.removeWhere((archive) => archive.status == 'Pending');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +42,10 @@ class _ItArchiveScreenState extends State<ItArchiveScreen> {
           decoration: const BoxDecoration(boxShadow: kShadow),
           child: MyAppBar(
             title: 'Archive',
-            onpressed: () => Navigator.pop(context),
+            onpressed: () {
+              // updateArchiveList();
+              Navigator.pop(context);
+            },
           ),
         ),
       ),

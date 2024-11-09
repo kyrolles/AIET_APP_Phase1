@@ -121,23 +121,23 @@ class _ServicesScreenState extends State<ServicesScreen> {
           );
         },
       ),
-      ServiceItem(
-        title: 'Tuition Fees Upload',
-        imageUrl: 'assets/project_image/invoice.png',
-        backgroundColor: const Color(0xFF8AC9FE),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            builder: (BuildContext context) {
-              return const TuitionFeesSheet();
-            },
-          );
-        },
-      ),
+      // ServiceItem(
+      //   title: 'Tuition Fees Upload',
+      //   imageUrl: 'assets/project_image/invoice.png',
+      //   backgroundColor: const Color(0xFF8AC9FE),
+      //   onPressed: () {
+      //     showModalBottomSheet(
+      //       context: context,
+      //       isScrollControlled: true,
+      //       shape: const RoundedRectangleBorder(
+      //         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      //       ),
+      //       builder: (BuildContext context) {
+      //         return const TuitionFeesSheet();
+      //       },
+      //     );
+      //   },
+      // ),
       ServiceItem(
         title: 'E-Payment',
         imageUrl: 'assets/project_image/e-wallet.png',
@@ -164,12 +164,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
       body: ListView(
         children: [
           const SizedBox(height: 18),
-          ...serviceItems.where((item) => item.title != 'IT-Invoices' || isStaff).map((item) => ServiceItem(
-                title: item.title,
-                imageUrl: item.imageUrl,
-                backgroundColor: item.backgroundColor,
-                onPressed: item.onPressed,
-              )),
+          ...serviceItems
+              .where((item) => item.title != 'IT-Invoices' || isStaff)
+              .map((item) => ServiceItem(
+                    title: item.title,
+                    imageUrl: item.imageUrl,
+                    backgroundColor: item.backgroundColor,
+                    onPressed: item.onPressed,
+                  )),
         ],
       ),
     );
