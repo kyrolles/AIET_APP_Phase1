@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class TuitionFeesSheet extends StatelessWidget {
-  const TuitionFeesSheet({super.key});
+  const TuitionFeesSheet({super.key, required this.doneFunctionality});
+  final Function() doneFunctionality;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,7 @@ class TuitionFeesSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: doneFunctionality,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF34C759),
               minimumSize: const Size(double.infinity, 50),

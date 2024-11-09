@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/proof_sheet_screen.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/tuition_fees_upload.dart';
 
-class RequestContainer extends StatefulWidget {
-  RequestContainer(
+class TuitionContainer extends StatefulWidget {
+  TuitionContainer(
       {super.key,
       this.status = 'No Status',
       this.statusColor = const Color(0XFFE5E5E5)});
@@ -11,42 +11,28 @@ class RequestContainer extends StatefulWidget {
   String? status;
 
   @override
-  State<RequestContainer> createState() => _RequestContainerState();
+  State<TuitionContainer> createState() => _TuitionContainerState();
 }
 
-class _RequestContainerState extends State<RequestContainer> {
+class _TuitionContainerState extends State<TuitionContainer> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        showModalBottomSheet<void>(
-          backgroundColor: const Color(0XFFF1F1F2),
+        showModalBottomSheet(
           context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
           builder: (BuildContext context) {
-            return ProofOfEnrollmentSheetScreen(
+            return TuitionFeesSheet(
               doneFunctionality: () {
                 setState(() {
-                  widget.status = "Done";
-                  widget.statusColor = const Color(0XFF34C759);
+                  widget.status = 'Done';
+                  widget.statusColor = const Color(0xFF34C759);
+                  Navigator.pop(context);
                 });
-                Navigator.pop(context);
-              },
-              rejectedFunctionality: () {
-                setState(() {
-                  widget.status = "Rejected";
-                  widget.statusColor = const Color(0XFFFF7648);
-                  // Remove the item from the source list and add it to the destination list
-                  // itArchive.add(requests[index]);
-                  // requests.remove(requests[index]);
-                });
-                Navigator.pop(context);
-              },
-              pendingFunctionality: () {
-                setState(() {
-                  widget.status = "Pending";
-                  widget.statusColor = const Color(0XFFFFDD29);
-                });
-                Navigator.pop(context);
               },
             );
           },
@@ -105,11 +91,12 @@ class _RequestContainerState extends State<RequestContainer> {
                   child: CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.white,
-                    child: Image.asset('assets/images/image 29 (2).png'),
+                    child: Image.asset(
+                        'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png'),
                   ),
                 ),
                 const Text(
-                  'Proof of enrollment',
+                  'Tuition Fees',
                   style: TextStyle(fontSize: 18),
                 ),
                 Row(

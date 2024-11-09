@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/it_invoice_request_contanier.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
+import 'package:graduation_project/components/tuition_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/it_archive.dart';
+
+// Color? statusColor;
+// String status = "No Status";
+// Color circleColor = const Color(0XFFE5E5E5);
+
+// void updateContainer(Color newColor) {
+//   setState(() {
+//     circleColor = newColor;
+//   });
+// }
 
 class ItInvoiceScreen extends StatefulWidget {
   const ItInvoiceScreen({super.key});
@@ -11,40 +22,45 @@ class ItInvoiceScreen extends StatefulWidget {
   State<ItInvoiceScreen> createState() => _ItInvoiceScreenState();
 }
 
-enum Status { pending, rejected, done }
-
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
-  bool? isChecked = false;
-  // Color? statusColor;
-  // String status = "No Status";
-  // Color circleColor = const Color(0XFFE5E5E5);
+  void updateRequestList() {
+    //!requests list
+    for (var i = 0; i < requests.length; i++) {
+      if (requests[i].status == 'Done' || requests[i].status == 'Rejected') {
+        setState(() {
+          //! add it to the archive list
+          itArchive.add(requests[i]);
+        });
+      }
+    }
+    setState(() {
+      //!Remove the item from the requests list
+      requests.removeWhere((request) =>
+          request.status == 'Done' || request.status == 'Rejected');
+    });
 
-  // void updateContainer(Color newColor) {
-  //   setState(() {
-  //     circleColor = newColor;
-  //   });
-  // }
+    // //!archive list
+    // for (var i = 0; i < itArchive.length; i++) {
+    //   if (itArchive[i].status == 'Pending') {
+    //     setState(() {
+    //       //* add it to the requests list
+    //       requests.add(requests[i]);
+    //     });
+    //   }
+    // }
+    // setState(() {
+    //   //*Remove the item from the archive list
+    //   itArchive.removeWhere((archive) => archive.status == 'Pending');
+    // });
+  }
 
-  List<RequestContainer> requests = [
-    RequestContainer(),
+  final List<RequestContainer> requests = [
     RequestContainer(),
     RequestContainer(),
     RequestContainer(),
   ];
-  List<RequestContainer> itArchive = [];
-  void transferRequest(int index) {
-    setState(() {
-      itArchive.add(requests[index]);
-      requests.remove(requests[index]);
-    });
-  }
 
-  void updatePending(int index) {
-    return setState(() {
-      requests[index].status = "Pending";
-      requests[index].statusColor = const Color(0XFFFFDD29);
-    });
-  }
+  final List<RequestContainer> itArchive = [];
 
   @override
   Widget build(BuildContext context) {
@@ -81,187 +97,17 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
               child: ListView.builder(
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      showModalBottomSheet<void>(
-                        backgroundColor: const Color(0XFFF1F1F2),
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SizedBox(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Text(
-                                          'اثبات القيد',
-                                          style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0XFF6C7072)),
-                                        ),
-                                      ]),
-                                  const SizedBox(height: 20),
-                                  const SizedBox(
-                                    width: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          'كيرلس رافت لمعي ابراهيم',
-                                          textAlign: TextAlign.right,
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                        Text(
-                                          '   : الاسم',
-                                          textAlign: TextAlign.right,
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const SizedBox(
-                                    width: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          'مصلحة الضرائب',
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                        Text(
-                                          '   : الجهة الموجه إليها',
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Checkbox(
-                                          value: isChecked,
-                                          activeColor: kPrimary,
-                                          onChanged: (newBool) {
-                                            setState(() {
-                                              isChecked = newBool ?? false;
-                                            });
-                                          },
-                                        ),
-                                        const Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              'هل تريد ختم النسر ؟',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            Text(
-                                              '(!ملحوظة: سيأخذ الكثير من الوقت)',
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0XFFFF7648),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            requests[index].status = "Rejected";
-                                            requests[index].statusColor =
-                                                const Color(0XFFFF7648);
-                                            transferRequest(index);
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('Rejected',
-                                              style: TextStyle(
-                                                  color: Colors.white)),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0XFFFFDD29),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          child: const Text('Pending',
-                                              style: TextStyle(
-                                                  color: Colors.white)),
-                                          onPressed: () {
-                                            updatePending(index);
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xFF34C759),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            requests[index].status = "Done";
-                                            requests[index].statusColor =
-                                                const Color(0XFF34C759);
-                                            // Remove the item from the source list and add it to the destination list
-                                            transferRequest(index);
-                                            // transferRequest();
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('Done',
-                                              style: TextStyle(
-                                                  color: Colors.white)),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: requests[index],
-                  );
+                  return requests[index];
                 },
               ),
             ),
+            TuitionContainer(),
             TextButton(
               onPressed: () {
+                updateRequestList();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return ItArchiveScreen(itArchive: itArchive);
+                  return ItArchiveScreen(
+                      itArchive: itArchive, requests: requests);
                 }));
               },
               child: Container(
