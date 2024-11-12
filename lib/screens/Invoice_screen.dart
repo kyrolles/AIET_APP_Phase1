@@ -92,7 +92,7 @@ class InvoiceScreen extends StatelessWidget {
                 onPressed: () {
                  Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ArchiveScreen()),
+        MaterialPageRoute(builder: (context) =>const ArchiveScreen()),
       );
                 },
                 style: TextButton.styleFrom(
@@ -280,25 +280,27 @@ Widget statusTile({
 }
 
 class ArchiveScreen extends StatelessWidget {
+  const ArchiveScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Archive'),
+        title: const Text('Archive'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Status',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView(
                 children: [
@@ -312,8 +314,8 @@ class ArchiveScreen extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    title: Text('Proof of enrollment'),
-                    trailing: Row(
+                    title: const Text('Proof of enrollment'),
+                    trailing: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Done', style: TextStyle(color: Colors.green)),
@@ -322,7 +324,7 @@ class ArchiveScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Divider(),
+                  const Divider(),
                   
                   ListTile(
                     leading: CircleAvatar(
@@ -333,8 +335,8 @@ class ArchiveScreen extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    title: Text('Tuition fees'),
-                    trailing: Row(
+                    title: const Text('Tuition fees'),
+                    trailing: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Done', style: TextStyle(color: Colors.green)),
@@ -343,7 +345,7 @@ class ArchiveScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
                     leading: CircleAvatar(
                       radius: 20,
@@ -353,8 +355,8 @@ class ArchiveScreen extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    title: Text('Proof of enrollment'),
-                    trailing: Row(
+                    title: const Text('Proof of enrollment'),
+                    trailing: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Rejected', style: TextStyle(color: Colors.orange)),
@@ -363,7 +365,7 @@ class ArchiveScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
                     leading: CircleAvatar(
                       radius: 20,
@@ -373,8 +375,8 @@ class ArchiveScreen extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    title: Text('Tuition fees'),
-                    trailing: Row(
+                    title: const Text('Tuition fees'),
+                    trailing: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Rejected', style: TextStyle(color: Colors.orange)),
@@ -383,7 +385,7 @@ class ArchiveScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Divider(),
+                  const Divider(),
                   
                 ],
               ),
