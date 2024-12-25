@@ -26,7 +26,7 @@ class FloorContainer extends StatelessWidget {
               child: Center(
                 child: Text(
                   floor,
-                  style: kTextStyleNumber,
+                  style: kTextStyleSize24,
                 ),
               ),
             ),
