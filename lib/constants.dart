@@ -18,7 +18,7 @@ const kTextStyleNormal = TextStyle(
   fontSize: 18,
 );
 
-const kTextStyleNumber = TextStyle(
+const kTextStyleSize24 = TextStyle(
   fontFamily: 'Lexend',
   fontWeight: FontWeight.w600,
   fontSize: 24,

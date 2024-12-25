@@ -70,19 +70,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         title: Row(
           children: [
-            Spacer(), // This pushes the content to the center from the start
+            const Spacer(), // This pushes the content to the center from the start
             Text(
               userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
             ),
-            SizedBox(
+            const SizedBox(
                 width:
                     8), // Adds a small space between the Text and CircleAvatar
-            CircleAvatar(
+            const CircleAvatar(
               radius: 22,
               backgroundImage: AssetImage('assets/images/1704502172296.jfif'),
             ),
-            Spacer(
+            const Spacer(
               flex: 2,
             ), // This pushes the content to the center from the end
           ],

@@ -5,6 +5,7 @@ import 'package:graduation_project/screens/invoice_screen.dart';
 import 'package:graduation_project/screens/calculator_screen.dart';
 import 'package:graduation_project/screens/it_invoice_screen.dart';
 import 'package:graduation_project/screens/login_screen.dart';
+import 'package:graduation_project/screens/qrCode_screen.dart';
 import 'package:graduation_project/screens/splash_screen.dart';
 
 void main() async {
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const QrcodeScreen(),
     );
   }
 }
