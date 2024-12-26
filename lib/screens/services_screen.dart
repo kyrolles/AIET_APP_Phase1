@@ -5,9 +5,6 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/invoice_screen.dart';
 import 'package:graduation_project/screens/calculator_screen.dart';
 import 'package:graduation_project/screens/it_invoice_screen.dart';
-import 'package:graduation_project/screens/tuition_fees_request.dart';
-import 'package:graduation_project/screens/tuition_fees_download.dart';
-import 'package:graduation_project/screens/tuition_fees_upload.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/screens/announcement_screen.dart';
@@ -145,24 +142,26 @@ class _ServicesScreenState extends State<ServicesScreen> {
         backgroundColor: const Color(0xFFFFBCAB),
         onPressed: () {},
       ),
-      if (isStaff) ServiceItem(
-        title: 'Announcements',
-        imageUrl: 'assets/project_image/announcement.png',
-        backgroundColor: const Color(0xFFFFBCAB),
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AnnouncementScreen(),
-            ),
-          );
-          if (result == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Announcement posted successfully!')),
+      if (isStaff)
+        ServiceItem(
+          title: 'Announcements',
+          imageUrl: 'assets/project_image/announcement.png',
+          backgroundColor: const Color(0xFFFFBCAB),
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AnnouncementScreen(),
+              ),
             );
-          }
-        },
-      ),
+            if (result == true) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Announcement posted successfully!')),
+              );
+            }
+          },
+        ),
       // Add more service items here
     ];
 
