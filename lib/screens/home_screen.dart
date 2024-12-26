@@ -14,11 +14,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String userName = '';
+  String? currentUserEmail;
 
   @override
   void initState() {
     super.initState();
     fetchUserName();
+    currentUserEmail = FirebaseAuth.instance.currentUser?.email;
   }
 
   Future<void> fetchUserName() async {
@@ -49,6 +51,27 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         userName = userDoc['name'][0]; // Get the first character of the name
       });
+    }
+  }
+
+  Future<void> deleteAnnouncement(String docId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('announcements')
+          .doc(docId)
+          .delete();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Announcement deleted successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting announcement: $e')),
+        );
+      }
     }
   }
 
@@ -108,6 +131,109 @@ class _HomeScreenState extends State<HomeScreen> {
           const TextLink(
             text: 'Announcements',
             textLink: 'View All',
+          ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('announcements')
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return Column(
+                children: snapshot.data!.docs.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final timestamp = data['timestamp'] as Timestamp?;
+                  final formattedDate = timestamp != null
+                      ? '${timestamp.toDate().hour}:${timestamp.toDate().minute} · ${timestamp.toDate().day}/${timestamp.toDate().month}/${timestamp.toDate().year}'
+                      : 'No date';
+
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      boxShadow: kShadow,
+                    ),
+                    margin: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(22.0),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              const CircleAvatar(
+                                radius: 28,
+                                backgroundImage:
+                                    AssetImage('assets/images/dr-sheshtawey.jpg'),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(14.0),
+                                  child: Text(
+                                    data['author'] ?? '',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              if (currentUserEmail == data['email'])
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Delete Announcement'),
+                                          content: const Text('Are you sure you want to delete this announcement?'),
+                                          actions: [
+                                            TextButton(
+                                              child: const Text('Cancel'),
+                                              onPressed: () => Navigator.of(context).pop(),
+                                            ),
+                                            TextButton(
+                                              child: const Text('Delete'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                deleteAnnouncement(doc.id);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          data['text'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 17,
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            formattedDate,
+                            style: const TextStyle(
+                              color: Color(0XFF657786),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            },
           ),
           Container(
             decoration: const BoxDecoration(
