@@ -229,7 +229,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Align(
-                          alignment: Alignment.centerLeft,
+                          alignment: RegExp(r'[a-zA-Z]').hasMatch(data['text'])
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
                           child: Text(
                             data['text'] ?? '',
                             style: const TextStyle(
