@@ -154,6 +154,7 @@ class InvoiceScreen extends StatelessWidget {
                         showModalBottomSheet(
                           backgroundColor: const Color(0XFFF1F1F2),
                           context: context,
+                          isScrollControlled: true,
                           builder: (BuildContext context) {
                             return const ProofOfEnrollment();
                           },
