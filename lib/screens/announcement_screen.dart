@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graduation_project/components/my_app_bar.dart';
+import 'package:graduation_project/constants.dart';
 
 class AnnouncementScreen extends StatefulWidget {
   const AnnouncementScreen({super.key});
@@ -25,17 +27,18 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
       if (user != null) {
         String? userName;
         String email = user.email!;
-        
+
         // Check staffs collection first
         QuerySnapshot staffDocs = await FirebaseFirestore.instance
             .collection('staffs')
             .where('email', isEqualTo: email)
             .get();
-            
+
         if (staffDocs.docs.isNotEmpty) {
           // Access the name field and convert it to string if it's a list
           var nameField = staffDocs.docs.first.get('name');
-          userName = nameField is List ? nameField.join(' ') : nameField.toString();
+          userName =
+              nameField is List ? nameField.join(' ') : nameField.toString();
         }
 
         if (userName == null) {
@@ -44,10 +47,11 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               .collection('teaching_staff')
               .where('email', isEqualTo: email)
               .get();
-              
+
           if (teacherDocs.docs.isNotEmpty) {
             var nameField = teacherDocs.docs.first.get('name');
-            userName = nameField is List ? nameField.join(' ') : nameField.toString();
+            userName =
+                nameField is List ? nameField.join(' ') : nameField.toString();
           }
         }
 
@@ -58,17 +62,19 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
             'author': userName,
             'email': email,
           });
-          
+
           _controller.clear();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Announcement posted successfully!')),
+              const SnackBar(
+                  content: Text('Announcement posted successfully!')),
             );
             Navigator.pop(context, true);
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Only staff members can post announcements')),
+            const SnackBar(
+                content: Text('Only staff members can post announcements')),
           );
         }
       }
@@ -83,8 +89,18 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Post Announcement'),
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
+        child: DecoratedBox(
+          decoration: const BoxDecoration(boxShadow: kShadow),
+          child: MyAppBar(
+            title: 'Services',
+            onpressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

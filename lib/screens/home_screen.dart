@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .collection('announcements')
           .doc(docId)
           .delete();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Announcement deleted successfully')),
@@ -78,37 +78,46 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Image.asset(
-            'assets/images/paragraph.png',
-            width: 30.0, // Set desired width
-            height: 30.0, // Set desired height
-            fit: BoxFit.contain, // Ensure the image fits without distortion
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: DecoratedBox(
+          decoration: const BoxDecoration(boxShadow: kShadow),
+          child: AppBar(
+            surfaceTintColor: Colors.white,
+            backgroundColor: Colors.white,
+            leading: IconButton(
+              icon: Image.asset(
+                'assets/images/paragraph.png',
+                width: 30.0, // Set desired width
+                height: 30.0, // Set desired height
+                fit: BoxFit.contain, // Ensure the image fits without distortion
+              ),
+              onPressed: () {
+                // Define the action for when the icon is tapped
+              },
+            ),
+            title: Row(
+              children: [
+                const Spacer(), // This pushes the content to the center from the start
+                Text(
+                  userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 27),
+                ),
+                const SizedBox(
+                    width:
+                        8), // Adds a small space between the Text and CircleAvatar
+                const CircleAvatar(
+                  radius: 22,
+                  backgroundImage:
+                      AssetImage('assets/images/1704502172296.jfif'),
+                ),
+                const Spacer(
+                  flex: 2,
+                ), // This pushes the content to the center from the end
+              ],
+            ),
           ),
-          onPressed: () {
-            // Define the action for when the icon is tapped
-          },
-        ),
-        title: Row(
-          children: [
-            const Spacer(), // This pushes the content to the center from the start
-            Text(
-              userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
-            ),
-            const SizedBox(
-                width:
-                    8), // Adds a small space between the Text and CircleAvatar
-            const CircleAvatar(
-              radius: 22,
-              backgroundImage: AssetImage('assets/images/1704502172296.jfif'),
-            ),
-            const Spacer(
-              flex: 2,
-            ), // This pushes the content to the center from the end
-          ],
         ),
       ),
       body: ListView(
@@ -170,32 +179,37 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               const CircleAvatar(
                                 radius: 28,
-                                backgroundImage:
-                                    AssetImage('assets/images/dr-sheshtawey.jpg'),
+                                backgroundImage: AssetImage(
+                                    'assets/images/dr-sheshtawey.jpg'),
                               ),
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.all(14.0),
                                   child: Text(
                                     data['author'] ?? '',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
                               if (currentUserEmail == data['email'])
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
                                   onPressed: () {
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: const Text('Delete Announcement'),
-                                          content: const Text('Are you sure you want to delete this announcement?'),
+                                          title:
+                                              const Text('Delete Announcement'),
+                                          content: const Text(
+                                              'Are you sure you want to delete this announcement?'),
                                           actions: [
                                             TextButton(
                                               child: const Text('Cancel'),
-                                              onPressed: () => Navigator.of(context).pop(),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
                                             ),
                                             TextButton(
                                               child: const Text('Delete'),
