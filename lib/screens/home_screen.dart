@@ -208,12 +208,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                               'Are you sure you want to delete this announcement?'),
                                           actions: [
                                             TextButton(
-                                              child: const Text('Cancel'),
+                                              child: const Text('Cancel',
+                                                  style: TextStyle(
+                                                      color: Colors.black)),
                                               onPressed: () =>
                                                   Navigator.of(context).pop(),
                                             ),
                                             TextButton(
-                                              child: const Text('Delete'),
+                                              child: const Text('Delete',
+                                                  style: TextStyle(
+                                                      color: Colors.red)),
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                                 deleteAnnouncement(doc.id);
