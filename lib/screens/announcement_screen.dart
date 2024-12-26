@@ -67,7 +67,9 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                  content: Text('Announcement posted successfully!')),
+                backgroundColor: Colors.green,
+                content: Text('Announcement posted successfully!'),
+              ),
             );
             Navigator.pop(context, true);
           }
@@ -81,7 +83,10 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     } catch (e) {
       print('Error posting announcement: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error posting announcement: $e')),
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Error posting announcement: $e'),
+        ),
       );
     }
   }
@@ -96,31 +101,45 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           decoration: const BoxDecoration(boxShadow: kShadow),
           child: MyAppBar(
             title: 'Services',
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: postAnnouncement,
+              ),
+            ],
             onpressed: () {
               Navigator.pop(context);
             },
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'Announcement',
-                border: OutlineInputBorder(),
+      body: Column(
+        children: [
+          // The main text input area
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: TextField(
+                  controller: _controller,
+                  maxLines: null, // Allows the TextField to grow vertically
+                  expands:
+                      true, // Makes the TextField take up all available space
+                  keyboardType: TextInputType.multiline,
+                  decoration: const InputDecoration(
+                    hintText: 'Write your announcement here...',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16.0),
+                  ),
+                ),
               ),
-              maxLines: 5,
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: postAnnouncement,
-              child: const Text('Post'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

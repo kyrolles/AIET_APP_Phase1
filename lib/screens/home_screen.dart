@@ -201,6 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
+                                          backgroundColor: Colors.white,
                                           title:
                                               const Text('Delete Announcement'),
                                           content: const Text(
@@ -227,12 +228,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        Text(
-                          data['text'] ?? '',
-                          style: const TextStyle(
-                            fontSize: 17,
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            data['text'] ?? '',
+                            style: const TextStyle(
+                              fontSize: 17,
+                            ),
+                            textAlign: TextAlign.left,
                           ),
                         ),
+                        const SizedBox(height: 8),
                         Container(
                           alignment: Alignment.centerLeft,
                           child: Text(
