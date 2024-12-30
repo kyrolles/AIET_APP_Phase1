@@ -154,7 +154,7 @@ class QrcodeScreen extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                        data: '$name',
+                        data: '$name|$studentId',
                         version: QrVersions.auto,
                         size: 200.0,
                         backgroundColor: Colors.white,
