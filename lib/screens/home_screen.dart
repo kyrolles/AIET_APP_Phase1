@@ -14,7 +14,8 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   String userName = '';
   String? currentUserEmail;
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
@@ -34,7 +35,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     // Initialize the animation controller
     _blurController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250), // Adjust the duration as needed
+      duration:
+          const Duration(milliseconds: 250), // Adjust the duration as needed
     );
 
     // Define the blur animation
@@ -108,9 +110,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       for (var change in snapshot.docChanges) {
         if (change.type == DocumentChangeType.added) {
           _announcements.insert(0, change.doc);
-          _listKey.currentState?.insertItem(0, duration: const Duration(milliseconds: 300));
+          _listKey.currentState
+              ?.insertItem(0, duration: const Duration(milliseconds: 300));
         } else if (change.type == DocumentChangeType.removed) {
-          int index = _announcements.indexWhere((doc) => doc.id == change.doc.id);
+          int index =
+              _announcements.indexWhere((doc) => doc.id == change.doc.id);
           if (index != -1) {
             _announcements.removeAt(index);
             _listKey.currentState?.removeItem(
@@ -140,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       builder: (BuildContext context) {
         return Dialog(
           insetPadding: EdgeInsets.zero, // Remove default padding
-          backgroundColor: Colors.transparent, // Make the dialog background transparent
+          backgroundColor:
+              Colors.transparent, // Make the dialog background transparent
           child: AnimatedBuilder(
             animation: _blurAnimation,
             builder: (context, child) {
@@ -153,28 +158,31 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       sigmaY: _blurAnimation.value, // Animated blur intensity
                     ),
                     child: Container(
-                      color: Colors.black.withOpacity(0.5), // Semi-transparent black overlay
+                      color: Colors.black
+                          .withOpacity(0.5), // Semi-transparent black overlay
                     ),
                   ),
                   // Full-screen image
                   GestureDetector(
                     onTap: () {
                       _blurController.reverse().then((_) {
-                        Navigator.of(context).pop(); // Close the dialog after reversing the animation
+                        Navigator.of(context)
+                            .pop(); // Close the dialog after reversing the animation
                       });
                     },
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       child: InteractiveViewer(
                         panEnabled: true, // Allow panning
-                        boundaryMargin: EdgeInsets.all(0), // No margin
+                        boundaryMargin: const EdgeInsets.all(0), // No margin
                         minScale: 1.0, // Minimum scale
                         maxScale: 3.0, // Maximum scale for zooming
                         child: Center(
                           child: Image.memory(
                             base64Decode(imageBase64),
-                            fit: BoxFit.contain, // Ensure the image fits within the screen
+                            fit: BoxFit
+                                .contain, // Ensure the image fits within the screen
                           ),
                         ),
                       ),
@@ -212,7 +220,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               children: [
                 const CircleAvatar(
                   radius: 28,
-                  backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
+                  backgroundImage:
+                      AssetImage('assets/images/dr-sheshtawey.jpg'),
                 ),
                 Expanded(
                   child: Padding(
@@ -233,14 +242,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           return AlertDialog(
                             backgroundColor: Colors.white,
                             title: const Text('Delete Announcement'),
-                            content: const Text('Are you sure you want to delete this announcement?'),
+                            content: const Text(
+                                'Are you sure you want to delete this announcement?'),
                             actions: [
                               TextButton(
-                                child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                                child: const Text('Cancel',
+                                    style: TextStyle(color: Colors.black)),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                               TextButton(
-                                child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                child: const Text('Delete',
+                                    style: TextStyle(color: Colors.red)),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   deleteAnnouncement(doc.id);
@@ -259,25 +271,31 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Align(
-                alignment: _isArabic(title) ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: _isArabic(title)
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
                 child: Text(
                   title,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
-                  textDirection: _isArabic(title) ? TextDirection.rtl : TextDirection.ltr,
+                  textDirection:
+                      _isArabic(title) ? TextDirection.rtl : TextDirection.ltr,
                 ),
               ),
             ),
           Align(
-            alignment: _isArabic(text ?? '') ? Alignment.centerRight : Alignment.centerLeft,
+            alignment: _isArabic(text ?? '')
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
             child: Text(
               text ?? '',
               style: const TextStyle(
                 fontSize: 17,
               ),
-              textDirection: _isArabic(text ?? '') ? TextDirection.rtl : TextDirection.ltr,
+              textDirection:
+                  _isArabic(text ?? '') ? TextDirection.rtl : TextDirection.ltr,
             ),
           ),
           if (imageBase64 != null)
@@ -285,7 +303,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               padding: const EdgeInsets.only(top: 8.0),
               child: GestureDetector(
                 onTap: () {
-                  _showFullScreenImage(context, imageBase64); // Show full screen image
+                  _showFullScreenImage(
+                      context, imageBase64); // Show full screen image
                 },
                 child: Image.memory(
                   base64Decode(imageBase64), // Decode the Base64 string
@@ -318,40 +337,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: AppBar(
-            surfaceTintColor: Colors.white,
-            backgroundColor: Colors.white,
-            leading: IconButton(
-              icon: Image.asset(
-                'assets/images/paragraph.png',
-                width: 30.0,
-                height: 30.0,
-                fit: BoxFit.contain,
-              ),
-              onPressed: () {
-                // Define the action for when the icon is tapped
-              },
-            ),
-            title: Row(
-              children: [
-                const Spacer(),
-                Text(
-                  userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
-                ),
-                const SizedBox(width: 8),
-                const CircleAvatar(
-                  radius: 22,
-                  backgroundImage: AssetImage('assets/images/1704502172296.jfif'),
-                ),
-                const Spacer(flex: 2),
-              ],
-            ),
+      appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Image.asset(
+            'assets/images/paragraph.png',
+            width: 30.0,
+            height: 30.0,
+            fit: BoxFit.contain,
           ),
+          onPressed: () {
+            // Define the action for when the icon is tapped
+          },
+        ),
+        title: Row(
+          children: [
+            const Spacer(),
+            Text(
+              userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
+            ),
+            const SizedBox(width: 8),
+            const CircleAvatar(
+              radius: 22,
+              backgroundImage: AssetImage('assets/images/1704502172296.jfif'),
+            ),
+            const Spacer(flex: 2),
+          ],
         ),
       ),
       body: Column(
@@ -394,52 +407,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                 );
               },
-            ),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              boxShadow: kShadow,
-            ),
-            margin: const EdgeInsets.all(12.0),
-            padding: const EdgeInsets.all(22.0),
-            child: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 12.0),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(14.0),
-                        child: Text(
-                          'DR.Reda El-Sheshtawy',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Text(
-                  'أهلاً بكم في العام الدراسي الجديد! أتمنى لكم سنة مليئة بالنجاح والتقدم. استعدوا للغوص في عالم المعرفة واكتشاف إمكانياتكم. بالتوفيق!',
-                  style: TextStyle(
-                    fontSize: 17,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: const Text(
-                    '5:25 PM · Sep 1, 2024',
-                    style: TextStyle(
-                      color: Color(0XFF657786),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
