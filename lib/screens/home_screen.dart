@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/components/activities_list_view.dart';
 import 'package:graduation_project/components/text_link.dart';
 import 'package:graduation_project/constants.dart';
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,12 +16,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String userName = '';
   String? currentUserEmail;
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  List<DocumentSnapshot> _announcements = [];
 
   @override
   void initState() {
     super.initState();
     fetchUserName();
     currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+    _setupAnnouncementsListener();
   }
 
   Future<void> fetchUserName() async {
@@ -75,6 +79,152 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _setupAnnouncementsListener() {
+    FirebaseFirestore.instance
+        .collection('announcements')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      for (var change in snapshot.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          _announcements.insert(0, change.doc);
+          _listKey.currentState?.insertItem(0, duration: const Duration(milliseconds: 300));
+        } else if (change.type == DocumentChangeType.removed) {
+          int index = _announcements.indexWhere((doc) => doc.id == change.doc.id);
+          if (index != -1) {
+            _announcements.removeAt(index);
+            _listKey.currentState?.removeItem(
+              index,
+              (context, animation) => _buildRemovedItem(change.doc, animation),
+              duration: const Duration(milliseconds: 300),
+            );
+          }
+        }
+      }
+    });
+  }
+
+  Widget _buildRemovedItem(DocumentSnapshot doc, Animation<double> animation) {
+    return SizeTransition(
+      sizeFactor: animation,
+      child: _buildAnnouncementItem(doc),
+    );
+  }
+
+  Widget _buildAnnouncementItem(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    final timestamp = data['timestamp'] as String?;
+    final imageBase64 = data['imageBase64'] as String?;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        boxShadow: kShadow,
+      ),
+      margin: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(22.0),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 28,
+                  backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Text(
+                      data['author'] ?? '',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                if (currentUserEmail == data['email'])
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: const Text('Delete Announcement'),
+                            content: const Text('Are you sure you want to delete this announcement?'),
+                            actions: [
+                              TextButton(
+                                child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              TextButton(
+                                child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  deleteAnnouncement(doc.id);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+              ],
+            ),
+          ),
+          if (data['title'] != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  data['title'],
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          Align(
+            alignment: RegExp(r'[a-zA-Z]').hasMatch(data['text'])
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            child: Text(
+              data['text'] ?? '',
+              style: const TextStyle(
+                fontSize: 17,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+          if (imageBase64 != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Image.memory(
+                base64Decode(imageBase64), // Decode the Base64 string
+                height: 150,
+                fit: BoxFit.cover,
+              ),
+            ),
+          const SizedBox(height: 8),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              timestamp ?? 'No date',
+              style: const TextStyle(
+                color: Color(0XFF657786),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,9 +238,9 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: IconButton(
               icon: Image.asset(
                 'assets/images/paragraph.png',
-                width: 30.0, // Set desired width
-                height: 30.0, // Set desired height
-                fit: BoxFit.contain, // Ensure the image fits without distortion
+                width: 30.0,
+                height: 30.0,
+                fit: BoxFit.contain,
               ),
               onPressed: () {
                 // Define the action for when the icon is tapped
@@ -98,29 +248,23 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             title: Row(
               children: [
-                const Spacer(), // This pushes the content to the center from the start
+                const Spacer(),
                 Text(
                   userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 27),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
                 ),
-                const SizedBox(
-                    width:
-                        8), // Adds a small space between the Text and CircleAvatar
+                const SizedBox(width: 8),
                 const CircleAvatar(
                   radius: 22,
-                  backgroundImage:
-                      AssetImage('assets/images/1704502172296.jfif'),
+                  backgroundImage: AssetImage('assets/images/1704502172296.jfif'),
                 ),
-                const Spacer(
-                  flex: 2,
-                ), // This pushes the content to the center from the end
+                const Spacer(flex: 2),
               ],
             ),
           ),
         ),
       ),
-      body: ListView(
+      body: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(20.0),
@@ -141,125 +285,26 @@ class _HomeScreenState extends State<HomeScreen> {
             text: 'Announcements',
             textLink: 'View All',
           ),
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('announcements')
-                .orderBy('timestamp', descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              return Column(
-                children: snapshot.data!.docs.map((doc) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  final timestamp = data['timestamp'] as Timestamp?;
-                  final formattedDate = timestamp != null
-                      ? '${timestamp.toDate().hour}:${timestamp.toDate().minute} · ${timestamp.toDate().day}/${timestamp.toDate().month}/${timestamp.toDate().year}'
-                      : 'No date';
-
-                  return Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      boxShadow: kShadow,
-                    ),
-                    margin: const EdgeInsets.all(12.0),
-                    padding: const EdgeInsets.all(22.0),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: Row(
-                            children: [
-                              const CircleAvatar(
-                                radius: 28,
-                                backgroundImage: AssetImage(
-                                    'assets/images/dr-sheshtawey.jpg'),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14.0),
-                                  child: Text(
-                                    data['author'] ?? '',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              if (currentUserEmail == data['email'])
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          backgroundColor: Colors.white,
-                                          title:
-                                              const Text('Delete Announcement'),
-                                          content: const Text(
-                                              'Are you sure you want to delete this announcement?'),
-                                          actions: [
-                                            TextButton(
-                                              child: const Text('Cancel',
-                                                  style: TextStyle(
-                                                      color: Colors.black)),
-                                              onPressed: () =>
-                                                  Navigator.of(context).pop(),
-                                            ),
-                                            TextButton(
-                                              child: const Text('Delete',
-                                                  style: TextStyle(
-                                                      color: Colors.red)),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                deleteAnnouncement(doc.id);
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                            ],
-                          ),
-                        ),
-                        Align(
-                          alignment: RegExp(r'[a-zA-Z]').hasMatch(data['text'])
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          child: Text(
-                            data['text'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 17,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            formattedDate,
-                            style: const TextStyle(
-                              color: Color(0XFF657786),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              );
-            },
+          Expanded(
+            child: AnimatedList(
+              key: _listKey,
+              initialItemCount: _announcements.length,
+              itemBuilder: (context, index, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.5),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOut,
+                    )),
+                    child: _buildAnnouncementItem(_announcements[index]),
+                  ),
+                );
+              },
+            ),
           ),
           Container(
             decoration: const BoxDecoration(
@@ -277,8 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       CircleAvatar(
                         radius: 28,
-                        backgroundImage:
-                            AssetImage('assets/images/dr-sheshtawey.jpg'),
+                        backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
                       ),
                       Padding(
                         padding: EdgeInsets.all(14.0),
@@ -307,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
