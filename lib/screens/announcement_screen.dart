@@ -197,8 +197,17 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: _titleController,
-                decoration: const InputDecoration(
+                textDirection: _isArabic(_titleController.text)
+                    ? TextDirection.rtl
+                    : TextDirection.ltr, // Set text direction based on language
+                onChanged: (value) {
+                  setState(() {}); // Rebuild the widget to update text direction
+                },
+                decoration: InputDecoration(
                   hintText: 'Enter announcement title',
+                  hintTextDirection: _isArabic(_titleController.text)
+                      ? TextDirection.rtl
+                      : TextDirection.ltr, // Set hint text direction
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -209,8 +218,17 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               child: TextField(
                 controller: _descriptionController,
                 maxLines: 5,
-                decoration: const InputDecoration(
+                textDirection: _isArabic(_descriptionController.text)
+                    ? TextDirection.rtl
+                    : TextDirection.ltr, // Set text direction based on language
+                onChanged: (value) {
+                  setState(() {}); // Rebuild the widget to update text direction
+                },
+                decoration: InputDecoration(
                   hintText: 'Write your announcement here...',
+                  hintTextDirection: _isArabic(_descriptionController.text)
+                      ? TextDirection.rtl
+                      : TextDirection.ltr, // Set hint text direction
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -237,5 +255,11 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         ),
       ),
     );
+  }
+
+  // Helper function to check if the text is in Arabic
+  bool _isArabic(String text) {
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]'); // Arabic Unicode range
+    return arabicRegex.hasMatch(text);
   }
 }

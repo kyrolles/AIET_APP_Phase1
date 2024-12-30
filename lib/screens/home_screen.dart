@@ -162,6 +162,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final data = doc.data() as Map<String, dynamic>;
     final timestamp = data['timestamp'] as String?;
     final imageBase64 = data['imageBase64'] as String?;
+    final title = data['title'] as String?;
+    final text = data['text'] as String?;
 
     return Container(
       decoration: const BoxDecoration(
@@ -222,30 +224,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          if (data['title'] != null)
+          if (title != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Align(
-                alignment: Alignment.centerLeft,
+                alignment: _isArabic(title) ? Alignment.centerRight : Alignment.centerLeft,
                 child: Text(
-                  data['title'],
+                  title,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
+                  textDirection: _isArabic(title) ? TextDirection.rtl : TextDirection.ltr,
                 ),
               ),
             ),
           Align(
-            alignment: RegExp(r'[a-zA-Z]').hasMatch(data['text'])
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
+            alignment: _isArabic(text ?? '') ? Alignment.centerRight : Alignment.centerLeft,
             child: Text(
-              data['text'] ?? '',
+              text ?? '',
               style: const TextStyle(
                 fontSize: 17,
               ),
-              textAlign: TextAlign.left,
+              textDirection: _isArabic(text ?? '') ? TextDirection.rtl : TextDirection.ltr,
             ),
           ),
           if (imageBase64 != null)
@@ -275,6 +276,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  // Helper function to check if the text is in Arabic
+  bool _isArabic(String text) {
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]'); // Arabic Unicode range
+    return arabicRegex.hasMatch(text);
   }
 
   @override
