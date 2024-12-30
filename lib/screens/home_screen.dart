@@ -14,11 +14,15 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   String userName = '';
   String? currentUserEmail;
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<DocumentSnapshot> _announcements = [];
+
+  // Animation controller for blur effect
+  late AnimationController _blurController;
+  late Animation<double> _blurAnimation;
 
   @override
   void initState() {
@@ -26,6 +30,21 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchUserName();
     currentUserEmail = FirebaseAuth.instance.currentUser?.email;
     _setupAnnouncementsListener();
+
+    // Initialize the animation controller
+    _blurController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250), // Adjust the duration as needed
+    );
+
+    // Define the blur animation
+    _blurAnimation = Tween<double>(begin: 0, end: 10).animate(_blurController);
+  }
+
+  @override
+  void dispose() {
+    _blurController.dispose(); // Dispose the animation controller
+    super.dispose();
   }
 
   Future<void> fetchUserName() async {
@@ -112,46 +131,58 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Function to show the image in full screen with a blurred background
+  // Function to show the image in full screen with a gradually blurred background
   void _showFullScreenImage(BuildContext context, String imageBase64) {
+    _blurController.forward(); // Start the blur animation
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
           insetPadding: EdgeInsets.zero, // Remove default padding
           backgroundColor: Colors.transparent, // Make the dialog background transparent
-          child: Stack(
-            children: [
-              // Blurred background
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust blur intensity
-                child: Container(
-                  color: Colors.black.withOpacity(0.5), // Semi-transparent black overlay
-                ),
-              ),
-              // Full-screen image
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop(); // Close the dialog when tapped
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: InteractiveViewer(
-                    panEnabled: true, // Allow panning
-                    boundaryMargin: EdgeInsets.all(0), // No margin
-                    minScale: 1.0, // Minimum scale
-                    maxScale: 3.0, // Maximum scale for zooming
-                    child: Center(
-                      child: Image.memory(
-                        base64Decode(imageBase64),
-                        fit: BoxFit.contain, // Ensure the image fits within the screen
+          child: AnimatedBuilder(
+            animation: _blurAnimation,
+            builder: (context, child) {
+              return Stack(
+                children: [
+                  // Blurred background
+                  BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: _blurAnimation.value, // Animated blur intensity
+                      sigmaY: _blurAnimation.value, // Animated blur intensity
+                    ),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.5), // Semi-transparent black overlay
+                    ),
+                  ),
+                  // Full-screen image
+                  GestureDetector(
+                    onTap: () {
+                      _blurController.reverse().then((_) {
+                        Navigator.of(context).pop(); // Close the dialog after reversing the animation
+                      });
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: InteractiveViewer(
+                        panEnabled: true, // Allow panning
+                        boundaryMargin: EdgeInsets.all(0), // No margin
+                        minScale: 1.0, // Minimum scale
+                        maxScale: 3.0, // Maximum scale for zooming
+                        child: Center(
+                          child: Image.memory(
+                            base64Decode(imageBase64),
+                            fit: BoxFit.contain, // Ensure the image fits within the screen
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
         );
       },
