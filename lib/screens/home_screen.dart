@@ -5,6 +5,7 @@ import 'package:graduation_project/components/activities_list_view.dart';
 import 'package:graduation_project/components/text_link.dart';
 import 'package:graduation_project/constants.dart';
 import 'dart:convert';
+import 'dart:ui'; // Required for ImageFilter.blur
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -111,6 +112,52 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Function to show the image in full screen with a blurred background
+  void _showFullScreenImage(BuildContext context, String imageBase64) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.zero, // Remove default padding
+          backgroundColor: Colors.transparent, // Make the dialog background transparent
+          child: Stack(
+            children: [
+              // Blurred background
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust blur intensity
+                child: Container(
+                  color: Colors.black.withOpacity(0.5), // Semi-transparent black overlay
+                ),
+              ),
+              // Full-screen image
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop(); // Close the dialog when tapped
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: InteractiveViewer(
+                    panEnabled: true, // Allow panning
+                    boundaryMargin: EdgeInsets.all(0), // No margin
+                    minScale: 1.0, // Minimum scale
+                    maxScale: 3.0, // Maximum scale for zooming
+                    child: Center(
+                      child: Image.memory(
+                        base64Decode(imageBase64),
+                        fit: BoxFit.contain, // Ensure the image fits within the screen
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildAnnouncementItem(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final timestamp = data['timestamp'] as String?;
@@ -204,10 +251,15 @@ class _HomeScreenState extends State<HomeScreen> {
           if (imageBase64 != null)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Image.memory(
-                base64Decode(imageBase64), // Decode the Base64 string
-                height: 150,
-                fit: BoxFit.cover,
+              child: GestureDetector(
+                onTap: () {
+                  _showFullScreenImage(context, imageBase64); // Show full screen image
+                },
+                child: Image.memory(
+                  base64Decode(imageBase64), // Decode the Base64 string
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           const SizedBox(height: 8),
