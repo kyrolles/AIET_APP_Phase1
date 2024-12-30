@@ -238,7 +238,10 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: _pickImage,
-                child: const Text('Upload Image'),
+                child: const Text(
+                  'Upload Image',
+                  style: TextStyle(color: Colors.blue),
+                ),
               ),
             ),
             // Display the selected image
