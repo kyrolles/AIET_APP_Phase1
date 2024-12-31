@@ -5,7 +5,9 @@ import 'package:graduation_project/components/activities_list_view.dart';
 import 'package:graduation_project/components/text_link.dart';
 import 'package:graduation_project/constants.dart';
 import 'dart:convert';
-import 'dart:ui'; // Required for ImageFilter.blur
+import 'dart:ui'; // For ImageFilter
+import 'package:flutter_pdfview/flutter_pdfview.dart'; // For PDF viewing
+import 'dart:io'; // For File handling
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,8 +37,7 @@ class _HomeScreenState extends State<HomeScreen>
     // Initialize the animation controller
     _blurController = AnimationController(
       vsync: this,
-      duration:
-          const Duration(milliseconds: 250), // Adjust the duration as needed
+      duration: const Duration(milliseconds: 250),
     );
 
     // Define the blur animation
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    _blurController.dispose(); // Dispose the animation controller
+    _blurController.dispose();
     super.dispose();
   }
 
@@ -75,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (querySnapshot.docs.isNotEmpty) {
       DocumentSnapshot userDoc = querySnapshot.docs.first;
       setState(() {
-        userName = userDoc['name'][0]; // Get the first character of the name
+        userName = userDoc['name'][0];
       });
     }
   }
@@ -113,8 +114,7 @@ class _HomeScreenState extends State<HomeScreen>
           _listKey.currentState
               ?.insertItem(0, duration: const Duration(milliseconds: 300));
         } else if (change.type == DocumentChangeType.removed) {
-          int index =
-              _announcements.indexWhere((doc) => doc.id == change.doc.id);
+          int index = _announcements.indexWhere((doc) => doc.id == change.doc.id);
           if (index != -1) {
             _announcements.removeAt(index);
             _listKey.currentState?.removeItem(
@@ -137,52 +137,46 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Function to show the image in full screen with a gradually blurred background
   void _showFullScreenImage(BuildContext context, String imageBase64) {
-    _blurController.forward(); // Start the blur animation
+    _blurController.forward();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          insetPadding: EdgeInsets.zero, // Remove default padding
-          backgroundColor:
-              Colors.transparent, // Make the dialog background transparent
+          insetPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
           child: AnimatedBuilder(
             animation: _blurAnimation,
             builder: (context, child) {
               return Stack(
                 children: [
-                  // Blurred background
                   BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: _blurAnimation.value, // Animated blur intensity
-                      sigmaY: _blurAnimation.value, // Animated blur intensity
+                      sigmaX: _blurAnimation.value,
+                      sigmaY: _blurAnimation.value,
                     ),
                     child: Container(
-                      color: Colors.black
-                          .withOpacity(0.5), // Semi-transparent black overlay
+                      color: Colors.black.withOpacity(0.5),
                     ),
                   ),
-                  // Full-screen image
                   GestureDetector(
                     onTap: () {
                       _blurController.reverse().then((_) {
-                        Navigator.of(context)
-                            .pop(); // Close the dialog after reversing the animation
+                        Navigator.of(context).pop();
                       });
                     },
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       child: InteractiveViewer(
-                        panEnabled: true, // Allow panning
-                        boundaryMargin: const EdgeInsets.all(0), // No margin
-                        minScale: 1.0, // Minimum scale
-                        maxScale: 3.0, // Maximum scale for zooming
+                        panEnabled: true,
+                        boundaryMargin: const EdgeInsets.all(0),
+                        minScale: 1.0,
+                        maxScale: 3.0,
                         child: Center(
                           child: Image.memory(
                             base64Decode(imageBase64),
-                            fit: BoxFit
-                                .contain, // Ensure the image fits within the screen
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
@@ -197,10 +191,73 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  // Function to show the PDF in full screen
+  void _showFullScreenPDF(BuildContext context, String pdfBase64) {
+    final pdfBytes = base64Decode(pdfBase64);
+    final tempDir = Directory.systemTemp;
+    final tempFile = File('${tempDir.path}/temp.pdf');
+    tempFile.writeAsBytesSync(pdfBytes);
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('PDF Viewer'),
+          ),
+          body: PDFView(
+            filePath: tempFile.path,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget to display the PDF file name and logo
+Widget _buildPDFWidget(String pdfBase64, String fileName) {
+  return GestureDetector(
+    onTap: () {
+      _showFullScreenPDF(context, pdfBase64);
+    },
+    child: Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Row(
+        children: [
+          // PDF logo in the left corner
+          Image.asset(
+            'assets/images/4726010.png', // Add a PDF logo asset
+            width: 24,
+            height: 24,
+          ),
+          const SizedBox(width: 8),
+          // File name centered in the remaining space
+          Expanded(
+            child: Center(
+              child: Text(
+                fileName,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
   Widget _buildAnnouncementItem(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final timestamp = data['timestamp'] as String?;
     final imageBase64 = data['imageBase64'] as String?;
+    final pdfBase64 = data['pdfBase64'] as String?;
+    final pdfFileName = data['pdfFileName'] as String?; // Retrieve the PDF file name
     final title = data['title'] as String?;
     final text = data['text'] as String?;
 
@@ -220,8 +277,7 @@ class _HomeScreenState extends State<HomeScreen>
               children: [
                 const CircleAvatar(
                   radius: 28,
-                  backgroundImage:
-                      AssetImage('assets/images/dr-sheshtawey.jpg'),
+                  backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
                 ),
                 Expanded(
                   child: Padding(
@@ -303,14 +359,21 @@ class _HomeScreenState extends State<HomeScreen>
               padding: const EdgeInsets.only(top: 8.0),
               child: GestureDetector(
                 onTap: () {
-                  _showFullScreenImage(
-                      context, imageBase64); // Show full screen image
+                  _showFullScreenImage(context, imageBase64);
                 },
                 child: Image.memory(
-                  base64Decode(imageBase64), // Decode the Base64 string
+                  base64Decode(imageBase64),
                   height: 150,
                   fit: BoxFit.cover,
                 ),
+              ),
+            ),
+          if (pdfBase64 != null && pdfFileName != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: _buildPDFWidget(
+                pdfBase64,
+                pdfFileName, // Pass the actual PDF file name
               ),
             ),
           const SizedBox(height: 8),
@@ -330,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Helper function to check if the text is in Arabic
   bool _isArabic(String text) {
-    final arabicRegex = RegExp(r'[\u0600-\u06FF]'); // Arabic Unicode range
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]');
     return arabicRegex.hasMatch(text);
   }
 
