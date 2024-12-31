@@ -4,10 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/components/activities_list_view.dart';
 import 'package:graduation_project/components/text_link.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:io';
+import 'dart:ui';
 import 'dart:convert';
-import 'dart:ui'; // For ImageFilter
-import 'package:flutter_pdfview/flutter_pdfview.dart'; // For PDF viewing
-import 'dart:io'; // For File handling
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:graduation_project/screens/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,12 +18,12 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   String userName = '';
   String? currentUserEmail;
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<DocumentSnapshot> _announcements = [];
+  final storage = FlutterSecureStorage();
 
   // Animation controller for blur effect
   late AnimationController _blurController;
@@ -135,7 +137,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // Function to show the image in full screen with a gradually blurred background
   void _showFullScreenImage(BuildContext context, String imageBase64) {
     _blurController.forward();
 
@@ -191,7 +192,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // Function to show the PDF in full screen
   void _showFullScreenPDF(BuildContext context, String pdfBase64) {
     final pdfBytes = base64Decode(pdfBase64);
     final tempDir = Directory.systemTemp;
@@ -212,52 +212,49 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // Widget to display the PDF file name and logo
-Widget _buildPDFWidget(String pdfBase64, String fileName) {
-  return GestureDetector(
-    onTap: () {
-      _showFullScreenPDF(context, pdfBase64);
-    },
-    child: Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Row(
-        children: [
-          // PDF logo in the left corner
-          Image.asset(
-            'assets/images/4726010.png', // Add a PDF logo asset
-            width: 24,
-            height: 24,
-          ),
-          const SizedBox(width: 8),
-          // File name centered in the remaining space
-          Expanded(
-            child: Center(
-              child: Text(
-                fileName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
+  Widget _buildPDFWidget(String pdfBase64, String fileName) {
+    return GestureDetector(
+      onTap: () {
+        _showFullScreenPDF(context, pdfBase64);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Row(
+          children: [
+            Image.asset(
+              'assets/images/4726010.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Center(
+                child: Text(
+                  fileName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildAnnouncementItem(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final timestamp = data['timestamp'] as String?;
     final imageBase64 = data['imageBase64'] as String?;
     final pdfBase64 = data['pdfBase64'] as String?;
-    final pdfFileName = data['pdfFileName'] as String?; // Retrieve the PDF file name
+    final pdfFileName = data['pdfFileName'] as String?;
     final title = data['title'] as String?;
     final text = data['text'] as String?;
 
@@ -373,7 +370,7 @@ Widget _buildPDFWidget(String pdfBase64, String fileName) {
               padding: const EdgeInsets.only(top: 8.0),
               child: _buildPDFWidget(
                 pdfBase64,
-                pdfFileName, // Pass the actual PDF file name
+                pdfFileName,
               ),
             ),
           const SizedBox(height: 8),
@@ -391,10 +388,23 @@ Widget _buildPDFWidget(String pdfBase64, String fileName) {
     );
   }
 
-  // Helper function to check if the text is in Arabic
   bool _isArabic(String text) {
     final arabicRegex = RegExp(r'[\u0600-\u06FF]');
     return arabicRegex.hasMatch(text);
+  }
+
+  Future<void> _logout() async {
+    // Clear the saved token
+    await storage.delete(key: 'token');
+
+    // Sign out from Firebase
+    await FirebaseAuth.instance.signOut();
+
+    // Navigate back to the login screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
   }
 
   @override
@@ -429,6 +439,12 @@ Widget _buildPDFWidget(String pdfBase64, String fileName) {
             const Spacer(flex: 2),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+          ),
+        ],
       ),
       body: Column(
         children: [
