@@ -43,11 +43,50 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     return arabicRegex.hasMatch(text);
   }
 
+  String _formatTimestamp(DateTime dateTime) {
+    final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
+    final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+    final month = _getMonthName(dateTime.month);
+    return '$hour:${dateTime.minute.toString().padLeft(2, '0')} $period · $month ${dateTime.day}, ${dateTime.year}';
+  }
+
+  String _getMonthName(int month) {
+    switch (month) {
+      case 1:
+        return 'Jan';
+      case 2:
+        return 'Feb';
+      case 3:
+        return 'Mar';
+      case 4:
+        return 'Apr';
+      case 5:
+        return 'May';
+      case 6:
+        return 'Jun';
+      case 7:
+        return 'Jul';
+      case 8:
+        return 'Aug';
+      case 9:
+        return 'Sep';
+      case 10:
+        return 'Oct';
+      case 11:
+        return 'Nov';
+      case 12:
+        return 'Dec';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final doc = widget.doc;
     final data = doc.data() as Map<String, dynamic>;
-    final timestamp = data['timestamp'] as String?;
+    final timestamp = data['timestamp'] as Timestamp?; // Cast to Timestamp
+    final formattedTimestamp = timestamp != null ? _formatTimestamp(timestamp.toDate()) : 'No date'; // Convert to DateTime and format
     final imageBase64 = data['imageBase64'] as String?;
     final pdfBase64 = data['pdfBase64'] as String?;
     final pdfFileName = data['pdfFileName'] as String?;
@@ -70,8 +109,7 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
               children: [
                 const CircleAvatar(
                   radius: 28,
-                  backgroundImage:
-                      AssetImage('assets/images/dr-sheshtawey.jpg'),
+                  backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
                 ),
                 Expanded(
                   child: Padding(
@@ -156,7 +194,7 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              timestamp ?? 'No date',
+              formattedTimestamp, // Use formatted timestamp
               style: const TextStyle(
                 color: Color(0XFF657786),
               ),

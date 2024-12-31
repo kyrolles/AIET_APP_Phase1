@@ -77,29 +77,31 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: homeScreenAppBar(),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            child: TextField(
-              style: const TextStyle(
-                color: Colors.black,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              child: TextField(
+                style: const TextStyle(
+                  color: Colors.black,
+                ),
+                decoration: kTextFeildInputDecoration,
+                onChanged: (value) {},
               ),
-              decoration: kTextFeildInputDecoration,
-              onChanged: (value) {},
             ),
-          ),
-          const TextLink(
-            text: 'Activities',
-            textLink: 'see more',
-          ),
-          const ActivitiesListView(),
-          const TextLink(
-            text: 'Announcements',
-            textLink: 'View All',
-          ),
-          const AnnouncementList(),
-        ],
+            const TextLink(
+              text: 'Activities',
+              textLink: 'see more',
+            ),
+            const ActivitiesListView(),
+            const TextLink(
+              text: 'Announcements',
+              textLink: 'View All',
+            ),
+            const AnnouncementList(), // Correctly integrated AnnouncementList
+          ],
+        ),
       ),
     );
   }
