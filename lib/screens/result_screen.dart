@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/constants.dart';
+import '../constants.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({super.key});
@@ -364,11 +364,11 @@ class _ResultPageState extends State<ResultPage> {
         children: [
           Container(
             padding:
-            const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 20),
+                const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(20)),
+                  const BorderRadius.vertical(bottom: Radius.circular(20)),
               boxShadow: [
                 BoxShadow(
                     color: Colors.black.withOpacity(0.2),
@@ -587,11 +587,14 @@ class _ResultPageState extends State<ResultPage> {
                         color: kLightGrey,
                       ),
                     ),
-                    SizedBox(width: 73), // Adjust this to control the shortening on the right
+                    SizedBox(
+                        width:
+                            73), // Adjust this to control the shortening on the right
                   ],
                 ),
 
-                const SizedBox(height: 5), // Add spacing below the divider if needed
+                const SizedBox(
+                    height: 5), // Add spacing below the divider if needed
 
                 // Scores Row (horizontal layout)
                 Row(
@@ -601,18 +604,21 @@ class _ResultPageState extends State<ResultPage> {
                       Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 5.0),
                             child: Text(
                               "${scores[index]['score'].toStringAsFixed(2)}",
                               style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.width * 0.04, // Scale font size with screen width
+                                fontSize: MediaQuery.of(context).size.width *
+                                    0.04, // Scale font size with screen width
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                           const SizedBox(height: 4),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 5.0),
                             child: Text(
                               scores[index]['label'],
                               style: const TextStyle(
@@ -647,8 +653,10 @@ class _ResultPageState extends State<ResultPage> {
           bottom: 8, // Align to the bottom of the card
           right: 0,
           child: Container(
-            height: MediaQuery.of(context).size.width * 0.18, // Scale height with screen width
-            width: MediaQuery.of(context).size.width * 0.18,  // Scale width with screen width
+            height: MediaQuery.of(context).size.width *
+                0.18, // Scale height with screen width
+            width: MediaQuery.of(context).size.width *
+                0.18, // Scale width with screen width
             decoration: BoxDecoration(
               color: gradeColor,
               borderRadius: const BorderRadius.only(
@@ -659,7 +667,8 @@ class _ResultPageState extends State<ResultPage> {
               child: Text(
                 grade,
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.1, // Scale font size with screen width
+                  fontSize: MediaQuery.of(context).size.width *
+                      0.1, // Scale font size with screen width
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -670,5 +679,4 @@ class _ResultPageState extends State<ResultPage> {
       ],
     );
   }
-
 }

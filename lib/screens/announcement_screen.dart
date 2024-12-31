@@ -5,8 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart'; // For PDF file picking
 import 'dart:io';
 import 'dart:convert';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/constants.dart';
+import '../components/my_app_bar.dart';
+import '../constants.dart';
 
 class AnnouncementScreen extends StatefulWidget {
   const AnnouncementScreen({super.key});

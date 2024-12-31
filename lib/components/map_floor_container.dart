@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/map_lec_container.dart';
-import 'package:graduation_project/constants.dart';
+import 'map_lec_container.dart';
+import '../constants.dart';
 
 class FloorContainer extends StatelessWidget {
   const FloorContainer({super.key, required this.floor});

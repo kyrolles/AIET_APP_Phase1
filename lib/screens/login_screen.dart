@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:graduation_project/screens/home_screen.dart';
+import 'home_screen/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -31,7 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void _performLogin() async {
     if (_validateInputs()) {
       try {
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
@@ -77,7 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 100),
               SvgPicture.asset(
-                _hasError ? 'assets/images/ErrorLogo.svg' : 'assets/images/Logo.svg',
+                _hasError
+                    ? 'assets/images/ErrorLogo.svg'
+                    : 'assets/images/Logo.svg',
               ),
               const SizedBox(height: 40),
               _buildEmailField(),
@@ -103,7 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
         enabledBorder: _inputBorder(color: Colors.black),
         focusedBorder: _inputBorder(color: Colors.blue, width: 2.0),
         prefixIcon: const Icon(Icons.email, color: Colors.blue),
-        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -139,7 +143,8 @@ class _LoginScreenState extends State<LoginScreen> {
             });
           },
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -177,7 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  OutlineInputBorder _inputBorder({Color color = Colors.blue, double width = 1.0}) {
+  OutlineInputBorder _inputBorder(
+      {Color color = Colors.blue, double width = 1.0}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(40),
       borderSide: BorderSide(color: color, width: width),

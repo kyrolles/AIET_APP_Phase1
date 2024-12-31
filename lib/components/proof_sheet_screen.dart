@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/rpd_button.dart';
-import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/it_invoice_screen.dart';
+import 'rpd_button.dart';
+import '../constants.dart';
+import '../screens/it_invoice_screen.dart';
 
 class ProofOfEnrollmentSheetScreen extends StatefulWidget {
   const ProofOfEnrollmentSheetScreen({

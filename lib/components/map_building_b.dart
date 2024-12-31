@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/map_floor_container.dart';
+import 'map_floor_container.dart';
 
 class BuildingB extends StatelessWidget {
   const BuildingB({

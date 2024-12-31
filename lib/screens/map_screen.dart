@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/map_building_b.dart';
-import 'package:graduation_project/components/map_building_a.dart';
-import 'package:graduation_project/components/map_building_selection.dart';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/components/search_bar.dart';
-import 'package:graduation_project/constants.dart';
+import '../components/map_building_b.dart';
+import '../components/map_building_a.dart';
+import '../components/map_building_selection.dart';
+import '../components/my_app_bar.dart';
+import '../components/search_bar.dart';
+import '../constants.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
