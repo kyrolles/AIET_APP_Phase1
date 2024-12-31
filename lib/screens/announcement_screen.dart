@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart'; // For PDF file picking
 import 'dart:io';
 import 'dart:convert';
 import 'package:graduation_project/components/my_app_bar.dart';
@@ -18,6 +19,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   File? _image;
+  File? _pdfFile;
   final ImagePicker _picker = ImagePicker();
 
   // Helper function to format the timestamp
@@ -70,10 +72,24 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     }
   }
 
-  // Function to convert image to Base64
-  Future<String?> _imageToBase64(File? image) async {
-    if (image == null) return null;
-    final bytes = await image.readAsBytes();
+  // Function to pick a PDF file
+  Future<void> _pickPDF() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'], // Allow only PDF files
+    );
+
+    if (result != null) {
+      setState(() {
+        _pdfFile = File(result.files.single.path!);
+      });
+    }
+  }
+
+  // Function to convert file to Base64
+  Future<String?> _fileToBase64(File? file) async {
+    if (file == null) return null;
+    final bytes = await file.readAsBytes();
     return base64Encode(bytes);
   }
 
@@ -123,8 +139,12 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           // Format the timestamp
           String formattedTimestamp = _formatTimestamp(now);
 
-          // Convert the image to Base64
-          String? imageBase64 = await _imageToBase64(_image);
+          // Convert the image and PDF to Base64
+          String? imageBase64 = await _fileToBase64(_image);
+          String? pdfBase64 = await _fileToBase64(_pdfFile);
+
+          // Get the PDF file name
+          String? pdfFileName = _pdfFile?.path.split('/').last;
 
           await FirebaseFirestore.instance.collection('announcements').add({
             'title': _titleController.text.trim(),
@@ -133,12 +153,15 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
             'author': userName,
             'email': email,
             'imageBase64': imageBase64, // Save the Base64 string (can be null)
+            'pdfBase64': pdfBase64, // Save the PDF Base64 string (can be null)
+            'pdfFileName': pdfFileName, // Save the PDF file name (can be null)
           });
 
           _titleController.clear();
           _descriptionController.clear();
           setState(() {
             _image = null;
+            _pdfFile = null;
           });
 
           if (mounted) {
@@ -199,15 +222,15 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                 controller: _titleController,
                 textDirection: _isArabic(_titleController.text)
                     ? TextDirection.rtl
-                    : TextDirection.ltr, // Set text direction based on language
+                    : TextDirection.ltr,
                 onChanged: (value) {
-                  setState(() {}); // Rebuild the widget to update text direction
+                  setState(() {});
                 },
                 decoration: InputDecoration(
                   hintText: 'Enter announcement title',
                   hintTextDirection: _isArabic(_titleController.text)
                       ? TextDirection.rtl
-                      : TextDirection.ltr, // Set hint text direction
+                      : TextDirection.ltr,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -220,15 +243,15 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                 maxLines: 5,
                 textDirection: _isArabic(_descriptionController.text)
                     ? TextDirection.rtl
-                    : TextDirection.ltr, // Set text direction based on language
+                    : TextDirection.ltr,
                 onChanged: (value) {
-                  setState(() {}); // Rebuild the widget to update text direction
+                  setState(() {});
                 },
                 decoration: InputDecoration(
                   hintText: 'Write your announcement here...',
                   hintTextDirection: _isArabic(_descriptionController.text)
                       ? TextDirection.rtl
-                      : TextDirection.ltr, // Set hint text direction
+                      : TextDirection.ltr,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -244,6 +267,17 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                 ),
               ),
             ),
+            // PDF upload button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _pickPDF,
+                child: const Text(
+                  'Upload PDF',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ),
             // Display the selected image
             if (_image != null)
               Padding(
@@ -254,6 +288,15 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                   fit: BoxFit.cover,
                 ),
               ),
+            // Display the selected PDF file name
+            if (_pdfFile != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Selected PDF: ${_pdfFile!.path.split('/').last}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
           ],
         ),
       ),
@@ -262,7 +305,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
   // Helper function to check if the text is in Arabic
   bool _isArabic(String text) {
-    final arabicRegex = RegExp(r'[\u0600-\u06FF]'); // Arabic Unicode range
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]');
     return arabicRegex.hasMatch(text);
   }
 }
