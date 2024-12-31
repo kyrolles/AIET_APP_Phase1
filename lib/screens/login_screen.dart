@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graduation_project/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,20 +15,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final storage = FlutterSecureStorage();
 
-  bool _isPasswordVisible = false; // Toggles password visibility
-  bool _hasError = false; // State to manage error display
+  bool _isPasswordVisible = false;
+  bool _hasError = false;
 
-  // Validates the input fields and updates the error state
   bool _validateInputs() {
     bool isValid = _formKey.currentState?.validate() ?? false;
     setState(() {
-      _hasError = !isValid; // Set error state if validation fails
+      _hasError = !isValid;
     });
     return isValid;
   }
 
-  // Perform login using Firebase Authentication
   void _performLogin() async {
     if (_validateInputs()) {
       try {
@@ -35,13 +35,16 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
-        // Navigate to home screen on successful login
+
+        // Save the user's token securely
+        await storage.write(key: 'token', value: userCredential.user?.uid);
+
+        // Navigate to home screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } on FirebaseAuthException catch (e) {
-        // Handle login errors
         setState(() {
           _hasError = true;
         });
@@ -63,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true, // Adjust layout when keyboard opens
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Form(
@@ -72,22 +75,17 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 100), // Space for the top padding
-              // Display the appropriate SVG based on the error state
+              const SizedBox(height: 100),
               SvgPicture.asset(
-                _hasError
-                    ? 'assets/images/ErrorLogo.svg' // Error logo path
-                    : 'assets/images/Logo.svg', // Normal logo path
-                // height: 300,
-                // width: 300,
+                _hasError ? 'assets/images/ErrorLogo.svg' : 'assets/images/Logo.svg',
               ),
               const SizedBox(height: 40),
-              _buildEmailField(), // Email input field
+              _buildEmailField(),
               const SizedBox(height: 20),
-              _buildPasswordField(), // Password input field
+              _buildPasswordField(),
               const SizedBox(height: 20),
-              _buildLoginButton(), // Login button
-              const SizedBox(height: 100), // Space for keyboard
+              _buildLoginButton(),
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -95,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Builds the email input field with validation
   Widget _buildEmailField() {
     return TextFormField(
       controller: _emailController,
@@ -106,8 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
         enabledBorder: _inputBorder(color: Colors.black),
         focusedBorder: _inputBorder(color: Colors.blue, width: 2.0),
         prefixIcon: const Icon(Icons.email, color: Colors.blue),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -121,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Builds the password input field with visibility toggle
   Widget _buildPasswordField() {
     return TextFormField(
       controller: _passwordController,
@@ -144,8 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
             });
           },
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -159,12 +153,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Builds the login button
   Widget _buildLoginButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _performLogin, // Call the login method
+        onPressed: _performLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF0074CE),
           shape: RoundedRectangleBorder(
@@ -184,9 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Helper method to create input borders
-  OutlineInputBorder _inputBorder(
-      {Color color = Colors.blue, double width = 1.0}) {
+  OutlineInputBorder _inputBorder({Color color = Colors.blue, double width = 1.0}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(40),
       borderSide: BorderSide(color: color, width: width),
