@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/it_invoice_request_contanier.dart';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/components/tuition_container.dart';
-import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/it_archive.dart';
+import '../components/it_invoice_request_contanier.dart';
+import '../components/my_app_bar.dart';
+import '../components/tuition_container.dart';
+import '../constants.dart';
+import 'it_archive.dart';
 
 // Color? statusColor;
 // String status = "No Status";

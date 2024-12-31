@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/activities_container.dart';
-import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/map_screen.dart';
-import 'package:graduation_project/screens/result_screen.dart';
-import 'package:graduation_project/screens/services_screen.dart';
+import 'activities_container.dart';
+import '../constants.dart';
+import '../screens/map_screen.dart';
+import '../screens/result_screen.dart';
+import '../screens/services_screen.dart';
 
 class ActivitiesListView extends StatelessWidget {
   const ActivitiesListView({super.key});

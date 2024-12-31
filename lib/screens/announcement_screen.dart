@@ -5,8 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart'; // For PDF file picking
 import 'dart:io';
 import 'dart:convert';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/constants.dart';
+import '../components/my_app_bar.dart';
+import '../constants.dart';
 
 class AnnouncementScreen extends StatefulWidget {
   const AnnouncementScreen({super.key});
@@ -136,8 +136,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         if (userName != null) {
           // Get the current date and time
           DateTime now = DateTime.now();
-          // Format the timestamp
-          String formattedTimestamp = _formatTimestamp(now);
 
           // Convert the image and PDF to Base64
           String? imageBase64 = await _fileToBase64(_image);
@@ -149,12 +147,12 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           await FirebaseFirestore.instance.collection('announcements').add({
             'title': _titleController.text.trim(),
             'text': _descriptionController.text.trim(),
-            'timestamp': formattedTimestamp,
+            'timestamp': Timestamp.fromDate(now), // Store as Timestamp
             'author': userName,
             'email': email,
-            'imageBase64': imageBase64, // Save the Base64 string (can be null)
-            'pdfBase64': pdfBase64, // Save the PDF Base64 string (can be null)
-            'pdfFileName': pdfFileName, // Save the PDF file name (can be null)
+            'imageBase64': imageBase64,
+            'pdfBase64': pdfBase64,
+            'pdfFileName': pdfFileName,
           });
 
           _titleController.clear();

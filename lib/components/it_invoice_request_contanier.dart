@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/proof_sheet_screen.dart';
-import 'package:graduation_project/constants.dart';
+import 'proof_sheet_screen.dart';
+import '../constants.dart';
 
 class RequestContainer extends StatefulWidget {
   RequestContainer(

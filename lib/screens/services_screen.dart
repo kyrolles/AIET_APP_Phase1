@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/components/service_items.dart';
-import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/invoice_screen.dart';
-import 'package:graduation_project/screens/calculator_screen.dart';
-import 'package:graduation_project/screens/it_invoice_screen.dart';
+import '../components/my_app_bar.dart';
+import '../components/service_items.dart';
+import '../constants.dart';
+import 'invoice_screen.dart';
+import 'calculator_screen.dart';
+import 'it_invoice_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:graduation_project/screens/announcement_screen.dart';
+import 'announcement_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});

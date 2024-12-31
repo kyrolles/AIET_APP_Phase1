@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/constants.dart';
+import '../components/my_app_bar.dart';
+import '../constants.dart';
 
 class GPACalculatorScreen extends StatefulWidget {
   const GPACalculatorScreen({super.key});

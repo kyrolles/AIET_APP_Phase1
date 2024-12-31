@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:graduation_project/constants.dart';
+import '../constants.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -85,7 +85,8 @@ class QrcodeScreen extends StatelessWidget {
                     : "Loading...";
                 final department = userData?['department'] ?? "Loading...";
                 final studentId = userData?['student_ID'] ?? "Loading...";
-                final year = "${userData?['academicYear'] ?? 'Loading...'}"+"th";
+                final year =
+                    "${userData?['academicYear'] ?? 'Loading...'}" + "th";
 
                 return Column(
                   children: [
@@ -95,7 +96,8 @@ class QrcodeScreen extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: 58,
-                        backgroundImage: AssetImage('assets/images/1704502172296.jpg'),
+                        backgroundImage:
+                            AssetImage('assets/images/1704502172296.jpg'),
                       ),
                     ),
                     const SizedBox(height: 50),
@@ -120,7 +122,8 @@ class QrcodeScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(3),
                           child: Text(
                             studentId,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
                           ),
                         ),
                         const SizedBox(width: 5),
@@ -132,7 +135,8 @@ class QrcodeScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(3),
                           child: Text(
                             year,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
                           ),
                         ),
                       ],

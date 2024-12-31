@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/components/proof_of_enrollment.dart';
-import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/tuition_fees_download.dart';
+import '../components/my_app_bar.dart';
+import '../components/proof_of_enrollment.dart';
+import '../constants.dart';
+import 'tuition_fees_download.dart';
 
 class InvoiceScreen extends StatelessWidget {
   const InvoiceScreen({super.key});
