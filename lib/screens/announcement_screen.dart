@@ -104,78 +104,65 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        String? userName;
         String email = user.email!;
-
-        // Check staffs collection first
-        QuerySnapshot staffDocs = await FirebaseFirestore.instance
-            .collection('staffs')
+        
+        // Check user role
+        QuerySnapshot userDocs = await FirebaseFirestore.instance
+            .collection('users')
             .where('email', isEqualTo: email)
             .get();
 
-        if (staffDocs.docs.isNotEmpty) {
-          var nameField = staffDocs.docs.first.get('name');
-          userName =
-              nameField is List ? nameField.join(' ') : nameField.toString();
-        }
+        if (userDocs.docs.isNotEmpty) {
+          String role = userDocs.docs.first['role'];
+          String firstName = userDocs.docs.first['firstName'];
+          String lastName = userDocs.docs.first['lastName'];
+          String userName = '$firstName $lastName';
 
-        if (userName == null) {
-          // If not found in staffs, check teaching_staff
-          QuerySnapshot teacherDocs = await FirebaseFirestore.instance
-              .collection('teaching_staff')
-              .where('email', isEqualTo: email)
-              .get();
+          // Check if user has permission to post
+          bool hasPermission = role == 'Admin' || 
+              ['IT', 'Professor', 'Assistant', 'Secretary', 'Training Unit', 'Student Affair']
+              .contains(role);
 
-          if (teacherDocs.docs.isNotEmpty) {
-            var nameField = teacherDocs.docs.first.get('name');
-            userName =
-                nameField is List ? nameField.join(' ') : nameField.toString();
-          }
-        }
+          if (hasPermission) {
+            // Continue with announcement posting...
+            DateTime now = DateTime.now();
+            String? imageBase64 = await _fileToBase64(_image);
+            String? pdfBase64 = await _fileToBase64(_pdfFile);
+            String? pdfFileName = _pdfFile?.path.split('/').last;
 
-        if (userName != null) {
-          // Get the current date and time
-          DateTime now = DateTime.now();
+            await FirebaseFirestore.instance.collection('announcements').add({
+              'title': _titleController.text.trim(),
+              'text': _descriptionController.text.trim(),
+              'timestamp': Timestamp.fromDate(now),
+              'author': userName,
+              'email': email,
+              'role': role,  // Add role to announcement
+              'imageBase64': imageBase64,
+              'pdfBase64': pdfBase64,
+              'pdfFileName': pdfFileName,
+            });
 
-          // Convert the image and PDF to Base64
-          String? imageBase64 = await _fileToBase64(_image);
-          String? pdfBase64 = await _fileToBase64(_pdfFile);
+            _titleController.clear();
+            _descriptionController.clear();
+            setState(() {
+              _image = null;
+              _pdfFile = null;
+            });
 
-          // Get the PDF file name
-          String? pdfFileName = _pdfFile?.path.split('/').last;
-
-          await FirebaseFirestore.instance.collection('announcements').add({
-            'title': _titleController.text.trim(),
-            'text': _descriptionController.text.trim(),
-            'timestamp': Timestamp.fromDate(now), // Store as Timestamp
-            'author': userName,
-            'email': email,
-            'imageBase64': imageBase64,
-            'pdfBase64': pdfBase64,
-            'pdfFileName': pdfFileName,
-          });
-
-          _titleController.clear();
-          _descriptionController.clear();
-          setState(() {
-            _image = null;
-            _pdfFile = null;
-          });
-
-          if (mounted) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  backgroundColor: Colors.green,
+                  content: Text('Announcement posted successfully!'),
+                ),
+              );
+              Navigator.pop(context, true);
+            }
+          } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                backgroundColor: Colors.green,
-                content: Text('Announcement posted successfully!'),
-              ),
+              const SnackBar(content: Text('You do not have permission to post announcements')),
             );
-            Navigator.pop(context, true);
           }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Only staff members can post announcements')),
-          );
         }
       }
     } catch (e) {

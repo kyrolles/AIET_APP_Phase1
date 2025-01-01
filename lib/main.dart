@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen/home_screen.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'screens/create_user_screen.dart'; // Import the CreateUserScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +47,11 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/createUser': (context) => const CreateUserScreen(), // Add route for CreateUserScreen
+      },
     );
   }
 }

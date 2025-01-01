@@ -33,29 +33,23 @@ class HomeScreenState extends State<HomeScreen> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;
-        await checkCollectionForUser('users', email);
-        if (userName.isEmpty) {
-          await checkCollectionForUser('staffs', email);
-        }
-        if (userName.isEmpty) {
-          await checkCollectionForUser('teaching_staff', email);
+        
+        // Check in the users collection
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          DocumentSnapshot userDoc = querySnapshot.docs.first;
+          setState(() {
+            // Combine first and last name
+            userName = '${userDoc['firstName']} ${userDoc['lastName']}'.trim();
+          });
         }
       }
     } catch (e) {
       print('Error fetching user name: $e');
-    }
-  }
-
-  Future<void> checkCollectionForUser(String collection, String email) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection(collection)
-        .where('email', isEqualTo: email)
-        .get();
-    if (querySnapshot.docs.isNotEmpty) {
-      DocumentSnapshot userDoc = querySnapshot.docs.first;
-      setState(() {
-        userName = userDoc['name'][0];
-      });
     }
   }
 
@@ -125,7 +119,7 @@ class HomeScreenState extends State<HomeScreen> {
         children: [
           const Spacer(),
           Text(
-            userName.isNotEmpty ? 'Hi, $userName!' : 'Hi!',
+            userName.isNotEmpty ? 'Hi, ${userName.split(' ')[0]}!' : 'Hi!',
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
           ),
           const SizedBox(width: 8),

@@ -93,6 +93,21 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     final title = data['title'] as String?;
     final text = data['text'] as String?;
 
+    // Add role check for delete permission
+    Future<bool> checkDeletePermission() async {
+      if (currentUserEmail == null) return false;
+      
+      QuerySnapshot userDocs = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: currentUserEmail)
+          .get();
+          
+      if (userDocs.docs.isEmpty) return false;
+      
+      String userRole = userDocs.docs.first['role'];
+      return userRole == 'Admin' || currentUserEmail == data['email'];
+    }
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -120,38 +135,18 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
                     ),
                   ),
                 ),
-                if (currentUserEmail == data['email'])
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            title: const Text('Delete Announcement'),
-                            content: const Text(
-                                'Are you sure you want to delete this announcement?'),
-                            actions: [
-                              TextButton(
-                                child: const Text('Cancel',
-                                    style: TextStyle(color: Colors.black)),
-                                onPressed: () => Navigator.of(context).pop(),
-                              ),
-                              TextButton(
-                                child: const Text('Delete',
-                                    style: TextStyle(color: Colors.red)),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  deleteAnnouncement(doc.id);
-                                },
-                              ),
-                            ],
-                          );
-                        },
+                FutureBuilder<bool>(
+                  future: checkDeletePermission(),
+                  builder: (context, snapshot) {
+                    if (snapshot.data == true) {
+                      return IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => showDeleteDialog(context, doc.id),
                       );
-                    },
-                  ),
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
               ],
             ),
           ),
@@ -202,6 +197,32 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
           ),
         ],
       ),
+    );
+  }
+
+  void showDeleteDialog(BuildContext context, String docId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Delete Announcement'),
+          content: const Text('Are you sure you want to delete this announcement?'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteAnnouncement(docId);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
