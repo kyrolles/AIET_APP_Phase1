@@ -1,17 +1,133 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CreateUserScreen extends StatelessWidget {
+class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
 
   @override
+  State<CreateUserScreen> createState() => _CreateUserScreenState();
+}
+
+class _CreateUserScreenState extends State<CreateUserScreen> {
+  // Controllers for each text field
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _departmentController = TextEditingController();
+  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _academicYearController = TextEditingController();
+  final TextEditingController _birthDateController = TextEditingController();
+
+  String selectedRole = 'IT'; // Default role
+  bool isLoading = false; // Loading indicator state
+  bool isPasswordVisible = false; // Password visibility state
+
+  // Form key for validation
+  final _formKey = GlobalKey<FormState>();
+
+  Future<void> createAccount() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        // Step 1: Create user in Firebase Authentication
+        final UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        if (userCredential.user != null) {
+          // Step 2: Store additional user data in Firestore
+          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+            'firstName': _firstNameController.text,
+            'lastName': _lastNameController.text,
+            'email': _emailController.text,
+            'phone': _phoneController.text,
+            'role': selectedRole,
+            'department': _departmentController.text,
+            'id': _idController.text,
+            'academicYear': _academicYearController.text,
+            'birthDate': _birthDateController.text,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Account created successfully!')),
+          );
+
+          // Reset the form after successful creation
+          resetForm();
+        }
+      } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create account: ${e.message}')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create account: $e')),
+        );
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  void resetForm() {
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _emailController.clear();
+    _passwordController.clear();
+    _phoneController.clear();
+    _departmentController.clear();
+    _idController.clear();
+    _academicYearController.clear();
+    _birthDateController.clear();
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controllers when the widget is disposed
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _departmentController.dispose();
+    _idController.dispose();
+    _academicYearController.dispose();
+    _birthDateController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Determine if the selected role is IT, Professor, Assistant, Secretary, Training Unit, or Student Affair
+    bool isRoleWithNoExtraFields = [
+      'IT',
+      'Professor',
+      'Assistant',
+      'Secretary',
+      'Training Unit',
+      'Student Affair'
+    ].contains(selectedRole);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+          onPressed: () {
+            // Navigate back to the previous screen
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           'Create User',
@@ -26,79 +142,137 @@ class CreateUserScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Role',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Role',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Role1',
-                    child: Text('Role1'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Role2',
-                    child: Text('Role2'),
-                  ),
-                ],
-                onChanged: (value) {},
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'First name', hintText: 'enter First name'),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'Last name', hintText: 'enter Last name'),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'Email', hintText: 'enter Email'),
-              const SizedBox(height: 16),
-              _buildPasswordField(),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'Phone', hintText: 'enter Phone'),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'Department', hintText: 'enter Department'),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'ID', hintText: 'ex: 20060785'),
-              const SizedBox(height: 16),
-              _buildTextField(label: 'Academic Year', hintText: 'enter Academic Year'),
-              const SizedBox(height: 16),
-              _buildDateField(),
-              const SizedBox(height: 24),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    minimumSize: const Size(double.infinity, 50),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
-                  child: const Text(
-                    'Create',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  value: selectedRole,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'IT',
+                      child: Text('IT'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Professor',
+                      child: Text('Professor'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Assistant',
+                      child: Text('Assistant'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Student',
+                      child: Text('Student'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Secretary',
+                      child: Text('Secretary'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Training Unit',
+                      child: Text('Training Unit'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Student Affair',
+                      child: Text('Student Affair'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedRole = value!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(controller: _firstNameController, label: 'First name', hintText: 'enter First name'),
+                const SizedBox(height: 16),
+                _buildTextField(controller: _lastNameController, label: 'Last name', hintText: 'enter Last name'),
+                const SizedBox(height: 16),
+                _buildTextField(controller: _emailController, label: 'Email', hintText: 'enter Email'),
+                const SizedBox(height: 16),
+                _buildPasswordField(controller: _passwordController),
+                const SizedBox(height: 16),
+                _buildTextField(controller: _phoneController, label: 'Phone', hintText: 'enter Phone'),
+                const SizedBox(height: 16),
+                // Conditionally show Department field
+                Visibility(
+                  visible: !isRoleWithNoExtraFields,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTextField(controller: _departmentController, label: 'Department', hintText: 'enter Department'),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                // Conditionally show ID field
+                Visibility(
+                  visible: !isRoleWithNoExtraFields,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTextField(controller: _idController, label: 'ID', hintText: 'ex: 20060785'),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+                // Conditionally show Academic Year field
+                Visibility(
+                  visible: !isRoleWithNoExtraFields,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTextField(controller: _academicYearController, label: 'Academic Year', hintText: 'enter Academic Year'),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+                _buildDateField(controller: _birthDateController),
+                const SizedBox(height: 24),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : createAccount,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Create Account'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({required String label, required String hintText}) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -107,7 +281,8 @@ class CreateUserScreen extends StatelessWidget {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hintText,
             border: OutlineInputBorder(
@@ -115,12 +290,20 @@ class CreateUserScreen extends StatelessWidget {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'This field is required';
+            }
+            return null;
+          },
         ),
       ],
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -129,22 +312,41 @@ class CreateUserScreen extends StatelessWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
-        TextField(
-          obscureText: true,
+        TextFormField(
+          controller: controller,
+          obscureText: !isPasswordVisible,
           decoration: InputDecoration(
             hintText: 'enter Password',
-            suffixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+              onPressed: () {
+                setState(() {
+                  isPasswordVisible = !isPasswordVisible;
+                });
+              },
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Password is required';
+            }
+            if (value.length < 15) {
+              return 'Password must be at least 15 characters';
+            }
+            return null;
+          },
         ),
       ],
     );
   }
 
-  Widget _buildDateField() {
+  Widget _buildDateField({
+    required TextEditingController controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -153,15 +355,38 @@ class CreateUserScreen extends StatelessWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: '---- -- --',
-            suffixIcon: const Icon(Icons.calendar_today_outlined),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.calendar_today_outlined),
+              onPressed: () async {
+                final DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    controller.text = "${pickedDate.toLocal()}".split(' ')[0];
+                  });
+                }
+              },
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
+          readOnly: true, // Prevent manual typing
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Birth Date is required';
+            }
+            return null;
+          },
         ),
       ],
     );

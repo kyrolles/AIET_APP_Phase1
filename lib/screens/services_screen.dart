@@ -19,6 +19,7 @@ class ServicesScreen extends StatefulWidget {
 
 class _ServicesScreenState extends State<ServicesScreen> {
   bool isStaff = false;
+  bool isAdmin = false;  // Add this field
 
   @override
   void initState() {
@@ -32,12 +33,15 @@ class _ServicesScreenState extends State<ServicesScreen> {
       if (user != null) {
         String email = user.email!;
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('staffs')
+            .collection('users')
             .where('email', isEqualTo: email)
             .get();
+
         if (querySnapshot.docs.isNotEmpty) {
+          String role = querySnapshot.docs.first['role'];
           setState(() {
-            isStaff = true;
+            isAdmin = role == 'Admin';
+            isStaff = isAdmin || ['IT', 'Professor', 'Assistant', 'Secretary', 'Training Unit', 'Student Affair'].contains(role);
           });
         }
       }
@@ -164,21 +168,22 @@ class _ServicesScreenState extends State<ServicesScreen> {
             }
           },
         ),
-      ServiceItem(
-        title: 'Create User (Test)',
-        imageUrl: 'assets/project_image/invoice.png',
-        backgroundColor: const Color(0xFFCC70EC),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return const CreateUserScreen();
-              },
-            ),
-          );
-        },
-      ),
+      if (isAdmin)
+        ServiceItem(
+          title: 'Create User',  // Remove (Test) from title for Admin
+          imageUrl: 'assets/project_image/invoice.png',
+          backgroundColor: const Color(0xFFCC70EC),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return const CreateUserScreen();
+                },
+              ),
+            );
+          },
+        ),
       // Add more service items here
     ];
 
