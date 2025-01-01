@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import '../components/my_app_bar.dart';
-import '../components/service_items.dart';
-import '../constants.dart';
+import '../components/service_item.dart';
 import 'invoice_screen.dart';
 import 'create_user_screen.dart';
 import 'calculator_screen.dart';
 import 'it_invoice_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'announcement_screen.dart';
+import 'announcement/announcement_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -19,7 +18,7 @@ class ServicesScreen extends StatefulWidget {
 
 class _ServicesScreenState extends State<ServicesScreen> {
   bool isStaff = false;
-  bool isAdmin = false;  // Add this field
+  bool isAdmin = false; // Add this field
 
   @override
   void initState() {
@@ -41,7 +40,15 @@ class _ServicesScreenState extends State<ServicesScreen> {
           String role = querySnapshot.docs.first['role'];
           setState(() {
             isAdmin = role == 'Admin';
-            isStaff = isAdmin || ['IT', 'Professor', 'Assistant', 'Secretary', 'Training Unit', 'Student Affair'].contains(role);
+            isStaff = isAdmin ||
+                [
+                  'IT',
+                  'Professor',
+                  'Assistant',
+                  'Secretary',
+                  'Training Unit',
+                  'Student Affair'
+                ].contains(role);
           });
         }
       }
@@ -65,7 +72,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
         title: 'Student Training',
         imageUrl: 'assets/project_image/analysis.png',
         backgroundColor: const Color(0xFFED1C24),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/studentTraining');
+        },
       ),
       ServiceItem(
         title: 'Moodle',
@@ -170,7 +179,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         ),
       if (isAdmin)
         ServiceItem(
-          title: 'Create User',  // Remove (Test) from title for Admin
+          title: 'Create User', // Remove (Test) from title for Admin
           imageUrl: 'assets/project_image/invoice.png',
           backgroundColor: const Color(0xFFCC70EC),
           onPressed: () {
@@ -188,18 +197,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
     ];
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'Services',
-            onpressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
+      appBar: MyAppBar(
+        title: 'Services',
+        onpressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: ListView(
         children: [

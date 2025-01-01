@@ -5,17 +5,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart'; // For PDF file picking
 import 'dart:io';
 import 'dart:convert';
-import '../components/my_app_bar.dart';
-import '../constants.dart';
+import '../../components/my_app_bar.dart';
 
 class AnnouncementScreen extends StatefulWidget {
   const AnnouncementScreen({super.key});
 
   @override
-  _AnnouncementScreenState createState() => _AnnouncementScreenState();
+  AnnouncementScreenState createState() => AnnouncementScreenState();
 }
 
-class _AnnouncementScreenState extends State<AnnouncementScreen> {
+class AnnouncementScreenState extends State<AnnouncementScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   File? _image;
@@ -23,6 +22,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final ImagePicker _picker = ImagePicker();
 
   // Helper function to format the timestamp
+  // ignore: unused_element
   String _formatTimestamp(DateTime dateTime) {
     final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
     final period = dateTime.hour >= 12 ? 'PM' : 'AM';
@@ -105,7 +105,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;
-        
+
         // Check user role
         QuerySnapshot userDocs = await FirebaseFirestore.instance
             .collection('users')
@@ -119,9 +119,15 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           String userName = '$firstName $lastName';
 
           // Check if user has permission to post
-          bool hasPermission = role == 'Admin' || 
-              ['IT', 'Professor', 'Assistant', 'Secretary', 'Training Unit', 'Student Affair']
-              .contains(role);
+          bool hasPermission = role == 'Admin' ||
+              [
+                'IT',
+                'Professor',
+                'Assistant',
+                'Secretary',
+                'Training Unit',
+                'Student Affair'
+              ].contains(role);
 
           if (hasPermission) {
             // Continue with announcement posting...
@@ -136,7 +142,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               'timestamp': Timestamp.fromDate(now),
               'author': userName,
               'email': email,
-              'role': role,  // Add role to announcement
+              'role': role, // Add role to announcement
               'imageBase64': imageBase64,
               'pdfBase64': pdfBase64,
               'pdfFileName': pdfFileName,
@@ -160,7 +166,9 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
             }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('You do not have permission to post announcements')),
+              const SnackBar(
+                  content:
+                      Text('You do not have permission to post announcements')),
             );
           }
         }
@@ -179,23 +187,17 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'Services',
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: postAnnouncement,
-              ),
-            ],
-            onpressed: () {
-              Navigator.pop(context);
-            },
+      appBar: MyAppBar(
+        title: 'Services',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: postAnnouncement,
           ),
-        ),
+        ],
+        onpressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -216,7 +218,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                   hintTextDirection: _isArabic(_titleController.text)
                       ? TextDirection.rtl
                       : TextDirection.ltr,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ),
@@ -237,7 +239,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                   hintTextDirection: _isArabic(_descriptionController.text)
                       ? TextDirection.rtl
                       : TextDirection.ltr,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/my_app_bar.dart';
 import '../components/proof_of_enrollment.dart';
-import '../constants.dart';
 import 'tuition_fees_download.dart';
 
 class InvoiceScreen extends StatelessWidget {
@@ -10,16 +9,9 @@ class InvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'Invoice',
-            onpressed: () => Navigator.pop(context),
-          ),
-        ),
+      appBar: MyAppBar(
+        title: 'Invoice',
+        onpressed: () => Navigator.pop(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

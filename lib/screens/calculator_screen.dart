@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../components/my_app_bar.dart';
-import '../constants.dart';
 
 class GPACalculatorScreen extends StatefulWidget {
   const GPACalculatorScreen({super.key});
@@ -82,16 +81,9 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'GPA Calculator',
-            onpressed: () => Navigator.pop(context),
-          ),
-        ),
+      appBar: MyAppBar(
+        title: 'GPA Calculator',
+        onpressed: () => Navigator.pop(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
