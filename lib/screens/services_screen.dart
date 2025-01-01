@@ -3,6 +3,7 @@ import '../components/my_app_bar.dart';
 import '../components/service_items.dart';
 import '../constants.dart';
 import 'invoice_screen.dart';
+import 'create_user_screen.dart';
 import 'calculator_screen.dart';
 import 'it_invoice_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -119,6 +120,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           );
         },
       ),
+
       // ServiceItem(
       //   title: 'Tuition Fees Upload',
       //   imageUrl: 'assets/project_image/invoice.png',
@@ -162,6 +164,21 @@ class _ServicesScreenState extends State<ServicesScreen> {
             }
           },
         ),
+      ServiceItem(
+        title: 'Create User (Test)',
+        imageUrl: 'assets/project_image/invoice.png',
+        backgroundColor: const Color(0xFFCC70EC),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const CreateUserScreen();
+              },
+            ),
+          );
+        },
+      ),
       // Add more service items here
     ];
 
