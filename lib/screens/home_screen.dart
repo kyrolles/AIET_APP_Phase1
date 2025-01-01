@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:graduation_project/components/activities_list_view.dart';
-import 'package:graduation_project/components/text_link.dart';
-import 'package:graduation_project/constants.dart';
+import '../components/activities_list_view.dart';
+import '../components/text_link.dart';
+import '../constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:graduation_project/screens/home_screen/home_screen_components/announcement_list.dart';
+import 'announcement/announcement_list.dart';
 import 'package:graduation_project/screens/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class HomeScreenState extends State<HomeScreen> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;
-        
+
         // Check in the users collection
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('users')

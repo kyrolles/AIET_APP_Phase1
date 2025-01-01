@@ -34,19 +34,12 @@ class _ItArchiveScreenState extends State<ItArchiveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'Archive',
-            onpressed: () {
-              // updateArchiveList();
-              Navigator.pop(context);
-            },
-          ),
-        ),
+      appBar: MyAppBar(
+        title: 'Archive',
+        onpressed: () {
+          // updateArchiveList();
+          Navigator.pop(context);
+        },
       ),
       body: Container(
         // height: 100,

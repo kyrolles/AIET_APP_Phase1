@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/screens/training/student_training/departement_training_screen.dart';
+import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
+import 'package:graduation_project/screens/training/student_training/trianing_details_screen.dart';
 import 'screens/login_screen.dart';
-import 'screens/home_screen/home_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart'; // Import the CreateUserScreen
 
 void main() async {
@@ -10,7 +13,7 @@ void main() async {
   await Firebase.initializeApp();
 
   // Check if the user is already logged in
-  final storage = FlutterSecureStorage();
+  const storage = FlutterSecureStorage();
   String? token = await storage.read(key: 'token');
 
   runApp(MyApp(
@@ -50,7 +53,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
-        '/createUser': (context) => const CreateUserScreen(), // Add route for CreateUserScreen
+        '/createUser': (context) =>
+            const CreateUserScreen(), // Add route for CreateUserScreen
+        '/studentTraining': (context) => const StudentTrainingScreen(),
+        '/departmentTraining': (context) => const DepartementTrainingScreen(),
+        '/trainingDetails': (context) => const TrianingDetailsScreen(),
       },
     );
   }

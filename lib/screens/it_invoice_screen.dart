@@ -65,16 +65,9 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'It-Invoice',
-            onpressed: () => Navigator.pop(context),
-          ),
-        ),
+      appBar: MyAppBar(
+        title: 'It-Invoice',
+        onpressed: () => Navigator.pop(context),
       ),
       body: Container(
         // height: 100,

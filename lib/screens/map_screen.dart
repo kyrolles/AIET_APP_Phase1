@@ -30,21 +30,14 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(kToolbarHeight), // Standard AppBar height
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: kShadow),
-          child: MyAppBar(
-            title: 'Map',
-            onpressed: () => Navigator.pop(context),
-            actions: [
-              BuildingSelection(
-                onTabChange: (index) => navigateBottomBar(index),
-              ),
-            ],
+      appBar: MyAppBar(
+        title: 'Map',
+        onpressed: () => Navigator.pop(context),
+        actions: [
+          BuildingSelection(
+            onTabChange: (index) => navigateBottomBar(index),
           ),
-        ),
+        ],
       ),
       //////////////////////////////////////////////////////////////////////////
       body: SafeArea(

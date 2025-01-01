@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../components/my_app_bar.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -36,14 +37,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
       try {
         // Step 1: Create user in Firebase Authentication
-        final UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
 
         if (userCredential.user != null) {
           // Step 2: Store additional user data in Firestore
-          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .set({
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'email': _emailController.text,
@@ -119,25 +124,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     ].contains(selectedRole);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Navigate back to the previous screen
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text(
-          'Create User',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: true,
+      appBar: MyAppBar(
+        title: 'Create User',
+        onpressed: () => Navigator.pop(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -200,15 +189,27 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                _buildTextField(controller: _firstNameController, label: 'First name', hintText: 'enter First name'),
+                _buildTextField(
+                    controller: _firstNameController,
+                    label: 'First name',
+                    hintText: 'enter First name'),
                 const SizedBox(height: 16),
-                _buildTextField(controller: _lastNameController, label: 'Last name', hintText: 'enter Last name'),
+                _buildTextField(
+                    controller: _lastNameController,
+                    label: 'Last name',
+                    hintText: 'enter Last name'),
                 const SizedBox(height: 16),
-                _buildTextField(controller: _emailController, label: 'Email', hintText: 'enter Email'),
+                _buildTextField(
+                    controller: _emailController,
+                    label: 'Email',
+                    hintText: 'enter Email'),
                 const SizedBox(height: 16),
                 _buildPasswordField(controller: _passwordController),
                 const SizedBox(height: 16),
-                _buildTextField(controller: _phoneController, label: 'Phone', hintText: 'enter Phone'),
+                _buildTextField(
+                    controller: _phoneController,
+                    label: 'Phone',
+                    hintText: 'enter Phone'),
                 const SizedBox(height: 16),
                 // Conditionally show Department field
                 Visibility(
@@ -216,7 +217,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField(controller: _departmentController, label: 'Department', hintText: 'enter Department'),
+                      _buildTextField(
+                          controller: _departmentController,
+                          label: 'Department',
+                          hintText: 'enter Department'),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -227,7 +231,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField(controller: _idController, label: 'ID', hintText: 'ex: 20060785'),
+                      _buildTextField(
+                          controller: _idController,
+                          label: 'ID',
+                          hintText: 'ex: 20060785'),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -238,7 +245,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField(controller: _academicYearController, label: 'Academic Year', hintText: 'enter Academic Year'),
+                      _buildTextField(
+                          controller: _academicYearController,
+                          label: 'Academic Year',
+                          hintText: 'enter Academic Year'),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -318,7 +328,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           decoration: InputDecoration(
             hintText: 'enter Password',
             suffixIcon: IconButton(
-              icon: Icon(isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+              icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
                 setState(() {
                   isPasswordVisible = !isPasswordVisible;

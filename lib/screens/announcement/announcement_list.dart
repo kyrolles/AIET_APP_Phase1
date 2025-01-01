@@ -15,7 +15,8 @@ class _AnnouncementListState extends State<AnnouncementList> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('announcements')
-          .orderBy('timestamp', descending: true) // Sort by timestamp in descending order
+          .orderBy('timestamp',
+              descending: true) // Sort by timestamp in descending order
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
