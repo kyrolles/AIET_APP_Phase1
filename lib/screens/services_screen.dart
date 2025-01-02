@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/my_app_bar.dart';
 import '../components/service_item.dart';
-import 'invoice_screen.dart';
+import 'Invoice_screen.dart';
 import 'create_user_screen.dart';
 import 'calculator_screen.dart';
 import 'it_invoice_screen.dart';
@@ -74,6 +74,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
         backgroundColor: const Color(0xFFED1C24),
         onPressed: () {
           Navigator.pushNamed(context, '/studentTraining');
+        },
+      ),
+      ServiceItem(
+        title: 'Stuff-Student Training',
+        imageUrl: 'assets/project_image/analysis.png',
+        backgroundColor: const Color(0xFFED1C24),
+        onPressed: () {
+          Navigator.pushNamed(context, '/stuffStudentTraining');
         },
       ),
       ServiceItem(
