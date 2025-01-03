@@ -51,7 +51,7 @@ class AttendanceScreen extends StatelessWidget {
       children: [
         ServiceItem(
           title: 'Generate QR Code',
-          imageUrl: 'assets/project_image/announcement.png',
+          imageUrl: 'assets/project_image/qr-code.png',
           backgroundColor: Colors.blue,
           onPressed: () {},
         ),
