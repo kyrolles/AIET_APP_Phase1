@@ -77,7 +77,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
       ServiceItem(
-        title: 'Staff-Student Training',
+        title: 'Staff-Student\nTraining',
         imageUrl: 'assets/project_image/analysis.png',
         backgroundColor: const Color(0xFFED1C24),
         onPressed: () {

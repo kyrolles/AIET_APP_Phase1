@@ -16,7 +16,7 @@ class StaffstudentTrainingScreen extends StatelessWidget {
         padding: const EdgeInsetsDirectional.only(top: 15),
         children: [
           ServiceItem(
-            title: 'Create Announcement',
+            title: 'Create\nAnnouncement',
             imageUrl: 'assets/project_image/loudspeaker.png',
             backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {},
