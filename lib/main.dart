@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/departement_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/trianing_details_screen.dart';
@@ -57,6 +58,8 @@ class MyApp extends StatelessWidget {
         '/createUser': (context) =>
             const CreateUserScreen(), // Add route for CreateUserScreen
         '/studentTraining': (context) => const StudentTrainingScreen(),
+        '/staffStudentTraining': (context) =>
+            const StaffstudentTrainingScreen(),
         '/departmentTraining': (context) => const DepartementTrainingScreen(),
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
         '/attendance': (context) => AttendanceScreen(),
