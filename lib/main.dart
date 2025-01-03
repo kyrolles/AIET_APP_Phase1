@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/screens/attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/departement_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
         '/departmentTraining': (context) => const DepartementTrainingScreen(),
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
         '/attendance': (context) => AttendanceScreen(),
+        '/attendance/archive': (context) => const AttendanceArchive(),
       },
     );
   }

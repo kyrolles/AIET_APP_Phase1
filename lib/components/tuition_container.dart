@@ -58,7 +58,7 @@ class _TuitionContainerState extends State<TuitionContainer> {
                 const SizedBox(width: 5),
                 Container(
                   decoration: BoxDecoration(
-                    color: kPrimary,
+                    color: kPrimaryColor,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   padding: const EdgeInsets.all(3),
