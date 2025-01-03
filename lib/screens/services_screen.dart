@@ -77,11 +77,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
       ServiceItem(
-        title: 'Stuff-Student Training',
+        title: 'Staff-Student Training',
         imageUrl: 'assets/project_image/analysis.png',
         backgroundColor: const Color(0xFFED1C24),
         onPressed: () {
-          Navigator.pushNamed(context, '/stuffStudentTraining');
+          Navigator.pushNamed(context, '/staffStudentTraining');
         },
       ),
       ServiceItem(

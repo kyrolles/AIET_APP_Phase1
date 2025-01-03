@@ -17,7 +17,7 @@ class StudentTrainingScreen extends StatelessWidget {
           ServiceItem(
             title: 'Announcement',
             imageUrl: 'assets/project_image/loudspeaker.png',
-            backgroundColor: Colors.blue,
+            backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -61,8 +61,8 @@ class StudentTrainingScreen extends StatelessWidget {
           ),
           ServiceItem(
             title: 'Submit Training',
-            imageUrl: 'assets/project_image/open-book.png',
-            backgroundColor: Colors.blue,
+            imageUrl: 'assets/project_image/submit-training.png',
+            backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {},
           ),
         ],
