@@ -56,7 +56,9 @@ class ActivitiesListView extends StatelessWidget {
       ActivitiesContainer(
         image: 'assets/project_image/attendance.png',
         title: 'Attendance',
-        onpressed: () {},
+        onpressed: () {
+          Navigator.pushNamed(context, '/attendance');
+        },
       ),
       ActivitiesContainer(
         image: 'assets/project_image/loudspeaker.png',

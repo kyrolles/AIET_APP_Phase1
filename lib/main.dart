@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/screens/training/student_training/departement_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/trianing_details_screen.dart';
+import 'screens/attendance/attendance_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart'; // Import the CreateUserScreen
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
         '/studentTraining': (context) => const StudentTrainingScreen(),
         '/departmentTraining': (context) => const DepartementTrainingScreen(),
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
+        '/attendance': (context) => AttendanceScreen(),
       },
     );
   }
