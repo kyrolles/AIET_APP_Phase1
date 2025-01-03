@@ -85,7 +85,7 @@ class _ProofOfEnrollmentSheetScreenState
                 children: [
                   Checkbox(
                     value: isChecked,
-                    activeColor: kPrimary,
+                    activeColor: kPrimaryColor,
                     onChanged: (newBool) {
                       setState(() {
                         isChecked = newBool ?? false;

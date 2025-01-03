@@ -29,7 +29,7 @@ class TextLink extends StatelessWidget {
           child: Text(
             textLink,
             style: TextStyle(
-              color: kPrimary,
+              color: kPrimaryColor,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),

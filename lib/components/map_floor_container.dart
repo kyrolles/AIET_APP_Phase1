@@ -20,7 +20,7 @@ class FloorContainer extends StatelessWidget {
               width: 45,
               decoration: BoxDecoration(
                 boxShadow: kShadow,
-                color: kPrimary,
+                color: kPrimaryColor,
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Center(

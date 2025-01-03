@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/components/list_container.dart';
+
+import 'attendance_buttom_sheet.dart';
 
 class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
 
-  final List periods = [];
+  final List<Widget> periods = [];
 
   @override
   Widget build(BuildContext context) {
@@ -15,22 +18,10 @@ class AttendanceScreen extends StatelessWidget {
           title: 'Attendance', onpressed: () => Navigator.pop(context)),
       body: Column(
         children: [
-          Expanded(
-            child: Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                color: const Color(0XFFFAFAFA),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  currentAttendanceText(),
-                  currentAttendanceList(),
-                ],
-              ),
-            ),
+          ListContainer(
+            title: 'Current attendance',
+            listOfWidgets: periods,
+            emptyMessage: 'No recent attendance found',
           ),
           const Divider(
             color: kLightGrey,
@@ -38,14 +29,14 @@ class AttendanceScreen extends StatelessWidget {
             endIndent: 10,
             height: 10,
           ),
-          generateQRcodeButton(),
+          generateQRcodeButton(context),
           const SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  Column generateQRcodeButton() {
+  Column generateQRcodeButton(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -53,7 +44,14 @@ class AttendanceScreen extends StatelessWidget {
           title: 'Generate QR Code',
           imageUrl: 'assets/project_image/qr-code.png',
           backgroundColor: Colors.blue,
-          onPressed: () {},
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return const AttendanceButtomSheet();
+              },
+            );
+          },
         ),
       ],
     );

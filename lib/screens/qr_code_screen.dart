@@ -116,7 +116,7 @@ class QrcodeScreen extends StatelessWidget {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: kPrimary,
+                            color: kPrimaryColor,
                             borderRadius: BorderRadius.circular(5),
                           ),
                           padding: const EdgeInsets.all(3),
