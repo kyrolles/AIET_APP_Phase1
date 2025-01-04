@@ -9,7 +9,26 @@ import 'attendance_buttom_sheet.dart';
 class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
 
-  final List<Widget> periods = [];
+  final List<Widget> periods = [
+    CurrentAttendanceItem(
+      subject: 'Microprocessor',
+      period: 'P1',
+      startTime: '9:00',
+      endTime: '10:30',
+      total: 34,
+      ontapOnReview: () {},
+      ontapOnSend: () {},
+    ),
+    CurrentAttendanceItem(
+      subject: 'Data Structure',
+      period: 'P2',
+      startTime: '10:40',
+      endTime: '12:10',
+      total: 32,
+      ontapOnReview: () {},
+      ontapOnSend: () {},
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +67,7 @@ class AttendanceScreen extends StatelessWidget {
             showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
-                return AttendanceButtomSheet();
+                return const AttendanceButtomSheet();
               },
             );
           },
@@ -56,29 +75,117 @@ class AttendanceScreen extends StatelessWidget {
       ],
     );
   }
+}
 
-  Expanded currentAttendanceList() {
-    return Expanded(
-      child: periods.isEmpty
-          ? const Center(
-              child: Text(
-                'No recent attendance found',
-                style: TextStyle(color: kGrey),
+class CurrentAttendanceItem extends StatelessWidget {
+  const CurrentAttendanceItem({
+    super.key,
+    required this.subject,
+    required this.period,
+    required this.startTime,
+    required this.endTime,
+    required this.total,
+    required this.ontapOnReview,
+    required this.ontapOnSend,
+  });
+
+  final String subject;
+  final String period;
+  final String startTime;
+  final String endTime;
+  final int total;
+  final Function() ontapOnReview;
+  final Function() ontapOnSend;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Column(
+          spacing: 10,
+          children: [
+            Container(
+              width: 60,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEB8991),
+                borderRadius: BorderRadius.circular(6),
               ),
-            )
-          : ListView.builder(
-              itemBuilder: (context, index) {
-                return Container();
-              },
-              itemCount: 10,
+              child: Center(child: Text(period, style: kTextStyleBold)),
             ),
-    );
-  }
-
-  Container currentAttendanceText() {
-    return Container(
-      margin: const EdgeInsets.only(top: 15.0, left: 15.0),
-      child: const Text('Current attendance', style: kTextStyleBold),
+            Text(startTime, style: kTextStyleNormal),
+            Text(
+              endTime,
+              style: const TextStyle(
+                fontFamily: 'Lexend',
+                fontSize: 16,
+                color: kGrey,
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: Container(
+              decoration: BoxDecoration(
+                color: kGreyLight,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(subject, style: kTextStyleBold),
+                      const Icon(Icons.close, color: kGrey),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text('Total: ', style: kTextStyleNormal),
+                      Text(
+                        "$total",
+                        style: const TextStyle(
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 34,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kOrange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: ontapOnReview,
+                        child: const Text('Review'),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kPrimaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: ontapOnSend,
+                        child: const Text('Send'),
+                      ),
+                    ],
+                  )
+                ],
+              )),
+        ),
+      ],
     );
   }
 }

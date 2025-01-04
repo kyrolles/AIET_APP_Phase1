@@ -14,19 +14,20 @@ class Period {
 }
 
 class AttendanceButtomSheet extends StatefulWidget {
-  AttendanceButtomSheet({super.key});
+  const AttendanceButtomSheet({super.key});
 
+  @override
+  State<AttendanceButtomSheet> createState() => _AttendanceButtomSheetState();
+}
+
+class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   List<Period> periods = [
     Period(number: 'P1', isSelected: false, color: const Color(0xFFEB8991)),
     Period(number: 'P2', isSelected: false, color: const Color(0xFF978ECB)),
     Period(number: 'P3', isSelected: false, color: const Color(0xFF0ED290)),
     Period(number: 'P4', isSelected: false, color: const Color(0xFFFFDD29)),
   ];
-  @override
-  State<AttendanceButtomSheet> createState() => _AttendanceButtomSheetState();
-}
 
-class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -64,12 +65,12 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  for (var period in widget.periods)
+                  for (var period in periods)
                     PeriodButton(
                       period: period,
                       ontap: () {
                         setState(() {
-                          for (var p in widget.periods) {
+                          for (var p in periods) {
                             p.isSelected = false;
                           }
                           period.isSelected = true;
