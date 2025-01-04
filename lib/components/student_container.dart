@@ -14,7 +14,7 @@ class StudentContainer extends StatelessWidget {
     required this.title,
     required this.image,
   });
-  final Function()? onTap;
+  final Function(BuildContext)? onTap;
   final String name;
   final String status;
   final Color statusColor;
@@ -26,7 +26,11 @@ class StudentContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        if (onTap != null) {
+          onTap!(context); // Pass the context here
+        }
+      },
       child: Container(
         margin: const EdgeInsets.all(8.0),
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
@@ -44,16 +48,16 @@ class StudentContainer extends StatelessWidget {
                   name,
                   style: kTextStyleNormal,
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 10),
                 Container(
                   decoration: BoxDecoration(
                     color: kPrimaryColor,
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.all(3),
                   child: Text(
                     id,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
                   ),
                 ),
                 const SizedBox(width: 5),
@@ -65,7 +69,7 @@ class StudentContainer extends StatelessWidget {
                   padding: const EdgeInsets.all(3),
                   child: Text(
                     year,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
                   ),
                 ),
               ],
@@ -75,12 +79,19 @@ class StudentContainer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CircleAvatar(
-                  radius: 21,
+                  radius: 16.5,
                   backgroundColor: Colors.black,
                   child: CircleAvatar(
-                    radius: 20,
+                    radius: 15,
                     backgroundColor: Colors.white,
-                    child: Image.asset(image),
+                    child: ClipOval(
+                      child: Image.asset(
+                        image,
+                        width: 35,
+                        height: 35,
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ),
                   ),
                 ),
                 Text(
