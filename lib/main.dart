@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/screens/attendance/attendance_archive.dart';
+import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
+import 'package:graduation_project/screens/training/staff_training/validate_screen.dart';
 import 'package:graduation_project/screens/training/student_training/departement_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/trianing_details_screen.dart';
@@ -61,6 +63,9 @@ class MyApp extends StatelessWidget {
         '/studentTraining': (context) => const StudentTrainingScreen(),
         '/staffStudentTraining': (context) =>
             const StaffstudentTrainingScreen(),
+        '/staffStudentTraining/validate': (context) => ValidateScreen(),
+        '/staffStudentTraining/validate/archive': (context) =>
+            ArchiveValidateScreen(),
         '/departmentTraining': (context) => const DepartementTrainingScreen(),
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
         '/attendance': (context) => AttendanceScreen(),

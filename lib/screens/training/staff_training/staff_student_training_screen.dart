@@ -25,7 +25,9 @@ class StaffstudentTrainingScreen extends StatelessWidget {
             title: 'Validate',
             imageUrl: 'assets/project_image/validation.png',
             backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/staffStudentTraining/validate');
+            },
           ),
         ],
       ),
