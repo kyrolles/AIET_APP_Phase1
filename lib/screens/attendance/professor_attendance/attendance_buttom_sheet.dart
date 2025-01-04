@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart'; // Add this import
 
 class Period {
   String number;
@@ -21,12 +22,26 @@ class AttendanceButtomSheet extends StatefulWidget {
 }
 
 class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
+  final TextEditingController _subjectCodeController = TextEditingController();
   List<Period> periods = [
     Period(number: 'P1', isSelected: false, color: const Color(0xFFEB8991)),
     Period(number: 'P2', isSelected: false, color: const Color(0xFF978ECB)),
     Period(number: 'P3', isSelected: false, color: const Color(0xFF0ED290)),
     Period(number: 'P4', isSelected: false, color: const Color(0xFFFFDD29)),
   ];
+
+  String? getSelectedPeriod() {
+    for (var period in periods) {
+      if (period.isSelected) return period.number;
+    }
+    return null;
+  }
+
+  @override
+  void dispose() {
+    _subjectCodeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +67,9 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               ),
               const SizedBox(height: 20),
               const Text('Subject Code'),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _subjectCodeController,
+                decoration: const InputDecoration(
                   border: UnderlineInputBorder(),
                   labelText: 'Enter the subject code',
                   labelStyle: TextStyle(color: kGrey),
@@ -83,7 +99,34 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               MyButton(
                 text: 'Generate QR Code',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/attendance/archive');
+                  final subjectCode = _subjectCodeController.text.trim();
+                  final selectedPeriod = getSelectedPeriod();
+
+                  if (subjectCode.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a subject code')),
+                    );
+                    return;
+                  }
+
+                  if (selectedPeriod == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select a period')),
+                    );
+                    return;
+                  }
+
+                  // Close bottom sheet and navigate to archive screen
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AttendanceArchive(
+                        subjectCode: subjectCode,
+                        period: selectedPeriod,
+                      ),
+                    ),
+                  );
                 },
                 height: 50,
                 width: double.infinity,
