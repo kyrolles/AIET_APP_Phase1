@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
+import 'package:graduation_project/screens/qr_code_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_screen.dart';
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
+      home: isLoggedIn ? const QrcodeScreen() : const LoginScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
