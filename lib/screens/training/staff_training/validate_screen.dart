@@ -79,7 +79,7 @@ class ValidateScreen extends StatelessWidget {
           ),
           KButton(
             text: 'Archive',
-            width: 345,
+            // width: 345,
             height: 62,
             svgPath: 'assets/project_image/Pin.svg',
             onPressed: () {
@@ -87,9 +87,9 @@ class ValidateScreen extends StatelessWidget {
                   context, '/staffStudentTraining/validate/archive');
             },
           ),
-          const SizedBox(
-            height: 16,
-          )
+          // const SizedBox(
+          //   height: 10,
+          // )
         ],
       ),
     );

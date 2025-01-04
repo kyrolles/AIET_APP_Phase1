@@ -27,10 +27,12 @@ class KButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(20), // Matches container radius
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(20), // Matches container radius
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 10),
         child: Container(
           width: width, // Null allows width to adapt to parent constraints
           height: height, // Null allows height to adapt to parent constraints
