@@ -44,14 +44,18 @@ class StudentContainer extends StatelessWidget {
             Row(
               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  name,
-                  style: kTextStyleNormal,
+                Expanded(
+                  child: Text(
+                    name,
+                    style: kTextStyleNormal,
+                    overflow: TextOverflow.ellipsis, // Add this line
+                  ),
                 ),
-                const SizedBox(width: 10),
+                // const SizedBox(width: 10),
                 Container(
                   decoration: BoxDecoration(
-                    color: kPrimaryColor,
+                    // color: kPrimaryColor,
+                    color: Colors.black26,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.all(3),
@@ -63,7 +67,8 @@ class StudentContainer extends StatelessWidget {
                 const SizedBox(width: 5),
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0XFFFF8504),
+                    // color: const Color(0XFFFF8504),
+                    color: Colors.black38,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   padding: const EdgeInsets.all(3),

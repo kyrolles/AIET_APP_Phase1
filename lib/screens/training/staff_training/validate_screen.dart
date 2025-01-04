@@ -27,7 +27,7 @@ class ValidateScreen extends StatelessWidget {
         image: 'assets/project_image/pdf.png'),
     const StudentContainer(
         onTap: null,
-        name: 'Mahmoud Abdelnaser',
+        name: 'Mahmoud Abdelnaserrrrrrrrr',
         status: 'pending',
         statusColor: Colors.yellow,
         id: '20-0-60785',
