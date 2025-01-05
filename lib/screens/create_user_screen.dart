@@ -17,12 +17,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _departmentController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _academicYearController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
 
   String selectedRole = 'IT'; // Default role
+  String selectedDepartment = 'General'; // Default department
   bool isLoading = false; // Loading indicator state
   bool isPasswordVisible = false; // Password visibility state
 
@@ -54,7 +54,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department': _departmentController.text,
+            'department': selectedDepartment, // Updated to use selectedDepartment
             'id': _idController.text,
             'academicYear': _academicYearController.text,
             'birthDate': _birthDateController.text,
@@ -90,10 +90,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _emailController.clear();
     _passwordController.clear();
     _phoneController.clear();
-    _departmentController.clear();
     _idController.clear();
     _academicYearController.clear();
     _birthDateController.clear();
+    setState(() {
+      selectedDepartment = 'General'; // Reset department to default
+    });
   }
 
   @override
@@ -104,7 +106,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _phoneController.dispose();
-    _departmentController.dispose();
     _idController.dispose();
     _academicYearController.dispose();
     _birthDateController.dispose();
@@ -211,16 +212,59 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     label: 'Phone',
                     hintText: 'enter Phone'),
                 const SizedBox(height: 16),
-                // Conditionally show Department field
+                // Conditionally show Department dropdown
                 Visibility(
                   visible: !isRoleWithNoExtraFields,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField(
-                          controller: _departmentController,
-                          label: 'Department',
-                          hintText: 'enter Department'),
+                      const Text(
+                        'Department',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        value: selectedDepartment,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'General',
+                            child: Text('General'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'CE',
+                            child: Text('CE'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ECE',
+                            child: Text('ECE'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'IE',
+                            child: Text('IE'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'EME',
+                            child: Text('EME'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            selectedDepartment = value!;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Department is required';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 16),
                     ],
                   ),
