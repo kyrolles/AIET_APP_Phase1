@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/attendance/professor_attendance/add_student_manually_bottom_sheet.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/add_student_bottom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AttendanceArchive extends StatefulWidget {
   final String? subjectCode;

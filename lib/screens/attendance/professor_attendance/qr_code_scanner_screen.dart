@@ -46,7 +46,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       Future.delayed(const Duration(seconds: 2), () {
         Navigator.pop(context);
       });
-
     } catch (e) {
       // Show error if QR code format is invalid
       ScaffoldMessenger.of(context).showSnackBar(

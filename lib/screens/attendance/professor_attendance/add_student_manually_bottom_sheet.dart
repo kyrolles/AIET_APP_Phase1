@@ -57,6 +57,5 @@ class AddStudentManuallyBottmSheet extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }
