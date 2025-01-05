@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../components/my_app_bar.dart';
 import '../components/service_item.dart';
-import 'Invoice_screen.dart';
+import 'invoice/student_invoice/invoice_screen.dart';
 import 'create_user_screen.dart';
 import 'calculator_screen.dart';
-import 'it_invoice_screen.dart';
+import 'invoice/it_incoive/it_invoice_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'announcement/announcement_screen.dart';

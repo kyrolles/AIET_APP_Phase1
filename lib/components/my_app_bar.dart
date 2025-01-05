@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MyAppBar(
-      {super.key, required this.title, this.actions, required this.onpressed});
+  const MyAppBar({
+    super.key,
+    required this.title,
+    this.actions,
+    required this.onpressed,
+  });
 
   final String title;
   final List<Widget>? actions;

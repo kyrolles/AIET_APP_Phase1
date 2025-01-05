@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants.dart';
-import '../screens/tuition_fees_upload.dart';
+import '../../../constants.dart';
+import '../it_incoive/tuition_fees_upload.dart';
 
 class TuitionContainer extends StatefulWidget {
   TuitionContainer(
