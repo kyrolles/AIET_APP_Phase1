@@ -54,7 +54,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department': selectedDepartment, // Updated to use selectedDepartment
+            'department':
+                selectedDepartment, // Updated to use selectedDepartment
             'id': _idController.text,
             'academicYear': _academicYearController.text,
             'birthDate': _birthDateController.text,
@@ -220,7 +221,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     children: [
                       const Text(
                         'Department',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
@@ -228,7 +230,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 12),
                         ),
                         value: selectedDepartment,
                         items: const [
