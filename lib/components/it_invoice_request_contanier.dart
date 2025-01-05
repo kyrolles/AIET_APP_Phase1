@@ -72,7 +72,7 @@ class _RequestContainerState extends State<RequestContainer> {
                 const SizedBox(width: 5),
                 Container(
                   decoration: BoxDecoration(
-                    color: kPrimary,
+                    color: kPrimaryColor,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   padding: const EdgeInsets.all(3),

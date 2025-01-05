@@ -60,7 +60,7 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                   children: [
                     Checkbox(
                       value: isChecked,
-                      activeColor: kPrimary,
+                      activeColor: kPrimaryColor,
                       onChanged: (newBool) {
                         setState(() {
                           isChecked = newBool ?? false;
@@ -89,7 +89,7 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary,
+                  backgroundColor: kPrimaryColor,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

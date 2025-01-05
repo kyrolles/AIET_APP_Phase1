@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:graduation_project/screens/home_screen/home_screen_components/upload_image.dart';
-import 'package:graduation_project/screens/home_screen/home_screen_components/upload_pdf.dart';
+import 'upload_image.dart';
+import 'upload_pdf.dart';
 
-import '../../../constants.dart';
+import '../../constants.dart';
 
 class AnnouncementItem extends StatefulWidget {
   const AnnouncementItem({super.key, required this.doc});
@@ -86,7 +86,9 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     final doc = widget.doc;
     final data = doc.data() as Map<String, dynamic>;
     final timestamp = data['timestamp'] as Timestamp?; // Cast to Timestamp
-    final formattedTimestamp = timestamp != null ? _formatTimestamp(timestamp.toDate()) : 'No date'; // Convert to DateTime and format
+    final formattedTimestamp = timestamp != null
+        ? _formatTimestamp(timestamp.toDate())
+        : 'No date'; // Convert to DateTime and format
     final imageBase64 = data['imageBase64'] as String?;
     final pdfBase64 = data['pdfBase64'] as String?;
     final pdfFileName = data['pdfFileName'] as String?;
@@ -96,14 +98,14 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     // Add role check for delete permission
     Future<bool> checkDeletePermission() async {
       if (currentUserEmail == null) return false;
-      
+
       QuerySnapshot userDocs = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: currentUserEmail)
           .get();
-          
+
       if (userDocs.docs.isEmpty) return false;
-      
+
       String userRole = userDocs.docs.first['role'];
       return userRole == 'Admin' || currentUserEmail == data['email'];
     }
@@ -124,7 +126,8 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
               children: [
                 const CircleAvatar(
                   radius: 28,
-                  backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
+                  backgroundImage:
+                      AssetImage('assets/images/dr-sheshtawey.jpg'),
                 ),
                 Expanded(
                   child: Padding(
@@ -207,10 +210,12 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
         return AlertDialog(
           backgroundColor: Colors.white,
           title: const Text('Delete Announcement'),
-          content: const Text('Are you sure you want to delete this announcement?'),
+          content:
+              const Text('Are you sure you want to delete this announcement?'),
           actions: [
             TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black)),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(

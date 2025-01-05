@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-Color kPrimary = const Color(0XFF3DB2FF);
-Color kGrey = const Color(0XFF888C94);
-Color kGreyLight = const Color(0XFFE5E5E5);
-Color kOrange = const Color(0XFFFF7648);
+const Color kPrimaryColor = Color(0XFF3DB2FF);
+const Color kGrey = Color(0XFF888C94);
+const Color kGreyLight = Color(0XFFE5E5E5);
+const Color kOrange = Color(0XFFFF7648);
 const Color kLightGrey = Color(0xFFE1E8ED);
 
 const kTextStyleBold = TextStyle(

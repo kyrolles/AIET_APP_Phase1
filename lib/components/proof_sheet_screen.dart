@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'rpd_button.dart';
 import '../constants.dart';
-import '../screens/it_invoice_screen.dart';
 
 class ProofOfEnrollmentSheetScreen extends StatefulWidget {
   const ProofOfEnrollmentSheetScreen({
@@ -86,7 +85,7 @@ class _ProofOfEnrollmentSheetScreenState
                 children: [
                   Checkbox(
                     value: isChecked,
-                    activeColor: kPrimary,
+                    activeColor: kPrimaryColor,
                     onChanged: (newBool) {
                       setState(() {
                         isChecked = newBool ?? false;
