@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 
@@ -43,15 +44,49 @@ class StudentTrainingScreen extends StatelessWidget {
                                     color: Color(0XFF6C7072)),
                               ),
                             ]),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, '/departmentTraining');
-                            },
-                            child: const Text('CE')),
-                        TextButton(onPressed: () {}, child: const Text('EME')),
-                        TextButton(onPressed: () {}, child: const Text('ECE')),
-                        TextButton(onPressed: () {}, child: const Text('IE')),
+                        KButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/departmentTraining');
+                          },
+                          text: 'CE',
+                          textColor: Colors.black,
+                          borderWidth: 1,
+                          borderColor: Colors.black,
+                          backgroundImage: const DecorationImage(
+                              image: AssetImage('assets/project_image/CE.jpeg'),
+                              fit: BoxFit.cover),
+                        ),
+                        KButton(
+                          onPressed: () {},
+                          text: 'EME',
+                          textColor: Colors.white,
+                          borderWidth: 1,
+                          borderColor: Colors.black,
+                          backgroundImage: const DecorationImage(
+                              image: AssetImage('assets/project_image/EME.png'),
+                              fit: BoxFit.cover),
+                        ),
+                        KButton(
+                          onPressed: () {},
+                          text: 'ECE',
+                          textColor: Colors.white,
+                          borderWidth: 1,
+                          borderColor: Colors.black,
+                          backgroundImage: const DecorationImage(
+                              image:
+                                  AssetImage('assets/project_image/ECE.jpeg'),
+                              fit: BoxFit.cover),
+                        ),
+                        KButton(
+                          onPressed: () {},
+                          text: 'IE',
+                          textColor: Colors.white,
+                          borderWidth: 1,
+                          borderColor: Colors.black,
+                          backgroundImage: const DecorationImage(
+                              image: AssetImage('assets/project_image/IE.jpeg'),
+                              fit: BoxFit.cover),
+                        )
                       ],
                     ),
                   );

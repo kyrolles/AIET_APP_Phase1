@@ -14,6 +14,7 @@ class KButton extends StatelessWidget {
   final double? fontSize; // Optional font size for text
   final double? svgWidth; // Optional width for the SVG icon
   final double? svgHeight; // Optional height for the SVG icon
+  final DecorationImage? backgroundImage; // Optional background image
 
   const KButton({
     super.key,
@@ -29,6 +30,7 @@ class KButton extends StatelessWidget {
     this.fontSize = 25, // Default font size for text
     this.svgWidth = 30, // Default SVG width
     this.svgHeight = 30, // Default SVG height
+    this.backgroundImage, // Optional background image
   });
 
   @override
@@ -49,6 +51,7 @@ class KButton extends StatelessWidget {
             border: borderWidth != null && borderColor != null
                 ? Border.all(color: borderColor!, width: borderWidth!)
                 : null, // Optional border
+            image: backgroundImage, // Optional background image
           ),
           child: Stack(
             alignment: Alignment.center,
