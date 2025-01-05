@@ -5,23 +5,26 @@ import '../constants.dart';
 class StudentContainer extends StatelessWidget {
   const StudentContainer({
     super.key,
-    required this.onTap,
-    required this.name,
-    required this.status,
-    required this.statusColor,
-    required this.id,
-    required this.year,
+    this.onTap,
+    this.name, // Nullable by default
+    this.status, // Nullable by default
+    this.statusColor, // Nullable by default
+    this.id, // Nullable by default
+    this.year, // Nullable by default
     required this.title,
     required this.image,
+    this.button,
   });
+
   final Function(BuildContext)? onTap;
-  final String name;
-  final String status;
-  final Color statusColor;
-  final String id;
-  final String year;
+  final String? name; // Nullable by default
+  final String? status; // Nullable by default
+  final Color? statusColor; // Nullable by default
+  final String? id; // Nullable by default
+  final String? year; // Nullable by default
   final String title;
   final String image;
+  final Function(BuildContext)? button;
 
   @override
   Widget build(BuildContext context) {
@@ -38,48 +41,46 @@ class StudentContainer extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
         ),
-        // height: 100,
         child: Column(
           children: [
             Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    name,
-                    style: kTextStyleNormal,
-                    overflow: TextOverflow.ellipsis, // Add this line
+                if (name != null) // Only show name if it's not null
+                  Expanded(
+                    child: Text(
+                      name!,
+                      style: kTextStyleNormal,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                // const SizedBox(width: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    // color: kPrimaryColor,
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(8),
+                if (id != null) // Only show ID if it's not null
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: Text(
+                      id!,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
                   ),
-                  padding: const EdgeInsets.all(3),
-                  child: Text(
-                    id,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
                 const SizedBox(width: 5),
-                Container(
-                  decoration: BoxDecoration(
-                    // color: const Color(0XFFFF8504),
-                    color: Colors.black38,
-                    borderRadius: BorderRadius.circular(5),
+                if (year != null) // Only show year if it's not null
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black38,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: Text(
+                      year!,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
                   ),
-                  padding: const EdgeInsets.all(3),
-                  child: Text(
-                    year,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                  ),
-                ),
               ],
             ),
-            const SizedBox(height: 8),
+            if (name != null) const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -104,25 +105,30 @@ class StudentContainer extends StatelessWidget {
                   style: const TextStyle(fontSize: 18),
                 ),
                 Row(
+                  spacing: 6,
                   children: [
-                    Text(
-                      status,
-                      style: const TextStyle(
-                          fontSize: 14, color: Color(0XFF6C7072)),
-                    ),
-                    const SizedBox(width: 3),
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: statusColor,
+                    if (status != null) // Only show status if it's not null
+                      Text(
+                        status!,
+                        style: const TextStyle(
+                            fontSize: 14, color: Color(0XFF6C7072)),
                       ),
-                      height: 22,
-                      width: 22,
-                    )
+                    // const SizedBox(width: 3),
+                    if (statusColor !=
+                        null) // Only show status color if it's not null
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: statusColor,
+                        ),
+                        height: 22,
+                        width: 22,
+                      ),
+                    if (button != null) button!(context)
                   ],
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
