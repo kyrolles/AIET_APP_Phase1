@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:graduation_project/screens/attendance/attendance_archive.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_screen.dart';
 import 'package:graduation_project/screens/training/student_training/departement_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/trianing_details_screen.dart';
-import 'screens/attendance/attendance_screen.dart';
 import 'screens/invoice/student_invoice/invoice_archive_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';

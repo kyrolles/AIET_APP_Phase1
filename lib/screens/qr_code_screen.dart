@@ -80,13 +80,12 @@ class QrcodeScreen extends StatelessWidget {
 
                 final userData = snapshot.data;
 
-                final name = userData != null
-                    ? "${userData['name'][0]} ${userData['name'][1]}"
-                    : "Loading...";
+                final firstName = userData?['firstName'] ?? "Loading...";
+                final lastName = userData?['lastName'] ?? "Loading...";
+                final name = "$firstName $lastName";
                 final department = userData?['department'] ?? "Loading...";
-                final studentId = userData?['student_ID'] ?? "Loading...";
-                final year =
-                    "${userData?['academicYear'] ?? 'Loading...'}" + "th";
+                final studentId = userData?['id'] ?? "Loading...";
+                final year = "${userData?['academicYear'] ?? 'Loading...'}th";
 
                 return Column(
                   children: [
@@ -97,7 +96,7 @@ class QrcodeScreen extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 58,
                         backgroundImage:
-                            AssetImage('assets/images/1704502172296.jpg'),
+                        AssetImage('assets/images/1704502172296.jpg'),
                       ),
                     ),
                     const SizedBox(height: 50),
