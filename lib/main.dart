@@ -9,6 +9,7 @@ import 'package:graduation_project/screens/training/student_training/departement
 import 'package:graduation_project/screens/training/student_training/student_training_screen.dart';
 import 'package:graduation_project/screens/training/student_training/trianing_details_screen.dart';
 import 'screens/attendance/attendance_screen.dart';
+import 'screens/invoice/student_invoice/invoice_archive_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart'; // Import the CreateUserScreen
@@ -70,6 +71,7 @@ class MyApp extends StatelessWidget {
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
         '/attendance': (context) => AttendanceScreen(),
         '/attendance/archive': (context) => const AttendanceArchive(),
+        '/invoice/archive': (context) => const InvoiceArchiveScreen(),
       },
     );
   }

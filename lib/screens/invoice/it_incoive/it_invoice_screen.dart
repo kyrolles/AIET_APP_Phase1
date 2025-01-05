@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../components/it_invoice_request_contanier.dart';
-import '../components/my_app_bar.dart';
-import '../components/tuition_container.dart';
-import '../constants.dart';
+import 'it_invoice_request_contanier.dart';
+import '../../../components/my_app_bar.dart';
+import '../student_invoice/tuition_container.dart';
+import '../../../constants.dart';
 import 'it_archive.dart';
 
 // Color? statusColor;

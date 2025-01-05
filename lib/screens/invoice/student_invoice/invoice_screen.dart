@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/components/list_container.dart';
-import '../components/my_app_bar.dart';
-import '../components/proof_of_enrollment.dart';
+import '../../../components/my_app_bar.dart';
+import 'proof_of_enrollment.dart';
 import 'tuition_fees_download.dart';
 
 class InvoiceScreen extends StatelessWidget {
@@ -14,6 +14,12 @@ class InvoiceScreen extends StatelessWidget {
       appBar: MyAppBar(
         title: 'Invoice',
         onpressed: () => Navigator.pop(context),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, '/invoice/archive'),
+            icon: const Icon(Icons.archive),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -53,7 +59,7 @@ class InvoiceScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          // archiveButton(context),
           const Padding(
             padding: EdgeInsets.only(left: 16.0),
             child: Text(
@@ -64,36 +70,80 @@ class InvoiceScreen extends StatelessWidget {
               ),
             ),
           ),
-          ServiceItem(
-              title: 'Tuition fees',
-              imageUrl: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
-              backgroundColor: Colors.blue,
-              onPressed: () {
-                showModalBottomSheet<void>(
-                  backgroundColor: const Color(0XFFF1F1F2),
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const TuitionFeesDownload();
-                  },
-                );
-              }),
-          const SizedBox(height: 10),
-          ServiceItem(
-            title: 'Proof of enrollment',
-            imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-            backgroundColor: Colors.blue,
-            onPressed: () {
-              showModalBottomSheet<void>(
-                backgroundColor: const Color(0XFFF1F1F2),
-                context: context,
-                builder: (BuildContext context) {
-                  return const ProofOfEnrollment();
-                },
-              );
-            },
-          ),
+          tuitionFeesButton(context),
+          proofOfEnrollmentButton(context),
         ],
       ),
+    );
+  }
+
+  GestureDetector archiveButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/invoice/archive');
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0XFF888C94),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: const Row(
+          children: [
+            Icon(
+              Icons.archive,
+              color: Colors.white,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Archive',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontFamily: 'Lexend',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  ServiceItem proofOfEnrollmentButton(BuildContext context) {
+    return ServiceItem(
+      title: 'Proof of enrollment',
+      imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+      backgroundColor: Colors.blue,
+      onPressed: () {
+        showModalBottomSheet<void>(
+          backgroundColor: const Color(0XFFF1F1F2),
+          context: context,
+          builder: (BuildContext context) {
+            return const ProofOfEnrollment();
+          },
+        );
+      },
+    );
+  }
+
+  ServiceItem tuitionFeesButton(BuildContext context) {
+    return ServiceItem(
+      title: 'Tuition fees',
+      imageUrl: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
+      backgroundColor: Colors.blue,
+      onPressed: () {
+        showModalBottomSheet<void>(
+          backgroundColor: const Color(0XFFF1F1F2),
+          context: context,
+          builder: (BuildContext context) {
+            return const TuitionFeesDownload();
+          },
+        );
+      },
     );
   }
 }
