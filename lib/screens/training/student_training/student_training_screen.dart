@@ -21,6 +21,7 @@ class StudentTrainingScreen extends StatelessWidget {
             backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {
               showModalBottomSheet(
+                backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
                 context: context,
                 isScrollControlled: true,
                 shape: const RoundedRectangleBorder(
@@ -49,6 +50,7 @@ class StudentTrainingScreen extends StatelessWidget {
                             Navigator.pushNamed(context, '/departmentTraining');
                           },
                           text: 'CE',
+                          fontSize: 34,
                           textColor: Colors.black,
                           borderWidth: 1,
                           borderColor: Colors.black,
@@ -59,6 +61,7 @@ class StudentTrainingScreen extends StatelessWidget {
                         KButton(
                           onPressed: () {},
                           text: 'EME',
+                          fontSize: 34,
                           textColor: Colors.white,
                           borderWidth: 1,
                           borderColor: Colors.black,
@@ -69,23 +72,27 @@ class StudentTrainingScreen extends StatelessWidget {
                         KButton(
                           onPressed: () {},
                           text: 'ECE',
-                          textColor: Colors.white,
+                          fontSize: 34,
+                          textColor: Colors.black,
                           borderWidth: 1,
                           borderColor: Colors.black,
                           backgroundImage: const DecorationImage(
                               image:
                                   AssetImage('assets/project_image/ECE.jpeg'),
-                              fit: BoxFit.cover),
+                              fit: BoxFit.cover,
+                              opacity: 0.5),
                         ),
                         KButton(
                           onPressed: () {},
                           text: 'IE',
+                          fontSize: 34,
                           textColor: Colors.white,
                           borderWidth: 1,
                           borderColor: Colors.black,
                           backgroundImage: const DecorationImage(
                               image: AssetImage('assets/project_image/IE.jpeg'),
-                              fit: BoxFit.cover),
+                              fit: BoxFit.cover,
+                              opacity: 0.8),
                         )
                       ],
                     ),
