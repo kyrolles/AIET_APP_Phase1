@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-<<<<<<< HEAD
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_screen.dart';
-=======
-import 'package:graduation_project/screens/attendance/attendance_archive.dart';
+// import 'package:graduation_project/screens/attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/training/idk_where_put_it/create_announcement.dart';
->>>>>>> 3bbe8414854ad9e423f5f41b31db91b0baa44759
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_screen.dart';
@@ -31,7 +28,6 @@ void main() async {
     isLoggedIn: token != null,
   ));
 }
-
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
@@ -77,12 +73,9 @@ class MyApp extends StatelessWidget {
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
         '/attendance': (context) => AttendanceScreen(),
         '/attendance/archive': (context) => const AttendanceArchive(),
-<<<<<<< HEAD
         '/invoice/archive': (context) => const InvoiceArchiveScreen(),
-=======
-        '/staffStudentTraining/createAnnouncement': (context) => const CreateAnnouncement(),
-
->>>>>>> 3bbe8414854ad9e423f5f41b31db91b0baa44759
+        '/staffStudentTraining/createAnnouncement': (context) =>
+            const CreateAnnouncement(),
       },
     );
   }
