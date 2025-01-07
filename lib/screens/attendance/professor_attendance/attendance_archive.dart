@@ -1,15 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/add_student_bottom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class AttendanceArchive extends StatefulWidget {
-  final String? subjectCode;
+  final String? subjectName;
   final String? period;
 
   const AttendanceArchive({
     super.key,
-    this.subjectCode,
+    this.subjectName,
     this.period,
   });
 
@@ -18,29 +20,79 @@ class AttendanceArchive extends StatefulWidget {
 }
 
 class _AttendanceArchiveState extends State<AttendanceArchive> {
+  String userName = '';
+  Future<void> fetchUserName() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+
+        // Check in the users collection
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          DocumentSnapshot userDoc = querySnapshot.docs.first;
+          setState(() {
+            // Combine first and last name
+            userName = '${userDoc['firstName']} ${userDoc['lastName']}'.trim();
+          });
+        }
+      }
+    } catch (e) {
+      print('Error fetching user name: $e');
+    }
+  }
+
   String? qrData;
   // Hardcoded attendance list to match screenshot
   final List<Map<String, String>> attendanceList = [
-    {'name': 'Youssef Abdelfatah'},
-    {'name': 'Mahmoud Abdelnaser'},
-    {'name': 'Sotiri Tamer'},
-    {'name': 'Kyrolles Raafat'},
-    {'name': 'Youssef saleh'},
-    {'name': 'Mohamed Mardy'},
-    {'name': 'Ahamed Tarek'},
+    {
+      'name': 'Youssef Abdelfatah',
+      'id': '2000135',
+      'academicYear': '4',
+    },
+    {
+      'name': 'Mahmoud Abdelnaser',
+      'id': '2000135',
+      'academicYear': '4',
+    },
+    {
+      'name': 'Ahamed Tarek',
+      'id': '2000135',
+      'academicYear': '4',
+    },
+    {
+      'name': 'Mohamed Mardy',
+      'id': '2000135',
+      'academicYear': '4',
+    },
+    {
+      'name': 'Kyrolles Raafat',
+      'id': '2000135',
+      'academicYear': '4',
+    },
+    {
+      'name': 'Youssef saleh',
+      'id': '2000135',
+      'academicYear': '4',
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    if (widget.subjectCode != null && widget.period != null) {
+    if (widget.subjectName != null && widget.period != null) {
       generateQRCode();
     }
+    fetchUserName();
   }
 
   void generateQRCode() {
     qrData =
-        '{"subjectCode":"${widget.subjectCode}","period":"${widget.period}","timestamp":"${DateTime.now().toIso8601String()}"}';
+        '{"subjectCode":"${widget.subjectName}","period":"${widget.period}","timestamp":"${DateTime.now().toIso8601String()}"}';
     setState(() {});
   }
 
@@ -181,6 +233,15 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      CollectionReference attendance =
+                          FirebaseFirestore.instance.collection('attendance');
+                      attendance.add({
+                        'email': FirebaseAuth.instance.currentUser?.email,
+                        'period': widget.period,
+                        'subjectName': widget.subjectName,
+                        'profName': userName,
+                        'studentList': [],
+                      });
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
