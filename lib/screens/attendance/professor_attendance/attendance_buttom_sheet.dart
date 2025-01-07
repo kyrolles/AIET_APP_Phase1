@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart'; // Add this import
@@ -104,7 +106,8 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
 
                   if (subjectCode.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a subject code')),
+                      const SnackBar(
+                          content: Text('Please enter a subject code')),
                     );
                     return;
                   }
@@ -122,7 +125,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => AttendanceArchive(
-                        subjectCode: subjectCode,
+                        subjectName: subjectCode,
                         period: selectedPeriod,
                       ),
                     ),
