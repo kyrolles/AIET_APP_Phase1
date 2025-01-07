@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../components/it_invoice_request_contanier.dart';
-import '../components/my_app_bar.dart';
-import '../constants.dart';
+import 'it_invoice_request_contanier.dart';
+import '../../../components/my_app_bar.dart';
+import '../../../constants.dart';
 
 class ItArchiveScreen extends StatefulWidget {
   const ItArchiveScreen(

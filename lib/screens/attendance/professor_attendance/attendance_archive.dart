@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
-import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/add_student_bottom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AttendanceArchive extends StatefulWidget {
   final String? subjectCode;
@@ -40,7 +39,8 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
   }
 
   void generateQRCode() {
-    qrData = '{"subjectCode":"${widget.subjectCode}","period":"${widget.period}","timestamp":"${DateTime.now().toIso8601String()}"}';
+    qrData =
+        '{"subjectCode":"${widget.subjectCode}","period":"${widget.period}","timestamp":"${DateTime.now().toIso8601String()}"}';
     setState(() {});
   }
 
@@ -74,16 +74,16 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                 ),
                 child: qrData != null
                     ? QrImageView(
-                  data: qrData!,
-                  version: QrVersions.auto,
-                  size: 180,
-                  backgroundColor: Colors.white,
-                )
+                        data: qrData!,
+                        version: QrVersions.auto,
+                        size: 180,
+                        backgroundColor: Colors.white,
+                      )
                     : const SizedBox(
-                  height: 180,
-                  width: 180,
-                  child: Center(child: Text('QR Code')),
-                ),
+                        height: 180,
+                        width: 180,
+                        child: Center(child: Text('QR Code')),
+                      ),
               ),
             ),
           ),
@@ -152,7 +152,14 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const AddStudentBottomSheet();
+                        },
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[300],
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -173,7 +180,9 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(vertical: 12),
