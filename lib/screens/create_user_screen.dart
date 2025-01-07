@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/my_app_bar.dart';
+import 'package:uuid/uuid.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -28,63 +30,22 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
+  final _uuid = const Uuid();
 
-  Future<void> createAccount() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-
-      try {
-        // Step 1: Create user in Firebase Authentication
-        final UserCredential userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-
-        if (userCredential.user != null) {
-          // Step 2: Store additional user data in Firestore
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userCredential.user!.uid)
-              .set({
-            'firstName': _firstNameController.text,
-            'lastName': _lastNameController.text,
-            'email': _emailController.text,
-            'phone': _phoneController.text,
-            'role': selectedRole,
-            'department':
-                selectedDepartment, // Updated to use selectedDepartment
-            'id': _idController.text,
-            'academicYear': _academicYearController.text,
-            'birthDate': _birthDateController.text,
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account created successfully!')),
-          );
-
-          // Reset the form after successful creation
-          resetForm();
-        }
-      } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create account: ${e.message}')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create account: $e')),
-        );
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _idController.dispose();
+    _academicYearController.dispose();
+    _birthDateController.dispose();
+    super.dispose();
   }
 
+  // Reset form fields
   void resetForm() {
     _firstNameController.clear();
     _lastNameController.clear();
@@ -95,22 +56,71 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _academicYearController.clear();
     _birthDateController.clear();
     setState(() {
-      selectedDepartment = 'General'; // Reset department to default
+      selectedRole = 'IT';
+      selectedDepartment = '';
+      isPasswordVisible = false;
     });
   }
 
-  @override
-  void dispose() {
-    // Dispose of the controllers when the widget is disposed
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _phoneController.dispose();
-    _idController.dispose();
-    _academicYearController.dispose();
-    _birthDateController.dispose();
-    super.dispose();
+  Future<void> createAccount() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        // Generate unique QR code data
+        String qrData = _uuid.v4();
+
+        // Create a SEPARATE Firebase Auth instance for creating the new user
+        final FirebaseAuth secondaryAuth = FirebaseAuth.instanceFor(
+          app: FirebaseAuth.instance.app,
+        );
+
+        // Create new user using the secondary auth instance
+        final UserCredential userCredential =
+            await secondaryAuth.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        if (userCredential.user != null) {
+          // Store additional user data and QR code in Firestore
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .set({
+            'firstName': _firstNameController.text,
+            'lastName': _lastNameController.text,
+            'email': _emailController.text,
+            'phone': _phoneController.text,
+            'role': selectedRole,
+            'department': selectedDepartment, // Updated to use selectedDepartment
+            'id': _idController.text,
+            'academicYear': _academicYearController.text,
+            'birthDate': _birthDateController.text,
+            'createdAt': FieldValue.serverTimestamp(),
+            'qrCode': qrData,
+          });
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Account created successfully!')),
+          );
+
+          // Reset the form after successful creation
+          resetForm();
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create account: $e')),
+        );
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -221,8 +231,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     children: [
                       const Text(
                         'Department',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w400),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
@@ -230,8 +239,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         ),
                         value: selectedDepartment,
                         items: const [
