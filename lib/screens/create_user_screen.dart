@@ -24,7 +24,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final TextEditingController _birthDateController = TextEditingController();
 
   String selectedRole = 'IT'; // Default role
-  String selectedDepartment = ''; // Default department
+  String selectedDepartment = 'General'; // Default department
   bool isLoading = false; // Loading indicator state
   bool isPasswordVisible = false; // Password visibility state
 
@@ -57,7 +57,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _birthDateController.clear();
     setState(() {
       selectedRole = 'IT';
-      selectedDepartment = 'General';
+      selectedDepartment = '';
       isPasswordVisible = false;
     });
   }
@@ -72,12 +72,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         // Generate unique QR code data
         String qrData = _uuid.v4();
 
-        // Create auth instance
-        final auth = FirebaseAuth.instance;
+        // Create a SEPARATE Firebase Auth instance for creating the new user
+        final FirebaseAuth secondaryAuth = FirebaseAuth.instanceFor(
+          app: FirebaseAuth.instance.app,
+        );
 
-        // Create new user
-        final UserCredential userCredential = 
-            await auth.createUserWithEmailAndPassword(
+        // Create new user using the secondary auth instance
+        final UserCredential userCredential =
+            await secondaryAuth.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
@@ -93,7 +95,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department': selectedDepartment,
+            'department': selectedDepartment, // Updated to use selectedDepartment
             'id': _idController.text,
             'academicYear': _academicYearController.text,
             'birthDate': _birthDateController.text,
@@ -101,10 +103,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'qrCode': qrData,
           });
 
+          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Account created successfully!')),
           );
 
+          // Reset the form after successful creation
           resetForm();
         }
       } catch (e) {
@@ -227,8 +231,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     children: [
                       const Text(
                         'Department',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w400),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
@@ -236,8 +239,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         ),
                         value: selectedDepartment,
                         items: const [
