@@ -1,33 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum PeriodNumber { p1, p2, p3, p4 }
 
 class AttendanceModel {
+  final String id;
   final String profEmail;
   final String profName;
   final String subjectName;
   final String period;
-  // final Timestamp startTime;
-  // final Timestamp endTime;
   final List<Student> studentsList;
 
   AttendanceModel({
+    required this.id,
     required this.profEmail,
     required this.profName,
     required this.subjectName,
     required this.studentsList,
-    // required this.endTime,
     required this.period,
-    // required this.startTime,
   });
 
-  factory AttendanceModel.fromJson(jsonData) {
+  factory AttendanceModel.fromJson(QueryDocumentSnapshot jsonData) {  // Changed to QueryDocumentSnapshot
     return AttendanceModel(
-      profEmail: jsonData['email'],
-      profName: jsonData['profName'],
-      subjectName: jsonData['subjectName'],
-      // startTime: jsonData['startTime'],
-      // endTime: jsonData['endTime'],
-      period: jsonData['period'],
-      studentsList: getAllStudents(jsonData['studentList']),
+      id: jsonData.id,
+      profEmail: jsonData['email'] ?? '',
+      profName: jsonData['profName'] ?? '',
+      subjectName: jsonData['subjectName'] ?? '',
+      period: jsonData['period'] ?? '',
+      studentsList: getAllStudents(jsonData['studentList'] ?? []),
     );
   }
 }

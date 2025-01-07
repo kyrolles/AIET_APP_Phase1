@@ -14,28 +14,9 @@ class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
 
   final CollectionReference attendance =
-      FirebaseFirestore.instance.collection('attendance');
+  FirebaseFirestore.instance.collection('attendance');
 
   List<AttendanceModel> periods = [];
-
-  // CurrentAttendanceItem(
-  //   subject: 'Microprocessor',
-  //   period: 'P1',
-  //   startTime: '9:00',
-  //   endTime: '10:30',
-  //   total: 34,
-  //   ontapOnReview: () {},
-  //   ontapOnSend: () {},
-  // ),
-  // CurrentAttendanceItem(
-  //   subject: 'Data Structure',
-  //   period: 'P2',
-  //   startTime: '10:40',
-  //   endTime: '12:10',
-  //   total: 32,
-  //   ontapOnReview: () {},
-  //   ontapOnSend: () {},
-  // ),
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +74,7 @@ class AttendanceScreen extends StatelessWidget {
                 builder: (context) => AttendanceArchive(
                   subjectName: periods[i].subjectName,
                   period: periods[i].period,
+                  existingDocId: periods[i].id,  // Pass the existing document ID
                 ),
               ),
             );
