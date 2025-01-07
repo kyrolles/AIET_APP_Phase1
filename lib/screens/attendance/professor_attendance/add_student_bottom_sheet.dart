@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'professor_qr_code_scanner_screen.dart';
 import 'add_student_manually_bottom_sheet.dart';
 
 class AddStudentBottomSheet extends StatelessWidget {
@@ -38,7 +38,14 @@ class AddStudentBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfessorQRScannerScreen(),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0ED290),
               shape: RoundedRectangleBorder(

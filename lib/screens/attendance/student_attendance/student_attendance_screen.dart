@@ -3,7 +3,7 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/components/list_container.dart';
-import 'package:graduation_project/screens/attendance/professor_attendance/qr_code_scanner_screen.dart';
+import 'package:graduation_project/screens/attendance/student_attendance/qr_code_scanner_screen.dart';
 
 class StudentAttendanceScreen extends StatelessWidget {
   StudentAttendanceScreen({super.key});

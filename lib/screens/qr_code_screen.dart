@@ -17,7 +17,10 @@ class QrcodeScreen extends StatelessWidget {
           .get();
 
       if (doc.exists) {
-        return doc.data();
+        return {
+          ...doc.data()!,
+          'uid': user.uid, // Add UID to the returned data
+        };
       }
     }
     return null;
@@ -79,6 +82,7 @@ class QrcodeScreen extends StatelessWidget {
                 }
 
                 final userData = snapshot.data;
+                final uid = userData?['uid'] ?? "";  // Get the UID
 
                 final firstName = userData?['firstName'] ?? "Loading...";
                 final lastName = userData?['lastName'] ?? "Loading...";
@@ -157,7 +161,7 @@ class QrcodeScreen extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                        data: '$name|$studentId',
+                        data: userData?['qrCode'] ?? "", // Use the qrCode field value
                         version: QrVersions.auto,
                         size: 200.0,
                         backgroundColor: Colors.white,
