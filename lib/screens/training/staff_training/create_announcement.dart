@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/checkbox_with_label.dart';
+import 'package:graduation_project/components/file_upload_with_progress.dart';
 
 class CreateAnnouncement extends StatelessWidget {
   const CreateAnnouncement({super.key});
@@ -126,13 +128,9 @@ class CreateAnnouncement extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter Important links',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                    FileUploadWidget(
+                      height: 350,
+                      width: double.infinity, // Full width
                     ),
                     SizedBox(
                       height: 20,
@@ -152,13 +150,9 @@ class CreateAnnouncement extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter Important links',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                    FileUploadWidget(
+                      height: 350,
+                      width: double.infinity, // Full width
                     ),
                     SizedBox(
                       height: 20,
@@ -178,13 +172,29 @@ class CreateAnnouncement extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter Important links',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                    CustomCheckbox(
+                      label: "Computer",
+                      onChanged: (value) {
+                        print("Computer selected: $value");
+                      },
+                    ),
+                    CustomCheckbox(
+                      label: "Mechatronics",
+                      onChanged: (value) {
+                        print("Mechatronics selected: $value");
+                      },
+                    ),
+                    CustomCheckbox(
+                      label: "Communication & Electronics",
+                      onChanged: (value) {
+                        print("Communication & Electronics selected: $value");
+                      },
+                    ),
+                    CustomCheckbox(
+                      label: "Industrial",
+                      onChanged: (value) {
+                        print("Industrial selected: $value");
+                      },
                     ),
                   ],
                 ))));

@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_screen.dart';
 // import 'package:graduation_project/screens/attendance/attendance_archive.dart';
-import 'package:graduation_project/screens/training/idk_where_put_it/create_announcement.dart';
+import 'package:graduation_project/screens/training/staff_training/create_announcement.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_screen.dart';
