@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/createUser': (context) =>
             const CreateUserScreen(), // Add route for CreateUserScreen
-        '/studentTraining': (context) => const StudentTrainingScreen(),
+        '/studentTraining': (context) => StudentTrainingScreen(),
         '/staffStudentTraining': (context) =>
             const StaffstudentTrainingScreen(),
         '/staffStudentTraining/validate': (context) => ValidateScreen(),

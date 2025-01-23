@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
-
 import '../constants.dart';
 
 class StudentContainer extends StatelessWidget {
   const StudentContainer({
     super.key,
     this.onTap,
-    this.name, // Nullable by default
-    this.status, // Nullable by default
-    this.statusColor, // Nullable by default
-    this.id, // Nullable by default
-    this.year, // Nullable by default
+    this.name,
+    this.status,
+    this.statusColor,
+    this.id,
+    this.year,
     required this.title,
     required this.image,
     this.button,
   });
 
   final Function(BuildContext)? onTap;
-  final String? name; // Nullable by default
-  final String? status; // Nullable by default
-  final Color? statusColor; // Nullable by default
-  final String? id; // Nullable by default
-  final String? year; // Nullable by default
+  final String? name;
+  final String? status;
+  final Color? statusColor;
+  final String? id;
+  final String? year;
   final String title;
   final String image;
   final Function(BuildContext)? button;
@@ -31,7 +30,7 @@ class StudentContainer extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (onTap != null) {
-          onTap!(context); // Pass the context here
+          onTap!(context);
         }
       },
       child: Container(
@@ -45,7 +44,7 @@ class StudentContainer extends StatelessWidget {
           children: [
             Row(
               children: [
-                if (name != null) // Only show name if it's not null
+                if (name != null)
                   Expanded(
                     child: Text(
                       name!,
@@ -53,7 +52,7 @@ class StudentContainer extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                if (id != null) // Only show ID if it's not null
+                if (id != null)
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black26,
@@ -66,7 +65,7 @@ class StudentContainer extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(width: 5),
-                if (year != null) // Only show year if it's not null
+                if (year != null)
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black38,
@@ -82,7 +81,6 @@ class StudentContainer extends StatelessWidget {
             ),
             if (name != null) const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CircleAvatar(
                   radius: 16.5,
@@ -100,33 +98,34 @@ class StudentContainer extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 18),
+                const SizedBox(width: 5), // Add spacing for better layout
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center, // Center the text
+                    overflow: TextOverflow.ellipsis, // Enables "..."
+                    maxLines: 1, // Keeps it on one line
+                  ),
                 ),
-                Row(
-                  spacing: 6,
-                  children: [
-                    if (status != null) // Only show status if it's not null
-                      Text(
-                        status!,
-                        style: const TextStyle(
-                            fontSize: 14, color: Color(0XFF6C7072)),
-                      ),
-                    // const SizedBox(width: 3),
-                    if (statusColor !=
-                        null) // Only show status color if it's not null
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: statusColor,
-                        ),
-                        height: 22,
-                        width: 22,
-                      ),
-                    if (button != null) button!(context)
-                  ],
-                ),
+                const SizedBox(width: 5),
+                if (status != null)
+                  Text(
+                    status!,
+                    style:
+                        const TextStyle(fontSize: 14, color: Color(0XFF6C7072)),
+                  ),
+                const SizedBox(width: 6),
+                if (statusColor != null)
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: statusColor,
+                    ),
+                    height: 22,
+                    width: 22,
+                  ),
+                if (button != null) button!(context),
               ],
             ),
           ],
