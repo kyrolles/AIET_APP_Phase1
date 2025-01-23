@@ -1,34 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/components/list_container.dart';
+import 'package:graduation_project/screens/attendance/attendance_model.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_item.dart';
 
 import 'attendance_buttom_sheet.dart';
 
 class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
 
-  final List<Widget> periods = [
-    CurrentAttendanceItem(
-      subject: 'Microprocessor',
-      period: 'P1',
-      startTime: '9:00',
-      endTime: '10:30',
-      total: 34,
-      ontapOnReview: () {},
-      ontapOnSend: () {},
-    ),
-    CurrentAttendanceItem(
-      subject: 'Data Structure',
-      period: 'P2',
-      startTime: '10:40',
-      endTime: '12:10',
-      total: 32,
-      ontapOnReview: () {},
-      ontapOnSend: () {},
-    ),
-  ];
+  final CollectionReference attendance =
+  FirebaseFirestore.instance.collection('attendance');
+
+  List<AttendanceModel> periods = [];
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +25,23 @@ class AttendanceScreen extends StatelessWidget {
           title: 'Attendance', onpressed: () => Navigator.pop(context)),
       body: Column(
         children: [
-          ListContainer(
-            title: 'Current attendance',
-            listOfWidgets: periods,
-            emptyMessage: 'No recent attendance found',
+          StreamBuilder<QuerySnapshot>(
+            stream: attendance.snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasData) {
+                periods = [];
+                for (var i = 0; i < snapshot.data!.docs.length; i++) {
+                  periods.add(AttendanceModel.fromJson(snapshot.data!.docs[i]));
+                }
+                return ListContainer(
+                  title: 'Current attendance',
+                  listOfWidgets: currentAttendanceItems(context, periods),
+                  emptyMessage: 'No recent attendance found',
+                );
+              } else {
+                return showLoadingIndicator();
+              }
+            },
           ),
           const Divider(
             color: kLightGrey,
@@ -53,6 +54,40 @@ class AttendanceScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<CurrentAttendanceItem> currentAttendanceItems(
+      context, List<AttendanceModel> periods) {
+    List<CurrentAttendanceItem> attendanceItems = [];
+    for (var i = 0; i < periods.length; i++) {
+      attendanceItems.add(
+        CurrentAttendanceItem(
+          subject: periods[i].subjectName,
+          period: periods[i].period,
+          startTime: '9:00',
+          endTime: '10:30',
+          total: periods[i].studentsList.length,
+          ontapOnReview: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AttendanceArchive(
+                  subjectName: periods[i].subjectName,
+                  period: periods[i].period,
+                  existingDocId: periods[i].id,  // Pass the existing document ID
+                ),
+              ),
+            );
+          },
+          ontapOnSend: () {},
+        ),
+      );
+    }
+    return attendanceItems;
+  }
+
+  Widget showLoadingIndicator() {
+    return const Center(child: CircularProgressIndicator());
   }
 
   Column generateQRcodeButton(BuildContext context) {
@@ -71,119 +106,6 @@ class AttendanceScreen extends StatelessWidget {
               },
             );
           },
-        ),
-      ],
-    );
-  }
-}
-
-class CurrentAttendanceItem extends StatelessWidget {
-  const CurrentAttendanceItem({
-    super.key,
-    required this.subject,
-    required this.period,
-    required this.startTime,
-    required this.endTime,
-    required this.total,
-    required this.ontapOnReview,
-    required this.ontapOnSend,
-  });
-
-  final String subject;
-  final String period;
-  final String startTime;
-  final String endTime;
-  final int total;
-  final Function() ontapOnReview;
-  final Function() ontapOnSend;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Column(
-          spacing: 10,
-          children: [
-            Container(
-              width: 60,
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEB8991),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Center(child: Text(period, style: kTextStyleBold)),
-            ),
-            Text(startTime, style: kTextStyleNormal),
-            Text(
-              endTime,
-              style: const TextStyle(
-                fontFamily: 'Lexend',
-                fontSize: 16,
-                color: kGrey,
-              ),
-            ),
-          ],
-        ),
-        Expanded(
-          child: Container(
-              decoration: BoxDecoration(
-                color: kGreyLight,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(subject, style: kTextStyleBold),
-                      const Icon(Icons.close, color: kGrey),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('Total: ', style: kTextStyleNormal),
-                      Text(
-                        "$total",
-                        style: const TextStyle(
-                          fontFamily: 'Lexend',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 34,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kOrange,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: ontapOnReview,
-                        child: const Text('Review'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: ontapOnSend,
-                        child: const Text('Send'),
-                      ),
-                    ],
-                  )
-                ],
-              )),
         ),
       ],
     );

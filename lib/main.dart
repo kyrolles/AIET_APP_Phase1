@@ -13,7 +13,9 @@ import 'package:graduation_project/screens/training/student_training/trianing_de
 import 'screens/invoice/student_invoice/invoice_archive_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/create_user_screen.dart'; // Import the CreateUserScreen
+import 'screens/create_user_screen.dart';
+import 'package:graduation_project/screens/attendance/attendance_router.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +34,7 @@ class MyApp extends StatelessWidget {
   final bool isLoggedIn;
 
   const MyApp({super.key, required this.isLoggedIn});
+
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +73,7 @@ class MyApp extends StatelessWidget {
             ArchiveValidateScreen(),
         '/departmentTraining': (context) => const DepartementTrainingScreen(),
         '/trainingDetails': (context) => const TrianingDetailsScreen(),
-        '/attendance': (context) => AttendanceScreen(),
+        '/attendance': (context) => const AttendanceRouter(),
         '/attendance/archive': (context) => const AttendanceArchive(),
         '/invoice/archive': (context) => const InvoiceArchiveScreen(),
         '/staffStudentTraining/createAnnouncement': (context) =>
