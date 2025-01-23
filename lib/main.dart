@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
-import 'package:graduation_project/screens/attendance/professor_attendance/attendance_screen.dart';
+import 'package:graduation_project/screens/training/staff_training/create_announcement.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_screen.dart';
@@ -14,7 +14,6 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart';
 import 'package:graduation_project/screens/attendance/attendance_router.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +32,6 @@ class MyApp extends StatelessWidget {
   final bool isLoggedIn;
 
   const MyApp({super.key, required this.isLoggedIn});
-
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +73,8 @@ class MyApp extends StatelessWidget {
         '/attendance': (context) => const AttendanceRouter(),
         '/attendance/archive': (context) => const AttendanceArchive(),
         '/invoice/archive': (context) => const InvoiceArchiveScreen(),
+        '/staffStudentTraining/createAnnouncement': (context) =>
+            const CreateAnnouncement(),
       },
     );
   }

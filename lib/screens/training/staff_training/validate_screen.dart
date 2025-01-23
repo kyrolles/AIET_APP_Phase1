@@ -94,7 +94,7 @@ class ValidateScreen extends StatelessWidget {
         },
         name: 'Ahmed Tarek',
         status: 'No status',
-        statusColor: Color.fromRGBO(229, 229, 229, 1),
+        statusColor: const Color.fromRGBO(229, 229, 229, 1),
         id: '20-0-60785',
         year: '4th',
         title: 'EGSA.pdf',
