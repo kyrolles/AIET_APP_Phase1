@@ -199,12 +199,12 @@ class CreateAnnouncement extends StatelessWidget {
                     const SizedBox(
                       height: 35,
                     ),
-                    // KButton(
-                    //   backgroundColor: Colors.blue,
-                    //   text: 'post',
-                    //   padding: const EdgeInsets.all(0),
-                    //   onPressed: () {},
-                    // )
+                    KButton(
+                      backgroundColor: Color.fromRGBO(6, 147, 241, 1),
+                      text: 'post',
+                      padding: const EdgeInsets.all(0),
+                      onPressed: () {},
+                    )
                   ],
                 ))));
   }
