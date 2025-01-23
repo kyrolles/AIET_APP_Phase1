@@ -28,7 +28,7 @@ class StudentTrainingScreen extends StatelessWidget {
         image: 'assets/project_image/pdf.png'),
     const StudentContainer(
         status: 'No status',
-        statusColor: Colors.grey,
+        statusColor: Color.fromRGBO(229, 229, 229, 1),
         title: 'EgSA.pdf',
         image: 'assets/project_image/pdf.png'),
   ];
