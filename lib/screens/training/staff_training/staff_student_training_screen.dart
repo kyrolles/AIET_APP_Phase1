@@ -20,7 +20,8 @@ class StaffstudentTrainingScreen extends StatelessWidget {
             imageUrl: 'assets/project_image/loudspeaker.png',
             backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {
-              Navigator.pushNamed(context, '/staffStudentTraining/createAnnouncement');
+              Navigator.pushNamed(
+                  context, '/staffStudentTraining/createAnnouncement');
             },
           ),
           ServiceItem(

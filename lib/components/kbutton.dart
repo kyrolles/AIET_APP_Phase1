@@ -15,6 +15,7 @@ class KButton extends StatelessWidget {
   final double? svgWidth; // Optional width for the SVG icon
   final double? svgHeight; // Optional height for the SVG icon
   final DecorationImage? backgroundImage; // Optional background image
+  final EdgeInsetsGeometry? padding; // Optional padding (default maintained)
 
   const KButton({
     super.key,
@@ -31,6 +32,7 @@ class KButton extends StatelessWidget {
     this.svgWidth = 30, // Default SVG width
     this.svgHeight = 30, // Default SVG height
     this.backgroundImage, // Optional background image
+    this.padding, // Allow overriding default padding
   });
 
   @override
@@ -39,8 +41,12 @@ class KButton extends StatelessWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(20), // Matches container radius
       child: Padding(
-        padding:
-            const EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 10),
+        padding: padding ??
+            const EdgeInsets.only(
+                left: 13,
+                right: 13,
+                top: 10,
+                bottom: 10), // Use default if null
         child: Container(
           width: width, // Null allows width to adapt to parent constraints
           height: height, // Null allows height to adapt to parent constraints

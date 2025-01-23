@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/checkbox_with_label.dart';
 import 'package:graduation_project/components/file_upload_with_progress.dart';
+import 'package:graduation_project/components/kbutton.dart';
+import 'package:graduation_project/components/my_app_bar.dart';
 
 class CreateAnnouncement extends StatelessWidget {
   const CreateAnnouncement({super.key});
@@ -8,23 +10,21 @@ class CreateAnnouncement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Create Announcement'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
+        appBar: MyAppBar(
+          title: 'Create Announcement',
+          onpressed: () => Navigator.pop(context),
         ),
         body: SingleChildScrollView(
             child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity, // Full width
                       alignment:
                           Alignment.topLeft, // Align text to the top-left
-                      child: Text(
+                      child: const Text(
                         '1. Company Name',
                         style: TextStyle(
                           fontSize: 20,
@@ -32,22 +32,22 @@ class CreateAnnouncement extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
-                    TextField(
+                    const TextField(
                       decoration: InputDecoration(
                         hintText: 'Enter Company Name',
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
                       width: double.infinity, // Full width
                       alignment:
                           Alignment.topLeft, // Align text to the top-left
-                      child: Text(
+                      child: const Text(
                         '2. Description',
                         style: TextStyle(
                           fontSize: 20,
@@ -55,7 +55,7 @@ class CreateAnnouncement extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     SizedBox(
@@ -68,21 +68,21 @@ class CreateAnnouncement extends StatelessWidget {
                             borderRadius:
                                 BorderRadius.circular(8), // Rounded corners
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             vertical: 20, // Add padding to make it spacious
                             horizontal: 15, // Padding on the sides
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
                       width: double.infinity, // Full width
                       alignment:
                           Alignment.topLeft, // Align text to the top-left
-                      child: Text(
+                      child: const Text(
                         '3. Important links:',
                         style: TextStyle(
                           fontSize: 20,
@@ -90,7 +90,7 @@ class CreateAnnouncement extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     SizedBox(
@@ -103,21 +103,21 @@ class CreateAnnouncement extends StatelessWidget {
                             borderRadius:
                                 BorderRadius.circular(8), // Rounded corners
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             vertical: 20, // Add padding to make it spacious
                             horizontal: 15, // Padding on the sides
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
                       width: double.infinity, // Full width
                       alignment:
                           Alignment.topLeft, // Align text to the top-left
-                      child: Text(
+                      child: const Text(
                         '4. Upload Logo:',
                         style: TextStyle(
                           fontSize: 20,
@@ -125,21 +125,21 @@ class CreateAnnouncement extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     FileUploadWidget(
                       height: 350,
                       width: double.infinity, // Full width
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
                       width: double.infinity, // Full width
                       alignment:
                           Alignment.topLeft, // Align text to the top-left
-                      child: Text(
+                      child: const Text(
                         '5. Upload Image(Optionalfor the profile):',
                         style: TextStyle(
                           fontSize: 20,
@@ -147,21 +147,21 @@ class CreateAnnouncement extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     FileUploadWidget(
                       height: 350,
                       width: double.infinity, // Full width
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
                       width: double.infinity, // Full width
                       alignment:
                           Alignment.topLeft, // Align text to the top-left
-                      child: Text(
+                      child: const Text(
                         '6. Share Announcement to Department:',
                         style: TextStyle(
                           fontSize: 20,
@@ -169,7 +169,7 @@ class CreateAnnouncement extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     CustomCheckbox(
@@ -196,6 +196,15 @@ class CreateAnnouncement extends StatelessWidget {
                         print("Industrial selected: $value");
                       },
                     ),
+                    const SizedBox(
+                      height: 35,
+                    ),
+                    // KButton(
+                    //   backgroundColor: Colors.blue,
+                    //   text: 'post',
+                    //   padding: const EdgeInsets.all(0),
+                    //   onPressed: () {},
+                    // )
                   ],
                 ))));
   }
