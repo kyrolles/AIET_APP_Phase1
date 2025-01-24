@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
@@ -33,6 +35,8 @@ class StudentTrainingScreen extends StatelessWidget {
         image: 'assets/project_image/pdf.png'),
   ];
 
+  final int precent = 15;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,18 +58,19 @@ class StudentTrainingScreen extends StatelessWidget {
                 animationDuration: 1000,
                 radius: 100,
                 lineWidth: 20,
-                percent: 0.25,
+                percent: (precent / 60),
                 progressColor: kPrimaryColor,
                 backgroundColor: Colors.blue.shade50,
                 circularStrokeCap: CircularStrokeCap.round,
-                center: const Column(
+                center: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Progress',
                       style: TextStyle(fontSize: 33, color: Colors.blueGrey),
                     ),
-                    Text('15 of 60', style: TextStyle(fontSize: 32)),
+                    Text('$precent of 60',
+                        style: const TextStyle(fontSize: 32)),
                   ],
                 ),
               ),
