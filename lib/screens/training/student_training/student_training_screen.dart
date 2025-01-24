@@ -22,7 +22,7 @@ class StudentTrainingScreen extends StatelessWidget {
         title: 'EES.pdf',
         image: 'assets/project_image/pdf.png'),
     const StudentContainer(
-        status: 'pending',
+        status: 'Pending',
         statusColor: Colors.yellow,
         title: 'EPC.pdf',
         image: 'assets/project_image/pdf.png'),
@@ -32,6 +32,8 @@ class StudentTrainingScreen extends StatelessWidget {
         title: 'EgSA.pdf',
         image: 'assets/project_image/pdf.png'),
   ];
+
+  final int precent = 15; // the value of the progressbar
 
   @override
   Widget build(BuildContext context) {
@@ -54,23 +56,24 @@ class StudentTrainingScreen extends StatelessWidget {
                 animationDuration: 1000,
                 radius: 100,
                 lineWidth: 20,
-                percent: 0.25,
+                percent: (precent / 60),
                 progressColor: kPrimaryColor,
                 backgroundColor: Colors.blue.shade50,
                 circularStrokeCap: CircularStrokeCap.round,
-                center: const Column(
+                center: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Progress',
                       style: TextStyle(fontSize: 33, color: Colors.blueGrey),
                     ),
-                    Text('15 of 60', style: TextStyle(fontSize: 32)),
+                    Text('$precent of 60',
+                        style: const TextStyle(fontSize: 32)),
                   ],
                 ),
               ),
               SizedBox(
-                height: 400,
+                height: 350,
                 child: ListContainer(
                   title: 'Your Training',
                   listOfWidgets: uplodedfiles,

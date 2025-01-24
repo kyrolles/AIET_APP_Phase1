@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import '../../../constants.dart';
 
 class ProofOfEnrollment extends StatefulWidget {
@@ -84,23 +85,31 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                 ),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
+              // ElevatedButton(
+              //   onPressed: () {
+              //     Navigator.pop(context);
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: kPrimaryColor,
+              //     minimumSize: const Size(double.infinity, 50),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //     ),
+              //   ),
+              //   child: const Text('Submit',
+              //       style: TextStyle(
+              //           fontSize: 21.7,
+              //           fontWeight: FontWeight.w700,
+              //           color: Color(0xFFFFFFFF))),
+              // ),
+              KButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryColor,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Submit',
-                    style: TextStyle(
-                        fontSize: 21.7,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFFFFFFF))),
-              ),
+                text: 'Submit',
+                backgroundColor: const Color(0xFF0693F1),
+                padding: const EdgeInsets.all(0),
+              )
             ],
           ),
         ),

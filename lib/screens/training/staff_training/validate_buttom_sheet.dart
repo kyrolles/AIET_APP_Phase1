@@ -43,6 +43,7 @@ class ValidateButtomSheet extends StatelessWidget {
                       width: 115,
                       height: 50,
                       fontSize: 16.55,
+                      padding: EdgeInsets.only(top: 8, bottom: 8),
                     );
                   },
                   title: 'EGSA.pdf',
