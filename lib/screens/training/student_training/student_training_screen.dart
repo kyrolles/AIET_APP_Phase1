@@ -22,7 +22,7 @@ class StudentTrainingScreen extends StatelessWidget {
         title: 'EES.pdf',
         image: 'assets/project_image/pdf.png'),
     const StudentContainer(
-        status: 'pending',
+        status: 'Pending',
         statusColor: Colors.yellow,
         title: 'EPC.pdf',
         image: 'assets/project_image/pdf.png'),
@@ -70,7 +70,7 @@ class StudentTrainingScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 400,
+                height: 350,
                 child: ListContainer(
                   title: 'Your Training',
                   listOfWidgets: uplodedfiles,

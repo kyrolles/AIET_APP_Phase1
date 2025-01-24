@@ -34,8 +34,9 @@ class StudentContainer extends StatelessWidget {
         }
       },
       child: Container(
-        margin: const EdgeInsets.all(8.0),
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+        margin: const EdgeInsets.all(8.0), //
+        padding:
+            const EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -79,7 +80,7 @@ class StudentContainer extends StatelessWidget {
                   ),
               ],
             ),
-            if (name != null) const SizedBox(height: 8),
+            if (name != null) const SizedBox(height: 10),
             Row(
               children: [
                 CircleAvatar(

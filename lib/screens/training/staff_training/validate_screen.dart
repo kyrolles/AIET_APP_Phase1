@@ -21,7 +21,7 @@ class ValidateScreen extends StatelessWidget {
           );
         },
         name: 'Kyrolles Raafat',
-        status: 'pending',
+        status: 'Pending',
         statusColor: Colors.yellow,
         id: '20-0-60785',
         year: '4th',
@@ -39,7 +39,7 @@ class ValidateScreen extends StatelessWidget {
           );
         },
         name: 'Mahmoud Abdelnaserrrrrrrrr',
-        status: 'pending',
+        status: 'Pending',
         statusColor: Colors.yellow,
         id: '20-0-60785',
         year: '4th',
