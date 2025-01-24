@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
@@ -35,7 +33,7 @@ class StudentTrainingScreen extends StatelessWidget {
         image: 'assets/project_image/pdf.png'),
   ];
 
-  final int precent = 15;
+  final int precent = 15; // the value of the progressbar
 
   @override
   Widget build(BuildContext context) {
