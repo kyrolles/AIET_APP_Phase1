@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/components/list_container.dart';
+import 'package:graduation_project/components/student_container.dart';
+import 'package:graduation_project/constants.dart';
 import '../../../components/my_app_bar.dart';
 import 'proof_of_enrollment.dart';
 import 'tuition_fees_download.dart';
@@ -24,40 +26,63 @@ class InvoiceScreen extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ListContainer(
+          const ListContainer(
             title: 'Status',
             listOfWidgets: [
-              statusTile(
-                imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                label: 'Proof of enrollment',
+              StudentContainer(
+                title: 'Proof of enrollment',
+                image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
                 status: 'Done',
                 statusColor: Colors.green,
               ),
-              statusTile(
-                imagePath: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
-                label: 'Tuition fees',
+              StudentContainer(
+                title: 'Tuition fees',
+                image: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
                 status: 'Done',
                 statusColor: Colors.green,
               ),
-              statusTile(
-                imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                label: 'Proof of enrollment',
+              StudentContainer(
+                title: 'Proof of enrollment',
+                image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
                 status: 'Rejected',
-                statusColor: Colors.orange,
+                statusColor: Colors.red,
               ),
-              statusTile(
-                imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                label: 'Proof of enrollment',
-                status: 'Pending',
-                statusColor: Colors.yellow,
-              ),
-              statusTile(
-                imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-                label: 'Proof of enrollment',
+              StudentContainer(
+                title: 'Proof of enrollment',
+                image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
                 status: 'No Status',
-                statusColor: Colors.grey,
+                statusColor: Color.fromRGBO(229, 229, 229, 1),
               ),
+              // statusTile(
+              //   imagePath: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
+              //   label: 'Tuition fees',
+              //   status: 'Pending',
+              //   statusColor: Colors.yellow,
+              // ),
+              // statusTile(
+              //   imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+              //   label: 'Proof of enrollment',
+              //   status: 'Rejected',
+              //   statusColor: Colors.orange,
+              // ),
+              // statusTile(
+              //   imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+              //   label: 'Proof of enrollment',
+              //   status: 'Pending',
+              //   statusColor: Colors.yellow,
+              // ),
+              // statusTile(
+              //   imagePath: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
+              //   label: 'Proof of enrollment',
+              //   status: 'No Status',
+              //   statusColor: Colors.grey,
+              // ),
             ],
+          ),
+          const Divider(
+              color: kLightGrey, indent: 10, endIndent: 10, height: 10),
+          const SizedBox(
+            height: 8,
           ),
           // archiveButton(context),
           const Padding(
@@ -117,7 +142,7 @@ class InvoiceScreen extends StatelessWidget {
     return ServiceItem(
       title: 'Proof of enrollment',
       imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-      backgroundColor: Colors.blue,
+      backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
       onPressed: () {
         showModalBottomSheet<void>(
           backgroundColor: const Color(0XFFF1F1F2),
@@ -134,7 +159,7 @@ class InvoiceScreen extends StatelessWidget {
     return ServiceItem(
       title: 'Tuition fees',
       imageUrl: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
-      backgroundColor: Colors.blue,
+      backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
       onPressed: () {
         showModalBottomSheet<void>(
           backgroundColor: const Color(0XFFF1F1F2),
@@ -148,49 +173,49 @@ class InvoiceScreen extends StatelessWidget {
   }
 }
 
-Widget statusTile({
-  required String imagePath,
-  required String label,
-  required String status,
-  required Color statusColor,
-}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Row(
-      children: [
-        CircleAvatar(
-          backgroundColor: Colors.grey[200],
-          child: Image.asset(
-            imagePath,
-            width: 24,
-            height: 24,
-          ),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-        Text(
-          status,
-          style: TextStyle(
-            color: statusColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(width: 10),
-        CircleAvatar(
-          radius: 8,
-          backgroundColor: statusColor,
-        ),
-      ],
-    ),
-  );
-}
+// Widget statusTile({
+//   required String imagePath,
+//   required String label,
+//   required String status,
+//   required Color statusColor,
+// }) {
+//   return Container(
+//     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+//     margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+//     decoration: BoxDecoration(
+//       color: Colors.white,
+//       borderRadius: BorderRadius.circular(10),
+//     ),
+//     child: Row(
+//       children: [
+//         CircleAvatar(
+//           backgroundColor: Colors.grey[200],
+//           child: Image.asset(
+//             imagePath,
+//             width: 24,
+//             height: 24,
+//           ),
+//         ),
+//         const SizedBox(width: 15),
+//         Expanded(
+//           child: Text(
+//             label,
+//             style: const TextStyle(fontSize: 16),
+//           ),
+//         ),
+//         Text(
+//           status,
+//           style: TextStyle(
+//             color: statusColor,
+//             fontWeight: FontWeight.bold,
+//           ),
+//         ),
+//         const SizedBox(width: 10),
+//         CircleAvatar(
+//           radius: 8,
+//           backgroundColor: statusColor,
+//         ),
+//       ],
+//     ),
+//   );
+// }

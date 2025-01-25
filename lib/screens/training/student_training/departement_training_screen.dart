@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/announcement_card_training.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 
 class DepartementTrainingScreen extends StatelessWidget {
@@ -8,32 +9,51 @@ class DepartementTrainingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Training',
+        title: 'Training Announcement',
         onpressed: () => Navigator.pop(context),
       ),
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/trainingDetails');
-            },
-            child: const Text('Telecom Egypt'),
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Text('Alexandria Training Center'),
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Text('Egyption Petrochemicals Company'),
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Text('Egypt Experts for Software'),
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Text('Egyption Space Agency'),
+          Column(
+            spacing: 20,
+            children: [
+              AnnouncementCard(
+                imageUrl: 'assets/project_image/We_logo.svg.png',
+                title: 'Telecom Egypt',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/trainingDetails');
+                },
+              ),
+              AnnouncementCard(
+                imageUrl: 'assets/project_image/EES.png',
+                title: 'Egypt Experts for Software',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/trainingDetails');
+                },
+              ),
+              AnnouncementCard(
+                imageUrl: 'assets/project_image/Alextrainingcenter.jpeg',
+                title: 'Alexandria Training Center',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/trainingDetails');
+                },
+              ),
+              AnnouncementCard(
+                imageUrl: 'assets/project_image/EPC.png',
+                title: 'Egyption Petrochemicals Company',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/trainingDetails');
+                },
+              ),
+              AnnouncementCard(
+                imageUrl: 'assets/project_image/EgsaLogo.png',
+                title: 'Egyption Space Agency',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/trainingDetails');
+                },
+              ),
+            ],
           ),
         ],
       ),
