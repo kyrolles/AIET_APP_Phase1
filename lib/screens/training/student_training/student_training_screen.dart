@@ -5,6 +5,7 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/training/student_training/upload_buttom_sheet.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class StudentTrainingScreen extends StatelessWidget {
@@ -177,7 +178,20 @@ class StudentTrainingScreen extends StatelessWidget {
                 title: 'Submit Training',
                 imageUrl: 'assets/project_image/submit-training.png',
                 backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                    backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    builder: (BuildContext context) {
+                      return UploadButtomSheet();
+                    },
+                  );
+                },
               ),
             ],
           ),
