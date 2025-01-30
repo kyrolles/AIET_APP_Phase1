@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 import '../../../components/my_app_bar.dart';
-import '../student_invoice/tuition_container.dart';
 import '../../../constants.dart';
 
 class ItInvoiceScreen extends StatefulWidget {
@@ -21,7 +20,7 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget showRequestsList(context) {
+    Widget showRequestsList() {
       return ListView.builder(
         itemCount: requestsList.length,
         itemBuilder: (context, index) {
@@ -61,16 +60,17 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                     if (snapshot.hasData) {
                       requestsList = [];
                       for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                        requestsList
-                            .add(Request.fromJson(snapshot.data!.docs[i]));
+                        if (snapshot.data!.docs[i]['type'] ==
+                                'Proof of enrollment' ||
+                            snapshot.data!.docs[i]['type'] == 'Tuition Fees') {
+                          requestsList
+                              .add(Request.fromJson(snapshot.data!.docs[i]));
+                        }
                       }
-                      // print(snapchot.data!.docs[0]['name']);
-                      // print(patientsList[0].name);
                     }
-                    return showRequestsList(context);
+                    return showRequestsList();
                   }),
             ),
-            TuitionContainer(),
             TextButton(
               onPressed: () {},
               child: Container(

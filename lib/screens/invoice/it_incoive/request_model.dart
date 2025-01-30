@@ -3,7 +3,7 @@ class Request {
   final String comment;
   final String fileName;
   final String pdfBase64;
-  final String stamp;
+  final bool stamp;
   final String status;
   final String studentId;
   final String studentName;
@@ -27,15 +27,15 @@ class Request {
 
   factory Request.fromJson(json) {
     return Request(
-      addressedTo: json['addressedTo'],
+      addressedTo: json['addressed_to'],
       comment: json['comment'],
-      fileName: json['fileName'],
+      fileName: json['file_name'],
       pdfBase64: json['pdfBase64'],
       stamp: json['stamp'],
       status: json['status'],
-      studentId: json['studentId'],
-      studentName: json['studentName'],
-      trainingScore: json['trainingScore'],
+      studentId: json['student_id'],
+      studentName: json['student_name'],
+      trainingScore: json['training_score'],
       type: json['type'],
       year: json['year'],
     );
