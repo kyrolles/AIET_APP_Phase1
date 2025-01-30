@@ -1,19 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'it_invoice_request_contanier.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 import '../../../components/my_app_bar.dart';
-import '../student_invoice/tuition_container.dart';
 import '../../../constants.dart';
-import 'it_archive.dart';
-
-// Color? statusColor;
-// String status = "No Status";
-// Color circleColor = const Color(0XFFE5E5E5);
-
-// void updateContainer(Color newColor) {
-//   setState(() {
-//     circleColor = newColor;
-//   });
-// }
 
 class ItInvoiceScreen extends StatefulWidget {
   const ItInvoiceScreen({super.key});
@@ -23,47 +13,24 @@ class ItInvoiceScreen extends StatefulWidget {
 }
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
-  void updateRequestList() {
-    //!requests list
-    for (var i = 0; i < requests.length; i++) {
-      if (requests[i].status == 'Done' || requests[i].status == 'Rejected') {
-        setState(() {
-          //! add it to the archive list
-          itArchive.add(requests[i]);
-        });
-      }
-    }
-    setState(() {
-      //!Remove the item from the requests list
-      requests.removeWhere((request) =>
-          request.status == 'Done' || request.status == 'Rejected');
-    });
+  final Stream<QuerySnapshot> _requestsStream =
+      FirebaseFirestore.instance.collection('requests').snapshots();
 
-    // //!archive list
-    // for (var i = 0; i < itArchive.length; i++) {
-    //   if (itArchive[i].status == 'Pending') {
-    //     setState(() {
-    //       //* add it to the requests list
-    //       requests.add(requests[i]);
-    //     });
-    //   }
-    // }
-    // setState(() {
-    //   //*Remove the item from the archive list
-    //   itArchive.removeWhere((archive) => archive.status == 'Pending');
-    // });
-  }
-
-  final List<RequestContainer> requests = [
-    RequestContainer(),
-    RequestContainer(),
-    RequestContainer(),
-  ];
-
-  final List<RequestContainer> itArchive = [];
+  List<Request> requestsList = [];
 
   @override
   Widget build(BuildContext context) {
+    Widget showRequestsList() {
+      return ListView.builder(
+        itemCount: requestsList.length,
+        itemBuilder: (context, index) {
+          return RequestContainer(
+            request: requestsList[index],
+          );
+        },
+      );
+    }
+
     return Scaffold(
       appBar: MyAppBar(
         title: 'It-Invoice',
@@ -87,22 +54,25 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: requests.length,
-                itemBuilder: (context, index) {
-                  return requests[index];
-                },
-              ),
+              child: StreamBuilder<QuerySnapshot>(
+                  stream: _requestsStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      requestsList = [];
+                      for (var i = 0; i < snapshot.data!.docs.length; i++) {
+                        if (snapshot.data!.docs[i]['type'] ==
+                                'Proof of enrollment' ||
+                            snapshot.data!.docs[i]['type'] == 'Tuition Fees') {
+                          requestsList
+                              .add(Request.fromJson(snapshot.data!.docs[i]));
+                        }
+                      }
+                    }
+                    return showRequestsList();
+                  }),
             ),
-            TuitionContainer(),
             TextButton(
-              onPressed: () {
-                updateRequestList();
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return ItArchiveScreen(
-                      itArchive: itArchive, requests: requests);
-                }));
-              },
+              onPressed: () {},
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
