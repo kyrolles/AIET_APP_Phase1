@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
 
 class RequestContainer extends StatefulWidget {
-  RequestContainer(
-      {super.key,
-      this.status = 'No Status',
-      this.statusColor = const Color(0XFFE5E5E5)});
-  Color? statusColor;
-  String? status;
+  const RequestContainer({super.key, required this.request});
+  final Request request;
 
   @override
   State<RequestContainer> createState() => _RequestContainerState();
@@ -25,27 +22,14 @@ class _RequestContainerState extends State<RequestContainer> {
           builder: (BuildContext context) {
             return ProofOfEnrollmentSheetScreen(
               doneFunctionality: () {
-                setState(() {
-                  widget.status = "Done";
-                  widget.statusColor = const Color(0XFF34C759);
-                });
                 Navigator.pop(context);
               },
               rejectedFunctionality: () {
-                setState(() {
-                  widget.status = "Rejected";
-                  widget.statusColor = const Color(0XFFFF7648);
-                  // Remove the item from the source list and add it to the destination list
-                  // itArchive.add(requests[index]);
-                  // requests.remove(requests[index]);
-                });
+                setState(() {});
                 Navigator.pop(context);
               },
               pendingFunctionality: () {
-                setState(() {
-                  widget.status = "Pending";
-                  widget.statusColor = const Color(0XFFFFDD29);
-                });
+                setState(() {});
                 Navigator.pop(context);
               },
             );
@@ -115,7 +99,7 @@ class _RequestContainerState extends State<RequestContainer> {
                 Row(
                   children: [
                     Text(
-                      widget.status!,
+                      widget.request.status,
                       style: const TextStyle(
                           fontSize: 14, color: Color(0XFF6C7072)),
                     ),
@@ -123,7 +107,13 @@ class _RequestContainerState extends State<RequestContainer> {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: widget.statusColor,
+                        color: widget.request.status == 'Pending'
+                            ? Colors.yellow
+                            : widget.request.status == 'Rejected'
+                                ? Colors.red
+                                : widget.request.status == 'Done'
+                                    ? Colors.green
+                                    : Colors.blueGrey,
                       ),
                       height: 22,
                       width: 22,
