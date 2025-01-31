@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
 class FileUploadWidget extends StatefulWidget {
   final double height;
   final double width;
+  final Function(PlatformFile)? onFileSelected;
 
   const FileUploadWidget({
     Key? key,
-    this.height = 150.0, // Default height
-    this.width = 300.0, // Default width
+    this.height = 150.0,
+    this.width = 300.0,
+    this.onFileSelected,
   }) : super(key: key);
 
   @override
@@ -18,44 +19,34 @@ class FileUploadWidget extends StatefulWidget {
 }
 
 class _FileUploadWidgetState extends State<FileUploadWidget> {
-  double progress = 0.0;
   String? fileName;
-  String? downloadUrl;
+  bool isUploaded = false;
 
-  Future<void> pickAndUploadFile() async {
-    // Pick a file
-    final result = await FilePicker.platform.pickFiles();
-
-    if (result != null && result.files.single.path != null) {
-      final filePath = result.files.single.path!;
-      final file = result.files.single;
-
-      // Update file name
-      setState(() {
-        fileName = file.name;
-      });
-
-      // Upload to Firebase Storage
-      final storageRef =
-          FirebaseStorage.instance.ref().child("uploads/${file.name}");
-      final uploadTask = storageRef.putFile(
-        File(filePath),
-        SettableMetadata(contentType: file.extension),
+  Future<void> pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
       );
 
-      // Monitor upload progress
-      uploadTask.snapshotEvents.listen((taskSnapshot) {
+      if (result != null && result.files.single.path != null) {
+        final file = result.files.single;
+        
         setState(() {
-          progress = taskSnapshot.bytesTransferred / taskSnapshot.totalBytes;
+          fileName = file.name;
+          isUploaded = true;
         });
-      });
 
-      // Get download URL after successful upload
-      final snapshot = await uploadTask.whenComplete(() {});
-      final url = await snapshot.ref.getDownloadURL();
-
+        // Call the callback if provided
+        if (widget.onFileSelected != null) {
+          widget.onFileSelected!(file);
+        }
+      }
+    } catch (e) {
+      print('Error picking file: $e');
       setState(() {
-        downloadUrl = url;
+        fileName = null;
+        isUploaded = false;
       });
     }
   }
@@ -68,11 +59,10 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Upload Button
           GestureDetector(
-            onTap: pickAndUploadFile,
+            onTap: pickFile,
             child: Container(
-              height: widget.height * 0.5, // Adjust height proportionally
+              height: widget.height * 0.5,
               decoration: BoxDecoration(
                 color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(12),
@@ -84,9 +74,9 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                   children: [
                     Icon(Icons.cloud_upload,
                         size: widget.height * 0.2, color: Colors.blue),
-                    SizedBox(height: 8),
-                    Text(
-                      "Upload Logo",
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Upload File",
                       style: TextStyle(color: Colors.blue, fontSize: 16),
                     ),
                   ],
@@ -94,26 +84,16 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
               ),
             ),
           ),
-          SizedBox(height: 16),
-
-          // File Added Section
-          if (fileName != null)
-            Text(
-              "File added: $fileName",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          SizedBox(height: 16),
-
-          // Progress Indicator
-          if (fileName != null)
+          if (fileName != null) ...[
+            const SizedBox(height: 16),
             ListTile(
-              leading: Icon(Icons.insert_drive_file, color: Colors.blue),
+              leading: const Icon(Icons.insert_drive_file, color: Colors.blue),
               title: Text(fileName!),
-              subtitle: LinearProgressIndicator(value: progress),
-              trailing: progress == 1.0
-                  ? Icon(Icons.check_circle, color: Colors.green)
-                  : Text("${(progress * 100).toInt()}%"),
+              trailing: isUploaded
+                  ? const Icon(Icons.check_circle, color: Colors.green)
+                  : const CircularProgressIndicator(),
             ),
+          ],
         ],
       ),
     );

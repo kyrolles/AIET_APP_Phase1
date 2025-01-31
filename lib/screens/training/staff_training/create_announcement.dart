@@ -1,11 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:graduation_project/components/checkbox_with_label.dart';
 import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 
-class CreateAnnouncement extends StatelessWidget {
+class CreateAnnouncement extends StatefulWidget {
   const CreateAnnouncement({super.key});
+
+  @override
+  State<CreateAnnouncement> createState() => _CreateAnnouncementState();
+}
+
+class _CreateAnnouncementState extends State<CreateAnnouncement> {
+  final TextEditingController _companyNameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _linksController = TextEditingController();
+  String? _logoBase64;
+  String? _imageBase64;
+  final Map<String, bool> _selectedDepartments = {
+    'Computer': false,
+    'Mechatronics': false,
+    'Communication & Electronics': false,
+    'Industrial': false,
+  };
+
+  Future<void> _saveAnnouncement() async {
+    try {
+      if (_companyNameController.text.isEmpty) {
+        throw 'Company name is required';
+      }
+
+      if (_logoBase64 == null) {
+        throw 'Logo is required';
+      }
+
+      print('Logo base64: ${_logoBase64?.substring(0, 50)}...'); // Debug print
+
+      await FirebaseFirestore.instance.collection('training_announcements').add({
+        'companyName': _companyNameController.text,
+        'description': _descriptionController.text,
+        'links': _linksController.text,
+        'logo': _logoBase64,
+        'image': _imageBase64,
+        'departments': _selectedDepartments.entries
+            .where((e) => e.value)
+            .map((e) => e.key)
+            .toList(),
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Announcement saved successfully!')),
+      );
+    } catch (e) {
+      print('Error saving announcement: $e'); // Debug print
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +92,9 @@ class CreateAnnouncement extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      controller: _companyNameController,
+                      decoration: const InputDecoration(
                         hintText: 'Enter Company Name',
                       ),
                     ),
@@ -61,6 +119,7 @@ class CreateAnnouncement extends StatelessWidget {
                     SizedBox(
                       width: double.infinity, // Make it full-width
                       child: TextField(
+                        controller: _descriptionController,
                         maxLines: 8, // Adjust for height
                         decoration: InputDecoration(
                           hintText: "Enter company description....",
@@ -96,6 +155,7 @@ class CreateAnnouncement extends StatelessWidget {
                     SizedBox(
                       width: double.infinity, // Make it full-width
                       child: TextField(
+                        controller: _linksController,
                         maxLines: 5, // Adjust for height
                         decoration: InputDecoration(
                           hintText: "Enter company description....",
@@ -130,7 +190,21 @@ class CreateAnnouncement extends StatelessWidget {
                     ),
                     FileUploadWidget(
                       height: 350,
-                      width: double.infinity, // Full width
+                      width: double.infinity,
+                      onFileSelected: (file) async {
+                        try {
+                          if (file.path != null) {
+                            final bytes = await File(file.path!).readAsBytes();
+                            final base64String = base64Encode(bytes);
+                            setState(() {
+                              _logoBase64 = base64String;
+                            });
+                            print('Logo encoded successfully'); // Debug print
+                          }
+                        } catch (e) {
+                          print('Error encoding logo: $e'); // Debug print
+                        }
+                      },
                     ),
                     const SizedBox(
                       height: 20,
@@ -153,6 +227,12 @@ class CreateAnnouncement extends StatelessWidget {
                     FileUploadWidget(
                       height: 350,
                       width: double.infinity, // Full width
+                      onFileSelected: (file) async {
+                        final bytes = await File(file.path!).readAsBytes();
+                        setState(() {
+                          _imageBase64 = base64Encode(bytes);
+                        });
+                      },
                     ),
                     const SizedBox(
                       height: 20,
@@ -175,35 +255,35 @@ class CreateAnnouncement extends StatelessWidget {
                     CustomCheckbox(
                       label: "Computer",
                       onChanged: (value) {
-                        print("Computer selected: $value");
+                        setState(() => _selectedDepartments['Computer'] = value);
                       },
                     ),
                     CustomCheckbox(
                       label: "Mechatronics",
                       onChanged: (value) {
-                        print("Mechatronics selected: $value");
+                        setState(() => _selectedDepartments['Mechatronics'] = value);
                       },
                     ),
                     CustomCheckbox(
                       label: "Communication & Electronics",
                       onChanged: (value) {
-                        print("Communication & Electronics selected: $value");
+                        setState(() => _selectedDepartments['Communication & Electronics'] = value);
                       },
                     ),
                     CustomCheckbox(
                       label: "Industrial",
                       onChanged: (value) {
-                        print("Industrial selected: $value");
+                        setState(() => _selectedDepartments['Industrial'] = value);
                       },
                     ),
                     const SizedBox(
                       height: 35,
                     ),
                     KButton(
-                      backgroundColor: Color.fromRGBO(6, 147, 241, 1),
+                      backgroundColor: const Color.fromRGBO(6, 147, 241, 1),
                       text: 'post',
                       padding: const EdgeInsets.all(0),
-                      onPressed: () {},
+                      onPressed: _saveAnnouncement,
                     )
                   ],
                 ))));

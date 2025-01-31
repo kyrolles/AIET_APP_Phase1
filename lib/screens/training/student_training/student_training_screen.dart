@@ -116,7 +116,10 @@ class StudentTrainingScreen extends StatelessWidget {
                             KButton(
                               onPressed: () {
                                 Navigator.pushNamed(
-                                    context, '/departmentTraining');
+                                    context, 
+                                    '/departmentTraining',
+                                    arguments: 'Computer'  // Make sure this matches the department name in create_announcement.dart
+                                );
                               },
                               text: 'CE',
                               fontSize: 34,
@@ -129,7 +132,13 @@ class StudentTrainingScreen extends StatelessWidget {
                                   fit: BoxFit.cover),
                             ),
                             KButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, 
+                                    '/departmentTraining',
+                                    arguments: 'Mechatronics'
+                                );
+                              },
                               text: 'EME',
                               fontSize: 34,
                               textColor: Colors.white,
@@ -141,7 +150,13 @@ class StudentTrainingScreen extends StatelessWidget {
                                   fit: BoxFit.cover),
                             ),
                             KButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, 
+                                    '/departmentTraining',
+                                    arguments: 'Communication & Electronics'
+                                );
+                              },
                               text: 'ECE',
                               fontSize: 34,
                               textColor: Colors.black,
@@ -154,7 +169,13 @@ class StudentTrainingScreen extends StatelessWidget {
                                   opacity: 0.5),
                             ),
                             KButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, 
+                                    '/departmentTraining',
+                                    arguments: 'Industrial'
+                                );
+                              },
                               text: 'IE',
                               fontSize: 34,
                               textColor: Colors.white,
