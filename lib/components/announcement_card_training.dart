@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
+import 'dart:convert';
 
 class AnnouncementCard extends StatelessWidget {
-  final String imageUrl;
+  final String? imageBase64;  // Only need base64 string
   final String title;
-  final VoidCallback onPressed; // Callback for tap action
+  final VoidCallback onPressed;
 
   const AnnouncementCard({
     super.key,
-    required this.imageUrl,
+    this.imageBase64,
     required this.title,
-    required this.onPressed, // Required callback
+    required this.onPressed,
   });
 
   static const double cardHeight = 120;
@@ -80,10 +82,28 @@ class AnnouncementCard extends StatelessWidget {
                     bottomLeft: Radius.circular(12),
                   ),
                 ),
-                child: Image.asset(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                ),
+                child: imageBase64 != null 
+                  ? Builder(
+                      builder: (context) {
+                        try {
+                          final imageBytes = base64Decode(imageBase64!);
+                          return Image.memory(
+                            imageBytes,
+                            width: imageWidth,
+                            height: imageHeight,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              print('Error displaying image: $error');
+                              return const Icon(Icons.error);
+                            },
+                          );
+                        } catch (e) {
+                          print('Error decoding base64: $e');
+                          return const Icon(Icons.error);
+                        }
+                      },
+                    )
+                  : const Icon(Icons.business, size: 50),  // Fallback icon if no image
               ),
             ),
           ),
