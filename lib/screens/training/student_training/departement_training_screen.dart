@@ -3,10 +3,26 @@ import 'package:graduation_project/components/announcement_card_training.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 
 class DepartementTrainingScreen extends StatelessWidget {
   const DepartementTrainingScreen({super.key});
+
+  Future<bool> _canDeleteAnnouncement() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    
+    if (!userDoc.exists) return false;
+    
+    final String role = userDoc.data()?['role'] ?? '';
+    return role == 'Admin' || role == 'Training Unit';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +78,10 @@ class DepartementTrainingScreen extends StatelessWidget {
                           Navigator.pushNamed(context, '/trainingDetails',
                               arguments: doc.id);
                         },
-                        onLongPress: () {
+                        onLongPress: () async {
+                          final canDelete = await _canDeleteAnnouncement();
+                          if (!canDelete) return;
+
                           showModalBottomSheet(
                             backgroundColor:
                                 const Color.fromRGBO(250, 250, 250, 1),
