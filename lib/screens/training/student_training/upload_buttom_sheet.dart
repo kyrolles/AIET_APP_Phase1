@@ -11,15 +11,15 @@ class UploadButtomSheet extends StatelessWidget {
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: const SingleChildScrollView(
+      child: SingleChildScrollView(
         child: Padding(
-          padding:
-              EdgeInsets.only(bottom: 32.0, left: 16.0, right: 16.0, top: 22.0),
+          padding: const EdgeInsets.only(
+              bottom: 32.0, left: 16.0, right: 16.0, top: 22.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 10,
             children: [
-              Center(
+              const Center(
                 child: Text(
                   'Submit Training',
                   style: TextStyle(
@@ -28,18 +28,17 @@ class UploadButtomSheet extends StatelessWidget {
                       color: Color(0XFF6C7072)),
                 ),
               ),
-              KButton(
-                text: 'Upload pdf',
-                padding: EdgeInsets.all(0),
-                backgroundColor: Colors.transparent,
-                textColor: Colors.lightBlueAccent,
-                borderColor: Colors.lightBlueAccent,
-                borderWidth: 3,
-                // onPressed: _pickPDF,
-              ),
-              FileUploadWidget(
+              const FileUploadWidget(
                 height: 350,
                 width: double.infinity, // Full width
+              ),
+              KButton(
+                text: 'Done',
+                padding: const EdgeInsets.all(0),
+                backgroundColor: Colors.green,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
             ],
           ),

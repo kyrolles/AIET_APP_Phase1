@@ -1,11 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/screens/training/data_between_staff_and_trainning.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
 
 class ValidateScreen extends StatefulWidget {
@@ -71,7 +72,7 @@ class _ValidateScreenState extends State<ValidateScreen> {
                 }
                 return ListContainer(
                   title: 'Requests',
-                  listOfWidgets: studentreques,
+                  listOfWidgets: SharedData.studentRequests = studentreques,
                   emptyMessage: 'No Requests',
                 );
               } else if (snapshot.hasError) {

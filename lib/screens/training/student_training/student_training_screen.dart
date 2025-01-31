@@ -5,34 +5,35 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/training/data_between_staff_and_trainning.dart';
 import 'package:graduation_project/screens/training/student_training/upload_buttom_sheet.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class StudentTrainingScreen extends StatelessWidget {
   StudentTrainingScreen({super.key});
 
-  final List<Widget> uplodedfiles = [
-    const StudentContainer(
-        status: 'Done',
-        statusColor: Colors.green,
-        title: 'Telecom Egypt training.pdf',
-        image: 'assets/project_image/pdf.png'),
-    const StudentContainer(
-        status: 'Reject',
-        statusColor: Colors.red,
-        title: 'EES.pdf',
-        image: 'assets/project_image/pdf.png'),
-    const StudentContainer(
-        status: 'Pending',
-        statusColor: Colors.yellow,
-        title: 'EPC.pdf',
-        image: 'assets/project_image/pdf.png'),
-    const StudentContainer(
-        status: 'No status',
-        statusColor: Color.fromRGBO(229, 229, 229, 1),
-        title: 'EgSA.pdf',
-        image: 'assets/project_image/pdf.png'),
-  ];
+  // final List<Widget> uplodedfiles = [
+  //   const StudentContainer(
+  //       status: 'Done',
+  //       statusColor: Colors.green,
+  //       title: 'Telecom Egypt training.pdf',
+  //       image: 'assets/project_image/pdf.png'),
+  //   const StudentContainer(
+  //       status: 'Reject',
+  //       statusColor: Colors.red,
+  //       title: 'EES.pdf',
+  //       image: 'assets/project_image/pdf.png'),
+  //   const StudentContainer(
+  //       status: 'Pending',
+  //       statusColor: Colors.yellow,
+  //       title: 'EPC.pdf',
+  //       image: 'assets/project_image/pdf.png'),
+  //   const StudentContainer(
+  //       status: 'No status',
+  //       statusColor: Color.fromRGBO(229, 229, 229, 1),
+  //       title: 'EgSA.pdf',
+  //       image: 'assets/project_image/pdf.png'),
+  // ];
 
   final int precent = 15; // the value of the progressbar
 
@@ -77,7 +78,21 @@ class StudentTrainingScreen extends StatelessWidget {
                 height: 350,
                 child: ListContainer(
                   title: 'Your Training',
-                  listOfWidgets: uplodedfiles,
+                  listOfWidgets: SharedData.studentRequests.map((widget) {
+                    if (widget is StudentContainer) {
+                      return StudentContainer(
+                        // name: widget.name,
+                        status: widget.status,
+                        statusColor: widget.statusColor,
+                        // id: widget.id,
+                        // year: widget.year,
+                        title: widget.title,
+                        image: widget.image,
+                        // onTap: widget.onTap,
+                      );
+                    }
+                    return widget;
+                  }).toList(),
                   emptyMessage: 'Nothing',
                 ),
               ),
