@@ -6,12 +6,16 @@ class AnnouncementCard extends StatelessWidget {
   final String? imageBase64;  // Only need base64 string
   final String title;
   final VoidCallback onPressed;
+  final bool canDelete;  // New property
+  final VoidCallback? onDelete;  // New property
 
   const AnnouncementCard({
     super.key,
     this.imageBase64,
     required this.title,
     required this.onPressed,
+    this.canDelete = false,  // Default to false
+    this.onDelete,
   });
 
   static const double cardHeight = 120;
@@ -107,6 +111,31 @@ class AnnouncementCard extends StatelessWidget {
               ),
             ),
           ),
+
+          if (canDelete)
+            Positioned(
+              right: -10,
+              top: -10,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

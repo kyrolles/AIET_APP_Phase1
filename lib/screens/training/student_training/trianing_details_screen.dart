@@ -5,41 +5,62 @@ import 'dart:convert';
 
 import '../../../components/my_app_bar.dart';
 
-class TrianingDetailsScreen extends StatelessWidget {
+class TrianingDetailsScreen extends StatefulWidget {  // Changed to StatefulWidget
   const TrianingDetailsScreen({super.key});
 
-  Future<void> _launchURL(BuildContext context, String urlString) async {
+  @override
+  State<TrianingDetailsScreen> createState() => _TrianingDetailsScreenState();
+}
+
+class _TrianingDetailsScreenState extends State<TrianingDetailsScreen> {
+  late ScaffoldMessengerState scaffoldMessenger;
+  bool _isDisposed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    scaffoldMessenger = ScaffoldMessenger.of(context);
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    if (_isDisposed) return;
+
     try {
       urlString = urlString.trim();
       if (!urlString.startsWith('http://') && !urlString.startsWith('https://')) {
-        urlString = 'https://' + urlString.replaceAll('www.', '');
+        urlString = 'https://$urlString';
       }
 
       final Uri uri = Uri.parse(urlString);
       if (!await canLaunchUrl(uri)) {
-        throw 'Could not launch $urlString';
+        if (!_isDisposed) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('Could not launch $urlString')),
+          );
+        }
+        return;
       }
 
-      final bool success = await launchUrl(
+      await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
-
-      if (!success) {
-        throw 'Failed to launch $urlString';
-      }
     } catch (e) {
-      debugPrint('Error launching URL: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not open link: $urlString\nError: $e'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
+      if (!_isDisposed) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
-  Widget _buildClickableLinks(BuildContext context, String links) {
+  Widget _buildClickableLinks(String links) {  // Removed BuildContext parameter
     final linksList = links.split('\n');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +74,7 @@ class TrianingDetailsScreen extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(4),
-              onTap: () => _launchURL(context, trimmedLink),
+              onTap: () => _launchURL(trimmedLink),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                 child: Text(
@@ -125,7 +146,7 @@ class TrianingDetailsScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                _buildClickableLinks(context, data['links'] ?? 'No links available'),
+                _buildClickableLinks(data['links'] ?? 'No links available'),
                 if (data['image'] != null) ...[
                   const SizedBox(height: 16),
                   Center(
