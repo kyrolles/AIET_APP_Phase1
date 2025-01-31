@@ -17,9 +17,9 @@ class DepartementTrainingScreen extends StatelessWidget {
         .collection('users')
         .doc(user.uid)
         .get();
-    
+
     if (!userDoc.exists) return false;
-    
+
     final String role = userDoc.data()?['role'] ?? '';
     return role == 'Admin' || role == 'Training Unit';
   }
