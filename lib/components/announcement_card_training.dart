@@ -3,15 +3,17 @@ import 'dart:typed_data';
 import 'dart:convert';
 
 class AnnouncementCard extends StatelessWidget {
-  final String? imageBase64;  // Only need base64 string
+  final String? imageBase64; // Only need base64 string
   final String title;
   final VoidCallback onPressed;
+  final VoidCallback onLongPress;
 
   const AnnouncementCard({
     super.key,
     this.imageBase64,
     required this.title,
     required this.onPressed,
+    required this.onLongPress,
   });
 
   static const double cardHeight = 120;
@@ -24,6 +26,7 @@ class AnnouncementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPressed, // Handle tap event
+      onLongPress: onLongPress, // Handle long press event
       child: Stack(
         clipBehavior: Clip.none, // Allows the image to overflow
         children: [
@@ -82,28 +85,29 @@ class AnnouncementCard extends StatelessWidget {
                     bottomLeft: Radius.circular(12),
                   ),
                 ),
-                child: imageBase64 != null 
-                  ? Builder(
-                      builder: (context) {
-                        try {
-                          final imageBytes = base64Decode(imageBase64!);
-                          return Image.memory(
-                            imageBytes,
-                            width: imageWidth,
-                            height: imageHeight,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              print('Error displaying image: $error');
-                              return const Icon(Icons.error);
-                            },
-                          );
-                        } catch (e) {
-                          print('Error decoding base64: $e');
-                          return const Icon(Icons.error);
-                        }
-                      },
-                    )
-                  : const Icon(Icons.business, size: 50),  // Fallback icon if no image
+                child: imageBase64 != null
+                    ? Builder(
+                        builder: (context) {
+                          try {
+                            final imageBytes = base64Decode(imageBase64!);
+                            return Image.memory(
+                              imageBytes,
+                              width: imageWidth,
+                              height: imageHeight,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                print('Error displaying image: $error');
+                                return const Icon(Icons.error);
+                              },
+                            );
+                          } catch (e) {
+                            print('Error decoding base64: $e');
+                            return const Icon(Icons.error);
+                          }
+                        },
+                      )
+                    : const Icon(Icons.business,
+                        size: 50), // Fallback icon if no image
               ),
             ),
           ),
