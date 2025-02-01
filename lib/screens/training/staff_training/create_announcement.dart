@@ -39,7 +39,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
 
       print('Logo base64: ${_logoBase64?.substring(0, 50)}...'); // Debug print
 
-      await FirebaseFirestore.instance.collection('training_announcements').add({
+      await FirebaseFirestore.instance
+          .collection('training_announcements')
+          .add({
         'companyName': _companyNameController.text,
         'description': _descriptionController.text,
         'links': _linksController.text,
@@ -51,7 +53,7 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
             .toList(),
         'timestamp': FieldValue.serverTimestamp(),
       });
-      
+
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Announcement saved successfully!')),
@@ -191,6 +193,8 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                     FileUploadWidget(
                       height: 350,
                       width: double.infinity,
+                      allowedExtensions: const ['jpg', 'jpeg', 'png'],
+                      buttonText: "Upload Image",
                       onFileSelected: (file) async {
                         try {
                           if (file.path != null) {
@@ -227,6 +231,8 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                     FileUploadWidget(
                       height: 350,
                       width: double.infinity, // Full width
+                      allowedExtensions: const ['jpg', 'jpeg', 'png'],
+                      buttonText: "Upload Image",
                       onFileSelected: (file) async {
                         final bytes = await File(file.path!).readAsBytes();
                         setState(() {
@@ -255,25 +261,29 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                     CustomCheckbox(
                       label: "Computer",
                       onChanged: (value) {
-                        setState(() => _selectedDepartments['Computer'] = value);
+                        setState(
+                            () => _selectedDepartments['Computer'] = value);
                       },
                     ),
                     CustomCheckbox(
                       label: "Mechatronics",
                       onChanged: (value) {
-                        setState(() => _selectedDepartments['Mechatronics'] = value);
+                        setState(
+                            () => _selectedDepartments['Mechatronics'] = value);
                       },
                     ),
                     CustomCheckbox(
                       label: "Communication & Electronics",
                       onChanged: (value) {
-                        setState(() => _selectedDepartments['Communication & Electronics'] = value);
+                        setState(() => _selectedDepartments[
+                            'Communication & Electronics'] = value);
                       },
                     ),
                     CustomCheckbox(
                       label: "Industrial",
                       onChanged: (value) {
-                        setState(() => _selectedDepartments['Industrial'] = value);
+                        setState(
+                            () => _selectedDepartments['Industrial'] = value);
                       },
                     ),
                     const SizedBox(

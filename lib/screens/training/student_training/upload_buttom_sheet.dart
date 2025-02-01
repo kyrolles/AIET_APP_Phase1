@@ -17,7 +17,7 @@ class UploadButtomSheet extends StatelessWidget {
               bottom: 32.0, left: 16.0, right: 16.0, top: 22.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: 10,
+            spacing: 15,
             children: [
               const Center(
                 child: Text(
@@ -31,6 +31,8 @@ class UploadButtomSheet extends StatelessWidget {
               const FileUploadWidget(
                 height: 350,
                 width: double.infinity, // Full width
+                allowedExtensions: ['pdf'],
+                buttonText: "Upload Your PDF",
               ),
               KButton(
                 text: 'Done',
