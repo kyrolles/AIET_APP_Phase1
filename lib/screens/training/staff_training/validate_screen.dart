@@ -72,7 +72,7 @@ class _ValidateScreenState extends State<ValidateScreen> {
                 }
                 return ListContainer(
                   title: 'Requests',
-                  listOfWidgets: SharedData.studentRequests = studentreques,
+                  listOfWidgets: studentreques,
                   emptyMessage: 'No Requests',
                 );
               } else if (snapshot.hasError) {
