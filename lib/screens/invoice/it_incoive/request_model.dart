@@ -2,7 +2,7 @@ class Request {
   final String addressedTo;
   final String comment;
   final String fileName;
-  final String pdfBase64;
+  String? pdfBase64;
   final bool stamp;
   final String status;
   final String studentId;
