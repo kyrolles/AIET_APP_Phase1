@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/constants.dart';
 import '../../../components/rpd_button.dart';
-import '../../../constants.dart';
+import 'request_model.dart';
 
-class ProofOfEnrollmentSheetScreen extends StatefulWidget {
-  const ProofOfEnrollmentSheetScreen({
-    super.key,
-    required this.doneFunctionality,
-    required this.rejectedFunctionality,
-    required this.pendingFunctionality,
-  });
+class ProofOfEnrollmentSheetScreen extends StatelessWidget {
+  const ProofOfEnrollmentSheetScreen(
+      {super.key,
+      required this.doneFunctionality,
+      required this.rejectedFunctionality,
+      required this.pendingFunctionality,
+      required this.request});
+
   final Function() doneFunctionality;
   final Function() rejectedFunctionality;
   final Function() pendingFunctionality;
-
-  @override
-  State<ProofOfEnrollmentSheetScreen> createState() =>
-      _ProofOfEnrollmentSheetScreenState();
-}
-
-class _ProofOfEnrollmentSheetScreenState
-    extends State<ProofOfEnrollmentSheetScreen> {
-  bool? isChecked = false;
+  final Request request;
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +36,17 @@ class _ProofOfEnrollmentSheetScreenState
                   ),
                 ]),
             const SizedBox(height: 20),
-            const SizedBox(
+            SizedBox(
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'كيرلس رافت لمعي ابراهيم',
+                    request.studentName,
                     textAlign: TextAlign.right,
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
-                  Text(
+                  const Text(
                     '   : الاسم',
                     textAlign: TextAlign.right,
                     style: TextStyle(fontSize: 18),
@@ -61,16 +55,16 @@ class _ProofOfEnrollmentSheetScreenState
               ),
             ),
             const SizedBox(height: 20),
-            const SizedBox(
+            SizedBox(
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'مصلحة الضرائب',
-                    style: TextStyle(fontSize: 18),
+                    request.addressedTo,
+                    style: const TextStyle(fontSize: 18),
                   ),
-                  Text(
+                  const Text(
                     '   : الجهة الموجه إليها',
                     style: TextStyle(fontSize: 18),
                   ),
@@ -83,14 +77,29 @@ class _ProofOfEnrollmentSheetScreenState
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Checkbox(
-                    value: isChecked,
-                    activeColor: kPrimaryColor,
-                    onChanged: (newBool) {
-                      setState(() {
-                        isChecked = newBool ?? false;
-                      });
-                    },
+                  SizedBox(
+                    width: 24, // Match the size of a standard checkbox
+                    height: 24,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // The actual checkbox (disabled)
+                        Checkbox(
+                          value: request.stamp,
+                          onChanged: null, // Disable interaction
+                        ),
+                        // Show a custom "false" sign when the value is false
+                        if (!request.stamp)
+                          const Positioned(
+                            child: Icon(
+                              Icons
+                                  .cancel_presentation_outlined, // Use a cross icon
+                              color: kGrey, // Customize the color
+                              size: 24, // Adjust the size
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -113,18 +122,18 @@ class _ProofOfEnrollmentSheetScreenState
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 RejectPendinDoneButton(
-                  onpressed: widget.rejectedFunctionality,
+                  onpressed: rejectedFunctionality,
                   color: const Color(0XFFFF7648),
                   content: 'Rejected',
                 ),
                 const SizedBox(width: 3),
                 RejectPendinDoneButton(
-                    onpressed: widget.pendingFunctionality,
+                    onpressed: pendingFunctionality,
                     color: const Color(0XFFFFDD29),
                     content: 'Pending'),
                 const SizedBox(width: 3),
                 RejectPendinDoneButton(
-                    onpressed: widget.doneFunctionality,
+                    onpressed: doneFunctionality,
                     color: const Color(0xFF34C759),
                     content: 'Done'),
               ],

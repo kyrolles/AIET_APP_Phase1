@@ -1,8 +1,39 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
+
+//* Update a document in Firestore
+Future<void> updateDocument({
+  required String collectionPath,
+  required Map<String, dynamic> searchCriteria,
+  required Map<String, dynamic> newData,
+}) async {
+  try {
+    //* Start with the collection reference
+    Query query = FirebaseFirestore.instance.collection(collectionPath);
+
+    //* Add all search conditions
+    searchCriteria.forEach((field, value) {
+      query = query.where(field, isEqualTo: value);
+    });
+
+    //* Get the documents that match your criteria
+    QuerySnapshot querySnapshot = await query.get();
+
+    //* Update the first matching document
+    if (querySnapshot.docs.isNotEmpty) {
+      await querySnapshot.docs.first.reference.update(newData);
+    }
+    log('Document updated successfully');
+  } catch (e) {
+    log('Error updating document: $e');
+  }
+}
 
 class RequestContainer extends StatelessWidget {
   const RequestContainer({super.key, required this.request});
@@ -13,35 +44,8 @@ class RequestContainer extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         request.type == 'Tuition Fees'
-            ? showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder: (BuildContext context) {
-                  return TuitionFeesSheet(
-                    doneFunctionality: () {},
-                  );
-                },
-              )
-            : showModalBottomSheet<void>(
-                backgroundColor: const Color(0XFFF1F1F2),
-                context: context,
-                builder: (BuildContext context) {
-                  return ProofOfEnrollmentSheetScreen(
-                    doneFunctionality: () {
-                      Navigator.pop(context);
-                    },
-                    rejectedFunctionality: () {
-                      Navigator.pop(context);
-                    },
-                    pendingFunctionality: () {
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              );
+            ? showModalBottomSheetForTuitionFees(context)
+            : showModalBottomSheetForProofOfEnrollment(context);
       },
       child: Container(
         margin: const EdgeInsets.all(8.0),
@@ -119,9 +123,9 @@ class RequestContainer extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: request.status == 'Pending'
-                            ? Colors.yellow
+                            ? const Color(0XFFFFDD29)
                             : request.status == 'Rejected'
-                                ? Colors.red
+                                ? const Color(0XFFFF7648)
                                 : request.status == 'Done'
                                     ? const Color(0xFF34C759)
                                     : kGreyLight,
@@ -136,6 +140,72 @@ class RequestContainer extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> showModalBottomSheetForProofOfEnrollment(BuildContext context) {
+    return showModalBottomSheet<void>(
+      backgroundColor: const Color(0XFFF1F1F2),
+      context: context,
+      builder: (BuildContext context) {
+        return ProofOfEnrollmentSheetScreen(
+          request: request,
+          doneFunctionality: () {
+            updateDocument(
+              collectionPath: 'requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+              },
+              newData: {
+                'status': 'Done',
+              },
+            );
+            Navigator.pop(context);
+          },
+          rejectedFunctionality: () {
+            updateDocument(
+              collectionPath: 'requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+              },
+              newData: {
+                'status': 'Rejected',
+              },
+            );
+            Navigator.pop(context);
+          },
+          pendingFunctionality: () {
+            updateDocument(
+              collectionPath: 'requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+              },
+              newData: {
+                'status': 'Pending',
+              },
+            );
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
+  Future<dynamic> showModalBottomSheetForTuitionFees(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return TuitionFeesSheet(
+          doneFunctionality: () {},
+        );
+      },
     );
   }
 }
