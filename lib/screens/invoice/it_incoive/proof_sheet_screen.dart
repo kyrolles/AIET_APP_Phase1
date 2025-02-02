@@ -77,30 +77,17 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SizedBox(
-                    width: 24, // Match the size of a standard checkbox
-                    height: 24,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // The actual checkbox (disabled)
-                        Checkbox(
+                  request.stamp
+                      ? Checkbox(
                           value: request.stamp,
                           onChanged: null, // Disable interaction
+                        )
+                      : const Icon(
+                          Icons
+                              .cancel_presentation_outlined, // Use a cross icon
+                          color: kGrey, // Customize the color
+                          size: 24, // Adjust the size
                         ),
-                        // Show a custom "false" sign when the value is false
-                        if (!request.stamp)
-                          const Positioned(
-                            child: Icon(
-                              Icons
-                                  .cancel_presentation_outlined, // Use a cross icon
-                              color: kGrey, // Customize the color
-                              size: 24, // Adjust the size
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
