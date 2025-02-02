@@ -1,74 +1,56 @@
-// import 'package:flutter/material.dart';
-// import 'it_invoice_request_contanier.dart';
-// import '../../../components/my_app_bar.dart';
-// import '../../../constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:graduation_project/components/list_container.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import '../../../components/my_app_bar.dart';
 
-// class ItArchiveScreen extends StatefulWidget {
-//   const ItArchiveScreen(
-//       {super.key, required this.itArchive, required this.requests});
+class ItArchiveScreen extends StatefulWidget {
+  const ItArchiveScreen({super.key});
 
-//   final List<RequestContainer> itArchive;
-//   final List<RequestContainer> requests;
+  @override
+  State<ItArchiveScreen> createState() => _ItArchiveScreenState();
+}
 
-//   @override
-//   State<ItArchiveScreen> createState() => _ItArchiveScreenState();
-// }
+class _ItArchiveScreenState extends State<ItArchiveScreen> {
+  final Stream<QuerySnapshot> _requestsStream =
+      FirebaseFirestore.instance.collection('requests').snapshots();
 
-// class _ItArchiveScreenState extends State<ItArchiveScreen> {
-//   void updateArchiveList() {
-//     //!archive list
-//     for (var i = 0; i < widget.itArchive.length; i++) {
-//       if (widget.itArchive[i].status == 'Pending') {
-//         setState(() {
-//           //* add it to the requests list
-//           widget.requests.add(widget.itArchive[i]);
-//         });
-//       }
-//     }
-//     setState(() {
-//       //*Remove the item from the archive list
-//       widget.itArchive.removeWhere((archive) => archive.status == 'Pending');
-//     });
-//   }
+  List<Request> requestsList = [];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MyAppBar(
+        title: 'Invoice Archive',
+        onpressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: _requestsStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              requestsList = [];
+              for (var i = 0; i < snapshot.data!.docs.length; i++) {
+                if ((snapshot.data!.docs[i]['type'] == 'Proof of enrollment' ||
+                        snapshot.data!.docs[i]['type'] == 'Tuition Fees') &&
+                    (snapshot.data!.docs[i]['status'] == 'Done' ||
+                        snapshot.data!.docs[i]['status'] == 'Rejected')) {
+                  requestsList.add(Request.fromJson(snapshot.data!.docs[i]));
+                }
+              }
+            }
+            return ListContainer(
+                title: 'Requests', listOfWidgets: archiveRequestsList());
+          }),
+    );
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: MyAppBar(
-//         title: 'Archive',
-//         onpressed: () {
-//           // updateArchiveList();
-//           Navigator.pop(context);
-//         },
-//       ),
-//       body: Container(
-//         // height: 100,
-//         margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-//         decoration: BoxDecoration(
-//           borderRadius: BorderRadius.circular(15.0),
-//           color: const Color(0XFFFAFAFA),
-//         ),
-//         child: Column(
-//           children: [
-//             Container(
-//               alignment: Alignment.topLeft,
-//               padding: const EdgeInsets.all(15.0),
-//               child: const Text(
-//                 'Requests',
-//                 style: kTextStyleBold,
-//               ),
-//             ),
-//             Expanded(
-//               child: ListView.builder(
-//                 itemCount: widget.itArchive.length,
-//                 itemBuilder: (context, index) {
-//                   return widget.itArchive[index];
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+  List<RequestContainer> archiveRequestsList() {
+    List<RequestContainer> archiveRequests = [];
+    for (var i = 0; i < requestsList.length; i++) {
+      archiveRequests.add(RequestContainer(request: requestsList[i]));
+    }
+    return archiveRequests;
+  }
+}
