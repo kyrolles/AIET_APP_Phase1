@@ -7,8 +7,8 @@ import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_uploa
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
 
-//* Update a document in Firestore
 Future<void> updateDocument({
+//* Update a document in Firestore
   required String collectionPath,
   required Map<String, dynamic> searchCriteria,
   required Map<String, dynamic> newData,

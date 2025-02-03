@@ -4,11 +4,13 @@ class CustomTextField extends StatelessWidget {
   //required TextEditingController controller;
   final String label;
   final String hintText;
-  final bool isRequired; // Optional parameter with a default value of false
+  final bool isRequired;
+
+  final dynamic controller; // Optional parameter with a default value of false
 
   const CustomTextField({
     super.key,
-    //this.controller,
+    this.controller,
     required this.label,
     required this.hintText,
     this.isRequired = false,
@@ -29,7 +31,7 @@ class CustomTextField extends StatelessWidget {
         ),
         // const SizedBox(height: 8),
         TextFormField(
-          //controller: controller,
+          controller: controller,
           decoration: InputDecoration(
             hintText: hintText,
             border: const UnderlineInputBorder(
