@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Request {
   final String addressedTo;
   final String comment;
@@ -10,20 +12,21 @@ class Request {
   final int trainingScore;
   final String type;
   final String year;
+  final Timestamp createdAt;
 
-  Request({
-    required this.addressedTo,
-    required this.comment,
-    required this.fileName,
-    required this.pdfBase64,
-    required this.stamp,
-    required this.status,
-    required this.studentId,
-    required this.studentName,
-    required this.trainingScore,
-    required this.type,
-    required this.year,
-  });
+  Request(
+      {required this.addressedTo,
+      required this.comment,
+      required this.fileName,
+      required this.pdfBase64,
+      required this.stamp,
+      required this.status,
+      required this.studentId,
+      required this.studentName,
+      required this.trainingScore,
+      required this.type,
+      required this.year,
+      required this.createdAt});
 
   factory Request.fromJson(json) {
     return Request(
@@ -38,6 +41,7 @@ class Request {
       trainingScore: json['training_score'],
       type: json['type'],
       year: json['year'],
+      createdAt: json['created_at'],
     );
   }
 }
