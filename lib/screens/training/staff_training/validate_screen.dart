@@ -29,7 +29,7 @@ class _ValidateScreenState extends State<ValidateScreen> {
             backgroundColor: const Color.fromRGBO(250, 250, 250, 0.93),
             context: context,
             builder: (BuildContext context) {
-              return const ValidateButtomSheet();
+              return ValidateButtomSheet(request: request);
             },
           );
         },
@@ -46,6 +46,9 @@ class _ValidateScreenState extends State<ValidateScreen> {
         year: request.year,
         title: request.fileName,
         image: 'assets/project_image/pdf.png',
+        pdfBase64: request.pdfBase64,
+        trainingScore: request.trainingScore,
+        comment: request.comment,
       );
     }).toList();
   }

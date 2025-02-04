@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/custom_text_field.dart';
 import 'package:graduation_project/components/kbutton.dart';
+import 'package:graduation_project/components/pdf_view.dart';
 import 'package:graduation_project/components/student_container.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 
 class ValidateButtomSheet extends StatelessWidget {
-  const ValidateButtomSheet({super.key});
+  const ValidateButtomSheet({super.key, required this.request});
+  final Request request;
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +40,29 @@ class ValidateButtomSheet extends StatelessWidget {
                   id: null,
                   year: null,
                   button: (BuildContext context) {
-                    return const KButton(
-                      text: 'Download',
-                      backgroundColor: Color.fromRGBO(6, 147, 241, 1),
-                      width: 115,
-                      height: 50,
-                      fontSize: 16.55,
-                      padding: EdgeInsets.only(top: 8, bottom: 8),
-                    );
+                    return KButton(
+                        onPressed: () {
+                          if (request.pdfBase64 != null) {
+                            PDFViewer.open(
+                              context,
+                              request.pdfBase64!,
+                            );
+                          } else {
+                            // Handle the case where pdfBase64 is null
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('PDF data is not available')),
+                            );
+                          }
+                        },
+                        text: 'view',
+                        backgroundColor: const Color.fromRGBO(6, 147, 241, 1),
+                        width: 115,
+                        height: 50,
+                        fontSize: 16.55,
+                        padding: const EdgeInsets.only(bottom: 8, top: 8));
                   },
-                  title: 'EGSA.pdf',
+                  title: request.fileName,
                   image: 'assets/project_image/pdf.png'),
               const CustomTextField(
                 label: 'Score(in Days)',

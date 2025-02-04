@@ -144,7 +144,7 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
                     if (snapshot.data == true) {
                       return IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => showDeleteDialog(context, doc.id),
+                        onPressed: () => showDeleteBottomSheet(context, doc.id),
                       );
                     }
                     return const SizedBox.shrink();
@@ -203,29 +203,58 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     );
   }
 
-  void showDeleteDialog(BuildContext context, String docId) {
-    showDialog(
+  void showDeleteBottomSheet(BuildContext context, String docId) {
+    showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Delete Announcement'),
-          content:
-              const Text('Are you sure you want to delete this announcement?'),
-          actions: [
-            TextButton(
-              child:
-                  const Text('Cancel', style: TextStyle(color: Colors.black)),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-                deleteAnnouncement(docId);
-              },
-            ),
-          ],
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Delete Announcement',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Are you sure you want to delete this announcement?',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  TextButton(
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      deleteAnnouncement(docId);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
