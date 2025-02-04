@@ -22,7 +22,7 @@ class StudentTrainingScreen extends StatefulWidget {
 class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
   Stream<QuerySnapshot>? _requestsStream;
   List<Request> requestsList = [];
-  int totalTrainingScore = 1; // Add this variable to store the score
+  int totalTrainingScore = 0; // Add this variable to store the score
 
   @override
   void initState() {
