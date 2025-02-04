@@ -96,7 +96,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         'student_name': studentName,
         'type': 'Training',
         'year': academicYear,
-        'created_at': FieldValue.serverTimestamp(),
+        'created_at': Timestamp.now(),
         'status': 'No status',
         'addressed_to': '',
         'comment': '',

@@ -102,6 +102,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'birthDate': _birthDateController.text,
             'createdAt': FieldValue.serverTimestamp(),
             'qrCode': qrData,
+            'totalTrainingScore': 0,
           });
 
           // Show success message
