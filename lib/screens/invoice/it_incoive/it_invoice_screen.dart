@@ -13,8 +13,10 @@ class ItInvoiceScreen extends StatefulWidget {
 }
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
-  final Stream<QuerySnapshot> _requestsStream =
-      FirebaseFirestore.instance.collection('requests').snapshots();
+  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
+      .collection('requests')
+      .orderBy('created_at', descending: true)
+      .snapshots();
 
   List<Request> requestsList = [];
   @override
@@ -54,6 +56,14 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
     );
   }
 
+  List<RequestContainer> showRequestsList() {
+    List<RequestContainer> requests = [];
+    for (var i = 0; i < requestsList.length; i++) {
+      requests.add(RequestContainer(request: requestsList[i]));
+    }
+    return requests;
+  }
+
   TextButton archiveButton(BuildContext context) {
     return TextButton(
       onPressed: () {
@@ -83,13 +93,5 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
         ),
       ),
     );
-  }
-
-  List<RequestContainer> showRequestsList() {
-    List<RequestContainer> requests = [];
-    for (var i = 0; i < requestsList.length; i++) {
-      requests.add(RequestContainer(request: requestsList[i]));
-    }
-    return requests;
   }
 }
