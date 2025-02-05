@@ -38,7 +38,9 @@ class Request {
       status: json['status'],
       studentId: json['student_id'],
       studentName: json['student_name'],
-      trainingScore: json['training_score'],
+      trainingScore: json['training_score'] is int
+          ? json['training_score']
+          : int.tryParse(json['training_score']) ?? 0,
       type: json['type'],
       year: json['year'],
       createdAt: json['created_at'],
