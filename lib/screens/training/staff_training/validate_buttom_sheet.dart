@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/pdf_view.dart';
 import 'package:graduation_project/components/student_container.dart';
+import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 
 class ValidateButtomSheet extends StatefulWidget {
@@ -114,12 +115,13 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                       width: 115,
                       height: 50,
                       fontSize: 16.55,
-                      padding: const EdgeInsets.only(bottom: 8, top: 8),
+                      margin: const EdgeInsets.only(top: 8, bottom: 8),
                     );
                   },
                   title: widget.request.fileName,
                   image: 'assets/project_image/pdf.png',
                 ),
+                const SizedBox(height: 5),
                 TextFormField(
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -167,8 +169,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                     labelText: 'Comment',
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 29),
                 Row(
+                  spacing: 15,
                   children: [
                     Flexible(
                       child: KButton(
@@ -200,7 +203,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                         svgHeight: 50,
                         svgWidth: 50,
                         height: 65,
-                        backgroundColor: const Color.fromRGBO(52, 199, 89, 1),
+                        backgroundColor: kgreen,
                       ),
                     )
                   ],

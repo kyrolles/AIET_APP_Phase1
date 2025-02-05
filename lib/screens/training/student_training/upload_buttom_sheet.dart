@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
+import 'package:graduation_project/constants.dart';
 import 'package:path/path.dart' as path;
 
 class UploadButtomSheet extends StatefulWidget {
   const UploadButtomSheet({super.key});
-
   @override
   State<UploadButtomSheet> createState() => _UploadButtomSheetState();
 }
@@ -27,6 +26,24 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
     _fetchUserData();
   }
 
+  // Show custom snackbar function
+  void _showCustomSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : kgreen,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 100,
+            right: 20,
+            left: 20,
+          ),
+        ),
+      );
+  }
+
   Future<void> _fetchUserData() async {
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
@@ -35,7 +52,6 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
             .collection('users')
             .doc(currentUser.uid)
             .get();
-
         if (userDoc.exists) {
           setState(() {
             userData = userDoc.data();
@@ -43,40 +59,32 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching user data: $e')),
-      );
+      _showCustomSnackBar('Error fetching user data: $e', isError: true);
     }
   }
 
   Future<void> _saveAnnouncement() async {
     if (_isLoading) return;
-
     setState(() {
       _isLoading = true;
     });
-
     try {
       // Validate inputs
       if (pdfBase64 == null || pdfBase64!.isEmpty) {
         throw 'Please upload a PDF file';
       }
-
       if (fileName == null || fileName!.isEmpty) {
         throw 'File name is required';
       }
-
       if (userData == null) {
         throw 'User data not available';
       }
-
       // Get user data
       final String studentId = userData!['id'] ?? '';
       final String firstName = userData!['firstName'] ?? '';
       final String lastName = userData!['lastName'] ?? '';
       final String studentName = '$firstName$lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
-
       // Validate required fields
       if (studentId.isEmpty) {
         throw 'Student ID not found';
@@ -87,7 +95,6 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       if (academicYear.isEmpty) {
         throw 'Academic year not found';
       }
-
       // Save to Firestore
       await FirebaseFirestore.instance.collection('requests').add({
         'file_name': fileName,
@@ -103,15 +110,10 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         'stamp': false,
         'training_score': 0,
       });
-
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('PDF uploaded successfully!')),
-      );
+      _showCustomSnackBar('PDF uploaded successfully!');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showCustomSnackBar('Error: $e', isError: true);
     } finally {
       setState(() {
         _isLoading = false;
@@ -147,19 +149,6 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
                   ),
                 ),
               ),
-              // if (userData != null) ...[
-              //   const SizedBox(height: 10),
-              //   Text(
-              //     'Student: ${userData!['firstName']} ${userData!['lastName']}',
-              //     style: const TextStyle(fontSize: 16),
-              //     textAlign: TextAlign.center,
-              //   ),
-              //   Text(
-              //     'ID: ${userData!['id']}',
-              //     style: const TextStyle(fontSize: 16),
-              //     textAlign: TextAlign.center,
-              //   ),
-              // ],
               const SizedBox(height: 15),
               FileUploadWidget(
                 height: 350,
@@ -173,22 +162,17 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
                       setState(() {
                         fileName = path.basename(file.path!);
                       });
-
                       final bytes = await File(file.path!).readAsBytes();
                       final base64String = base64Encode(bytes);
                       setState(() {
                         pdfBase64 = base64String;
                       });
-
                       // Show filename in a snackbar
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Selected file: $fileName')),
-                      );
+                      _showCustomSnackBar('Selected file: $fileName');
                     }
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error encoding PDF: $e')),
-                    );
+                    _showCustomSnackBar('Error encoding PDF: $e',
+                        isError: true);
                   }
                 },
               ),
@@ -203,8 +187,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
               const SizedBox(height: 15),
               KButton(
                 text: _isLoading ? 'Uploading...' : 'Done',
-                padding: const EdgeInsets.all(0),
-                backgroundColor: Colors.green,
+                backgroundColor: kgreen,
                 onPressed: _isLoading ? null : _saveAnnouncement,
               ),
             ],

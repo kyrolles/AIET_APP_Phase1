@@ -14,7 +14,7 @@ class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
 
   final CollectionReference attendance =
-  FirebaseFirestore.instance.collection('attendance');
+      FirebaseFirestore.instance.collection('attendance');
 
   List<AttendanceModel> periods = [];
 
@@ -74,7 +74,7 @@ class AttendanceScreen extends StatelessWidget {
                 builder: (context) => AttendanceArchive(
                   subjectName: periods[i].subjectName,
                   period: periods[i].period,
-                  existingDocId: periods[i].id,  // Pass the existing document ID
+                  existingDocId: periods[i].id, // Pass the existing document ID
                 ),
               ),
             );
@@ -97,7 +97,7 @@ class AttendanceScreen extends StatelessWidget {
         ServiceItem(
           title: 'Generate QR Code',
           imageUrl: 'assets/project_image/qr-code.png',
-          backgroundColor: Colors.blue,
+          backgroundColor: kDarkBlue,
           onPressed: () {
             showModalBottomSheet(
               context: context,

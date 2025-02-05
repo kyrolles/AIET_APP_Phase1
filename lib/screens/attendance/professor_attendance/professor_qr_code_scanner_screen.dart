@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,7 +8,8 @@ class ProfessorQRScannerScreen extends StatefulWidget {
   const ProfessorQRScannerScreen({super.key});
 
   @override
-  State<ProfessorQRScannerScreen> createState() => _ProfessorQRScannerScreenState();
+  State<ProfessorQRScannerScreen> createState() =>
+      _ProfessorQRScannerScreenState();
 }
 
 class _ProfessorQRScannerScreenState extends State<ProfessorQRScannerScreen> {
@@ -41,7 +43,8 @@ class _ProfessorQRScannerScreenState extends State<ProfessorQRScannerScreen> {
       }
 
       DocumentSnapshot studentDoc = querySnapshot.docs.first;
-      Map<String, dynamic> studentData = studentDoc.data() as Map<String, dynamic>;
+      Map<String, dynamic> studentData =
+          studentDoc.data() as Map<String, dynamic>;
 
       return {
         'name': '${studentData['firstName']} ${studentData['lastName']}'.trim(),
@@ -81,10 +84,11 @@ class _ProfessorQRScannerScreenState extends State<ProfessorQRScannerScreen> {
 
       final currentAttendanceDoc = querySnapshot.docs.first;
       final attendanceData = currentAttendanceDoc.data();
-      final studentList = List<Map<String, dynamic>>.from(attendanceData['studentList'] ?? []);
+      final studentList =
+          List<Map<String, dynamic>>.from(attendanceData['studentList'] ?? []);
 
       bool isAlreadyPresent = studentList.any((student) =>
-      student['id']?.toString() == studentData['id']?.toString());
+          student['id']?.toString() == studentData['id']?.toString());
 
       if (isAlreadyPresent) {
         throw Exception('Student is already in the attendance list');
@@ -173,25 +177,12 @@ class _ProfessorQRScannerScreenState extends State<ProfessorQRScannerScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: ElevatedButton(
+            child: KButton(
+              text: 'Cancel',
+              backgroundColor: Colors.red,
               onPressed: () {
                 Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
             ),
           ),
         ],

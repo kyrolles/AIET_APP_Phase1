@@ -86,14 +86,18 @@ class _ValidateScreenState extends State<ValidateScreen> {
               }
             },
           ),
-          KButton(
-            text: 'Archive',
-            height: 62,
-            svgPath: 'assets/project_image/Pin.svg',
-            onPressed: () {
-              Navigator.pushNamed(
-                  context, '/staffStudentTraining/validate/archive');
-            },
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
+            child: KButton(
+              backgroundColor: Colors.black26,
+              text: 'Archive',
+              height: 62,
+              svgPath: 'assets/project_image/Pin.svg',
+              onPressed: () {
+                Navigator.pushNamed(
+                    context, '/staffStudentTraining/validate/archive');
+              },
+            ),
           ),
         ],
       ),

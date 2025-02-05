@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
+import 'package:graduation_project/constants.dart';
 
 class TuitionFeesDownload extends StatelessWidget {
   const TuitionFeesDownload({super.key});
@@ -43,19 +45,13 @@ class TuitionFeesDownload extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
+            child: KButton(
               onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 70),
-                backgroundColor: const Color(0xFF0693F1),
-              ),
-              child: const Text(
-                'Download as PDF',
-                style: TextStyle(
-                    fontSize: 21.7,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFFFFFFF)),
-              ),
+              text: 'Download as PDF',
+              fontSize: 21.7,
+              textColor: Colors.white,
+              backgroundColor: kBlue,
+              borderColor: Colors.white,
             ),
           ),
         ],

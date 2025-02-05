@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
+import 'package:graduation_project/constants.dart';
 
 class AddStudentManuallyBottmSheet extends StatelessWidget {
   const AddStudentManuallyBottmSheet({super.key});
@@ -43,17 +45,15 @@ class AddStudentManuallyBottmSheet extends StatelessWidget {
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 25),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child:
-                      const Text("Add", style: TextStyle(color: Colors.white)),
+                child: KButton(
+                  onPressed: () {
+                    // Add student
+                  },
+                  text: 'Add',
+                  fontSize: 22,
+                  textColor: Colors.white,
+                  backgroundColor: kBlue,
+                  borderColor: Colors.white,
                 ),
               ),
             ],
