@@ -76,26 +76,27 @@ class _ServicesScreenState extends State<ServicesScreen> {
           Navigator.pushNamed(context, '/studentTraining');
         },
       ),
-      ServiceItem(
-        title: 'Staff-Student\nTraining',
-        imageUrl: 'assets/project_image/analysis.png',
-        backgroundColor: const Color(0xFFED1C24),
-        onPressed: () {
-          Navigator.pushNamed(context, '/staffStudentTraining');
-        },
-      ),
-      ServiceItem(
-        title: 'Moodle',
-        imageUrl: 'assets/project_image/education.png',
-        backgroundColor: const Color(0xFFFF9811),
-        onPressed: () {},
-      ),
-      ServiceItem(
-        title: 'Unofficial Transcript',
-        imageUrl: 'assets/project_image/transcription.png',
-        backgroundColor: const Color(0xFF0ED290),
-        onPressed: () {},
-      ),
+      if (isStaff)
+        ServiceItem(
+          title: 'Staff-Student\nTraining',
+          imageUrl: 'assets/project_image/analysis.png',
+          backgroundColor: const Color(0xFFED1C24),
+          onPressed: () {
+            Navigator.pushNamed(context, '/staffStudentTraining');
+          },
+        ),
+      // ServiceItem(
+      //   title: 'Moodle',
+      //   imageUrl: 'assets/project_image/education.png',
+      //   backgroundColor: const Color(0xFFFF9811),
+      //   onPressed: () {},
+      // ),
+      // ServiceItem(
+      //   title: 'Unofficial Transcript',
+      //   imageUrl: 'assets/project_image/transcription.png',
+      //   backgroundColor: const Color(0xFF0ED290),
+      //   onPressed: () {},
+      // ),
       ServiceItem(
         title: 'GPA Calculator',
         imageUrl: 'assets/project_image/gpa.png',
@@ -142,23 +143,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
 
-      // ServiceItem(
-      //   title: 'Tuition Fees Upload',
-      //   imageUrl: 'assets/project_image/invoice.png',
-      //   backgroundColor: const Color(0xFF8AC9FE),
-      //   onPressed: () {
-      //     showModalBottomSheet(
-      //       context: context,
-      //       isScrollControlled: true,
-      //       shape: const RoundedRectangleBorder(
-      //         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      //       ),
-      //       builder: (BuildContext context) {
-      //         return const TuitionFeesSheet();
-      //       },
-      //     );
-      //   },
-      // ),
       ServiceItem(
         title: 'E-Payment',
         imageUrl: 'assets/project_image/e-wallet.png',
