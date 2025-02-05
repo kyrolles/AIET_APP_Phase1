@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../constants.dart';
 
 class ResultPage extends StatefulWidget {
@@ -10,33 +12,69 @@ class ResultPage extends StatefulWidget {
 
 class _ResultPageState extends State<ResultPage> {
   int selectedSemester = 1;
-
   List<List<Map<String, dynamic>>> semesterResults = [];
 
   @override
   void initState() {
     super.initState();
-    semesterResults = _generateSemesterResults();
+    _initializeSemesterData();
   }
 
-  // Method to get color based on grade
-  Color getGradeColor(String grade) {
-    switch (grade) {
-      case 'A':
-        return const Color(0xFFFF7D7D);
-      case 'B':
-        return const Color(0xFFFFDD29);
-      case 'C':
-        return const Color(0xFF978ECB);
-      case 'D':
-        return const Color(0xFF0ED290);
-      case 'F':
-        return const Color(0xFFED1C24);
-      default:
-        return Colors.grey; // Fallback color if needed
+  // Step 1: Create Firestore docs if missing for semesters 1-10
+  Future<void> _initializeSemesterData() async {
+    String userId = FirebaseAuth.instance.currentUser?.uid ?? "defaultUser";
+    // In production, fetch the user's department from the users document
+    String department = "CE"; 
+    for (int sem = 1; sem <= 10; sem++) {
+      DocumentReference docRef = FirebaseFirestore.instance
+          .collection('results')
+          .doc(userId)
+          .collection('semesters')
+          .doc(sem.toString());
+      DocumentSnapshot docSnap = await docRef.get();
+      if (!docSnap.exists) {
+        List<Map<String, dynamic>> defaultSubjects = _getDefaultSubjects(sem);
+        // Map hardcoded fields to our document structure
+        await docRef.set({
+          "semesterNumber": sem,
+          "department": department,
+          "lastUpdated": FieldValue.serverTimestamp(),
+          "subjects": defaultSubjects.map((subject) => {
+                "code": subject["smallTitle"],
+                "name": subject["label"],
+                "credits": 4,  // default credit value; adjust as needed
+                "grade": subject["grade"],
+                "points": _gradeToPoints(subject["grade"]),
+                "scores": {
+                  "week5": (subject["scores"] as List)[0]["score"],
+                  "week10": (subject["scores"] as List)[1]["score"],
+                  "coursework": (subject["scores"] as List)[2]["score"],
+                  "lab": (subject["scores"] as List)[3]["score"],
+                }
+              }).toList(),
+        });
+      }
     }
   }
 
+  double _gradeToPoints(String grade) {
+    // Simple A=4, B=3, etc.
+    switch (grade) {
+      case 'A': return 4.0;
+      case 'B': return 3.0;
+      case 'C': return 2.0;
+      case 'D': return 1.0;
+      default:  return 0.0;
+    }
+  }
+
+  // Helper: returns default subjects for a given semester using your pre-existing arrays.
+  List<Map<String, dynamic>> _getDefaultSubjects(int semester) {
+    List<List<Map<String, dynamic>>> allSemesters = _generateSemesterResults();
+    return allSemesters.length >= semester ? allSemesters[semester - 1] : [];
+  }
+
+  // Existing hardcoded subject generator (contents elided)
   List<List<Map<String, dynamic>>> _generateSemesterResults() {
     return [
       // Semester 1
@@ -354,187 +392,254 @@ class _ResultPageState extends State<ResultPage> {
     ];
   }
 
+  // Step 2: Load semester documents and map them to UI structure.
+  Future<List<List<Map<String, dynamic>>>> _loadSemesterData() async {
+    String userId = FirebaseAuth.instance.currentUser?.uid ?? "defaultUser";
+    List<List<Map<String, dynamic>>> semestersData = [];
+    for (int sem = 1; sem <= 10; sem++) {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('results')
+          .doc(userId)
+          .collection('semesters')
+          .doc(sem.toString())
+          .get();
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        List subjects = data['subjects'] ?? [];
+        // Map Firestore subject to UI format:
+        List<Map<String, dynamic>> mappedSubjects = subjects.map<Map<String, dynamic>>((s) {
+          return {
+            "label": s["name"],
+            "smallTitle": s["code"],
+            "grade": s["grade"],
+            "color": getGradeColor(s["grade"]),
+            "scores": [
+              {"label": "5th Week", "score": (s["scores"]["week5"] as num).toDouble()},
+              {"label": "10th Week", "score": (s["scores"]["week10"] as num).toDouble()},
+              {"label": "Course Work", "score": (s["scores"]["coursework"] as num).toDouble()},
+              {"label": "Lab", "score": (s["scores"]["lab"] as num).toDouble()},
+            ],
+          };
+        }).toList();
+        semestersData.add(mappedSubjects);
+      } else {
+        semestersData.add([]);
+      }
+    }
+    return semestersData;
+  }
+
+  Color getGradeColor(String grade) {
+    switch (grade) {
+      case 'A':
+        return const Color(0xFFFF7D7D);
+      case 'B':
+        return const Color(0xFFFFDD29);
+      case 'C':
+        return const Color(0xFF978ECB);
+      case 'D':
+        return const Color(0xFF0ED290);
+      case 'F':
+        return const Color(0xFFED1C24);
+      default:
+        return Colors.grey; // Fallback color if needed
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding:
-                const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(20)),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 15,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 5))
-              ],
-            ),
-            child: Column(
+    return FutureBuilder<List<List<Map<String, dynamic>>>>(
+      future: _loadSemesterData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        } else {
+          semesterResults = snapshot.data ?? [];
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 5))
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                      onPressed: () => Navigator.pop(context),
-                      splashColor: Colors.transparent,
-                    ),
+                Container(
+                  padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 15,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 5))
+                    ],
                   ),
-                ]),
-                const Text("Results",
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black)),
-                const SizedBox(height: 5),
-                Center(
-                  child: Container(
-                    width: 270,
-                    decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Column(
+                    children: [
+                      Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 5))
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_new),
+                            onPressed: () => Navigator.pop(context),
+                            splashColor: Colors.transparent,
+                          ),
+                        ),
+                      ]),
+                      const Text("Results",
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black)),
+                      const SizedBox(height: 5),
+                      Center(
+                        child: Container(
+                          width: 270,
+                          decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        width: 80,
+                                        child: Center(
+                                            child: Text("126.0",
+                                                style: TextStyle(
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black)))),
+                                    SizedBox(height: 5),
+                                    Text("Credit Achieved",
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 8.5,
+                                            fontWeight: FontWeight.bold)),
+                                  ]),
                               SizedBox(
-                                  width: 80,
-                                  child: Center(
-                                      child: Text("126.0",
-                                          style: TextStyle(
-                                              fontSize: 25,
+                                  width: 3,
+                                  height: 55,
+                                  child: Container(color: Colors.grey)),
+                              const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        width: 80,
+                                        child: Center(
+                                            child: Text("3.99",
+                                                style: TextStyle(
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black)))),
+                                    SizedBox(height: 5),
+                                    Text("GPA",
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 8.5,
+                                            fontWeight: FontWeight.bold)),
+                                  ]),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Semester",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black))),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: SizedBox(
+                          width: 360,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              children: List.generate(10, (index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedSemester = index + 1;
+                                    });
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      color: selectedSemester == index + 1
+                                          ? Colors.orange
+                                          : Colors.blue[50],
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            spreadRadius: 1)
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text("${index + 1}",
+                                          style: const TextStyle(
+                                              fontSize: 30,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black)))),
-                              SizedBox(height: 5),
-                              Text("Credit Achieved",
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 8.5,
-                                      fontWeight: FontWeight.bold)),
-                            ]),
-                        SizedBox(
-                            width: 3,
-                            height: 55,
-                            child: Container(color: Colors.grey)),
-                        const Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                  width: 80,
-                                  child: Center(
-                                      child: Text("3.99",
-                                          style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black)))),
-                              SizedBox(height: 5),
-                              Text("GPA",
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 8.5,
-                                      fontWeight: FontWeight.bold)),
-                            ]),
-                      ],
-                    ),
+                                              color: Colors.black)),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 15),
-                const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Semester",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black))),
-                const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: SizedBox(
-                    width: 360,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        children: List.generate(10, (index) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedSemester = index + 1;
-                              });
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: selectedSemester == index + 1
-                                    ? Colors.orange
-                                    : Colors.blue[50],
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: const [
-                                  BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 4,
-                                      spreadRadius: 1)
-                                ],
-                              ),
-                              child: Center(
-                                child: Text("${index + 1}",
-                                    style: const TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black)),
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
+                const SizedBox(height: 2),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ListView(
+                      children: semesterResults[selectedSemester - 1].map((result) {
+                        return buildResultCard(
+                            result["label"],
+                            result["grade"],
+                            result["color"],
+                            result["scores"],
+                            result["smallTitle"] ?? "");
+                      }).toList(),
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 2),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ListView(
-                children: semesterResults[selectedSemester - 1].map((result) {
-                  return buildResultCard(
-                      result["label"],
-                      result["grade"],
-                      result["color"],
-                      result["scores"],
-                      result["smallTitle"] ?? "");
-                }).toList(),
-              ),
-            ),
-          ),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
 
