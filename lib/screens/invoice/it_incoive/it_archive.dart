@@ -13,8 +13,10 @@ class ItArchiveScreen extends StatefulWidget {
 }
 
 class _ItArchiveScreenState extends State<ItArchiveScreen> {
-  final Stream<QuerySnapshot> _requestsStream =
-      FirebaseFirestore.instance.collection('requests').snapshots();
+  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
+      .collection('requests')
+      .orderBy('created_at', descending: true)
+      .snapshots();
 
   List<Request> requestsList = [];
   @override
@@ -41,7 +43,9 @@ class _ItArchiveScreenState extends State<ItArchiveScreen> {
               }
             }
             return ListContainer(
-                title: 'Requests', listOfWidgets: archiveRequestsList());
+              title: 'Requests',
+              listOfWidgets: archiveRequestsList(),
+            );
           }),
     );
   }
