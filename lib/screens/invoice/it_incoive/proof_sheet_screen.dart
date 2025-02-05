@@ -115,14 +115,16 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 3),
                 RejectPendinDoneButton(
-                    onpressed: pendingFunctionality,
-                    color: const Color(0XFFFFDD29),
-                    content: 'Pending'),
+                  onpressed: pendingFunctionality,
+                  color: const Color(0XFFFFDD29),
+                  content: 'Pending',
+                ),
                 const SizedBox(width: 3),
                 RejectPendinDoneButton(
-                    onpressed: doneFunctionality,
-                    color: const Color(0xFF34C759),
-                    content: 'Done'),
+                  onpressed: doneFunctionality,
+                  color: const Color(0xFF34C759),
+                  content: 'Done',
+                ),
               ],
             )
           ],
