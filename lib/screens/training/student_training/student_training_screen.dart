@@ -52,6 +52,7 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
                 .collection('requests')
                 .where('type', isEqualTo: 'Training')
                 .where('student_id', isEqualTo: studentId)
+                .orderBy('created_at', descending: true)
                 .snapshots();
             totalTrainingScore =
                 trainingScore; // Store the score in the state variable

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 
@@ -17,7 +16,6 @@ class StudentContainer extends StatelessWidget {
     this.pdfBase64,
     this.trainingScore,
     this.comment,
-    this.createdAt,
   });
 
   final Function(BuildContext)? onTap;
@@ -31,7 +29,6 @@ class StudentContainer extends StatelessWidget {
   final String? pdfBase64;
   final int? trainingScore;
   final String? comment;
-  final Timestamp? createdAt;
   final Function(BuildContext)? button;
 
   @override

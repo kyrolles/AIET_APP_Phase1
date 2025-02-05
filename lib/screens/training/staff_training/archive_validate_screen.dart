@@ -86,7 +86,6 @@ class _ArchiveValidateScreenState extends State<ArchiveValidateScreen> {
         pdfBase64: request.pdfBase64,
         trainingScore: request.trainingScore,
         comment: request.comment,
-        createdAt: request.createdAt,
       );
     }).toList();
   }

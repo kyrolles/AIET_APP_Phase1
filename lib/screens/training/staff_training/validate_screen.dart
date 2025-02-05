@@ -53,7 +53,6 @@ class _ValidateScreenState extends State<ValidateScreen> {
         pdfBase64: request.pdfBase64,
         trainingScore: request.trainingScore,
         comment: request.comment,
-        createdAt: request.createdAt,
       );
     }).toList();
   }
