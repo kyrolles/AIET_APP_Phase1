@@ -16,8 +16,12 @@ class ValidateScreen extends StatefulWidget {
 }
 
 class _ValidateScreenState extends State<ValidateScreen> {
-  final Stream<QuerySnapshot> _requestsStream =
-      FirebaseFirestore.instance.collection('requests').snapshots();
+  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
+      .collection('requests')
+      .where('type', isEqualTo: 'Training')
+      .where('status', whereIn: ['No status', 'Pending'])
+      .orderBy('created_at', descending: true)
+      .snapshots();
 
   List<Request> requestsList = [];
 
@@ -49,6 +53,7 @@ class _ValidateScreenState extends State<ValidateScreen> {
         pdfBase64: request.pdfBase64,
         trainingScore: request.trainingScore,
         comment: request.comment,
+        createdAt: request.createdAt,
       );
     }).toList();
   }
@@ -68,9 +73,7 @@ class _ValidateScreenState extends State<ValidateScreen> {
               if (snapshot.hasData) {
                 requestsList = [];
                 for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                  if (snapshot.data!.docs[i]['type'] == 'Training') {
-                    requestsList.add(Request.fromJson(snapshot.data!.docs[i]));
-                  }
+                  requestsList.add(Request.fromJson(snapshot.data!.docs[i]));
                 }
                 return ListContainer(
                   title: 'Requests',

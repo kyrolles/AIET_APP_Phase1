@@ -5,6 +5,7 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
 
 class ArchiveValidateScreen extends StatefulWidget {
   const ArchiveValidateScreen({super.key});
@@ -17,7 +18,9 @@ class _ArchiveValidateScreenState extends State<ArchiveValidateScreen> {
   final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
       .collection('requests')
       .where('type', isEqualTo: 'Training')
-      .where('status', whereIn: ['Done', 'Rejected']).snapshots();
+      .where('status', whereIn: ['Done', 'Rejected'])
+      .orderBy('created_at', descending: true)
+      .snapshots();
 
   List<Request> requestsList = [];
 
@@ -58,6 +61,15 @@ class _ArchiveValidateScreenState extends State<ArchiveValidateScreen> {
   List<Widget> archiveRequestsList() {
     return requestsList.map((request) {
       return StudentContainer(
+        onTap: (BuildContext context) {
+          showModalBottomSheet(
+            backgroundColor: const Color.fromRGBO(250, 250, 250, 0.93),
+            context: context,
+            builder: (BuildContext context) {
+              return ValidateButtomSheet(request: request);
+            },
+          );
+        },
         name: request.studentName,
         status: request.status,
         statusColor: request.status == 'Pending'
@@ -71,6 +83,10 @@ class _ArchiveValidateScreenState extends State<ArchiveValidateScreen> {
         year: request.year,
         title: request.fileName,
         image: 'assets/project_image/pdf.png',
+        pdfBase64: request.pdfBase64,
+        trainingScore: request.trainingScore,
+        comment: request.comment,
+        createdAt: request.createdAt,
       );
     }).toList();
   }
