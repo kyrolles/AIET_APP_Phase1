@@ -8,6 +8,7 @@ import 'invoice/it_incoive/it_invoice_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'announcement/announcement_screen.dart';
+import 'admin/assign_results_screen.dart'; // added import for the new screen
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -141,7 +142,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
           );
         },
       ),
-
+      ServiceItem(
+        title: 'Assign Results', // new service item
+        imageUrl: 'assets/project_image/result.png', // update if needed
+        backgroundColor: const Color(0xFFCC70EC),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AssignResultsScreen(),
+            ),
+          );
+        },
+      ),
       // ServiceItem(
       //   title: 'Tuition Fees Upload',
       //   imageUrl: 'assets/project_image/invoice.png',
