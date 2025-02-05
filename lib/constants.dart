@@ -5,6 +5,9 @@ const Color kGrey = Color(0XFF888C94);
 const Color kGreyLight = Color(0XFFE5E5E5);
 const Color kOrange = Color(0XFFFF7648);
 const Color kLightGrey = Color(0xFFE1E8ED);
+const Color kBlue = Color.fromRGBO(6, 147, 241, 1);
+const Color kDarkBlue = Color.fromRGBO(41, 128, 185, 1);
+const Color kgreen = Color.fromRGBO(52, 199, 89, 1);
 
 const kTextStyleBold = TextStyle(
   fontFamily: 'Lexend',

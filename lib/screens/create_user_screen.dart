@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/my_app_bar.dart';
 import 'package:uuid/uuid.dart';
-// import 'package:qr_flutter/qr_flutter.dart';
+import '../services/results_service.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -13,6 +13,8 @@ class CreateUserScreen extends StatefulWidget {
 }
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
+  final ResultsService _resultsService = ResultsService();
+  
   // Controllers for each text field
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -24,7 +26,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final TextEditingController _birthDateController = TextEditingController();
 
   String selectedRole = 'IT'; // Default role
-  String selectedDepartment = 'General'; // Default department
+  String selectedDepartment = 'CE'; // Changed from 'General' to 'CE'
   bool isLoading = false; // Loading indicator state
   bool isPasswordVisible = false; // Password visibility state
 
@@ -85,10 +87,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         );
 
         if (userCredential.user != null) {
-          // Store additional user data and QR code in Firestore
+          final String userId = userCredential.user!.uid;
+          
+          // Create user document
           await FirebaseFirestore.instance
               .collection('users')
-              .doc(userCredential.user!.uid)
+              .doc(userId)
               .set({
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
@@ -102,7 +106,16 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'birthDate': _birthDateController.text,
             'createdAt': FieldValue.serverTimestamp(),
             'qrCode': qrData,
+            'totalTrainingScore': 0,
           });
+
+          // If user is a student, initialize their results profile
+          if (selectedRole == 'Student') {
+            await _resultsService.initializeStudentResults(
+              userId,
+              selectedDepartment,
+            );
+          }
 
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -246,26 +259,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                         ),
                         value: selectedDepartment,
                         items: const [
-                          DropdownMenuItem(
-                            value: 'General',
-                            child: Text('General'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'CE',
-                            child: Text('CE'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'ECE',
-                            child: Text('ECE'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'IE',
-                            child: Text('IE'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'EME',
-                            child: Text('EME'),
-                          ),
+                          DropdownMenuItem(value: 'General', child: Text('General')),
+                          DropdownMenuItem(value: 'CE', child: Text('CE')),
+                          DropdownMenuItem(value: 'ECE', child: Text('ECE')),
+                          DropdownMenuItem(value: 'IE', child: Text('IE')),
+                          DropdownMenuItem(value: 'EME', child: Text('EME')),
                         ],
                         onChanged: (value) {
                           setState(() {

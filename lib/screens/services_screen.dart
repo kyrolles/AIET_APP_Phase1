@@ -8,6 +8,7 @@ import 'invoice/it_incoive/it_invoice_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'announcement/announcement_screen.dart';
+import 'admin/assign_results_screen.dart'; // added import for the new screen
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -76,26 +77,27 @@ class _ServicesScreenState extends State<ServicesScreen> {
           Navigator.pushNamed(context, '/studentTraining');
         },
       ),
-      ServiceItem(
-        title: 'Staff-Student\nTraining',
-        imageUrl: 'assets/project_image/analysis.png',
-        backgroundColor: const Color(0xFFED1C24),
-        onPressed: () {
-          Navigator.pushNamed(context, '/staffStudentTraining');
-        },
-      ),
-      ServiceItem(
-        title: 'Moodle',
-        imageUrl: 'assets/project_image/education.png',
-        backgroundColor: const Color(0xFFFF9811),
-        onPressed: () {},
-      ),
-      ServiceItem(
-        title: 'Unofficial Transcript',
-        imageUrl: 'assets/project_image/transcription.png',
-        backgroundColor: const Color(0xFF0ED290),
-        onPressed: () {},
-      ),
+      if (isStaff)
+        ServiceItem(
+          title: 'Staff-Student\nTraining',
+          imageUrl: 'assets/project_image/analysis.png',
+          backgroundColor: const Color(0xFFED1C24),
+          onPressed: () {
+            Navigator.pushNamed(context, '/staffStudentTraining');
+          },
+        ),
+      // ServiceItem(
+      //   title: 'Moodle',
+      //   imageUrl: 'assets/project_image/education.png',
+      //   backgroundColor: const Color(0xFFFF9811),
+      //   onPressed: () {},
+      // ),
+      // ServiceItem(
+      //   title: 'Unofficial Transcript',
+      //   imageUrl: 'assets/project_image/transcription.png',
+      //   backgroundColor: const Color(0xFF0ED290),
+      //   onPressed: () {},
+      // ),
       ServiceItem(
         title: 'GPA Calculator',
         imageUrl: 'assets/project_image/gpa.png',
@@ -142,6 +144,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
 
+      ServiceItem(
+        title: 'Assign Results', // new service item
+        imageUrl: 'assets/project_image/result.png', // update if needed
+        backgroundColor: const Color(0xFFCC70EC),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AssignResultsScreen(),
+            ),
+          );
+        },
+      ),
       // ServiceItem(
       //   title: 'Tuition Fees Upload',
       //   imageUrl: 'assets/project_image/invoice.png',

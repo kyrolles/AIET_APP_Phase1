@@ -13,6 +13,9 @@ class StudentContainer extends StatelessWidget {
     required this.title,
     required this.image,
     this.button,
+    this.pdfBase64,
+    this.trainingScore,
+    this.comment,
   });
 
   final Function(BuildContext)? onTap;
@@ -23,6 +26,9 @@ class StudentContainer extends StatelessWidget {
   final String? year;
   final String title;
   final String image;
+  final String? pdfBase64;
+  final int? trainingScore;
+  final String? comment;
   final Function(BuildContext)? button;
 
   @override

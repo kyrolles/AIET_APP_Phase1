@@ -1,6 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart'; // Add this import
 
@@ -54,7 +53,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
-              bottom: 32.0, left: 16.0, right: 16.0, top: 22.0),
+              bottom: 22.0, left: 16.0, right: 16.0, top: 22.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -97,9 +96,10 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     ),
                 ],
               ),
-              const SizedBox(height: 20),
-              MyButton(
+              const SizedBox(height: 25),
+              KButton(
                 text: 'Generate QR Code',
+                backgroundColor: kBlue,
                 onPressed: () {
                   final subjectCode = _subjectCodeController.text.trim();
                   final selectedPeriod = getSelectedPeriod();
@@ -131,7 +131,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     ),
                   );
                 },
-                height: 50,
+                fontSize: 22,
                 width: double.infinity,
               ),
             ],
@@ -194,44 +194,6 @@ class PeriodButton extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
       ),
-    );
-  }
-}
-
-class MyButton extends StatelessWidget {
-  const MyButton({
-    super.key,
-    this.onPressed,
-    required this.text,
-    this.color,
-    this.textColor,
-    required this.height,
-    required this.width,
-  });
-
-  final Function()? onPressed;
-  final String text;
-  final Color? color;
-  final Color? textColor;
-  final double height;
-  final double width;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color ?? kPrimaryColor,
-        minimumSize: Size(width, height),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: Text(text,
-          style: TextStyle(
-              fontSize: 21.7,
-              fontWeight: FontWeight.w700,
-              color: textColor ?? Colors.white)),
     );
   }
 }

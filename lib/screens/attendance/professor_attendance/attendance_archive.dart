@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
+import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/add_student_bottom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:async';
@@ -52,10 +54,8 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
 
   Future<void> fetchExistingDocument() async {
     try {
-      DocumentSnapshot doc = await _firestore
-          .collection('attendance')
-          .doc(currentDocId)
-          .get();
+      DocumentSnapshot doc =
+          await _firestore.collection('attendance').doc(currentDocId).get();
 
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
@@ -232,16 +232,16 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                 ),
                 child: qrData != null
                     ? QrImageView(
-                  data: qrData!,
-                  version: QrVersions.auto,
-                  size: 180,
-                  backgroundColor: Colors.white,
-                )
+                        data: qrData!,
+                        version: QrVersions.auto,
+                        size: 180,
+                        backgroundColor: Colors.white,
+                      )
                     : const SizedBox(
-                  height: 180,
-                  width: 180,
-                  child: Center(child: Text('QR Code')),
-                ),
+                        height: 180,
+                        width: 180,
+                        child: Center(child: Text('QR Code')),
+                      ),
               ),
             ),
           ),
@@ -307,7 +307,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                  child: ElevatedButton(
+                  child: KButton(
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
@@ -316,42 +316,22 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                         },
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Add Stu +',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    text: 'Add Stu +',
+                    fontSize: 20,
+                    textColor: Colors.black87,
+                    backgroundColor: Colors.black12,
+                    borderColor: Colors.black87,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
+                  child: KButton(
                     onPressed: confirmAttendance,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Confirm',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
+                    text: 'Confirm',
+                    fontSize: 20,
+                    textColor: Colors.white,
+                    backgroundColor: kBlue,
+                    borderColor: Colors.white,
                   ),
                 ),
               ],
