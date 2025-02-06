@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../constants.dart';
+import '../utils/gpa_calculator.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({super.key});
@@ -13,47 +14,79 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   int selectedSemester = 1;
   List<List<Map<String, dynamic>>> semesterResults = [];
+  double overallGPA = 0.0;
+  double totalCredits = 0.0;
+  double semesterGPA = 0.0;
+  double semesterCredits = 0.0;
 
   @override
   void initState() {
     super.initState();
     _initializeSemesterData();
+    _loadGPAData();
   }
 
   // Step 1: Create Firestore docs if missing for semesters 1-10
   Future<void> _initializeSemesterData() async {
-    String userId = FirebaseAuth.instance.currentUser?.uid ?? "defaultUser";
-    // In production, fetch the user's department from the users document
-    String department = "CE"; 
-    for (int sem = 1; sem <= 10; sem++) {
-      DocumentReference docRef = FirebaseFirestore.instance
+    try {
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'unauthenticated',
+          message: 'User must be logged in to view results',
+        );
+      }
+
+      // In production, fetch the user's department from the users document
+      String department = "CE"; 
+      
+      // First verify if the user has any results
+      DocumentSnapshot userResultCheck = await FirebaseFirestore.instance
           .collection('results')
           .doc(userId)
-          .collection('semesters')
-          .doc(sem.toString());
-      DocumentSnapshot docSnap = await docRef.get();
-      if (!docSnap.exists) {
-        List<Map<String, dynamic>> defaultSubjects = _getDefaultSubjects(sem);
-        // Map hardcoded fields to our document structure
-        await docRef.set({
-          "semesterNumber": sem,
-          "department": department,
-          "lastUpdated": FieldValue.serverTimestamp(),
-          "subjects": defaultSubjects.map((subject) => {
-                "code": subject["smallTitle"],
-                "name": subject["label"],
-                "credits": 4,  // default credit value; adjust as needed
-                "grade": subject["grade"],
-                "points": _gradeToPoints(subject["grade"]),
-                "scores": {
-                  "week5": (subject["scores"] as List)[0]["score"],
-                  "week10": (subject["scores"] as List)[1]["score"],
-                  "coursework": (subject["scores"] as List)[2]["score"],
-                  "lab": (subject["scores"] as List)[3]["score"],
-                }
-              }).toList(),
-        });
+          .get();
+
+      if (!userResultCheck.exists) {
+        // Optional: You can throw an exception here or handle the case where user has no results
+        print('No results found for this user');
+        return;
       }
+
+      for (int sem = 1; sem <= 10; sem++) {
+        DocumentReference docRef = FirebaseFirestore.instance
+            .collection('results')
+            .doc(userId)
+            .collection('semesters')
+            .doc(sem.toString());
+        DocumentSnapshot docSnap = await docRef.get();
+        if (!docSnap.exists) {
+          List<Map<String, dynamic>> defaultSubjects = _getDefaultSubjects(sem);
+          // Map hardcoded fields to our document structure
+          await docRef.set({
+            "semesterNumber": sem,
+            "department": department,
+            "lastUpdated": FieldValue.serverTimestamp(),
+            "subjects": defaultSubjects.map((subject) => {
+                  "code": subject["smallTitle"],
+                  "name": subject["label"],
+                  "credits": 4,  // default credit value; adjust as needed
+                  "grade": subject["grade"],
+                  "points": _gradeToPoints(subject["grade"]),
+                  "scores": {
+                    "week5": (subject["scores"] as List)[0]["score"],
+                    "week10": (subject["scores"] as List)[1]["score"],
+                    "coursework": (subject["scores"] as List)[2]["score"],
+                    "lab": (subject["scores"] as List)[3]["score"],
+                  }
+                }).toList(),
+          });
+        }
+      }
+    } catch (e) {
+      print('Error initializing semester data: $e');
+      // You might want to rethrow or handle the error appropriately
+      rethrow;
     }
   }
 
@@ -394,39 +427,77 @@ class _ResultPageState extends State<ResultPage> {
 
   // Step 2: Load semester documents and map them to UI structure.
   Future<List<List<Map<String, dynamic>>>> _loadSemesterData() async {
-    String userId = FirebaseAuth.instance.currentUser?.uid ?? "defaultUser";
-    List<List<Map<String, dynamic>>> semestersData = [];
-    for (int sem = 1; sem <= 10; sem++) {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('results')
-          .doc(userId)
-          .collection('semesters')
-          .doc(sem.toString())
-          .get();
-      if (doc.exists) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        List subjects = data['subjects'] ?? [];
-        // Map Firestore subject to UI format:
-        List<Map<String, dynamic>> mappedSubjects = subjects.map<Map<String, dynamic>>((s) {
-          return {
-            "label": s["name"],
-            "smallTitle": s["code"],
-            "grade": s["grade"],
-            "color": getGradeColor(s["grade"]),
-            "scores": [
-              {"label": "5th Week", "score": (s["scores"]["week5"] as num).toDouble()},
-              {"label": "10th Week", "score": (s["scores"]["week10"] as num).toDouble()},
-              {"label": "Course Work", "score": (s["scores"]["coursework"] as num).toDouble()},
-              {"label": "Lab", "score": (s["scores"]["lab"] as num).toDouble()},
-            ],
-          };
-        }).toList();
-        semestersData.add(mappedSubjects);
-      } else {
-        semestersData.add([]);
+    try {
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'unauthenticated',
+          message: 'User must be logged in to view results',
+        );
       }
+
+      List<List<Map<String, dynamic>>> semestersData = [];
+      for (int sem = 1; sem <= 10; sem++) {
+        try {
+          DocumentSnapshot doc = await FirebaseFirestore.instance
+              .collection('results')
+              .doc(userId)
+              .collection('semesters')
+              .doc(sem.toString())
+              .get();
+
+          if (doc.exists) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            List subjects = data['subjects'] ?? [];
+            // Map Firestore subject to UI format:
+            List<Map<String, dynamic>> mappedSubjects = subjects.map<Map<String, dynamic>>((s) {
+              return {
+                "label": s["name"],
+                "smallTitle": s["code"],
+                "grade": s["grade"],
+                "color": getGradeColor(s["grade"]),
+                "scores": [
+                  {"label": "5th Week", "score": (s["scores"]["week5"] as num).toDouble()},
+                  {"label": "10th Week", "score": (s["scores"]["week10"] as num).toDouble()},
+                  {"label": "Course Work", "score": (s["scores"]["coursework"] as num).toDouble()},
+                  {"label": "Lab", "score": (s["scores"]["lab"] as num).toDouble()},
+                ],
+              };
+            }).toList();
+            semestersData.add(mappedSubjects);
+          } else {
+            semestersData.add([]);
+          }
+        } catch (e) {
+          print('Error loading semester $sem: $e');
+          semestersData.add([]); // Add empty semester on error
+        }
+      }
+      return semestersData;
+    } catch (e) {
+      print('Error loading semester data: $e');
+      rethrow;
     }
-    return semestersData;
+  }
+
+  Future<void> _loadGPAData() async {
+    var overall = await GPACalculator.calculateOverallGPA();
+    var semester = await GPACalculator.calculateSemesterGPA(selectedSemester);
+    
+    setState(() {
+      overallGPA = overall['gpa'] ?? 0.0;
+      totalCredits = overall['totalCredits'] ?? 0.0;
+      semesterGPA = semester['gpa'] ?? 0.0;
+      semesterCredits = semester['totalCredits'] ?? 0.0;
+    });
+  }
+
+  void onSemesterSelected(int semester) {
+    setState(() {
+      selectedSemester = semester;
+    });
+    _loadGPAData(); // Reload GPA data when semester changes
   }
 
   Color getGradeColor(String grade) {
@@ -457,7 +528,25 @@ class _ResultPageState extends State<ResultPage> {
           );
         } else if (snapshot.hasError) {
           return Scaffold(
-            body: Center(child: Text('Error: ${snapshot.error}')),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Unable to load results\n${snapshot.error}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Go Back'),
+                  ),
+                ],
+              ),
+            ),
           );
         } else {
           semesterResults = snapshot.data ?? [];
@@ -518,46 +607,65 @@ class _ResultPageState extends State<ResultPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                        width: 80,
-                                        child: Center(
-                                            child: Text("126.0",
-                                                style: TextStyle(
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black)))),
-                                    SizedBox(height: 5),
-                                    Text("Credit Achieved",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 8.5,
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Center(
+                                      child: Text(
+                                        totalCredits.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                        )
+                                      )
+                                    )
+                                  ),
+                                  const SizedBox(height: 5),
+                                  const Text(
+                                    "Credit Achieved",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.bold
+                                    )
+                                  ),
+                                ]
+                              ),
                               SizedBox(
-                                  width: 3,
-                                  height: 55,
-                                  child: Container(color: Colors.grey)),
-                              const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                        width: 80,
-                                        child: Center(
-                                            child: Text("3.99",
-                                                style: TextStyle(
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black)))),
-                                    SizedBox(height: 5),
-                                    Text("GPA",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 8.5,
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
+                                width: 3,
+                                height: 55,
+                                child: Container(color: Colors.grey)
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Center(
+                                      child: Text(
+                                        overallGPA.toStringAsFixed(2),
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                        )
+                                      )
+                                    )
+                                  ),
+                                  const SizedBox(height: 5),
+                                  const Text(
+                                    "GPA",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.bold
+                                    )
+                                  ),
+                                ]
+                              ),
                             ],
                           ),
                         ),
@@ -582,9 +690,7 @@ class _ResultPageState extends State<ResultPage> {
                               children: List.generate(10, (index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      selectedSemester = index + 1;
-                                    });
+                                    onSemesterSelected(index + 1);
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(right: 8),
