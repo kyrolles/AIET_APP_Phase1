@@ -15,80 +15,99 @@ class SubjectResultsDialog extends StatefulWidget {
 }
 
 class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
+  late Map<String, dynamic> editedSubject;
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController week5Controller;
-  late TextEditingController week10Controller;
-  late TextEditingController courseworkController;
-  late TextEditingController labController;
-  String selectedGrade = 'A';
-  final List<String> grades = ['A', 'B', 'C', 'D', 'F'];
+
+  // Updated grade points to match calculator screen
+  final Map<String, double> gradePoints = {
+    'A': 4.0,
+    'A-': 3.7,
+    'B+': 3.3,
+    'B': 3.0,
+    'B-': 2.7,
+    'C+': 2.3,
+    'C': 2.0,
+    'C-': 1.7,
+    'D+': 1.3,
+    'D': 1.0,
+    'D-': 0.7,
+    'F': 0.0,
+  };
 
   @override
   void initState() {
     super.initState();
-    final scores = widget.subject['scores'] as Map<String, dynamic>;
-    week5Controller = TextEditingController(text: scores['week5']?.toString() ?? '0.0');
-    week10Controller = TextEditingController(text: scores['week10']?.toString() ?? '0.0');
-    
-    if (scores['coursework'] != null) {
-      courseworkController = TextEditingController(text: scores['coursework'].toString());
-    }
-    
-    if (scores['lab'] != null) {
-      labController = TextEditingController(text: scores['lab'].toString());
-    }
-    
-    selectedGrade = widget.subject['grade'];
+    editedSubject = Map<String, dynamic>.from(widget.subject);
+  }
+
+  void _updateGrade(String newGrade) {
+    setState(() {
+      editedSubject['grade'] = newGrade;
+      editedSubject['points'] = gradePoints[newGrade] ?? 0.0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final scores = widget.subject['scores'] as Map<String, dynamic>;
-    
     return AlertDialog(
-      title: Text(widget.subject['name']),
+      title: Text('Edit ${editedSubject['name']}'),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Grade Dropdown
               DropdownButtonFormField<String>(
-                value: selectedGrade,
+                value: editedSubject['grade'] as String,
                 decoration: const InputDecoration(labelText: 'Grade'),
-                items: grades.map((grade) => 
-                  DropdownMenuItem(value: grade, child: Text(grade))
-                ).toList(),
-                onChanged: (value) {
-                  setState(() => selectedGrade = value!);
+                items: gradePoints.keys.map((grade) {
+                  return DropdownMenuItem(
+                    value: grade,
+                    child: Text('$grade (${gradePoints[grade]?.toStringAsFixed(1)})'),
+                  );
+                }).toList(),
+                onChanged: (value) => _updateGrade(value!),
+              ),
+              const SizedBox(height: 16),
+              
+              // Score inputs
+              TextFormField(
+                initialValue: editedSubject['scores']['week5'].toString(),
+                decoration: const InputDecoration(labelText: '5th Week Score'),
+                keyboardType: TextInputType.number,
+                validator: (value) => _validateScore(value),
+                onSaved: (value) {
+                  editedSubject['scores']['week5'] = double.parse(value ?? '0');
                 },
               ),
               TextFormField(
-                controller: week5Controller,
-                decoration: const InputDecoration(labelText: '5th Week Score'),
-                keyboardType: TextInputType.number,
-                validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-              ),
-              TextFormField(
-                controller: week10Controller,
+                initialValue: editedSubject['scores']['week10'].toString(),
                 decoration: const InputDecoration(labelText: '10th Week Score'),
                 keyboardType: TextInputType.number,
-                validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                validator: (value) => _validateScore(value),
+                onSaved: (value) {
+                  editedSubject['scores']['week10'] = double.parse(value ?? '0');
+                },
               ),
-              if (scores['coursework'] != null)
-                TextFormField(
-                  controller: courseworkController,
-                  decoration: const InputDecoration(labelText: 'Coursework Score'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-                ),
-              if (scores['lab'] != null)
-                TextFormField(
-                  controller: labController,
-                  decoration: const InputDecoration(labelText: 'Lab Score'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-                ),
+              TextFormField(
+                initialValue: editedSubject['scores']['coursework'].toString(),
+                decoration: const InputDecoration(labelText: 'Coursework Score'),
+                keyboardType: TextInputType.number,
+                validator: (value) => _validateScore(value),
+                onSaved: (value) {
+                  editedSubject['scores']['coursework'] = double.parse(value ?? '0');
+                },
+              ),
+              TextFormField(
+                initialValue: editedSubject['scores']['lab'].toString(),
+                decoration: const InputDecoration(labelText: 'Lab Score'),
+                keyboardType: TextInputType.number,
+                validator: (value) => _validateScore(value),
+                onSaved: (value) {
+                  editedSubject['scores']['lab'] = double.parse(value ?? '0');
+                },
+              ),
             ],
           ),
         ),
@@ -101,20 +120,8 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              final updatedSubject = {
-                ...widget.subject,
-                'grade': selectedGrade,
-                'scores': {
-                  'week5': double.parse(week5Controller.text),
-                  'week10': double.parse(week10Controller.text),
-                  if (scores['coursework'] != null)
-                    'coursework': double.parse(courseworkController.text),
-                  if (scores['lab'] != null)
-                    'lab': double.parse(labController.text),
-                },
-              };
-              widget.onSave(updatedSubject);
-              Navigator.pop(context);
+              _formKey.currentState!.save();
+              widget.onSave(editedSubject);
             }
           },
           child: const Text('Save'),
@@ -123,12 +130,17 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     );
   }
 
-  @override
-  void dispose() {
-    week5Controller.dispose();
-    week10Controller.dispose();
-    courseworkController.dispose();
-    labController.dispose();
-    super.dispose();
+  String? _validateScore(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a score';
+    }
+    final score = double.tryParse(value);
+    if (score == null) {
+      return 'Please enter a valid number';
+    }
+    if (score < 0 || score > 100) {
+      return 'Score must be between 0 and 100';
+    }
+    return null;
   }
 }

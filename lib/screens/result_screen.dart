@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../constants.dart';
+import '../utils/gpa_calculator.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({super.key});
@@ -13,11 +14,16 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   int selectedSemester = 1;
   List<List<Map<String, dynamic>>> semesterResults = [];
+  double overallGPA = 0.0;
+  double totalCredits = 0.0;
+  double semesterGPA = 0.0;
+  double semesterCredits = 0.0;
 
   @override
   void initState() {
     super.initState();
     _initializeSemesterData();
+    _loadGPAData();
   }
 
   // Step 1: Create Firestore docs if missing for semesters 1-10
@@ -475,6 +481,25 @@ class _ResultPageState extends State<ResultPage> {
     }
   }
 
+  Future<void> _loadGPAData() async {
+    var overall = await GPACalculator.calculateOverallGPA();
+    var semester = await GPACalculator.calculateSemesterGPA(selectedSemester);
+    
+    setState(() {
+      overallGPA = overall['gpa'] ?? 0.0;
+      totalCredits = overall['totalCredits'] ?? 0.0;
+      semesterGPA = semester['gpa'] ?? 0.0;
+      semesterCredits = semester['totalCredits'] ?? 0.0;
+    });
+  }
+
+  void onSemesterSelected(int semester) {
+    setState(() {
+      selectedSemester = semester;
+    });
+    _loadGPAData(); // Reload GPA data when semester changes
+  }
+
   Color getGradeColor(String grade) {
     switch (grade) {
       case 'A':
@@ -582,46 +607,65 @@ class _ResultPageState extends State<ResultPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                        width: 80,
-                                        child: Center(
-                                            child: Text("126.0",
-                                                style: TextStyle(
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black)))),
-                                    SizedBox(height: 5),
-                                    Text("Credit Achieved",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 8.5,
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Center(
+                                      child: Text(
+                                        totalCredits.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                        )
+                                      )
+                                    )
+                                  ),
+                                  const SizedBox(height: 5),
+                                  const Text(
+                                    "Credit Achieved",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.bold
+                                    )
+                                  ),
+                                ]
+                              ),
                               SizedBox(
-                                  width: 3,
-                                  height: 55,
-                                  child: Container(color: Colors.grey)),
-                              const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                        width: 80,
-                                        child: Center(
-                                            child: Text("3.99",
-                                                style: TextStyle(
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black)))),
-                                    SizedBox(height: 5),
-                                    Text("GPA",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 8.5,
-                                            fontWeight: FontWeight.bold)),
-                                  ]),
+                                width: 3,
+                                height: 55,
+                                child: Container(color: Colors.grey)
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Center(
+                                      child: Text(
+                                        overallGPA.toStringAsFixed(2),
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                        )
+                                      )
+                                    )
+                                  ),
+                                  const SizedBox(height: 5),
+                                  const Text(
+                                    "GPA",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.bold
+                                    )
+                                  ),
+                                ]
+                              ),
                             ],
                           ),
                         ),
@@ -646,9 +690,7 @@ class _ResultPageState extends State<ResultPage> {
                               children: List.generate(10, (index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      selectedSemester = index + 1;
-                                    });
+                                    onSemesterSelected(index + 1);
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(right: 8),
