@@ -22,38 +22,65 @@ class _ResultPageState extends State<ResultPage> {
 
   // Step 1: Create Firestore docs if missing for semesters 1-10
   Future<void> _initializeSemesterData() async {
-    String userId = FirebaseAuth.instance.currentUser?.uid ?? "defaultUser";
-    // In production, fetch the user's department from the users document
-    String department = "CE"; 
-    for (int sem = 1; sem <= 10; sem++) {
-      DocumentReference docRef = FirebaseFirestore.instance
+    try {
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'unauthenticated',
+          message: 'User must be logged in to view results',
+        );
+      }
+
+      // In production, fetch the user's department from the users document
+      String department = "CE"; 
+      
+      // First verify if the user has any results
+      DocumentSnapshot userResultCheck = await FirebaseFirestore.instance
           .collection('results')
           .doc(userId)
-          .collection('semesters')
-          .doc(sem.toString());
-      DocumentSnapshot docSnap = await docRef.get();
-      if (!docSnap.exists) {
-        List<Map<String, dynamic>> defaultSubjects = _getDefaultSubjects(sem);
-        // Map hardcoded fields to our document structure
-        await docRef.set({
-          "semesterNumber": sem,
-          "department": department,
-          "lastUpdated": FieldValue.serverTimestamp(),
-          "subjects": defaultSubjects.map((subject) => {
-                "code": subject["smallTitle"],
-                "name": subject["label"],
-                "credits": 4,  // default credit value; adjust as needed
-                "grade": subject["grade"],
-                "points": _gradeToPoints(subject["grade"]),
-                "scores": {
-                  "week5": (subject["scores"] as List)[0]["score"],
-                  "week10": (subject["scores"] as List)[1]["score"],
-                  "coursework": (subject["scores"] as List)[2]["score"],
-                  "lab": (subject["scores"] as List)[3]["score"],
-                }
-              }).toList(),
-        });
+          .get();
+
+      if (!userResultCheck.exists) {
+        // Optional: You can throw an exception here or handle the case where user has no results
+        print('No results found for this user');
+        return;
       }
+
+      for (int sem = 1; sem <= 10; sem++) {
+        DocumentReference docRef = FirebaseFirestore.instance
+            .collection('results')
+            .doc(userId)
+            .collection('semesters')
+            .doc(sem.toString());
+        DocumentSnapshot docSnap = await docRef.get();
+        if (!docSnap.exists) {
+          List<Map<String, dynamic>> defaultSubjects = _getDefaultSubjects(sem);
+          // Map hardcoded fields to our document structure
+          await docRef.set({
+            "semesterNumber": sem,
+            "department": department,
+            "lastUpdated": FieldValue.serverTimestamp(),
+            "subjects": defaultSubjects.map((subject) => {
+                  "code": subject["smallTitle"],
+                  "name": subject["label"],
+                  "credits": 4,  // default credit value; adjust as needed
+                  "grade": subject["grade"],
+                  "points": _gradeToPoints(subject["grade"]),
+                  "scores": {
+                    "week5": (subject["scores"] as List)[0]["score"],
+                    "week10": (subject["scores"] as List)[1]["score"],
+                    "coursework": (subject["scores"] as List)[2]["score"],
+                    "lab": (subject["scores"] as List)[3]["score"],
+                  }
+                }).toList(),
+          });
+        }
+      }
+    } catch (e) {
+      print('Error initializing semester data: $e');
+      // You might want to rethrow or handle the error appropriately
+      rethrow;
     }
   }
 
@@ -394,39 +421,58 @@ class _ResultPageState extends State<ResultPage> {
 
   // Step 2: Load semester documents and map them to UI structure.
   Future<List<List<Map<String, dynamic>>>> _loadSemesterData() async {
-    String userId = FirebaseAuth.instance.currentUser?.uid ?? "defaultUser";
-    List<List<Map<String, dynamic>>> semestersData = [];
-    for (int sem = 1; sem <= 10; sem++) {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('results')
-          .doc(userId)
-          .collection('semesters')
-          .doc(sem.toString())
-          .get();
-      if (doc.exists) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        List subjects = data['subjects'] ?? [];
-        // Map Firestore subject to UI format:
-        List<Map<String, dynamic>> mappedSubjects = subjects.map<Map<String, dynamic>>((s) {
-          return {
-            "label": s["name"],
-            "smallTitle": s["code"],
-            "grade": s["grade"],
-            "color": getGradeColor(s["grade"]),
-            "scores": [
-              {"label": "5th Week", "score": (s["scores"]["week5"] as num).toDouble()},
-              {"label": "10th Week", "score": (s["scores"]["week10"] as num).toDouble()},
-              {"label": "Course Work", "score": (s["scores"]["coursework"] as num).toDouble()},
-              {"label": "Lab", "score": (s["scores"]["lab"] as num).toDouble()},
-            ],
-          };
-        }).toList();
-        semestersData.add(mappedSubjects);
-      } else {
-        semestersData.add([]);
+    try {
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'unauthenticated',
+          message: 'User must be logged in to view results',
+        );
       }
+
+      List<List<Map<String, dynamic>>> semestersData = [];
+      for (int sem = 1; sem <= 10; sem++) {
+        try {
+          DocumentSnapshot doc = await FirebaseFirestore.instance
+              .collection('results')
+              .doc(userId)
+              .collection('semesters')
+              .doc(sem.toString())
+              .get();
+
+          if (doc.exists) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            List subjects = data['subjects'] ?? [];
+            // Map Firestore subject to UI format:
+            List<Map<String, dynamic>> mappedSubjects = subjects.map<Map<String, dynamic>>((s) {
+              return {
+                "label": s["name"],
+                "smallTitle": s["code"],
+                "grade": s["grade"],
+                "color": getGradeColor(s["grade"]),
+                "scores": [
+                  {"label": "5th Week", "score": (s["scores"]["week5"] as num).toDouble()},
+                  {"label": "10th Week", "score": (s["scores"]["week10"] as num).toDouble()},
+                  {"label": "Course Work", "score": (s["scores"]["coursework"] as num).toDouble()},
+                  {"label": "Lab", "score": (s["scores"]["lab"] as num).toDouble()},
+                ],
+              };
+            }).toList();
+            semestersData.add(mappedSubjects);
+          } else {
+            semestersData.add([]);
+          }
+        } catch (e) {
+          print('Error loading semester $sem: $e');
+          semestersData.add([]); // Add empty semester on error
+        }
+      }
+      return semestersData;
+    } catch (e) {
+      print('Error loading semester data: $e');
+      rethrow;
     }
-    return semestersData;
   }
 
   Color getGradeColor(String grade) {
@@ -457,7 +503,25 @@ class _ResultPageState extends State<ResultPage> {
           );
         } else if (snapshot.hasError) {
           return Scaffold(
-            body: Center(child: Text('Error: ${snapshot.error}')),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Unable to load results\n${snapshot.error}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Go Back'),
+                  ),
+                ],
+              ),
+            ),
           );
         } else {
           semesterResults = snapshot.data ?? [];
