@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../constants.dart';
+import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/screens/drawer/uplod_image_buttom_sheet.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
 
 class QrcodeScreen extends StatelessWidget {
   const QrcodeScreen({super.key});
@@ -19,7 +21,7 @@ class QrcodeScreen extends StatelessWidget {
       if (doc.exists) {
         return {
           ...doc.data()!,
-          'uid': user.uid, // Add UID to the returned data
+          'uid': user.uid,
         };
       }
     }
@@ -32,7 +34,6 @@ class QrcodeScreen extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          //! Background image
           Positioned.fill(
             child: SvgPicture.asset(
               'assets/images/ID.svg',
@@ -41,7 +42,6 @@ class QrcodeScreen extends StatelessWidget {
               height: double.infinity,
             ),
           ),
-          //! Back arrow button
           Positioned(
             top: 40,
             left: 16,
@@ -72,7 +72,6 @@ class QrcodeScreen extends StatelessWidget {
               ],
             ),
           ),
-          //! Foreground content
           Center(
             child: FutureBuilder<Map<String, dynamic>?>(
               future: _getUserData(),
@@ -82,28 +81,58 @@ class QrcodeScreen extends StatelessWidget {
                 }
 
                 final userData = snapshot.data;
-                final uid = userData?['uid'] ?? ""; // Get the UID
-
                 final firstName = userData?['firstName'] ?? "Loading...";
                 final lastName = userData?['lastName'] ?? "Loading...";
                 final name = "$firstName $lastName";
                 final department = userData?['department'] ?? "Loading...";
                 final studentId = userData?['id'] ?? "Loading...";
                 final year = "${userData?['academicYear'] ?? 'Loading...'}";
+                final imageBase64 = userData?['profileImage'];
 
                 return Column(
                   children: [
                     const SizedBox(height: 100),
-                    const CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.white,
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          backgroundColor:
+                              const Color.fromRGBO(250, 250, 250, 1),
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(16)),
+                          ),
+                          builder: (BuildContext context) {
+                            return const UploadProfileImageBottomSheet();
+                          },
+                        );
+                      },
                       child: CircleAvatar(
-                        radius: 58,
-                        backgroundImage:
-                            AssetImage('assets/images/1704502172296.jpg'),
+                        radius: 80,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 78,
+                          backgroundColor: Colors.grey[200],
+                          child: imageBase64 != null
+                              ? ClipOval(
+                                  child: Image.memory(
+                                    base64Decode(imageBase64),
+                                    fit: BoxFit.cover,
+                                    width: 156,
+                                    height: 156,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      debugPrint(
+                                          'Error displaying image: $error');
+                                      return const Icon(Icons.person, size: 50);
+                                    },
+                                  ),
+                                )
+                              : const Icon(Icons.person, size: 50),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 30),
                     Text(
                       name,
                       style: const TextStyle(
@@ -154,7 +183,6 @@ class QrcodeScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 30),
-                    //! QR Code
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -170,8 +198,7 @@ class QrcodeScreen extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                        data: userData?['qrCode'] ??
-                            "", // Use the qrCode field value
+                        data: userData?['qrCode'] ?? "",
                         version: QrVersions.auto,
                         size: 200.0,
                         backgroundColor: Colors.white,

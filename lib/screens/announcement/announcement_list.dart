@@ -36,7 +36,7 @@ class _AnnouncementListState extends State<AnnouncementList> {
           shrinkWrap: true,
           addAutomaticKeepAlives: true,
           cacheExtent: 100,
-          // physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             return AnnouncementItem(doc: announcements[index]);
           },

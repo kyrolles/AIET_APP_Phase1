@@ -14,7 +14,7 @@ class CreateUserScreen extends StatefulWidget {
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
   final ResultsService _resultsService = ResultsService();
-  
+
   // Controllers for each text field
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -88,12 +88,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
         if (userCredential.user != null) {
           final String userId = userCredential.user!.uid;
-          
+
           // Create user document
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userId)
-              .set({
+          await FirebaseFirestore.instance.collection('users').doc(userId).set({
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'email': _emailController.text,
@@ -107,6 +104,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'createdAt': FieldValue.serverTimestamp(),
             'qrCode': qrData,
             'totalTrainingScore': 0,
+            'profileImage': '',
           });
 
           // If user is a student, initialize their results profile
@@ -259,7 +257,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                         ),
                         value: selectedDepartment,
                         items: const [
-                          DropdownMenuItem(value: 'General', child: Text('General')),
+                          DropdownMenuItem(
+                              value: 'General', child: Text('General')),
                           DropdownMenuItem(value: 'CE', child: Text('CE')),
                           DropdownMenuItem(value: 'ECE', child: Text('ECE')),
                           DropdownMenuItem(value: 'IE', child: Text('IE')),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:graduation_project/screens/app_drawer.dart';
+import 'dart:convert';
+import 'package:graduation_project/screens/drawer/app_drawer.dart';
 import '../components/activities_list_view.dart';
 import '../components/text_link.dart';
 import '../constants.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   String userName = '';
   String? currentUserEmail;
+  String? imageBase64; // Added missing variable declaration
 
   final storage = const FlutterSecureStorage();
 
@@ -44,28 +46,35 @@ class HomeScreenState extends State<HomeScreen> {
         if (querySnapshot.docs.isNotEmpty) {
           DocumentSnapshot userDoc = querySnapshot.docs.first;
           setState(() {
-            // Combine first and last name
             userName = '${userDoc['firstName']} ${userDoc['lastName']}'.trim();
+            imageBase64 = userDoc['profileImage'] as String?; // Fixed casting
           });
         }
       }
     } catch (e) {
-      print('Error fetching user name: $e');
+      debugPrint(
+          'Error fetching user name: $e'); // Using debugPrint instead of print
     }
   }
 
   Future<void> _logout() async {
-    // Clear the saved token
-    await storage.delete(key: 'token');
+    try {
+      // Clear the saved token
+      await storage.delete(key: 'token');
 
-    // Sign out from Firebase
-    await FirebaseAuth.instance.signOut();
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
 
-    // Navigate back to the login screen
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
+      if (!mounted) return; // Added mounted check
+
+      // Navigate back to the login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } catch (e) {
+      debugPrint('Error during logout: $e');
+    }
   }
 
   @override
@@ -73,10 +82,10 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: homeScreenAppBar(context),
       drawer: AppDrawer(_logout),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
               padding: const EdgeInsets.all(20.0),
               child: TextField(
                 style: const TextStyle(
@@ -86,25 +95,31 @@ class HomeScreenState extends State<HomeScreen> {
                 onChanged: (value) {},
               ),
             ),
-            const TextLink(
+          ),
+          const SliverToBoxAdapter(
+            child: TextLink(
               text: 'Activities',
             ),
-            const ActivitiesListView(),
-            TextLink(
+          ),
+          const SliverToBoxAdapter(child: ActivitiesListView()),
+          SliverToBoxAdapter(
+            child: TextLink(
               text: 'Announcements',
               textLink: 'View All',
               onTap: () {
                 Navigator.pushNamed(context, '/all_announcement');
               },
             ),
-            const SizedBox(
-              height: 400, // Set a fixed height for the horizontal ListView
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 450,
               child: AnnouncementList(
-                scrollDirection: Axis.vertical,
-              ), // Horizontal scrolling in HomeScreen
+                scrollDirection: Axis.horizontal,
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -136,9 +151,23 @@ class HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
           ),
           const SizedBox(width: 8),
-          const CircleAvatar(
-            radius: 22,
-            backgroundImage: AssetImage('assets/images/1704502172296.jfif'),
+          CircleAvatar(
+            radius: 25,
+            backgroundColor: Colors.grey[200],
+            child: imageBase64 != null
+                ? ClipOval(
+                    child: Image.memory(
+                      base64Decode(imageBase64!),
+                      fit: BoxFit.cover,
+                      width: 50, // Adjusted width to match radius
+                      height: 50, // Adjusted height to match radius
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint('Error displaying image: $error');
+                        return const Icon(Icons.person, size: 25);
+                      },
+                    ),
+                  )
+                : const Icon(Icons.person, size: 25),
           ),
           const Spacer(flex: 2),
         ],

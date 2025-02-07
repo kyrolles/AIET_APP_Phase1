@@ -12,14 +12,8 @@ class AllAnnouncementAppearOnOneScreen extends StatelessWidget {
         title: 'Announcements',
         onpressed: () => Navigator.pop(context),
       ),
-      body: const SingleChildScrollView(
-        child: Column(
-          children: [
-            AnnouncementList(
-              scrollDirection: Axis.vertical,
-            ),
-          ],
-        ),
+      body: const AnnouncementList(
+        scrollDirection: Axis.vertical,
       ),
     );
   }

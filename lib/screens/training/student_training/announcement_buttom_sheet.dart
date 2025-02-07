@@ -9,7 +9,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        spacing: 10,
+        spacing: 15,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
