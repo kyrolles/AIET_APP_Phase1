@@ -82,14 +82,14 @@ class QrcodeScreen extends StatelessWidget {
                 }
 
                 final userData = snapshot.data;
-                final uid = userData?['uid'] ?? "";  // Get the UID
+                final uid = userData?['uid'] ?? ""; // Get the UID
 
                 final firstName = userData?['firstName'] ?? "Loading...";
                 final lastName = userData?['lastName'] ?? "Loading...";
                 final name = "$firstName $lastName";
                 final department = userData?['department'] ?? "Loading...";
                 final studentId = userData?['id'] ?? "Loading...";
-                final year = "${userData?['academicYear'] ?? 'Loading...'}th";
+                final year = "${userData?['academicYear'] ?? 'Loading...'}";
 
                 return Column(
                   children: [
@@ -100,18 +100,27 @@ class QrcodeScreen extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 58,
                         backgroundImage:
-                        AssetImage('assets/images/1704502172296.jpg'),
+                            AssetImage('assets/images/1704502172296.jpg'),
                       ),
                     ),
                     const SizedBox(height: 50),
                     Text(
                       name,
-                      style: kTextStyleSize24,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Lexend',
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       department,
-                      style: kTextStyleBold,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 30,
+                        fontFamily: 'Lexend',
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -120,26 +129,26 @@ class QrcodeScreen extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             color: kPrimaryColor,
-                            borderRadius: BorderRadius.circular(5),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(3),
                           child: Text(
                             studentId,
                             style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
+                                color: Colors.white, fontSize: 19),
                           ),
                         ),
                         const SizedBox(width: 5),
                         Container(
                           decoration: BoxDecoration(
                             color: const Color(0XFFFF8504),
-                            borderRadius: BorderRadius.circular(5),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(3),
                           child: Text(
                             year,
                             style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
+                                color: Colors.white, fontSize: 19),
                           ),
                         ),
                       ],
@@ -161,7 +170,8 @@ class QrcodeScreen extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                        data: userData?['qrCode'] ?? "", // Use the qrCode field value
+                        data: userData?['qrCode'] ??
+                            "", // Use the qrCode field value
                         version: QrVersions.auto,
                         size: 200.0,
                         backgroundColor: Colors.white,

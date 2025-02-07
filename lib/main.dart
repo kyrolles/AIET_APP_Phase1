@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/screens/announcement/all_announcement_appear_on_one_screen.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_archive.dart';
+import 'package:graduation_project/screens/qr_code_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/create_announcement.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
@@ -77,6 +79,9 @@ class MyApp extends StatelessWidget {
         '/staffStudentTraining/createAnnouncement': (context) =>
             const CreateAnnouncement(),
         '/it_invoice/archive': (context) => const ItArchiveScreen(),
+        '/id': (context) => const QrcodeScreen(),
+        '/all_announcement': (context) =>
+            const AllAnnouncementAppearOnOneScreen(),
       },
     );
   }

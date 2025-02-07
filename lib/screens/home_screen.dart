@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graduation_project/screens/app_drawer.dart';
 import '../components/activities_list_view.dart';
 import '../components/text_link.dart';
 import '../constants.dart';
@@ -70,7 +71,8 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: homeScreenAppBar(),
+      appBar: homeScreenAppBar(context),
+      drawer: AppDrawer(_logout),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -86,33 +88,44 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             const TextLink(
               text: 'Activities',
-              textLink: 'see more',
             ),
             const ActivitiesListView(),
-            const TextLink(
+            TextLink(
               text: 'Announcements',
               textLink: 'View All',
+              onTap: () {
+                Navigator.pushNamed(context, '/all_announcement');
+              },
             ),
-            const AnnouncementList(), // Correctly integrated AnnouncementList
+            const SizedBox(
+              height: 400, // Set a fixed height for the horizontal ListView
+              child: AnnouncementList(
+                scrollDirection: Axis.vertical,
+              ), // Horizontal scrolling in HomeScreen
+            ),
           ],
         ),
       ),
     );
   }
 
-  AppBar homeScreenAppBar() {
+  AppBar homeScreenAppBar(BuildContext context) {
     return AppBar(
       surfaceTintColor: Colors.white,
       backgroundColor: Colors.white,
-      leading: IconButton(
-        icon: Image.asset(
-          'assets/images/paragraph.png',
-          width: 30.0,
-          height: 30.0,
-          fit: BoxFit.contain,
-        ),
-        onPressed: () {
-          // Define the action for when the icon is tapped
+      leading: Builder(
+        builder: (context) {
+          return IconButton(
+            icon: Image.asset(
+              'assets/images/paragraph.png',
+              width: 30.0,
+              height: 30.0,
+              fit: BoxFit.contain,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          );
         },
       ),
       title: Row(
@@ -130,12 +143,6 @@ class HomeScreenState extends State<HomeScreen> {
           const Spacer(flex: 2),
         ],
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: _logout,
-        ),
-      ],
     );
   }
 }

@@ -60,11 +60,6 @@ class ActivitiesListView extends StatelessWidget {
           Navigator.pushNamed(context, '/attendance');
         },
       ),
-      ActivitiesContainer(
-        image: 'assets/project_image/loudspeaker.png',
-        title: 'Announce',
-        onpressed: () {},
-      ),
     ];
 
     return Container(

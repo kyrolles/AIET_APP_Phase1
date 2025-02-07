@@ -169,11 +169,19 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
                           listOfWidgets: uplodedfiles,
                           emptyMessage: 'No Requests',
                         );
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
                       } else {
-                        return const Center(child: CircularProgressIndicator());
+                        return ListContainer(
+                          title: 'Requests',
+                          emptyMessage: 'No Requests',
+                          listOfWidgets: uplodedfiles,
+                        );
                       }
+                      // else if (snapshot.hasError) {
+                      //   return Center(child: Text('Error: ${snapshot.error}'));
+                      // }
+                      // else {
+                      //   return const Center(child: CircularProgressIndicator());
+                      // }
                     },
                   )),
               const Divider(
