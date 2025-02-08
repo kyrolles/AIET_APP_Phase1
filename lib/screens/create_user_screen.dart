@@ -89,15 +89,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         if (userCredential.user != null) {
           final String userId = userCredential.user!.uid;
 
-          // Create user document
-          await FirebaseFirestore.instance.collection('users').doc(userId).set({
+          // Prepare user data for Firestore
+          final userData = {
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department':
-                selectedDepartment, // Updated to use selectedDepartment
+            'department': selectedDepartment,
             'id': _idController.text,
             'academicYear': _academicYearController.text,
             'birthDate': _birthDateController.text,
@@ -105,7 +104,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'qrCode': qrData,
             'totalTrainingScore': 0,
             'profileImage': '',
-          });
+          };
+
+          // Create user document in Firestore
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .set(userData);
 
           // If user is a student, initialize their results profile
           if (selectedRole == 'Student') {
@@ -124,6 +129,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           resetForm();
         }
       } catch (e) {
+        // Log the full error
+        print('Error creating account: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to create account: $e')),
         );
@@ -204,6 +211,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     DropdownMenuItem(
                       value: 'Student Affair',
                       child: Text('Student Affair'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Admin',
+                      child: Text('Admin'),
                     ),
                   ],
                   onChanged: (value) {

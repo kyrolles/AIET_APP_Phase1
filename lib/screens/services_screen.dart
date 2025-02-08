@@ -19,7 +19,8 @@ class ServicesScreen extends StatefulWidget {
 
 class _ServicesScreenState extends State<ServicesScreen> {
   bool isStaff = false;
-  bool isAdmin = false; // Add this field
+  bool isAdmin = false;
+  bool canAssignResults = false; // New field for results access
 
   @override
   void initState() {
@@ -50,6 +51,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   'Training Unit',
                   'Student Affair'
                 ].contains(role);
+            // Check if user can assign results
+            canAssignResults = ['Admin', 'IT', 'Professor'].contains(role);
           });
         }
       }
@@ -144,19 +147,20 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
 
-      ServiceItem(
-        title: 'Assign Results', // new service item
-        imageUrl: 'assets/project_image/result.png', // update if needed
-        backgroundColor: const Color(0xFFCC70EC),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AssignResultsScreen(),
-            ),
-          );
-        },
-      ),
+      if (canAssignResults) // Only show for Admin, IT, or Professor
+        ServiceItem(
+          title: 'Assign Results',
+          imageUrl: 'assets/project_image/result.png',
+          backgroundColor: const Color(0xFFCC70EC),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AssignResultsScreen(),
+              ),
+            );
+          },
+        ),
       // ServiceItem(
       //   title: 'Tuition Fees Upload',
       //   imageUrl: 'assets/project_image/invoice.png',
