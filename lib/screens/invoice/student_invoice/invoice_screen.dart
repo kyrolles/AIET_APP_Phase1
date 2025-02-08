@@ -10,7 +10,7 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
 import '../../../components/my_app_bar.dart';
 import 'proof_of_enrollment.dart';
-import 'tuition_fees_download.dart';
+import 'tuition_fees_request.dart';
 
 class InvoiceScreen extends StatefulWidget {
   const InvoiceScreen({super.key});
@@ -268,7 +268,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           backgroundColor: const Color(0XFFF1F1F2),
           context: context,
           builder: (BuildContext context) {
-            return const TuitionFeesDownload();
+            return const TuitionFeesPreview();
           },
         );
       },

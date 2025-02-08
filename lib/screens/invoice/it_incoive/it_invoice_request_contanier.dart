@@ -203,6 +203,7 @@ class RequestContainer extends StatelessWidget {
       ),
       builder: (BuildContext context) {
         return TuitionFeesSheet(
+          request: request,
           doneFunctionality: () {},
         );
       },
