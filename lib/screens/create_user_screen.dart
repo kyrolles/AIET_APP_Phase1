@@ -370,6 +370,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             if (value == null || value.isEmpty) {
               return 'This field is required';
             }
+            // Add email format validation
+            if (label == 'Email') {
+              final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegExp.hasMatch(value)) {
+                return 'Please enter a valid email address';
+              }
+            }
             return null;
           },
         ),
@@ -441,11 +448,19 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               onPressed: () async {
                 final DateTime? pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),
+                  initialDate: DateTime.now().subtract(const Duration(days: 6570)), // Set initial date to 18 years ago
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
                 if (pickedDate != null) {
+                  // Calculate age
+                  final age = DateTime.now().difference(pickedDate).inDays / 365;
+                  if (age < 18) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('User must be at least 18 years old')),
+                    );
+                    return;
+                  }
                   setState(() {
                     controller.text = "${pickedDate.toLocal()}".split(' ')[0];
                   });
@@ -457,10 +472,16 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
-          readOnly: true, // Prevent manual typing
+          readOnly: true,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Birth Date is required';
+            }
+            // Validate age is at least 18
+            final birthDate = DateTime.parse(value);
+            final age = DateTime.now().difference(birthDate).inDays / 365;
+            if (age < 18) {
+              return 'User must be at least 18 years old';
             }
             return null;
           },
