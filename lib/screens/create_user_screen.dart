@@ -89,15 +89,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         if (userCredential.user != null) {
           final String userId = userCredential.user!.uid;
 
-          // Create user document
-          await FirebaseFirestore.instance.collection('users').doc(userId).set({
+          // Prepare user data for Firestore
+          final userData = {
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department':
-                selectedDepartment, // Updated to use selectedDepartment
+            'department': selectedDepartment,
             'id': _idController.text,
             'academicYear': _academicYearController.text,
             'birthDate': _birthDateController.text,
@@ -105,7 +104,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'qrCode': qrData,
             'totalTrainingScore': 0,
             'profileImage': '',
-          });
+          };
+
+          // Create user document in Firestore
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .set(userData);
 
           // If user is a student, initialize their results profile
           if (selectedRole == 'Student') {
@@ -124,6 +129,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           resetForm();
         }
       } catch (e) {
+        // Log the full error
+        print('Error creating account: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to create account: $e')),
         );
@@ -204,6 +211,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     DropdownMenuItem(
                       value: 'Student Affair',
                       child: Text('Student Affair'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Admin',
+                      child: Text('Admin'),
                     ),
                   ],
                   onChanged: (value) {
@@ -359,6 +370,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             if (value == null || value.isEmpty) {
               return 'This field is required';
             }
+            // Add email format validation
+            if (label == 'Email') {
+              final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegExp.hasMatch(value)) {
+                return 'Please enter a valid email address';
+              }
+            }
             return null;
           },
         ),
@@ -430,11 +448,19 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               onPressed: () async {
                 final DateTime? pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),
+                  initialDate: DateTime.now().subtract(const Duration(days: 6570)), // Set initial date to 18 years ago
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
                 if (pickedDate != null) {
+                  // Calculate age
+                  final age = DateTime.now().difference(pickedDate).inDays / 365;
+                  if (age < 18) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('User must be at least 18 years old')),
+                    );
+                    return;
+                  }
                   setState(() {
                     controller.text = "${pickedDate.toLocal()}".split(' ')[0];
                   });
@@ -446,10 +472,16 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
-          readOnly: true, // Prevent manual typing
+          readOnly: true,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Birth Date is required';
+            }
+            // Validate age is at least 18
+            final birthDate = DateTime.parse(value);
+            final age = DateTime.now().difference(birthDate).inDays / 365;
+            if (age < 18) {
+              return 'User must be at least 18 years old';
             }
             return null;
           },
