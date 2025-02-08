@@ -112,11 +112,9 @@ class HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SliverToBoxAdapter(
-            child: SizedBox(
-              height: 450,
-              child: AnnouncementList(
-                scrollDirection: Axis.horizontal,
-              ),
+            child: AnnouncementList(
+              scrollDirection: Axis.vertical,
+              showOnlyLast: true,
             ),
           ),
         ],

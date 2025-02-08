@@ -4,7 +4,13 @@ import 'announcement_item.dart';
 
 class AnnouncementList extends StatefulWidget {
   final Axis scrollDirection;
-  const AnnouncementList({super.key, required this.scrollDirection});
+  final bool showOnlyLast; // New parameter to control display mode
+
+  const AnnouncementList({
+    super.key,
+    required this.scrollDirection,
+    this.showOnlyLast = false, // Default to showing all announcements
+  });
 
   @override
   _AnnouncementListState createState() => _AnnouncementListState();
@@ -13,10 +19,13 @@ class AnnouncementList extends StatefulWidget {
 class _AnnouncementListState extends State<AnnouncementList> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
+    return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('announcements')
           .orderBy('timestamp', descending: true)
+          .limit(widget.showOnlyLast
+              ? 1
+              : 100) // Limit to 1 if showOnlyLast is true
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -30,6 +39,12 @@ class _AnnouncementListState extends State<AnnouncementList> {
         }
 
         final announcements = snapshot.data!.docs;
+
+        // If showing only last announcement, use a single item instead of ListView
+        if (widget.showOnlyLast) {
+          return AnnouncementItem(doc: announcements.first);
+        }
+
         return ListView.builder(
           scrollDirection: widget.scrollDirection,
           itemCount: announcements.length,

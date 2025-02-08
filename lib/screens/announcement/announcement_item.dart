@@ -146,8 +146,6 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     final text = data['text'] as String?;
 
     return Container(
-      height: 410,
-      width: 400,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(Radius.circular(10)),
