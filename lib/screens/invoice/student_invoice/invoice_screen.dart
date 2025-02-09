@@ -3,14 +3,16 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/screens/invoice/student_invoice/tuition_fees_download.dart';
 import '../../../components/my_app_bar.dart';
 import 'proof_of_enrollment.dart';
-import 'tuition_fees_download.dart';
+import 'tuition_fees_request.dart';
 
 class InvoiceScreen extends StatefulWidget {
   const InvoiceScreen({super.key});
@@ -51,7 +53,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         if (querySnapshot.docs.isNotEmpty) {
           DocumentSnapshot userDoc = querySnapshot.docs.first;
           setState(() {
-            // Combine first and last name
             studentId = userDoc['id'];
           });
         }
@@ -61,7 +62,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     }
   }
 
-  Future<String> getEmail() async {
+  Future<String> getStuentId() async {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
@@ -122,7 +123,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                     ),
                   ),
                 ),
-                tuitionFeesButton(context),
+                tuitionFeesButton(context, requestsList),
                 proofOfEnrollmentButton(context),
               ],
             );
@@ -137,7 +138,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         StudentContainer(
           onTap: (context) {
             if (requestsList[i].type == 'Proof of enrollment') {
-              showModalSheetForRequestStatus(requestsList[i]);
+              showModalSheetForRequestStatusOfProofOfEnrollment(
+                  requestsList[i]);
+            } else if (requestsList[i].type == 'Tuition Fees') {
+              showModalSheetForRequestStatusOfTuitionFees(requestsList[i]);
             }
           },
           title: requestsList[i].type,
@@ -158,8 +162,45 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     return requests;
   }
 
-  Future<dynamic> showModalSheetForRequestStatus(Request request) {
+  Future<dynamic> showModalSheetForRequestStatusOfTuitionFees(Request request) {
     return showModalBottomSheet(
+        backgroundColor: Colors.white,
+        context: context,
+        builder: (context) {
+          return request.status == 'Done'
+              ? TuitionFeesDownload(request: request)
+              : Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 32.0, horizontal: 12.0),
+                  child: KButton(
+                    onPressed: () {
+                      FirebaseFirestore.instance
+                          .collection('requests')
+                          .where('student_id', isEqualTo: request.studentId)
+                          .where('type', isEqualTo: request.type)
+                          .where('created_at', isEqualTo: request.createdAt)
+                          .get()
+                          .then(
+                        (value) {
+                          value.docs.first.reference.delete();
+                        },
+                      );
+                      Navigator.pop(context);
+                    },
+                    text: 'Delete',
+                    fontSize: 21.7,
+                    textColor: Colors.white,
+                    backgroundColor: Colors.red,
+                    borderColor: Colors.white,
+                  ),
+                );
+        });
+  }
+
+  Future<dynamic> showModalSheetForRequestStatusOfProofOfEnrollment(
+      Request request) {
+    return showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       builder: (context) {
         return SizedBox(
@@ -258,7 +299,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  ServiceItem tuitionFeesButton(BuildContext context) {
+  ServiceItem tuitionFeesButton(
+      BuildContext context, List<Request> requestsList) {
     return ServiceItem(
       title: 'Tuition fees',
       imageUrl: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
@@ -268,7 +310,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           backgroundColor: const Color(0XFFF1F1F2),
           context: context,
           builder: (BuildContext context) {
-            return const TuitionFeesDownload();
+            return TuitionFeesPreview(requestsList: requestsList);
           },
         );
       },

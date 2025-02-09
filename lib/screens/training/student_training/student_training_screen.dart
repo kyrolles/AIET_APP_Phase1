@@ -10,7 +10,7 @@ import 'package:graduation_project/screens/training/student_training/announcemen
 import 'package:graduation_project/screens/training/student_training/requests_buttom_sheet.dart';
 import 'package:graduation_project/screens/training/student_training/upload_buttom_sheet.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 
 class StudentTrainingScreen extends StatefulWidget {
   const StudentTrainingScreen({super.key});

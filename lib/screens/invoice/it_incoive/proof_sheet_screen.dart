@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 import '../../../components/rpd_button.dart';
-import 'request_model.dart';
+import '../../../models/request_model.dart';
 
 class ProofOfEnrollmentSheetScreen extends StatelessWidget {
   const ProofOfEnrollmentSheetScreen(

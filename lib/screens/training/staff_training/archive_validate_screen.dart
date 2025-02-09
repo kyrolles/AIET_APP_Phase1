@@ -4,7 +4,7 @@ import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
 
 class ArchiveValidateScreen extends StatefulWidget {
