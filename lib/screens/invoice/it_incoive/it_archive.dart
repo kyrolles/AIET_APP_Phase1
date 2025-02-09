@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 import '../../../components/my_app_bar.dart';
 
 class ItArchiveScreen extends StatefulWidget {
@@ -13,8 +13,10 @@ class ItArchiveScreen extends StatefulWidget {
 }
 
 class _ItArchiveScreenState extends State<ItArchiveScreen> {
-  final Stream<QuerySnapshot> _requestsStream =
-      FirebaseFirestore.instance.collection('requests').snapshots();
+  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
+      .collection('requests')
+      .orderBy('created_at', descending: true)
+      .snapshots();
 
   List<Request> requestsList = [];
   @override
@@ -41,7 +43,9 @@ class _ItArchiveScreenState extends State<ItArchiveScreen> {
               }
             }
             return ListContainer(
-                title: 'Requests', listOfWidgets: archiveRequestsList());
+              title: 'Requests',
+              listOfWidgets: archiveRequestsList(),
+            );
           }),
     );
   }

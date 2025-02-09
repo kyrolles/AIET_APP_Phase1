@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 import '../../../components/my_app_bar.dart';
 
 class ItInvoiceScreen extends StatefulWidget {
@@ -13,8 +14,10 @@ class ItInvoiceScreen extends StatefulWidget {
 }
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
-  final Stream<QuerySnapshot> _requestsStream =
-      FirebaseFirestore.instance.collection('requests').snapshots();
+  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
+      .collection('requests')
+      .orderBy('created_at', descending: true)
+      .snapshots();
 
   List<Request> requestsList = [];
   @override
@@ -46,41 +49,21 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                 title: 'Requests',
                 listOfWidgets: showRequestsList(),
               ),
-              archiveButton(context)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: KButton(
+                  backgroundColor: Colors.black38,
+                  text: 'Archive',
+                  height: 62,
+                  svgPath: 'assets/project_image/Pin.svg',
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/it_invoice/archive');
+                  },
+                ),
+              ),
             ],
           );
         },
-      ),
-    );
-  }
-
-  TextButton archiveButton(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        Navigator.pushNamed(context, '/it_invoice/archive');
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0XFF888C94),
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: const Row(
-          children: [
-            Icon(
-              Icons.archive,
-              color: Colors.white,
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'Archive',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -92,4 +75,35 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
     }
     return requests;
   }
+
+//   TextButton archiveButton(BuildContext context) {
+//     return TextButton(
+//       onPressed: () {
+//         Navigator.pushNamed(context, '/it_invoice/archive');
+//       },
+//       child: Container(
+//         padding: const EdgeInsets.all(16),
+//         decoration: BoxDecoration(
+//           color: const Color(0XFF888C94),
+//           borderRadius: BorderRadius.circular(15.0),
+//         ),
+//         child: const Row(
+//           children: [
+//             Icon(
+//               Icons.archive,
+//               color: Colors.white,
+//             ),
+//             Expanded(
+//               child: Center(
+//                 child: Text(
+//                   'Archive',
+//                   style: TextStyle(color: Colors.white, fontSize: 18),
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 }

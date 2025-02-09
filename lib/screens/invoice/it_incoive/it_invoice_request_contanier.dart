@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
 
-//* Update a document in Firestore
 Future<void> updateDocument({
+//* Update a document in Firestore
   required String collectionPath,
   required Map<String, dynamic> searchCriteria,
   required Map<String, dynamic> newData,
@@ -203,6 +203,7 @@ class RequestContainer extends StatelessWidget {
       ),
       builder: (BuildContext context) {
         return TuitionFeesSheet(
+          request: request,
           doneFunctionality: () {},
         );
       },

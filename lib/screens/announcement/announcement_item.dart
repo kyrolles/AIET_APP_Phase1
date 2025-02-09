@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'upload_image.dart';
 import 'upload_pdf.dart';
-
 import '../../constants.dart';
 
 class AnnouncementItem extends StatefulWidget {
@@ -16,6 +16,38 @@ class AnnouncementItem extends StatefulWidget {
 
 class _AnnouncementItemState extends State<AnnouncementItem> {
   final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+  String? authorProfileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAuthorProfileImage();
+  }
+
+  Future<void> _fetchAuthorProfileImage() async {
+    try {
+      final data = widget.doc.data() as Map<String, dynamic>;
+      final authorEmail = data['email'] as String?;
+
+      if (authorEmail != null) {
+        final userDocs = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: authorEmail)
+            .get();
+
+        if (userDocs.docs.isNotEmpty) {
+          final profileImage = userDocs.docs.first['profileImage'] as String?;
+          if (mounted) {
+            setState(() {
+              authorProfileImage = profileImage;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching author profile image: $e');
+    }
+  }
 
   Future<void> deleteAnnouncement(String docId) async {
     try {
@@ -35,6 +67,26 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
           SnackBar(content: Text('Error deleting announcement: $e')),
         );
       }
+    }
+  }
+
+  Future<bool> checkDeletePermission() async {
+    if (currentUserEmail == null) return false;
+
+    try {
+      final data = widget.doc.data() as Map<String, dynamic>;
+      QuerySnapshot userDocs = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: currentUserEmail)
+          .get();
+
+      if (userDocs.docs.isEmpty) return false;
+
+      String userRole = userDocs.docs.first['role'] as String;
+      return userRole == 'Admin' || currentUserEmail == data['email'];
+    } catch (e) {
+      debugPrint('Error checking delete permission: $e');
+      return false;
     }
   }
 
@@ -83,32 +135,15 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
 
   @override
   Widget build(BuildContext context) {
-    final doc = widget.doc;
-    final data = doc.data() as Map<String, dynamic>;
-    final timestamp = data['timestamp'] as Timestamp?; // Cast to Timestamp
-    final formattedTimestamp = timestamp != null
-        ? _formatTimestamp(timestamp.toDate())
-        : 'No date'; // Convert to DateTime and format
+    final data = widget.doc.data() as Map<String, dynamic>;
+    final timestamp = data['timestamp'] as Timestamp?;
+    final formattedTimestamp =
+        timestamp != null ? _formatTimestamp(timestamp.toDate()) : 'No date';
     final imageBase64 = data['imageBase64'] as String?;
     final pdfBase64 = data['pdfBase64'] as String?;
     final pdfFileName = data['pdfFileName'] as String?;
     final title = data['title'] as String?;
     final text = data['text'] as String?;
-
-    // Add role check for delete permission
-    Future<bool> checkDeletePermission() async {
-      if (currentUserEmail == null) return false;
-
-      QuerySnapshot userDocs = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: currentUserEmail)
-          .get();
-
-      if (userDocs.docs.isEmpty) return false;
-
-      String userRole = userDocs.docs.first['role'];
-      return userRole == 'Admin' || currentUserEmail == data['email'];
-    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -124,17 +159,34 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
             padding: const EdgeInsets.only(bottom: 12.0),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 28,
-                  backgroundImage:
-                      AssetImage('assets/images/dr-sheshtawey.jpg'),
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.grey[200],
+                  child: authorProfileImage != null
+                      ? ClipOval(
+                          child: Image.memory(
+                            base64Decode(authorProfileImage!),
+                            fit: BoxFit.cover,
+                            width: 50,
+                            height: 50,
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint('Error displaying image: $error');
+                              return const Icon(Icons.person, size: 25);
+                            },
+                          ),
+                        )
+                      : const Icon(Icons.person, size: 25),
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Text(
                       data['author'] ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Lexend',
+                      ),
                     ),
                   ),
                 ),
@@ -144,7 +196,8 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
                     if (snapshot.data == true) {
                       return IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => showDeleteDialog(context, doc.id),
+                        onPressed: () =>
+                            showDeleteBottomSheet(context, widget.doc.id),
                       );
                     }
                     return const SizedBox.shrink();
@@ -171,31 +224,26 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
                 ),
               ),
             ),
-          Align(
-            alignment: _isArabic(text ?? '')
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: Text(
-              text ?? '',
-              style: const TextStyle(
-                fontSize: 17,
+          if (text != null)
+            Align(
+              alignment: _isArabic(text)
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: Text(
+                text,
+                style: const TextStyle(fontSize: 17),
+                textDirection:
+                    _isArabic(text) ? TextDirection.rtl : TextDirection.ltr,
               ),
-              textDirection:
-                  _isArabic(text ?? '') ? TextDirection.rtl : TextDirection.ltr,
             ),
-          ),
-          //! Image uploading widget
           UploadImage(imageBase64: imageBase64),
-          //! PDF uploading widget
           UploadPdf(pdfBase64: pdfBase64, pdfFileName: pdfFileName),
           const SizedBox(height: 8),
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              formattedTimestamp, // Use formatted timestamp
-              style: const TextStyle(
-                color: Color(0XFF657786),
-              ),
+              formattedTimestamp,
+              style: const TextStyle(color: Color(0XFF657786)),
             ),
           ),
         ],
@@ -203,29 +251,58 @@ class _AnnouncementItemState extends State<AnnouncementItem> {
     );
   }
 
-  void showDeleteDialog(BuildContext context, String docId) {
-    showDialog(
+  void showDeleteBottomSheet(BuildContext context, String docId) {
+    showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Delete Announcement'),
-          content:
-              const Text('Are you sure you want to delete this announcement?'),
-          actions: [
-            TextButton(
-              child:
-                  const Text('Cancel', style: TextStyle(color: Colors.black)),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-                deleteAnnouncement(docId);
-              },
-            ),
-          ],
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Delete Announcement',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Are you sure you want to delete this announcement?',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      deleteAnnouncement(docId);
+                    },
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );

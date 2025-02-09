@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/my_app_bar.dart';
 import 'package:uuid/uuid.dart';
-// import 'package:qr_flutter/qr_flutter.dart';
+import '../services/results_service.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -13,6 +13,8 @@ class CreateUserScreen extends StatefulWidget {
 }
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
+  final ResultsService _resultsService = ResultsService();
+
   // Controllers for each text field
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -24,7 +26,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final TextEditingController _birthDateController = TextEditingController();
 
   String selectedRole = 'IT'; // Default role
-  String selectedDepartment = 'General'; // Default department
+  String selectedDepartment = 'CE'; // Changed from 'General' to 'CE'
   bool isLoading = false; // Loading indicator state
   bool isPasswordVisible = false; // Password visibility state
 
@@ -85,24 +87,38 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         );
 
         if (userCredential.user != null) {
-          // Store additional user data and QR code in Firestore
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userCredential.user!.uid)
-              .set({
+          final String userId = userCredential.user!.uid;
+
+          // Prepare user data for Firestore
+          final userData = {
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department':
-                selectedDepartment, // Updated to use selectedDepartment
+            'department': selectedDepartment,
             'id': _idController.text,
             'academicYear': _academicYearController.text,
             'birthDate': _birthDateController.text,
             'createdAt': FieldValue.serverTimestamp(),
             'qrCode': qrData,
-          });
+            'totalTrainingScore': 0,
+            'profileImage': '',
+          };
+
+          // Create user document in Firestore
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .set(userData);
+
+          // If user is a student, initialize their results profile
+          if (selectedRole == 'Student') {
+            await _resultsService.initializeStudentResults(
+              userId,
+              selectedDepartment,
+            );
+          }
 
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -113,6 +129,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           resetForm();
         }
       } catch (e) {
+        // Log the full error
+        print('Error creating account: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to create account: $e')),
         );
@@ -194,6 +212,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       value: 'Student Affair',
                       child: Text('Student Affair'),
                     ),
+                    DropdownMenuItem(
+                      value: 'Admin',
+                      child: Text('Admin'),
+                    ),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -247,25 +269,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                         value: selectedDepartment,
                         items: const [
                           DropdownMenuItem(
-                            value: 'General',
-                            child: Text('General'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'CE',
-                            child: Text('CE'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'ECE',
-                            child: Text('ECE'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'IE',
-                            child: Text('IE'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'EME',
-                            child: Text('EME'),
-                          ),
+                              value: 'General', child: Text('General')),
+                          DropdownMenuItem(value: 'CE', child: Text('CE')),
+                          DropdownMenuItem(value: 'ECE', child: Text('ECE')),
+                          DropdownMenuItem(value: 'IE', child: Text('IE')),
+                          DropdownMenuItem(value: 'EME', child: Text('EME')),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -362,6 +370,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             if (value == null || value.isEmpty) {
               return 'This field is required';
             }
+            // Add email format validation
+            if (label == 'Email') {
+              final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegExp.hasMatch(value)) {
+                return 'Please enter a valid email address';
+              }
+            }
             return null;
           },
         ),
@@ -433,11 +448,19 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               onPressed: () async {
                 final DateTime? pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),
+                  initialDate: DateTime.now().subtract(const Duration(days: 6570)), // Set initial date to 18 years ago
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
                 if (pickedDate != null) {
+                  // Calculate age
+                  final age = DateTime.now().difference(pickedDate).inDays / 365;
+                  if (age < 18) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('User must be at least 18 years old')),
+                    );
+                    return;
+                  }
                   setState(() {
                     controller.text = "${pickedDate.toLocal()}".split(' ')[0];
                   });
@@ -449,10 +472,16 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
-          readOnly: true, // Prevent manual typing
+          readOnly: true,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Birth Date is required';
+            }
+            // Validate age is at least 18
+            final birthDate = DateTime.parse(value);
+            final age = DateTime.now().difference(birthDate).inDays / 365;
+            if (age < 18) {
+              return 'User must be at least 18 years old';
             }
             return null;
           },
