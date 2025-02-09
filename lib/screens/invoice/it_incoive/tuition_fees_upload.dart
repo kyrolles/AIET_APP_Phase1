@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 import 'package:path/path.dart' as path;
 
 import 'it_invoice_request_contanier.dart';

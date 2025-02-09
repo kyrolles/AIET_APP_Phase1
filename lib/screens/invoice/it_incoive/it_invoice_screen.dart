@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 import '../../../components/my_app_bar.dart';
 
 class ItInvoiceScreen extends StatefulWidget {

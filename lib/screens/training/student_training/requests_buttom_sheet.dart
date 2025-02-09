@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 
 class RequestsButtomSheet extends StatelessWidget {
   const RequestsButtomSheet({super.key, required this.request});

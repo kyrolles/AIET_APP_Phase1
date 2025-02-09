@@ -3,9 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/models/request_model.dart';
 
 class TuitionFeesPreview extends StatefulWidget {
-  const TuitionFeesPreview({super.key});
+  const TuitionFeesPreview({super.key, required this.requestsList});
+
+  final List<Request> requestsList;
 
   @override
   State<TuitionFeesPreview> createState() => _TuitionFeesPreviewState();
@@ -13,6 +16,24 @@ class TuitionFeesPreview extends StatefulWidget {
 
 class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
   bool payInInstallments = false;
+
+  // Show custom snackbar function
+  void _showCustomSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : kgreen,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 100,
+            right: 20,
+            left: 20,
+          ),
+        ),
+      );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,32 +115,45 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
                     .collection('users')
                     .where('email', isEqualTo: email)
                     .get();
-                FirebaseFirestore.instance.collection('requests').add({
-                  'addressed_to': '',
-                  'comment': '',
-                  'file_name': '',
-                  'pdfBase64': '',
-                  //!pay in installments or not
-                  'stamp': payInInstallments,
-                  'status': 'No Status',
-                  'student_id': snapshot.docs.first['id'],
-                  'student_name':
-                      '${snapshot.docs.first['firstName']} ${snapshot.docs.first['lastName']}'
-                          .trim(),
-                  'training_score': 0,
-                  'type': 'Tuition Fees',
-                  'year': snapshot.docs.first['academicYear'],
-                  'created_at': Timestamp.now(),
-                });
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    backgroundColor: Colors.green,
-                    content: Text('Request sent successfully'),
-                  ),
-                );
-                // ignore: use_build_context_synchronously
-                Navigator.pop(context);
+
+                int counter = 0;
+                for (var i = 0; i < widget.requestsList.length; i++) {
+                  if (widget.requestsList[i].studentId ==
+                          snapshot.docs.first['id'] &&
+                      widget.requestsList[i].type == 'Tuition Fees' &&
+                      widget.requestsList[i].createdAt.toDate().year ==
+                          DateTime.now().year) {
+                    counter++;
+                  }
+                }
+                //* the limit for Tuitin Fees requests is 3
+                if (counter < 3) {
+                  FirebaseFirestore.instance.collection('requests').add({
+                    'addressed_to': '',
+                    'comment': '',
+                    'file_name': '',
+                    'pdfBase64': '',
+                    //!pay in installments or not
+                    'stamp': payInInstallments,
+                    'status': 'No Status',
+                    'student_id': snapshot.docs.first['id'],
+                    'student_name':
+                        '${snapshot.docs.first['firstName']} ${snapshot.docs.first['lastName']}'
+                            .trim(),
+                    'training_score': 0,
+                    'type': 'Tuition Fees',
+                    'year': snapshot.docs.first['academicYear'],
+                    'created_at': Timestamp.now(),
+                  });
+                  // ignore: use_build_context_synchronously
+                  _showCustomSnackBar('Request sent successfully');
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                } else {
+                  _showCustomSnackBar(
+                      'You have reached the maximum number of requests',
+                      isError: true);
+                }
               },
               text: 'Request',
               fontSize: 21.7,

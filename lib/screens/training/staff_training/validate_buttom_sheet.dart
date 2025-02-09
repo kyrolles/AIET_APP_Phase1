@@ -6,7 +6,7 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/pdf_view.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/request_model.dart';
+import 'package:graduation_project/models/request_model.dart';
 
 class ValidateButtomSheet extends StatefulWidget {
   const ValidateButtomSheet({super.key, required this.request});

@@ -1,45 +1,49 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Request {
-  final String studentName;
-  final String studentId;
-  final String status;
-  final String year;
-  final String fileName;
-  final String pdfBase64;
-  final String trainingScore;
+  final String addressedTo;
   final String comment;
+  final String fileName;
+  String? pdfBase64;
+  final bool stamp;
+  final String status;
+  final String studentId;
+  final String studentName;
+  final int trainingScore;
   final String type;
-  final DateTime createdAt;
+  final String year;
+  final Timestamp createdAt;
 
-  Request({
-    required this.studentName,
-    required this.studentId,
-    required this.status,
-    required this.year,
-    required this.fileName,
-    required this.pdfBase64,
-    required this.trainingScore,
-    required this.comment,
-    required this.type,
-    required this.createdAt,
-  });
+  Request(
+      {required this.addressedTo,
+      required this.comment,
+      required this.fileName,
+      required this.pdfBase64,
+      required this.stamp,
+      required this.status,
+      required this.studentId,
+      required this.studentName,
+      required this.trainingScore,
+      required this.type,
+      required this.year,
+      required this.createdAt});
 
-  factory Request.fromJson(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    // safely check for the 'created_at' field; use current time if missing
-    final Timestamp? ts = data.containsKey('created_at') ? data['created_at'] as Timestamp : null;
+  factory Request.fromJson(json) {
     return Request(
-      studentName: data['studentName'] ?? '',
-      studentId: data['studentId'] ?? '',
-      status: data['status'] ?? '',
-      year: data['year'] ?? '',
-      fileName: data['fileName'] ?? '',
-      pdfBase64: data['pdfBase64'] ?? '',
-      trainingScore: data['trainingScore'] ?? '',
-      comment: data['comment'] ?? '',
-      type: data['type'] ?? '',
-      createdAt: ts?.toDate() ?? DateTime.now(),
+      addressedTo: json['addressed_to'],
+      comment: json['comment'],
+      fileName: json['file_name'],
+      pdfBase64: json['pdfBase64'],
+      stamp: json['stamp'],
+      status: json['status'],
+      studentId: json['student_id'],
+      studentName: json['student_name'],
+      trainingScore: json['training_score'] is int
+          ? json['training_score']
+          : int.tryParse(json['training_score']) ?? 0,
+      type: json['type'],
+      year: json['year'],
+      createdAt: json['created_at'],
     );
   }
 }
