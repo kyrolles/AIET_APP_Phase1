@@ -22,6 +22,17 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   int selectedSemester = 1;
   // Updated departments list to include 'General'
   final List<String> departments = ['All', 'General', 'CE', 'ECE', 'ME', 'IE'];
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String selectedAcademicYear = 'All';
+  // Update academic years list to match Firebase data
+  List<String> academicYears = ['All', 'GN', '1st', '2nd', '3rd', '4th'];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   // Updated query to properly fetch student data
   Stream<QuerySnapshot> getStudentsStream() {
@@ -32,8 +43,29 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     if (selectedDepartment != 'All') {
       query = query.where('department', isEqualTo: selectedDepartment);
     }
+
+    if (selectedAcademicYear != 'All') {
+      query = query.where('academicYear', isEqualTo: selectedAcademicYear);
+    }
     
     return query.snapshots();
+  }
+
+  // Filter students based on search query
+  List<QueryDocumentSnapshot> filterStudents(List<QueryDocumentSnapshot> students) {
+    if (_searchQuery.isEmpty) return students;
+    
+    return students.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      final id = data['id']?.toString().toLowerCase() ?? '';
+      final firstName = data['firstName']?.toString().toLowerCase() ?? '';
+      final lastName = data['lastName']?.toString().toLowerCase() ?? '';
+      
+      final query = _searchQuery.toLowerCase();
+      return id.contains(query) || 
+             firstName.contains(query) || 
+             lastName.contains(query);
+    }).toList();
   }
 
   // Replace _getDefaultSubjects with this new method
@@ -442,43 +474,109 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       ),
       body: Column(
         children: [
-          // Filter UI: Department and Semester Dropdowns
+          // Search and Filter Section
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Row(
+            child: Column(
               children: [
-                // Updated Department filter dropdown
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedDepartment,
-                    decoration: const InputDecoration(labelText: "Department"),
-                    items: departments
-                        .map((dept) =>
-                            DropdownMenuItem(value: dept, child: Text(dept)))
-                        .toList(),
-                    onChanged: (val) {
-                      setState(() {
-                        selectedDepartment = val!;
-                      });
-                    },
+                // Search Bar
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by Student ID...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
                   ),
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
                 ),
-                const SizedBox(width: 16),
-                // Semester dropdown
-                Expanded(
-                  child: DropdownButtonFormField<int>(
-                    value: selectedSemester,
-                    decoration: const InputDecoration(labelText: "Semester"),
-                    items: List.generate(10, (index) => index + 1)
-                        .map((sem) =>
-                            DropdownMenuItem(value: sem, child: Text("Sem $sem")))
-                        .toList(),
-                    onChanged: (val) {
-                      setState(() {
-                        selectedSemester = val!;
-                      });
-                    },
-                  ),
+                const SizedBox(height: 16),
+                // Filters Row
+                Row(
+                  children: [
+                    // Department Dropdown
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedDepartment,
+                        decoration: const InputDecoration(
+                          labelText: "Department",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: departments
+                            .map((dept) => DropdownMenuItem(
+                                  value: dept,
+                                  child: Text(dept),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedDepartment = val!;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Updated Academic Year Dropdown
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedAcademicYear,
+                        decoration: const InputDecoration(
+                          labelText: "Academic Year",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: academicYears
+                            .map((year) => DropdownMenuItem(
+                                  value: year,
+                                  child: Text(year == 'GN' ? 'General' : year),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedAcademicYear = val!;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Semester Dropdown
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        value: selectedSemester,
+                        decoration: const InputDecoration(
+                          labelText: "Semester",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: List.generate(
+                          10,
+                          (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text("Sem ${index + 1}"),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedSemester = val!;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -497,7 +595,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 
-                final docs = snapshot.data?.docs ?? [];
+                final docs = filterStudents(snapshot.data?.docs ?? []);
                 if(docs.isEmpty){
                   return const Center(child: Text("No students found."));
                 }
