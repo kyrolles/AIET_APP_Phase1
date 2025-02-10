@@ -27,6 +27,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   String selectedAcademicYear = 'All';
   // Update academic years list to match Firebase data
   List<String> academicYears = ['All', 'GN', '1st', '2nd', '3rd', '4th'];
+  // Add new state variable
+  Set<String> selectedStudentIds = {};
 
   @override
   void dispose() {
@@ -403,6 +405,17 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     }
   }
 
+  // Add selection methods
+  void toggleStudentSelection(String studentId) {
+    setState(() {
+      if (selectedStudentIds.contains(studentId)) {
+        selectedStudentIds.remove(studentId);
+      } else {
+        selectedStudentIds.add(studentId);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -603,41 +616,74 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
-                    // Debug print to check the data
-                    print("Document data: ${docs[index].data()}");
-                    
                     final userData = docs[index].data() as Map<String, dynamic>;
                     final firstName = userData['firstName'] as String? ?? 'No Name';
                     final lastName = userData['lastName'] as String? ?? '';
                     final studentId = docs[index].id;
                     final department = userData['department'] as String? ?? 'No Dept';
+                    final academicYear = userData['academicYear'] as String? ?? '';
 
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       child: ListTile(
+                        leading: SizedBox(
+                          width: 32,
+                          child: Checkbox(
+                            value: selectedStudentIds.contains(studentId),
+                            onChanged: (_) => toggleStudentSelection(studentId),
+                          ),
+                        ),
                         title: Text(
                           "$firstName $lastName",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          "ID: ${userData['id']}\nDepartment: $department",
+                          "ID: ${userData['id']}\nDepartment: $department • Year: $academicYear",
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => _assignGradesForStudent(context, studentId),
-                              child: const Text("Assign Grades"),
-                            ),
-                            const SizedBox(width: 8),
-                            ElevatedButton(
-                              onPressed: () => _modifySubjectsForStudent(context, studentId),
-                              child: const Text("Modify Subjects"),
-                            ),
-                          ],
+                        trailing: Container(
+                          width: 200, // Fixed width for buttons container
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                child: TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    minimumSize: const Size(0, 36),
+                                  ),
+                                  icon: const Icon(Icons.grade, size: 16),
+                                  label: const Text(
+                                    "Grades",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  onPressed: () => _assignGradesForStudent(context, studentId),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    minimumSize: const Size(0, 36),
+                                  ),
+                                  icon: const Icon(Icons.edit, size: 16),
+                                  label: const Text(
+                                    "Modify",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  onPressed: () => _modifySubjectsForStudent(context, studentId),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        horizontalTitleGap: 8,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
                     );
                   },
@@ -651,46 +697,110 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   }
 
   Future<void> _showBatchAssignDialog(BuildContext context) async {
-    final template = await _resultsService.getSemesterTemplate(
-      selectedDepartment,
-      selectedSemester,
-    );
+    // Check if department is selected
+    if (selectedDepartment == 'All') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a specific department first')),
+      );
+      return;
+    }
 
-    if (!mounted) return;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Batch Assign Results'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('This will assign default results to all selected students.'),
-            Text('Template has ${template.length} subjects.'),
+    // Check if students are selected
+    if (selectedStudentIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select students first')),
+      );
+      return;
+    }
+
+    // Verify all selected students are from the same department
+    try {
+      final selectedStudents = await Future.wait(
+        selectedStudentIds.map((id) => 
+          FirebaseFirestore.instance.collection('users').doc(id).get()
+        )
+      );
+
+      final differentDepartments = selectedStudents
+          .where((doc) => doc.data()?['department'] != selectedDepartment)
+          .toList();
+
+      if (differentDepartments.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('All selected students must be from the selected department')),
+        );
+        return;
+      }
+
+      // Get department subjects instead of template
+      final departmentSubjects = await _getDepartmentSubjects(selectedDepartment);
+      
+      if (departmentSubjects.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No subjects found for selected department')),
+        );
+        return;
+      }
+
+      if (!mounted) return;
+      
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Batch Assign Results'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Department: $selectedDepartment'),
+              Text('Selected Students: ${selectedStudentIds.length}'),
+              Text('Available Subjects: ${departmentSubjects.length}'),
+              const SizedBox(height: 8),
+              const Text('This action will:'),
+              const Text('• Initialize results for selected semester'),
+              const Text('• Add all department subjects'),
+              const Text('• Set default grades (F)'),
+              const Text('• Initialize score structure'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await _resultsService.batchAssignResults(
+                    studentIds: selectedStudentIds.toList(),
+                    department: selectedDepartment,
+                    semester: selectedSemester,
+                    subjects: departmentSubjects,
+                  );
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Results assigned successfully')),
+                  );
+                  // Clear selections after successful batch assign
+                  setState(() {
+                    selectedStudentIds.clear();
+                  });
+                } catch (e) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error assigning results: $e')),
+                  );
+                }
+              },
+              child: const Text('Assign'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              // Get selected student IDs
-              final selectedIds = []; // Implement selection logic
-              await _resultsService.batchAssignResults(
-                studentIds: selectedIds.cast<String>(),
-                department: selectedDepartment,
-                semester: selectedSemester,
-                subjects: template,
-              );
-              if (!mounted) return;
-              Navigator.pop(context);
-            },
-            child: const Text('Assign'),
-          ),
-        ],
-      ),
-    );
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error verifying students: $e')),
+      );
+    }
   }
 }
