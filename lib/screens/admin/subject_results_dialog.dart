@@ -38,6 +38,15 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
   void initState() {
     super.initState();
     editedSubject = Map<String, dynamic>.from(widget.subject);
+    // Ensure grade has a default value if null
+    editedSubject['grade'] ??= 'F';
+    // Initialize scores if null
+    editedSubject['scores'] ??= {
+      'week5': 0.0,
+      'week10': 0.0,
+      'coursework': 0.0,
+      'lab': 0.0,
+    };
   }
 
   void _updateGrade(String newGrade) {
@@ -50,7 +59,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Edit ${editedSubject['name']}'),
+      title: Text('Edit ${editedSubject['name'] ?? 'Subject'}'),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -59,7 +68,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
             children: [
               // Grade Dropdown
               DropdownButtonFormField<String>(
-                value: editedSubject['grade'] as String,
+                value: editedSubject['grade'] as String? ?? 'F',
                 decoration: const InputDecoration(labelText: 'Grade'),
                 items: gradePoints.keys.map((grade) {
                   return DropdownMenuItem(
@@ -67,44 +76,48 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                     child: Text('$grade (${gradePoints[grade]?.toStringAsFixed(1)})'),
                   );
                 }).toList(),
-                onChanged: (value) => _updateGrade(value!),
+                onChanged: (value) => _updateGrade(value ?? 'F'),
               ),
               const SizedBox(height: 16),
               
-              // Score inputs
+              // Score inputs with null safety
               TextFormField(
-                initialValue: editedSubject['scores']['week5'].toString(),
+                initialValue: (editedSubject['scores']?['week5'] ?? 0.0).toString(),
                 decoration: const InputDecoration(labelText: '5th Week Score'),
                 keyboardType: TextInputType.number,
                 validator: (value) => _validateScore(value),
                 onSaved: (value) {
+                  editedSubject['scores'] ??= {};
                   editedSubject['scores']['week5'] = double.parse(value ?? '0');
                 },
               ),
               TextFormField(
-                initialValue: editedSubject['scores']['week10'].toString(),
+                initialValue: (editedSubject['scores']?['week10'] ?? 0.0).toString(),
                 decoration: const InputDecoration(labelText: '10th Week Score'),
                 keyboardType: TextInputType.number,
                 validator: (value) => _validateScore(value),
                 onSaved: (value) {
+                  editedSubject['scores'] ??= {};
                   editedSubject['scores']['week10'] = double.parse(value ?? '0');
                 },
               ),
               TextFormField(
-                initialValue: editedSubject['scores']['coursework'].toString(),
+                initialValue: (editedSubject['scores']?['coursework'] ?? 0.0).toString(),
                 decoration: const InputDecoration(labelText: 'Coursework Score'),
                 keyboardType: TextInputType.number,
                 validator: (value) => _validateScore(value),
                 onSaved: (value) {
+                  editedSubject['scores'] ??= {};
                   editedSubject['scores']['coursework'] = double.parse(value ?? '0');
                 },
               ),
               TextFormField(
-                initialValue: editedSubject['scores']['lab'].toString(),
+                initialValue: (editedSubject['scores']?['lab'] ?? 0.0).toString(),
                 decoration: const InputDecoration(labelText: 'Lab Score'),
                 keyboardType: TextInputType.number,
                 validator: (value) => _validateScore(value),
                 onSaved: (value) {
+                  editedSubject['scores'] ??= {};
                   editedSubject['scores']['lab'] = double.parse(value ?? '0');
                 },
               ),
