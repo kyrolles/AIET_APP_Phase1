@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
@@ -56,18 +58,18 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
 
   Future<void> _fetchUserData() async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser.uid)
-            .get();
-        if (userDoc.exists) {
-          setState(() {
-            userData = userDoc.data();
-          });
-        }
-      }
+      final data = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'Student')
+          .where('id', isEqualTo: widget.request.studentId)
+          .get();
+      userData = data.docs.first.data();
+      // log('User doc: ${data.docs.first['id']}');
+      // if (userData.exists) {
+      //   setState(() {
+      //     userData = userDoc.data();
+      //   });
+      // }
     } catch (e) {
       _showCustomSnackBar('Error fetching user data: $e', isError: true);
     }
@@ -95,6 +97,7 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       final String lastName = userData!['lastName'] ?? '';
       final String studentName = '$firstName$lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
+      log('Student ID: $studentId');
       // Validate required fields
       if (studentId.isEmpty) {
         throw 'Student ID not found';
@@ -111,6 +114,7 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
         searchCriteria: {
           'student_id': studentId,
           'type': 'Tuition Fees',
+          'created_at': widget.request.createdAt,
         },
         newData: {
           'file_name': fileName,

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:graduation_project/screens/home_screen.dart';
 // import 'package:graduation_project/screens/home_screen.dart';
 import 'package:graduation_project/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({super.key, required this.isUserLoggedIn});
+  final bool isUserLoggedIn;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -19,11 +21,19 @@ class _SplashScreenState extends State<SplashScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
-        ),
-      );
+      if (widget.isUserLoggedIn) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      } else {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => const LoginScreen(),
+          ),
+        );
+      }
     });
   }
 
