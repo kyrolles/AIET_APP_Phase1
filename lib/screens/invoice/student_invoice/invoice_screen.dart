@@ -78,12 +78,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       appBar: MyAppBar(
         title: 'Invoice',
         onpressed: () => Navigator.pop(context),
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, '/invoice/archive'),
-            icon: const Icon(Icons.archive),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () => Navigator.pushNamed(context, '/invoice/archive'),
+        //     icon: const Icon(Icons.archive),
+        //   ),
+        // ],
       ),
       body: StreamBuilder<QuerySnapshot>(
           stream: _requestsStream,
