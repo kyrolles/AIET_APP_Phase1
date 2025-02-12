@@ -5,6 +5,7 @@ import 'package:graduation_project/screens/announcement/all_announcement_appear_
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/drawer/qr_code_screen.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_archive.dart';
+import 'package:graduation_project/screens/splash_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/create_announcement.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
+      home: SplashScreen(isUserLoggedIn: isLoggedIn),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
