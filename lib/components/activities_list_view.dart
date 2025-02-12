@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/attendance/student_attendance/qr_code_scanner_screen.dart';
 import 'activities_container.dart';
 import '../constants.dart';
 import '../screens/map_screen.dart';
@@ -54,10 +55,15 @@ class ActivitiesListView extends StatelessWidget {
         },
       ),
       ActivitiesContainer(
-        image: 'assets/project_image/attendance.png',
+        image: 'assets/project_image/qr-code.png',
         title: 'Attendance',
         onpressed: () {
-          Navigator.pushNamed(context, '/attendance');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const QRScannerScreen(),
+            ),
+          );
         },
       ),
     ];
