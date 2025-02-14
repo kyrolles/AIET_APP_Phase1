@@ -18,10 +18,19 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart';
 import 'package:graduation_project/screens/attendance/attendance_router.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:graduation_project/utils/fcm_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Initialize Firebase Messaging
+  await FirebaseMessaging.instance.requestPermission();
+  
+  // Get FCM token
+  String? fcmToken = await FCMUtils.getFCMToken();
+  print('FCM Token: $fcmToken');
 
   // Check if the user is already logged in
   const storage = FlutterSecureStorage();

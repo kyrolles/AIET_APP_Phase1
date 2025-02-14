@@ -148,6 +148,13 @@ class AnnouncementScreenState extends State<AnnouncementScreen> {
               'pdfFileName': pdfFileName,
             });
 
+            // After successfully posting the announcement, send notification
+            await FirebaseFirestore.instance.collection('fcm').add({
+              'title': 'Important Announcement from $firstName',
+              'body': _descriptionController.text.trim(),
+              'topic': 'announcements',
+            });
+
             _titleController.clear();
             _descriptionController.clear();
             setState(() {
