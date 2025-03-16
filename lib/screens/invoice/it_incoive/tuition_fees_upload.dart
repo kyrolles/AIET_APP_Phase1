@@ -1,16 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
-import 'dart:convert';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
-import 'package:path/path.dart' as path;
 
+import '../pdf_service.dart';
 import 'it_invoice_request_contanier.dart';
 
 class TuitionFeesSheet extends StatefulWidget {
@@ -118,7 +114,7 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
         },
         newData: {
           'file_name': fileName,
-          'pdfBase64': pdfBase64,
+          'pdfBase64': pdfBase64, //! Here is the pdf base 64
           'status': 'Done',
         },
       );
@@ -132,6 +128,11 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       });
     }
   }
+
+  //!---------------------------------------------------------------------------------------
+  final PDFService _pdfService = PDFService();
+  bool _isUploading = false;
+  //!---------------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -162,40 +163,118 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
                 ),
               ),
               const SizedBox(height: 15),
-              FileUploadWidget(
-                height: 350,
-                width: double.infinity,
-                allowedExtensions: const ['pdf'],
-                buttonText: "Upload Your PDF",
-                onFileSelected: (file) async {
-                  try {
-                    if (file.path != null) {
-                      // Get file name from path
-                      setState(() {
-                        fileName = path.basename(file.path!);
-                      });
-                      final bytes = await File(file.path!).readAsBytes();
-                      final base64String = base64Encode(bytes);
-                      setState(() {
-                        pdfBase64 = base64String;
-                      });
-                      // Show filename in a snackbar
-                      _showCustomSnackBar('Selected file: $fileName');
-                    }
-                  } catch (e) {
-                    _showCustomSnackBar('Error encoding PDF: $e',
-                        isError: true);
+              // PDF Picker Button
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final bool picked = await _pdfService.pickPDF();
+                  if (picked) {
+                    setState(() {
+                      // Update UI to show selected file
+                    });
                   }
                 },
-              ),
-              if (fileName != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  'Selected file: $fileName',
-                  style: const TextStyle(fontSize: 14),
-                  textAlign: TextAlign.center,
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Select PDF'),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 ),
-              ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Show selected file name if any
+              if (_pdfService.selectedFileName != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Text(
+                    'Selected file: ${_pdfService.selectedFileName}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+              const SizedBox(height: 20),
+
+              // Done Button
+              ElevatedButton(
+                onPressed: _pdfService.selectedFileName == null || _isUploading
+                    ? null // Disable button if no file selected or upload in progress
+                    : () async {
+                        setState(() {
+                          _isUploading = true;
+                        });
+
+                        // Upload PDF and save reference to Firestore
+                        final String? documentId =
+                            await _pdfService.uploadPDFAndSaveReference(
+                          'requests', // Collection name
+                          widget.request,
+                        );
+
+                        setState(() {
+                          _isUploading = false;
+                        });
+
+                        if (documentId != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('PDF uploaded successfully!')),
+                          );
+
+                          // Optional: Navigate back or to another screen
+                          Navigator.pop(context, documentId);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Failed to upload PDF')),
+                          );
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  backgroundColor: Colors.green,
+                ),
+                child: _isUploading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('DONE'),
+              ),
+              //!---------------------------------------------------------------------------------------
+              // FileUploadWidget(
+              //   height: 350,
+              //   width: double.infinity,
+              //   allowedExtensions: const ['pdf'],
+              //   buttonText: "Upload Your PDF",
+              //   onFileSelected: (file) async {
+              //     try {
+              //       if (file.path != null) {
+              //         // Get file name from path
+              //         setState(() {
+              //           fileName = path.basename(file.path!);
+              //         });
+              //         final bytes = await File(file.path!).readAsBytes();
+              //         final base64String = base64Encode(bytes);
+              //         setState(() {
+              //           pdfBase64 = base64String;
+              //         });
+              //         // Show filename in a snackbar
+              //         _showCustomSnackBar('Selected file: $fileName');
+              //       }
+              //     } catch (e) {
+              //       _showCustomSnackBar('Error encoding PDF: $e',
+              //           isError: true);
+              //     }
+              //   },
+              // ),
+              // if (fileName != null) ...[
+              //   const SizedBox(height: 10),
+              //   Text(
+              //     'Selected file: $fileName',
+              //     style: const TextStyle(fontSize: 14),
+              //     textAlign: TextAlign.center,
+              //   ),
+              // ],
+              //!---------------------------------------------------------------------------------------
               const SizedBox(height: 15),
               const Text(
                 'Do you want to pay in installments ?',
