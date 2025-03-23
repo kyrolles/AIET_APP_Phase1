@@ -69,7 +69,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         imageUrl: 'assets/project_image/health-clinic.png',
         backgroundColor: const Color(0xFFFFDD29),
         onPressed: () {
-          // print('Button pressed:');
+          Navigator.pushNamed(context, '/clinicStudentScreen');
         },
       ),
       ServiceItem(

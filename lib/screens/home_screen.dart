@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  String userRule = '';
   String userName = '';
   String? currentUserEmail;
   String? imageBase64; // Added missing variable declaration
@@ -45,6 +48,8 @@ class HomeScreenState extends State<HomeScreen> {
 
         if (querySnapshot.docs.isNotEmpty) {
           DocumentSnapshot userDoc = querySnapshot.docs.first;
+          userRule = userDoc['role'];
+          log(userRule);
           setState(() {
             userName = '${userDoc['firstName']} ${userDoc['lastName']}'.trim();
             imageBase64 = userDoc['profileImage'] as String?; // Fixed casting
@@ -101,7 +106,9 @@ class HomeScreenState extends State<HomeScreen> {
               text: 'Activities',
             ),
           ),
-          const SliverToBoxAdapter(child: ActivitiesListView()),
+          SliverToBoxAdapter(
+            child: ActivitiesListView(userRule: userRule),
+          ),
           SliverToBoxAdapter(
             child: TextLink(
               text: 'Announcements',
