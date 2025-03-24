@@ -31,16 +31,32 @@ class ClinicBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: [
           SvgPicture.asset('assets/project_image/Frame 879.svg'),
-          const KButton(
+          KButton(
+            onPressed: () {},
             text: 'New Appointment',
             backgroundColor: kPrimaryColor,
-            margin: EdgeInsets.symmetric(horizontal: 16),
           ),
-          const AppointmentItem(),
+          const SizedBox(height: 16),
+          const Text(
+            'Your Appointment',
+            style: TextStyle(
+              fontSize: 24,
+              fontFamily: 'lexend',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Center(
+            child: Text(
+              'No appointment has been booked',
+              style: TextStyle(color: kGrey),
+            ),
+          )
+          // const AppointmentItem(),
         ],
       ),
     );
