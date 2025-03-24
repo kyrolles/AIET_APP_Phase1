@@ -43,7 +43,10 @@ class _ClinicBodyState extends State<ClinicBody> {
         children: [
           SvgPicture.asset('assets/project_image/Frame 879.svg'),
           KButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(
+                  context, '/clinicStudentScreen/newAppointmentScreen');
+            },
             text: 'New Appointment',
             backgroundColor: kPrimaryColor,
           ),
