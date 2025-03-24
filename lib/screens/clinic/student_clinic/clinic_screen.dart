@@ -23,10 +23,17 @@ class ClinicScreen extends StatelessWidget {
   }
 }
 
-class ClinicBody extends StatelessWidget {
+class ClinicBody extends StatefulWidget {
   const ClinicBody({
     super.key,
   });
+
+  @override
+  State<ClinicBody> createState() => _ClinicBodyState();
+}
+
+class _ClinicBodyState extends State<ClinicBody> {
+  bool isBooked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -50,24 +57,16 @@ class ClinicBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Center(
-            child: Text(
-              'No appointment has been booked',
-              style: TextStyle(color: kGrey),
-            ),
-          )
-          // const AppointmentItem(),
+          isBooked
+              ? const AppointmentItem()
+              : const Center(
+                  child: Text(
+                    'No appointment has been booked',
+                    style: TextStyle(color: kGrey),
+                  ),
+                ),
         ],
       ),
     );
-  }
-}
-
-class AppointmentsList extends StatelessWidget {
-  const AppointmentsList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
