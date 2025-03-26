@@ -53,123 +53,52 @@ class _ClinicBodyState extends State<ClinicBody> {
 
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('clinic_appointments')
-            .where('userId', isEqualTo: userId)
-            .orderBy('date', descending: true)
-            .limit(10)
-            .get();
-        
-        List<Map<String, dynamic>> tempAppointments = [];
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          tempAppointments.add(data);
-        }
-        
-        tempAppointments.sort((a, b) {
-          if (a['status'] == 'pending' && b['status'] != 'pending') {
-            return -1;
-          }
-          if (b['status'] == 'pending' && a['status'] != 'pending') {
-            return 1;
-          }
-          return DateTime.parse(b['date']).compareTo(DateTime.parse(a['date']));
-        });
-
-        setState(() {
-          appointments = tempAppointments;
-          isLoading = false;
-          lastDocument = querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
-          hasMoreAppointments = querySnapshot.docs.length >= 10;
-        });
-      } else {
+      
+      if (user == null) {
         setState(() {
           isLoading = false;
         });
+        return;
       }
+      
+      String userId = user.uid;
+      
+      // Simple query to get all appointments for this user
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('clinic_appointments')
+          .where('userId', isEqualTo: userId)
+          .get();
+      
+      List<Map<String, dynamic>> tempAppointments = [];
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        tempAppointments.add(data);
+      }
+      
+      // Sort appointments: pending first, then by date
+      tempAppointments.sort((a, b) {
+        if (a['status'] == 'pending' && b['status'] != 'pending') {
+          return -1;
+        }
+        if (b['status'] == 'pending' && a['status'] != 'pending') {
+          return 1;
+        }
+        return DateTime.parse(b['date']).compareTo(DateTime.parse(a['date']));
+      });
+
+      setState(() {
+        appointments = tempAppointments;
+        isLoading = false;
+      });
     } catch (e) {
-      print('Error fetching appointments: $e');
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  Future<void> loadMoreAppointments() async {
-    if (!hasMoreAppointments || isLoadingMore || lastDocument == null) return;
-    
-    setState(() {
-      isLoadingMore = true;
-    });
-
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        
-        final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('clinic_appointments')
-            .where('userId', isEqualTo: userId)
-            .orderBy('date', descending: true)
-            .startAfterDocument(lastDocument!)
-            .limit(10)
-            .get();
-
-        List<Map<String, dynamic>> moreAppointments = [];
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          moreAppointments.add(data);
-        }
-
-        moreAppointments.sort((a, b) {
-          if (a['status'] == 'pending' && b['status'] != 'pending') {
-            return -1;
-          }
-          if (b['status'] == 'pending' && a['status'] != 'pending') {
-            return 1;
-          }
-          return DateTime.parse(b['date']).compareTo(DateTime.parse(a['date']));
-        });
-
-        setState(() {
-          appointments.addAll(moreAppointments);
-          isLoadingMore = false;
-          lastDocument = querySnapshot.docs.isNotEmpty 
-              ? querySnapshot.docs.last 
-              : lastDocument;
-          hasMoreAppointments = querySnapshot.docs.length >= 10;
-        });
-      }
-    } catch (e) {
-      print('Error loading more appointments: $e');
-      setState(() {
-        isLoadingMore = false;
-      });
-    }
-  }
-
-  Color getStatusColor(String? status) {
-    switch (status) {
-      case 'completed':
-        return Colors.green.shade800;
-      case 'cancelled':
-        return Colors.red.shade800;
-      case 'pending':
-      default:
-        return Colors.orange.shade800;
-    }
-  }
-
-  String getStatusText(String? status) {
-    if (status == null) return 'Pending';
-    if (status == 'completed') return 'Approved';
-    return status.toString()[0].toUpperCase() + status.toString().substring(1);
-  }
+  // Remove the loadMoreAppointments function as we're not using pagination anymore
 
   @override
   Widget build(BuildContext context) {
@@ -270,22 +199,8 @@ class _ClinicBodyState extends State<ClinicBody> {
                   : ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: appointments.length + (hasMoreAppointments ? 1 : 0),
+                      itemCount: appointments.length,
                       itemBuilder: (context, index) {
-                        if (index == appointments.length && hasMoreAppointments) {
-                          loadMoreAppointments();
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
-                        
-                        if (index >= appointments.length) {
-                          return const SizedBox.shrink();
-                        }
-                        
                         final appointment = appointments[index];
                         
                         DateTime appointmentDate = DateTime.parse(appointment['date']);
@@ -317,7 +232,7 @@ class _ClinicBodyState extends State<ClinicBody> {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      appointment['time'],
+                                      appointment['time'] ?? 'Not specified',
                                       style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 18,
@@ -327,7 +242,6 @@ class _ClinicBodyState extends State<ClinicBody> {
                                   ],
                                 ),
                               ),
-                              
                               Expanded(
                                 child: Container(
                                   margin: const EdgeInsets.all(12),
@@ -347,7 +261,6 @@ class _ClinicBodyState extends State<ClinicBody> {
                                         ),
                                       ),
                                       const SizedBox(height: 8),
-                                      
                                       Row(
                                         children: [
                                           Text(
@@ -380,16 +293,15 @@ class _ClinicBodyState extends State<ClinicBody> {
                                         ],
                                       ),
                                       const SizedBox(height: 16),
-                                      
-                                      const Row(
+                                      Row(
                                         children: [
-                                           Icon(
-                                            Icons.location_on_outlined,
+                                          const Icon(
+                                            Icons.medical_services_outlined,
                                             size: 18,
                                             color: Colors.grey,
                                           ),
-                                           SizedBox(width: 8),
-                                           Text(
+                                          const SizedBox(width: 8),
+                                          const Text(
                                             'Room 2-168',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -397,25 +309,32 @@ class _ClinicBodyState extends State<ClinicBody> {
                                           ),
                                         ],
                                       ),
-                                      
                                       const SizedBox(height: 16),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: appointment['status'] == 'pending' 
-                                                  ? Colors.orange.shade100 
-                                                  : appointment['status'] == 'cancelled'
-                                                      ? Colors.red.shade100
-                                                      : Colors.green.shade100,
-                                              borderRadius: BorderRadius.circular(12),
+                                              color: appointment['status'] == 'cancelled'
+                                                  ? const Color(0xFFFFEBEB)
+                                                  : appointment['status'] == 'completed'
+                                                      ? const Color(0xFFE8F5E9)
+                                                      : const Color(0xFFFFF8EB),
+                                              borderRadius: BorderRadius.circular(20),
                                             ),
                                             child: Text(
                                               getStatusText(appointment['status']),
                                               style: TextStyle(
-                                                color: getStatusColor(appointment['status']),
+                                                color: appointment['status'] == 'cancelled'
+                                                    ? Colors.red
+                                                    : appointment['status'] == 'completed'
+                                                        ? Colors.green
+                                                        : const Color(0xFFFF9500),
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -427,10 +346,13 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                   context: context,
                                                   builder: (context) => AlertDialog(
                                                     title: const Text('Cancel Appointment'),
-                                                    content: const Text('Are you sure you want to cancel this appointment?'),
+                                                    content: const Text(
+                                                        'Are you sure you want to cancel this appointment?'),
                                                     actions: [
                                                       TextButton(
-                                                        onPressed: () => Navigator.pop(context),
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
                                                         child: const Text('No'),
                                                       ),
                                                       TextButton(
@@ -448,9 +370,18 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                   ),
                                                 );
                                               },
-                                              child: const Text('Cancel'),
                                               style: TextButton.styleFrom(
                                                 foregroundColor: Colors.red,
+                                                padding: EdgeInsets.zero,
+                                                minimumSize: Size.zero,
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              ),
+                                              child: const Text(
+                                                'Cancel',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                             ),
                                         ],
@@ -467,5 +398,23 @@ class _ClinicBodyState extends State<ClinicBody> {
         ],
       ),
     );
+  }
+
+  Color getStatusColor(String? status) {
+    switch (status) {
+      case 'completed':
+        return Colors.green.shade800;
+      case 'cancelled':
+        return Colors.red.shade800;
+      case 'pending':
+      default:
+        return Colors.orange.shade800;
+    }
+  }
+
+  String getStatusText(String? status) {
+    if (status == null) return 'Pending';
+    if (status == 'completed') return 'Approved';
+    return status.toString()[0].toUpperCase() + status.toString().substring(1);
   }
 }
