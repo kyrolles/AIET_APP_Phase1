@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_screen.dart';
 import 'package:graduation_project/screens/attendance/student_attendance/qr_code_scanner_screen.dart';
 import 'activities_container.dart';
 import '../constants.dart';
@@ -7,7 +8,8 @@ import '../screens/result_screen.dart';
 import '../screens/services_screen.dart';
 
 class ActivitiesListView extends StatelessWidget {
-  const ActivitiesListView({super.key});
+  const ActivitiesListView({super.key, required this.userRule});
+  final String userRule;
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +60,21 @@ class ActivitiesListView extends StatelessWidget {
         image: 'assets/project_image/qr-code.png',
         title: 'Attendance',
         onpressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const QRScannerScreen(),
-            ),
-          );
+          if (userRule == 'Student') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const QRScannerScreen(),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AttendanceScreen(),
+              ),
+            );
+          }
         },
       ),
     ];
