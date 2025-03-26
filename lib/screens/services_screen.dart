@@ -28,6 +28,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
     checkIfStaff();
   }
 
+  String userRole = ''; // Add this variable to store the user's role
+
   Future<void> checkIfStaff() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -41,6 +43,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         if (querySnapshot.docs.isNotEmpty) {
           String role = querySnapshot.docs.first['role'];
           setState(() {
+            userRole = role; // Store the user's role
             isAdmin = role == 'Admin';
             isStaff = isAdmin ||
                 [
@@ -69,7 +72,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
         imageUrl: 'assets/project_image/health-clinic.png',
         backgroundColor: const Color(0xFFFFDD29),
         onPressed: () {
-          Navigator.pushNamed(context, '/clinicDoctorScreen');
+          // Navigate based on user role
+          if (userRole == 'Doctor') {
+            Navigator.pushNamed(context, '/doctorClinicScreen');
+          } else if (userRole == 'Student') {
+            Navigator.pushNamed(context, '/clinicStudentScreen');
+          } else {
+            // Show message for users with other roles
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('You do not have access to the clinic feature'),
+              ),
+            );
+          }
         },
       ),
       ServiceItem(

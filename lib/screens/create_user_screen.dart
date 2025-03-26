@@ -96,15 +96,22 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'email': _emailController.text,
             'phone': _phoneController.text,
             'role': selectedRole,
-            'department': selectedDepartment,
-            'id': _idController.text,
-            'academicYear': _academicYearController.text,
-            'birthDate': _birthDateController.text,
             'createdAt': FieldValue.serverTimestamp(),
             'qrCode': qrData,
-            'totalTrainingScore': 0,
             'profileImage': '',
           };
+          
+          // Add additional fields for roles that need them
+          if (selectedRole != 'Doctor') {
+            userData['department'] = selectedDepartment;
+            userData['id'] = _idController.text;
+            userData['academicYear'] = _academicYearController.text;
+            userData['birthDate'] = _birthDateController.text;
+            
+            if (selectedRole == 'Student') {
+              userData['totalTrainingScore'] = 0;
+            }
+          }
 
           // Create user document in Firestore
           await FirebaseFirestore.instance
@@ -151,7 +158,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       'Assistant',
       'Secretary',
       'Training Unit',
-      'Student Affair'
+      'Student Affair',
+      'Doctor' // Added Doctor to roles with no extra fields
     ].contains(selectedRole);
 
     return Scaffold(
@@ -211,6 +219,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     DropdownMenuItem(
                       value: 'Student Affair',
                       child: Text('Student Affair'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Doctor',
+                      child: Text('Doctor'),
                     ),
                     DropdownMenuItem(
                       value: 'Admin',
