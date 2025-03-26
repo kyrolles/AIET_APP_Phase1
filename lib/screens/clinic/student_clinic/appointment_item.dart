@@ -44,12 +44,13 @@ class AppointmentItem extends StatelessWidget {
         statusColor = Colors.green;
         break;
       case 'cancelled':
+        // Red color for cancelled appointments
         statusColor = Colors.red;
         break;
       default:
         statusColor = Colors.grey;
     }
-
+//s
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -152,6 +153,6 @@ class AppointmentItem extends StatelessWidget {
 
 extension StringExtension on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1)}";
+    return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }
