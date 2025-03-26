@@ -39,41 +39,11 @@ class _ClinicBodyState extends State<ClinicBody> {
   DocumentSnapshot? lastDocument;
   bool hasMoreAppointments = true;
   bool isLoadingMore = false;
-  String? error;
-  String doctorName = "Doctor";
 
   @override
   void initState() {
     super.initState();
     fetchUserAppointments();
-    fetchDoctorName(); 
-  }
-
-  Future<void> fetchDoctorName() async {
-    try {
-      final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'doctor')
-          .limit(1)
-          .get();
-      
-      if (querySnapshot.docs.isNotEmpty) {
-        final userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-        setState(() {
-          doctorName = userData['name'] ?? 
-                      userData['fullName'] ?? 
-                      userData['displayName'] ?? 
-                      userData['firstName'] ?? 
-                      "Dr. Unknown";
-          
-          if (!doctorName.startsWith("Dr.")) {
-            doctorName = "Dr. $doctorName";
-          }
-        });
-      }
-    } catch (e) {
-      print('Error fetching doctor: $e');
-    }
   }
 
   Future<void> fetchUserAppointments() async {
@@ -89,6 +59,8 @@ class _ClinicBodyState extends State<ClinicBody> {
         QuerySnapshot querySnapshot = await FirebaseFirestore.instance
             .collection('clinic_appointments')
             .where('userId', isEqualTo: userId)
+            .orderBy('date', descending: true)
+            .limit(10)
             .get();
         
         List<Map<String, dynamic>> tempAppointments = [];
@@ -111,6 +83,8 @@ class _ClinicBodyState extends State<ClinicBody> {
         setState(() {
           appointments = tempAppointments;
           isLoading = false;
+          lastDocument = querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+          hasMoreAppointments = querySnapshot.docs.length >= 10;
         });
       } else {
         setState(() {
@@ -121,7 +95,6 @@ class _ClinicBodyState extends State<ClinicBody> {
       print('Error fetching appointments: $e');
       setState(() {
         isLoading = false;
-        error = e.toString();
       });
     }
   }
@@ -176,7 +149,6 @@ class _ClinicBodyState extends State<ClinicBody> {
       print('Error loading more appointments: $e');
       setState(() {
         isLoadingMore = false;
-        error = e.toString();
       });
     }
   }
@@ -205,38 +177,86 @@ class _ClinicBodyState extends State<ClinicBody> {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: [
-          SizedBox(
-            height: 600,
-            child: SvgPicture.asset(
-              'assets/project_image/Frame 879.svg',
-              fit: BoxFit.contain,
+          
+          Container(
+            height: 450,
+            decoration: BoxDecoration(
+              color: const Color(0xFF39A0FF),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Stack(
+              children: [
+                
+                const Positioned(
+                  top: 30,
+                  left: 25,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:  [
+                      Text(
+                        'Book your',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'appointments',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/project_image/illustration.svg',
+                      height: 250,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           
-          Transform.translate(
-            offset: const Offset(0, -20), 
-            child: KButton(
-              onPressed: () {
-                Navigator.pushNamed(
-                    context, '/clinicStudentScreen/newAppointmentScreen')
-                    .then((_) {
-                  fetchUserAppointments();
-                });
-              },
-              text: 'New Appointment',
-              backgroundColor: kPrimaryColor,
-            ),
-          ),
           const SizedBox(height: 16),
+          
+         
+          KButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                  context, '/clinicStudentScreen/newAppointmentScreen')
+                  .then((_) {
+                fetchUserAppointments();
+              });
+            },
+            text: 'New Appointment',
+            backgroundColor: const Color(0xFF39A0FF),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          
           const Text(
             'Your Appointments',
             style: TextStyle(
               fontSize: 24,
-              fontFamily: 'lexend',
               fontWeight: FontWeight.bold,
             ),
           ),
+          
           const SizedBox(height: 16),
+          
           
           isLoading
               ? const Center(child: CircularProgressIndicator())
