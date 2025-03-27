@@ -1,140 +1,158 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AppointmentItem extends StatelessWidget {
-  const AppointmentItem({super.key});
+  final String date;
+  final String time;
+  final String problem;
+  final String status;
+  final String appointmentId;
+  final VoidCallback onCancelled;
+
+  const AppointmentItem({
+    super.key,
+    required this.date,
+    required this.time,
+    required this.problem,
+    required this.status,
+    required this.appointmentId,
+    required this.onCancelled,
+  });
+
+  Future<void> _cancelAppointment() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('clinic_appointments')
+          .doc(appointmentId)
+          .update({'status': 'cancelled'});
+      
+      onCancelled();
+    } catch (e) {
+      print('Error cancelling appointment: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        height: 200,
-        width: 300,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFD8E8F5),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Row(
-          children: [
-            Column(
-              children: [
-                Text(
-                  'Time',
+    Color statusColor;
+    switch (status) {
+      case 'pending':
+        statusColor = Colors.orange;
+        break;
+      case 'confirmed':
+        statusColor = Colors.green;
+        break;
+      case 'cancelled':
+        // Red color for cancelled appointments
+        statusColor = Colors.red;
+        break;
+      default:
+        statusColor = Colors.grey;
+    }
+//s
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                date,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  status.capitalize(),
                   style: TextStyle(
-                    fontFamily: 'lexend',
-                    color: Colors.white,
+                    color: statusColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
-                SizedBox(height: 5),
-                Text(
-                  '9:00',
-                  style: TextStyle(
-                    fontFamily: 'lexend',
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  '10:30',
-                  style: TextStyle(
-                    fontFamily: 'lexend',
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            VerticalDivider(
-              color: Colors.white,
-              indent: 30,
-            ),
-            Column(
-              children: [
-                Row(
-                  children: [
-                    SizedBox(width: 50),
-                    Text(
-                      'Date',
-                      style: TextStyle(
-                        fontFamily: 'lexend',
-                        color: Colors.white,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.access_time, size: 16, color: kGrey),
+              const SizedBox(width: 4),
+              Text(
+                time,
+                style: const TextStyle(color: kGrey),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Problem: $problem',
+            style: const TextStyle(color: kGrey),
+          ),
+          const SizedBox(height: 12),
+          if (status == 'pending')
+            TextButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Cancel Appointment'),
+                    content: const Text('Are you sure you want to cancel this appointment?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('No'),
                       ),
-                    ),
-                  ],
-                ),
-                Expanded(child: SmallContianer()),
-              ],
-            )
-          ],
-        ),
+                      TextButton(
+                        onPressed: () {
+                          _cancelAppointment();
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text('Cancel Appointment'),
+            ),
+        ],
       ),
     );
   }
 }
 
-class SmallContianer extends StatelessWidget {
-  const SmallContianer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      width: 200,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Spacer(),
-              Text(
-                '24',
-                style: TextStyle(
-                  fontFamily: 'lexend',
-                  fontSize: 32,
-                ),
-              ),
-              Spacer(),
-              Text(
-                'Wednesday',
-                style: TextStyle(
-                  fontFamily: 'lexend',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
-          Row(
-            children: [
-              Icon(
-                Icons.location_on_outlined,
-                color: Color(0XFF88889D),
-              ),
-              Text(
-                'Room 2-168',
-                style: TextStyle(fontFamily: 'lexend'),
-              )
-            ],
-          ),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 12,
-                backgroundImage: AssetImage('assets/images/dr-sheshtawey.jpg'),
-              ),
-              Text(
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                'DR. Reda Elsheshtawy',
-                style: TextStyle(fontFamily: 'lexend'),
-              )
-            ],
-          )
-        ],
-      ),
-    );
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }

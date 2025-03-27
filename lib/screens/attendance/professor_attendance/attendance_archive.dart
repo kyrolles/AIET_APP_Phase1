@@ -154,21 +154,60 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
   void removeStudent(int index) async {
     try {
       if (currentDocId != null) {
-        final studentToRemove = attendanceList[index];
-
+        // Get the current attendance document to get the exact student data
+        DocumentSnapshot attendanceDoc = await _firestore
+            .collection('attendance')
+            .doc(currentDocId)
+            .get();
+        
+        if (!attendanceDoc.exists) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Attendance record not found'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+        
+        Map<String, dynamic> data = attendanceDoc.data() as Map<String, dynamic>;
+        List<dynamic> studentList = data['studentList'] ?? [];
+        
+        if (index >= studentList.length) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Student index out of range'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+        
+        // Get the exact student data from Firestore
+        Map<String, dynamic> studentToRemove = Map<String, dynamic>.from(studentList[index]);
+        
+        // Update the UI first
         setState(() {
           attendanceList.removeAt(index);
         });
-
+        
+        // Then update Firestore
         await _firestore.collection('attendance').doc(currentDocId).update({
           'studentList': FieldValue.arrayRemove([studentToRemove])
         });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Student removed successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       print('Error removing student: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error removing student'),
+        SnackBar(
+          content: Text('Error removing student: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -311,8 +350,10 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
-                        builder: (BuildContext context) {
-                          return const AddStudentBottomSheet();
+                        builder: (context) {
+                          return AddStudentBottomSheet(
+                            documentId: currentDocId!, // Use currentDocId instead of existingDocId
+                          );
                         },
                       );
                     },

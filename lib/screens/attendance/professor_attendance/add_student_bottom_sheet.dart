@@ -4,7 +4,12 @@ import 'professor_qr_code_scanner_screen.dart';
 import 'add_student_manually_bottom_sheet.dart';
 
 class AddStudentBottomSheet extends StatelessWidget {
-  const AddStudentBottomSheet({super.key});
+  final String documentId;
+  
+  const AddStudentBottomSheet({
+    super.key,
+    required this.documentId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +27,11 @@ class AddStudentBottomSheet extends StatelessWidget {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
+                isScrollControlled: true,
                 builder: (BuildContext context) {
-                  return const AddStudentManuallyBottmSheet();
+                  return AddStudentManuallyBottmSheet(
+                    documentId: documentId,
+                  );
                 },
               );
             },
@@ -39,7 +47,9 @@ class AddStudentBottomSheet extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfessorQRScannerScreen(),
+                  builder: (context) => ProfessorQRScannerScreen(
+                    documentId: documentId,
+                  ),
                 ),
               );
             },

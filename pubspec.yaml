@@ -59,6 +59,7 @@ dependencies:
   percent_indicator: ^4.2.4 
   cached_network_image: ^3.4.1
   url_launcher: ^6.3.1
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
@@ -86,7 +87,6 @@ flutter:
   assets:
     - assets/images/
     - assets/project_image/
-    - assets/project_image/announcement.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

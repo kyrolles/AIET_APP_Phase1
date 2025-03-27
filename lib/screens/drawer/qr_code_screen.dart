@@ -7,8 +7,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 
-class QrcodeScreen extends StatelessWidget {
+class QrcodeScreen extends StatefulWidget {
   const QrcodeScreen({super.key});
+
+  @override
+  State<QrcodeScreen> createState() => _QrcodeScreenState();
+}
+
+class _QrcodeScreenState extends State<QrcodeScreen> {
+  bool _isGeneratingQR = false;
 
   Future<Map<String, dynamic>?> _getUserData() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -19,13 +26,56 @@ class QrcodeScreen extends StatelessWidget {
           .get();
 
       if (doc.exists) {
-        return {
+        Map<String, dynamic> userData = {
           ...doc.data()!,
           'uid': user.uid,
         };
+        
+        // Check if we need to generate and store a new QR code
+        String studentId = userData['id']?.toString() ?? '';
+        if (studentId.isNotEmpty && (userData['qrCode'] == null || userData['qrCode'] != studentId)) {
+          if (!_isGeneratingQR) {
+            _isGeneratingQR = true;
+            // Generate and store the QR code
+            await _generateAndStoreQRCode(user.uid, studentId);
+            _isGeneratingQR = false;
+            // Refresh the data
+            return _getUserData();
+          }
+        }
+        
+        return userData;
       }
     }
     return null;
+  }
+  
+  Future<void> _generateAndStoreQRCode(String uid, String studentId) async {
+    try {
+      if (studentId.isEmpty) {
+        throw 'Student ID is empty';
+      }
+      
+      // Store the student ID as the QR code data
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update({
+        'qrCode': studentId,
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('QR Code updated successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating QR code: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -198,7 +248,10 @@ class QrcodeScreen extends StatelessWidget {
                         ],
                       ),
                       child: QrImageView(
-                        data: userData?['qrCode'] ?? "",
+                        // Make sure we always have valid data for the QR code
+                        data: (userData?['qrCode'] ?? studentId).toString().isNotEmpty 
+                            ? (userData?['qrCode'] ?? studentId).toString()
+                            : "No ID available",
                         version: QrVersions.auto,
                         size: 200.0,
                         backgroundColor: Colors.white,
