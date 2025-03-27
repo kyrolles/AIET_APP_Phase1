@@ -10,13 +10,62 @@ import 'package:graduation_project/screens/attendance/professor_attendance/atten
 
 import 'attendance_buttom_sheet.dart';
 
-class AttendanceScreen extends StatelessWidget {
-  AttendanceScreen({super.key});
+// Change to StatefulWidget
+class AttendanceScreen extends StatefulWidget {
+  const AttendanceScreen({super.key});
 
+  @override
+  State<AttendanceScreen> createState() => _AttendanceScreenState();
+}
+
+class _AttendanceScreenState extends State<AttendanceScreen> {
   final CollectionReference attendance =
       FirebaseFirestore.instance.collection('attendance');
 
   List<AttendanceModel> periods = [];
+
+  // Add the delete confirmation dialog method
+  void _showDeleteConfirmation(BuildContext context, String documentId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('Delete Attendance'),
+        content: const Text('Are you sure you want to delete this attendance record? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _deleteAttendance(documentId);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Add the delete method
+  Future<void> _deleteAttendance(String documentId) async {
+    try {
+      await attendance.doc(documentId).delete();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Attendance record deleted successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting attendance record: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +123,13 @@ class AttendanceScreen extends StatelessWidget {
                 builder: (context) => AttendanceArchive(
                   subjectName: periods[i].subjectName,
                   period: periods[i].period,
-                  existingDocId: periods[i].id, // Pass the existing document ID
+                  existingDocId: periods[i].id,
                 ),
               ),
             );
           },
           ontapOnSend: () {},
+          onDelete: () => _showDeleteConfirmation(context, periods[i].id),
         ),
       );
     }
