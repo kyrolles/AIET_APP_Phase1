@@ -43,13 +43,13 @@ class AttendanceRouter extends StatelessWidget {
 
         final role = snapshot.data;
 
-        // Show StudentAttendanceScreen only for students
+        
         if (role == 'Student') {
           return StudentAttendanceScreen();
         }
 
-        // Show regular AttendanceScreen for all other roles
-        return AttendanceScreen();
+        
+        return const AttendanceScreen();
       },
     );
   }

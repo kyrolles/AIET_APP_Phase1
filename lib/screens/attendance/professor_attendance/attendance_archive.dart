@@ -146,7 +146,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
       'subjectName': widget.subjectName,
       'period': widget.period,
       'docId': currentDocId,
-      'timestamp': originalTimestamp // Use the original timestamp
+      'timestamp': originalTimestamp 
     });
     setState(() {});
   }
@@ -154,7 +154,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
   void removeStudent(int index) async {
     try {
       if (currentDocId != null) {
-        // Get the current attendance document to get the exact student data
+        
         DocumentSnapshot attendanceDoc = await _firestore
             .collection('attendance')
             .doc(currentDocId)
@@ -183,15 +183,15 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
           return;
         }
         
-        // Get the exact student data from Firestore
+        
         Map<String, dynamic> studentToRemove = Map<String, dynamic>.from(studentList[index]);
         
-        // Update the UI first
+        
         setState(() {
           attendanceList.removeAt(index);
         });
         
-        // Then update Firestore
+        
         await _firestore.collection('attendance').doc(currentDocId).update({
           'studentList': FieldValue.arrayRemove([studentToRemove])
         });
@@ -352,7 +352,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                         context: context,
                         builder: (context) {
                           return AddStudentBottomSheet(
-                            documentId: currentDocId!, // Use currentDocId instead of existingDocId
+                            documentId: currentDocId!, 
                           );
                         },
                       );

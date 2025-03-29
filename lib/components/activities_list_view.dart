@@ -76,7 +76,7 @@ class ActivitiesListView extends StatelessWidget {
                 builder: (context) => ITAttendanceScreen(),
               ),
             );
-          } else if (userRule == 'professor') {
+          } else if (userRule == 'Professor') {
             Navigator.push(
               context,
               MaterialPageRoute(

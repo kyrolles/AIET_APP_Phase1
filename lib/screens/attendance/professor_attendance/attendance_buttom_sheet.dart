@@ -126,13 +126,13 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     return;
                   }
 
-                  // Create attendance document with default status
+                  
                   try {
-                    // Get the current user's email and name
+                    
                     final User? currentUser = FirebaseAuth.instance.currentUser;
                     String? userEmail = currentUser?.email;
                     
-                    // Fetch the user's name from Firestore
+                    
                     String profName = '';
                     if (currentUser != null) {
                       QuerySnapshot userSnapshot = await FirebaseFirestore.instance
@@ -148,7 +148,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                       }
                     }
                     
-                    // Create the document with all required fields
+                    
                     DocumentReference docRef = await FirebaseFirestore.instance.collection('attendance').add({
                       'subjectName': subjectCode,
                       'period': selectedPeriod,
@@ -159,7 +159,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                       'timestamp': DateTime.now().toIso8601String(),
                     });
 
-                    // Close bottom sheet and navigate to archive screen
+                    
                     if (context.mounted) {
                       Navigator.pop(context);
                       Navigator.push(

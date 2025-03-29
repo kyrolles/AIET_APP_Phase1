@@ -9,7 +9,7 @@ class AttendanceModel {
   final String? profName;
   final String? timestamp;
   final String? status;
-  final String? approvalTimestamp; // Add this field
+  final String? approvalTimestamp; 
   final List<Map<String, dynamic>>? studentsList;
   final Map<String, dynamic>? data;
 
@@ -20,7 +20,7 @@ class AttendanceModel {
     this.profName,
     this.timestamp,
     this.status,
-    this.approvalTimestamp, // Add this parameter
+    this.approvalTimestamp, 
     this.studentsList,
     this.data,
   });
@@ -28,7 +28,7 @@ class AttendanceModel {
   factory AttendanceModel.fromJson(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     
-    // Check if the field is "studentsList" or "studentList"
+    
     List<Map<String, dynamic>>? students;
     if (data.containsKey('studentsList')) {
       students = List<Map<String, dynamic>>.from(data['studentsList']);
