@@ -67,6 +67,26 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
+  Future<void> _updateAttendanceStatus(String documentId) async {
+    try {
+      await attendance.doc(documentId).update({'status': 'pending'});
+      setState(() {
+        periods.removeWhere((period) => period.id == documentId);
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Attendance status updated to pending')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating attendance status: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +95,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       body: Column(
         children: [
           StreamBuilder<QuerySnapshot>(
-            stream: attendance.snapshots(),
+            stream: attendance.where('status', isNotEqualTo: 'pending').snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasData) {
                 periods = [];
@@ -115,7 +135,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           period: periods[i].period,
           startTime: '9:00',
           endTime: '10:30',
-          total: periods[i].studentsList.length,
+          total: periods[i].studentsList?.length ?? 0,
           ontapOnReview: () {
             Navigator.push(
               context,
@@ -128,7 +148,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               ),
             );
           },
-          ontapOnSend: () {},
+          ontapOnSend: () => _updateAttendanceStatus(periods[i].id),
           onDelete: () => _showDeleteConfirmation(context, periods[i].id),
         ),
       );
@@ -152,7 +172,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
-                return const AttendanceButtomSheet();
+                return const AttendanceButtomSheet(defaultStatus: 'none');
               },
             );
           },
