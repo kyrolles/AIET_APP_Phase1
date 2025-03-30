@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
-import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart'; // Add this import
+import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Period {
   String number;
@@ -16,7 +18,12 @@ class Period {
 }
 
 class AttendanceButtomSheet extends StatefulWidget {
-  const AttendanceButtomSheet({super.key});
+  final String defaultStatus;
+  
+  const AttendanceButtomSheet({
+    super.key, 
+    this.defaultStatus = 'none'
+  });
 
   @override
   State<AttendanceButtomSheet> createState() => _AttendanceButtomSheetState();
@@ -100,7 +107,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               KButton(
                 text: 'Generate QR Code',
                 backgroundColor: kBlue,
-                onPressed: () {
+                onPressed: () async {
                   final subjectCode = _subjectCodeController.text.trim();
                   final selectedPeriod = getSelectedPeriod();
 
@@ -119,17 +126,60 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     return;
                   }
 
-                  // Close bottom sheet and navigate to archive screen
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AttendanceArchive(
-                        subjectName: subjectCode,
-                        period: selectedPeriod,
-                      ),
-                    ),
-                  );
+                  
+                  try {
+                    
+                    final User? currentUser = FirebaseAuth.instance.currentUser;
+                    String? userEmail = currentUser?.email;
+                    
+                    
+                    String profName = '';
+                    if (currentUser != null) {
+                      QuerySnapshot userSnapshot = await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: userEmail)
+                          .limit(1)
+                          .get();
+                      
+                      if (userSnapshot.docs.isNotEmpty) {
+                        DocumentSnapshot userDoc = userSnapshot.docs.first;
+                        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+                        profName = '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
+                      }
+                    }
+                    
+                    
+                    DocumentReference docRef = await FirebaseFirestore.instance.collection('attendance').add({
+                      'subjectName': subjectCode,
+                      'period': selectedPeriod,
+                      'studentsList': [],
+                      'status': widget.defaultStatus,
+                      'profName': profName,
+                      'email': userEmail,
+                      'timestamp': DateTime.now().toIso8601String(),
+                    });
+
+                    
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AttendanceArchive(
+                            subjectName: subjectCode,
+                            period: selectedPeriod,
+                            existingDocId: docRef.id,
+                          ),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error creating attendance: $e')),
+                      );
+                    }
+                  }
                 },
                 fontSize: 22,
                 width: double.infinity,

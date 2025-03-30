@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/attendance/it_attendance/it_attendance_screen.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_screen.dart';
+import 'package:graduation_project/screens/attendance/student_attendance/student_attendance_screen.dart';
 import 'package:graduation_project/screens/attendance/student_attendance/qr_code_scanner_screen.dart';
 import 'activities_container.dart';
 import '../constants.dart';
@@ -67,11 +69,26 @@ class ActivitiesListView extends StatelessWidget {
                 builder: (context) => const QRScannerScreen(),
               ),
             );
-          } else {
+          } else if (userRule == 'IT') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ITAttendanceScreen(),
+              ),
+            );
+          } else if (userRule == 'Professor') {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => AttendanceScreen(),
+              ),
+            );
+          } else {
+            // Default case
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StudentAttendanceScreen(),
               ),
             );
           }

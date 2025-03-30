@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
@@ -10,7 +11,6 @@ import 'package:graduation_project/screens/attendance/professor_attendance/atten
 
 import 'attendance_buttom_sheet.dart';
 
-// Change to StatefulWidget
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
 
@@ -21,10 +21,10 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   final CollectionReference attendance =
       FirebaseFirestore.instance.collection('attendance');
+  final User? _currentUser = FirebaseAuth.instance.currentUser;
 
   List<AttendanceModel> periods = [];
 
-  // Add the delete confirmation dialog method
   void _showDeleteConfirmation(BuildContext context, String documentId) {
     showDialog(
       context: context,
@@ -49,7 +49,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 
-  // Add the delete method
   Future<void> _deleteAttendance(String documentId) async {
     try {
       await attendance.doc(documentId).delete();
@@ -67,6 +66,26 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
+  Future<void> _updateAttendanceStatus(String documentId) async {
+    try {
+      await attendance.doc(documentId).update({'status': 'pending'});
+      setState(() {
+        periods.removeWhere((period) => period.id == documentId);
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Attendance status updated to pending')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating attendance status: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,16 +94,60 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       body: Column(
         children: [
           StreamBuilder<QuerySnapshot>(
-            stream: attendance.snapshots(),
+            stream: FirebaseFirestore.instance
+                .collection('attendance')
+                .where('status', isEqualTo: 'none')
+                .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return showLoadingIndicator();
+              }
+              
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              }
+              
               if (snapshot.hasData) {
-                periods = [];
-                for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                  periods.add(AttendanceModel.fromJson(snapshot.data!.docs[i]));
-                }
+                final docs = snapshot.data!.docs;
+                
                 return ListContainer(
                   title: 'Current attendance',
-                  listOfWidgets: currentAttendanceItems(context, periods),
+                  listOfWidgets: docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    
+                    List? studentsList;
+                    if (data.containsKey('studentList')) {
+                      studentsList = data['studentList'] as List?;
+                    } else if (data.containsKey('studentsList')) {
+                      studentsList = data['studentsList'] as List?;
+                    }
+                    
+                    final studentCount = studentsList?.length ?? 0;
+                    
+                    return CurrentAttendanceItem(
+                      subject: data['subjectName'] ?? '',
+                      period: data['period'] ?? '',
+                      startTime: '9:00',
+                      endTime: '10:30',
+                      total: studentCount,
+                      ontapOnReview: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AttendanceArchive(
+                              subjectName: data['subjectName'] ?? '',
+                              period: data['period'] ?? '',
+                              existingDocId: doc.id,
+                            ),
+                          ),
+                        );
+                      },
+                      ontapOnSend: () => _updateAttendanceStatus(doc.id),
+                      onDelete: () => _showDeleteConfirmation(context, doc.id),
+                    );
+                  }).toList(),
                   emptyMessage: 'No recent attendance found',
                 );
               } else {
@@ -105,37 +168,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 
-  List<CurrentAttendanceItem> currentAttendanceItems(
-      context, List<AttendanceModel> periods) {
-    List<CurrentAttendanceItem> attendanceItems = [];
-    for (var i = 0; i < periods.length; i++) {
-      attendanceItems.add(
-        CurrentAttendanceItem(
-          subject: periods[i].subjectName,
-          period: periods[i].period,
-          startTime: '9:00',
-          endTime: '10:30',
-          total: periods[i].studentsList.length,
-          ontapOnReview: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AttendanceArchive(
-                  subjectName: periods[i].subjectName,
-                  period: periods[i].period,
-                  existingDocId: periods[i].id,
-                ),
-              ),
-            );
-          },
-          ontapOnSend: () {},
-          onDelete: () => _showDeleteConfirmation(context, periods[i].id),
-        ),
-      );
-    }
-    return attendanceItems;
-  }
-
   Widget showLoadingIndicator() {
     return const Center(child: CircularProgressIndicator());
   }
@@ -152,7 +184,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
-                return const AttendanceButtomSheet();
+                return const AttendanceButtomSheet(defaultStatus: 'none');
               },
             );
           },

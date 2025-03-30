@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 
 class AppDrawer extends StatelessWidget {
-  final Future<void> Function() _logout;
+  final Function() onLogout;
+  final String userRole;
 
-  const AppDrawer(this._logout, {super.key});
-
+  const AppDrawer(this.onLogout, {required this.userRole, super.key});
+  
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -42,7 +43,7 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
               ),
-              //secondpage
+              // Attendance option removed
               const Padding(
                 padding: EdgeInsets.only(left: 25.0),
                 child: ListTile(
@@ -71,9 +72,7 @@ class AppDrawer extends StatelessWidget {
                 "Logout",
                 style: kTextStyleBold,
               ),
-              onTap: () {
-                _logout();
-              },
+              onTap: onLogout,
             ),
           ),
         ],

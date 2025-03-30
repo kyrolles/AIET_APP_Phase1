@@ -86,7 +86,7 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: homeScreenAppBar(context),
-      drawer: AppDrawer(_logout),
+      drawer: AppDrawer(_logout, userRole: userRule),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
