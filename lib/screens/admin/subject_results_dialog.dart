@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants.dart';
 
 class SubjectResultsDialog extends StatefulWidget {
   final Map<String, dynamic> subject;
@@ -58,88 +59,430 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Edit ${editedSubject['name'] ?? 'Subject'}'),
-      content: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
+    final subjectName = editedSubject['name'] ?? 'Subject';
+    final subjectCode = editedSubject['code'] ?? '';
+    final currentGrade = editedSubject['grade'] as String? ?? 'F';
+    
+    // Define grade colors for visual indicator
+    final Map<String, Color> gradeColors = {
+      'A': const Color(0xFF4CAF50),   // Green
+      'A-': const Color(0xFF8BC34A),  // Light Green
+      'B+': const Color(0xFFCDDC39),  // Lime
+      'B': const Color(0xFFFFEB3B),   // Yellow
+      'B-': const Color(0xFFFFC107),  // Amber
+      'C+': const Color(0xFFFF9800),  // Orange
+      'C': const Color(0xFFFF5722),   // Deep Orange
+      'C-': const Color(0xFFE91E63),  // Pink
+      'D+': const Color(0xFF9C27B0),  // Purple
+      'D': const Color(0xFF673AB7),   // Deep Purple
+      'D-': const Color(0xFF3F51B5),  // Indigo
+      'F': const Color(0xFFF44336),   // Red
+    };
+    final gradeColor = gradeColors[currentGrade] ?? gradeColors['F']!;
+    
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x29000000),
+              offset: Offset(0, 10),
+              blurRadius: 20,
+            ),
+          ],
+        ),
+        child: Form(
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Grade Dropdown
-              DropdownButtonFormField<String>(
-                value: editedSubject['grade'] as String? ?? 'F',
-                decoration: const InputDecoration(labelText: 'Grade'),
-                items: gradePoints.keys.map((grade) {
-                  return DropdownMenuItem(
-                    value: grade,
-                    child: Text('$grade (${gradePoints[grade]?.toStringAsFixed(1)})'),
-                  );
-                }).toList(),
-                onChanged: (value) => _updateGrade(value ?? 'F'),
+              // Header with close button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: kBlue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.library_books, color: kBlue, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                subjectName,
+                                style: kTextStyleBold,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Subject Code: $subjectCode',
+                          style: const TextStyle(
+                            color: kGrey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(Icons.close, color: kGrey, size: 20),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              const Divider(height: 24),
+              
+              // Grade Section
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: kbabyblue,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.1),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.grade, color: kBlue, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Current Grade',
+                          style: TextStyle(
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const Spacer(),
+                        // Add a visual indicator for the current grade
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: gradeColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: gradeColor, width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                currentGrade,
+                                style: TextStyle(
+                                  color: gradeColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '(${gradePoints[currentGrade]?.toStringAsFixed(1)})',
+                                style: TextStyle(
+                                  color: gradeColor.withOpacity(0.8),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Select grade to update:',
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontSize: 14,
+                        color: kGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Grade selection with visual grade chips
+                    Container(
+                      height: 68,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: kLightGrey),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: gradePoints.keys.map((grade) {
+                            final isSelected = currentGrade == grade;
+                            final gradeColor = gradeColors[grade] ?? Colors.grey;
+                            
+                            return GestureDetector(
+                              onTap: () => _updateGrade(grade),
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? gradeColor.withOpacity(0.2) : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: isSelected ? gradeColor : Colors.grey.withOpacity(0.3),
+                                    width: isSelected ? 1.5 : 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      grade,
+                                      style: TextStyle(
+                                        color: isSelected ? gradeColor : Colors.grey,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '(${gradePoints[grade]?.toStringAsFixed(1)})',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: isSelected ? gradeColor.withOpacity(0.8) : Colors.grey.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
               const SizedBox(height: 16),
               
-              // Score inputs with null safety
-              TextFormField(
-                initialValue: (editedSubject['scores']?['week5'] ?? 0.0).toString(),
-                decoration: const InputDecoration(labelText: '5th Week Score'),
-                keyboardType: TextInputType.number,
-                validator: (value) => _validateScore(value),
-                onSaved: (value) {
-                  editedSubject['scores'] ??= {};
-                  editedSubject['scores']['week5'] = double.parse(value ?? '0');
-                },
+              // Scores Section
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: kLightGrey),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      offset: const Offset(0, 2),
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.assignment, color: kBlue, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Assessment Scores',
+                          style: TextStyle(
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Divider with score legend
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            'Component',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: kGrey,
+                            ),
+                          ),
+                          Text(
+                            'Score (0-100)',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: kGrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // 5th Week Score
+                    buildScoreField(
+                      label: '5th Week Score',
+                      icon: Icons.calendar_today,
+                      initialValue: (editedSubject['scores']?['week5'] ?? 0.0).toString(),
+                      onSaved: (value) {
+                        editedSubject['scores'] ??= {};
+                        editedSubject['scores']['week5'] = double.parse(value ?? '0');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // 10th Week Score
+                    buildScoreField(
+                      label: '10th Week Score',
+                      icon: Icons.calendar_month,
+                      initialValue: (editedSubject['scores']?['week10'] ?? 0.0).toString(),
+                      onSaved: (value) {
+                        editedSubject['scores'] ??= {};
+                        editedSubject['scores']['week10'] = double.parse(value ?? '0');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Coursework Score (conditional)
+                    if (editedSubject['scores']?['coursework'] != null)
+                      Column(
+                        children: [
+                          buildScoreField(
+                            label: 'Coursework Score',
+                            icon: Icons.assignment,
+                            initialValue: (editedSubject['scores']?['coursework'] ?? 0.0).toString(),
+                            onSaved: (value) {
+                              editedSubject['scores'] ??= {};
+                              editedSubject['scores']['coursework'] = double.parse(value ?? '0');
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    
+                    // Lab Score (conditional)
+                    if (editedSubject['scores']?['lab'] != null)
+                      buildScoreField(
+                        label: 'Lab Score',
+                        icon: Icons.science,
+                        initialValue: (editedSubject['scores']?['lab'] ?? 0.0).toString(),
+                        onSaved: (value) {
+                          editedSubject['scores'] ??= {};
+                          editedSubject['scores']['lab'] = double.parse(value ?? '0');
+                        },
+                      ),
+                  ],
+                ),
               ),
-              TextFormField(
-                initialValue: (editedSubject['scores']?['week10'] ?? 0.0).toString(),
-                decoration: const InputDecoration(labelText: '10th Week Score'),
-                keyboardType: TextInputType.number,
-                validator: (value) => _validateScore(value),
-                onSaved: (value) {
-                  editedSubject['scores'] ??= {};
-                  editedSubject['scores']['week10'] = double.parse(value ?? '0');
-                },
-              ),
-              TextFormField(
-                initialValue: (editedSubject['scores']?['coursework'] ?? 0.0).toString(),
-                decoration: const InputDecoration(labelText: 'Coursework Score'),
-                keyboardType: TextInputType.number,
-                validator: (value) => _validateScore(value),
-                onSaved: (value) {
-                  editedSubject['scores'] ??= {};
-                  editedSubject['scores']['coursework'] = double.parse(value ?? '0');
-                },
-              ),
-              TextFormField(
-                initialValue: (editedSubject['scores']?['lab'] ?? 0.0).toString(),
-                decoration: const InputDecoration(labelText: 'Lab Score'),
-                keyboardType: TextInputType.number,
-                validator: (value) => _validateScore(value),
-                onSaved: (value) {
-                  editedSubject['scores'] ??= {};
-                  editedSubject['scores']['lab'] = double.parse(value ?? '0');
-                },
+              
+              const SizedBox(height: 24),
+              
+              // Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: kGrey),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.save, size: 18),
+                    label: const Text('Save Results'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 2,
+                      shadowColor: kBlue.withOpacity(0.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        // Use a local variable for the widget.onSave callback
+                        // to avoid context issues if the widget is disposed
+                        final onSave = widget.onSave;
+                        onSave(editedSubject);
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              _formKey.currentState!.save();
-              widget.onSave(editedSubject);
-            }
-          },
-          child: const Text('Save'),
-        ),
-      ],
+    );
+  }
+
+  Widget buildScoreField({
+    required String label,
+    required IconData icon,
+    required String initialValue,
+    required Function(String?) onSaved,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        prefixIcon: Icon(icon, color: kBlue),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) => _validateScore(value),
+      onSaved: onSaved,
     );
   }
 
