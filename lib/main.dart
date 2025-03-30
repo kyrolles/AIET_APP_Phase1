@@ -18,6 +18,9 @@ import 'package:graduation_project/screens/training/student_training/trianing_de
 import 'package:graduation_project/screens/clinic/doctor_clinic/doctor_clinic_screen.dart';
 import 'package:graduation_project/screens/clinic/doctor_clinic/completed_appointments_screen.dart';
 import 'package:graduation_project/screens/clinic/doctor_clinic/pending_appointments_screen.dart';
+import 'package:graduation_project/services/firebase_storage_service.dart';
+import 'package:graduation_project/utils/firebase_diagnostics.dart';
+import 'package:graduation_project/utils/pdf_migration_utils.dart';
 import 'screens/invoice/student_invoice/invoice_archive_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -31,10 +34,63 @@ void main() async {
   // Check if the user is already logged in
   const storage = FlutterSecureStorage();
   String? token = await storage.read(key: 'token');
+  
+  // Run comprehensive Firebase diagnostics 
+  debugPrint('Running Firebase diagnostics...');
+  final diagnosticResults = await FirebaseDiagnostics.runDiagnostics();
+  debugPrint('Diagnostic results: $diagnosticResults');
+  
+  // Test Firebase Storage access
+  await testFirebaseStorage();
+  
+  // Repair missing file_url fields in Firestore documents
+  await FirebaseDiagnostics.repairMissingFileUrlFields();
+  
+  // Log document statistics
+  await FirebaseDiagnostics.countDocumentsByFieldStatus();
+  
+  // Check if migration has been run before
+  final migrationRun = await storage.read(key: 'pdf_migration_complete');
+  
+  if (migrationRun != 'true' && token != null) {
+    // Run migration in the background
+    _runPdfMigration(storage);
+  }
 
   runApp(MyApp(
     isLoggedIn: token != null,
   ));
+}
+
+/// Test Firebase Storage setup
+Future<void> testFirebaseStorage() async {
+  try {
+    final storageService = FirebaseStorageService();
+    final isAccessible = await storageService.testStorageAccess();
+    
+    debugPrint(isAccessible 
+        ? '✅ Firebase Storage setup successful!' 
+        : '❌ Firebase Storage test failed. Please check your configuration.');
+  } catch (e) {
+    debugPrint('❌ Error testing Firebase Storage: $e');
+  }
+}
+
+/// Run PDF migration in background
+Future<void> _runPdfMigration(FlutterSecureStorage storage) async {
+  try {
+    // Run migration
+    await PdfMigrationUtils.migrateAllRequestPdfs();
+    
+    // Mark migration as complete
+    await storage.write(key: 'pdf_migration_complete', value: 'true');
+    
+    debugPrint('PDF migration completed successfully');
+  } catch (e) {
+    debugPrint('Error during PDF migration: $e');
+    // We don't mark migration as complete if it fails, 
+    // so it will try again on next app start
+  }
 }
 
 class MyApp extends StatelessWidget {

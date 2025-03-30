@@ -4,6 +4,7 @@ import 'package:graduation_project/components/pdf_view.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/utils/file_download_utils.dart';
 
 class TuitionFeesDownload extends StatelessWidget {
   const TuitionFeesDownload({super.key, required this.request});
@@ -51,26 +52,52 @@ class TuitionFeesDownload extends StatelessWidget {
           // ),
           StudentContainer(
             button: (BuildContext context) {
-              return KButton(
-                onPressed: () {
-                  if (request.pdfBase64 != null) {
-                    PDFViewer.open(
-                      context,
-                      request.pdfBase64!,
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('PDF data is not available')),
-                    );
-                  }
-                },
-                text: 'view',
-                backgroundColor: const Color.fromRGBO(6, 147, 241, 1),
-                width: 115,
-                height: 50,
-                fontSize: 16.55,
-                margin: const EdgeInsets.only(top: 8, bottom: 8),
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  KButton(
+                    onPressed: () {
+                      if (request.fileUrl != null && request.fileUrl!.isNotEmpty) {
+                        PDFViewer.openUrl(context, request.fileUrl!);
+                      } else if (request.pdfBase64 != null && request.pdfBase64!.isNotEmpty) {
+                        PDFViewer.open(context, request.pdfBase64!);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('PDF data is not available')),
+                        );
+                      }
+                    },
+                    text: 'View',
+                    backgroundColor: const Color.fromRGBO(6, 147, 241, 1),
+                    width: 60,
+                    height: 50,
+                    fontSize: 14,
+                    margin: const EdgeInsets.only(top: 8, bottom: 8, right: 8),
+                  ),
+                  KButton(
+                    onPressed: () {
+                      if (request.fileUrl != null && request.fileUrl!.isNotEmpty) {
+                        FileDownloadUtils.downloadPdfToDevice(
+                          context, 
+                          request.fileUrl!, 
+                          request.fileName
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Cannot download. File not available in storage.')),
+                        );
+                      }
+                    },
+                    text: 'Download',
+                    backgroundColor: kgreen,
+                    width: 85,
+                    height: 50,
+                    fontSize: 14,
+                    margin: const EdgeInsets.only(top: 8, bottom: 8),
+                  ),
+                ],
               );
             },
             title: request.fileName,

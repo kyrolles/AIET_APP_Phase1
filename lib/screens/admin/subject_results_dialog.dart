@@ -31,7 +31,6 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     'C-': 1.7,
     'D+': 1.3,
     'D': 1.0,
-    'D-': 0.7,
     'F': 0.0,
   };
 
@@ -47,8 +46,16 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     'C-': const Color(0xFFE91E63),  // Pink
     'D+': const Color(0xFF9C27B0),  // Purple
     'D': const Color(0xFF673AB7),   // Deep Purple
-    'D-': const Color(0xFF3F51B5),  // Indigo
     'F': const Color(0xFFF44336),   // Red
+  };
+
+  // Score maximums for each component
+  final Map<String, double> scoreMaximums = {
+    'week5': 8.0,
+    'week10': 12.0,
+    'coursework': 10.0,
+    'lab': 10.0,
+    'finalExam': 60.0,
   };
 
   @override
@@ -63,7 +70,13 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
       'week10': 0.0,
       'coursework': 0.0,
       'lab': 0.0,
+      'finalExam': 0.0,
     };
+    
+    // Ensure finalExam exists (for backward compatibility)
+    if (!(editedSubject['scores'] as Map<String, dynamic>).containsKey('finalExam')) {
+      (editedSubject['scores'] as Map<String, dynamic>)['finalExam'] = 0.0;
+    }
   }
 
   void _updateGrade(String newGrade) {
@@ -79,56 +92,71 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     double week10 = (scores['week10'] as num?)?.toDouble() ?? 0.0;
     double coursework = (scores['coursework'] as num?)?.toDouble() ?? 0.0;
     double lab = (scores['lab'] as num?)?.toDouble() ?? 0.0;
+    double finalExam = (scores['finalExam'] as num?)?.toDouble() ?? 0.0;
     
-    // Normalize the scores to a total of 100
-    double totalScore = 0.0;
-    double week5Weight = 0.2;  // 20%
-    double week10Weight = 0.2; // 20%
+    // Calculate the actual scores using the maximum values
+    week5 = (week5 > scoreMaximums['week5']!) ? scoreMaximums['week5']!.toDouble() : week5;
+    week10 = (week10 > scoreMaximums['week10']!) ? scoreMaximums['week10']!.toDouble() : week10;
+    coursework = (coursework > scoreMaximums['coursework']!) ? scoreMaximums['coursework']!.toDouble() : coursework;
+    lab = (lab > scoreMaximums['lab']!) ? scoreMaximums['lab']!.toDouble() : lab;
+    finalExam = (finalExam > scoreMaximums['finalExam']!) ? scoreMaximums['finalExam']!.toDouble() : finalExam;
     
     bool hasLab = widget.subject['hasLab'] ?? false;
     bool hasCoursework = widget.subject['hasCoursework'] ?? false;
     
-    if (hasLab && hasCoursework) {
-      double labWeight = 0.3;      // 30%
-      double courseworkWeight = 0.3; // 30%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight) + 
-                  (lab * labWeight) + (coursework * courseworkWeight);
-    } else if (hasLab) {
-      double labWeight = 0.6;      // 60%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight) + (lab * labWeight);
-    } else if (hasCoursework) {
-      double courseworkWeight = 0.6; // 60%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight) + (coursework * courseworkWeight);
-    } else {
-      // Adjust weights if no lab or coursework
-      week5Weight = 0.5;  // 50%
-      week10Weight = 0.5; // 50%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight);
+    // Sum up the actual scores
+    double totalScore = week5 + week10 + finalExam;
+    
+    if (hasCoursework) {
+      totalScore += coursework;
     }
     
-    return totalScore;
+    if (hasLab) {
+      totalScore += lab;
+    }
+    
+    // The total possible score depends on which components are present
+    double maxPossibleScore = scoreMaximums['week5']! + 
+                             scoreMaximums['week10']! + 
+                             scoreMaximums['finalExam']!;
+    
+    if (hasCoursework) {
+      maxPossibleScore += scoreMaximums['coursework']!;
+    }
+    
+    if (hasLab) {
+      maxPossibleScore += scoreMaximums['lab']!;
+    }
+    
+    // Convert to percentage (0-100)
+    return (totalScore / maxPossibleScore) * 100;
   }
 
   Color _getScoreColor(double score) {
     if (score >= 90) return gradeColors['A']!;
-    if (score >= 80) return gradeColors['B']!;
-    if (score >= 70) return gradeColors['C']!;
-    if (score >= 60) return gradeColors['D']!;
+    if (score >= 85) return gradeColors['A-']!;
+    if (score >= 82) return gradeColors['B+']!;
+    if (score >= 78) return gradeColors['B']!;
+    if (score >= 75) return gradeColors['B-']!;
+    if (score >= 72) return gradeColors['C+']!;
+    if (score >= 68) return gradeColors['C']!;
+    if (score >= 65) return gradeColors['C-']!;
+    if (score >= 55) return gradeColors['D+']!;
+    if (score >= 50) return gradeColors['D']!;
     return gradeColors['F']!;
   }
 
   String _getRecommendedGrade(double score) {
     if (score >= 90) return 'A';
     if (score >= 85) return 'A-';
-    if (score >= 80) return 'B+';
-    if (score >= 75) return 'B';
-    if (score >= 70) return 'B-';
-    if (score >= 65) return 'C+';
-    if (score >= 60) return 'C';
-    if (score >= 55) return 'C-';
-    if (score >= 50) return 'D+';
-    if (score >= 45) return 'D';
-    if (score >= 40) return 'D-';
+    if (score >= 82) return 'B+';
+    if (score >= 78) return 'B';
+    if (score >= 75) return 'B-';
+    if (score >= 72) return 'C+';
+    if (score >= 68) return 'C';
+    if (score >= 65) return 'C-';
+    if (score >= 55) return 'D+';
+    if (score >= 50) return 'D';
     return 'F';
   }
 
@@ -305,7 +333,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                                     ),
                                   ),
                                   Text(
-                                    '/100',
+                                    '%',
                                     style: TextStyle(
                                       fontFamily: 'Lexend',
                                       fontSize: 14,
@@ -450,13 +478,20 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                       ),
                     ),
                     const Spacer(),
-                    // Info icon with tooltip
-                    Tooltip(
-                      message: 'Scores should be between 0-100',
-                      child: Icon(
-                        Icons.info_outline,
-                        size: 16,
-                        color: kBlue,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: kbabyblue,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Total: 100%',
+                        style: TextStyle(
+                          fontFamily: 'Lexend',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: kBlue,
+                        ),
                       ),
                     ),
                   ],
@@ -533,6 +568,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                 label: 'Week 5',
                 iconData: Icons.calendar_today,
                 value: scores['week5'],
+                maxValue: scoreMaximums['week5']!,
                 onChanged: (value) {
                   setState(() {
                     scores['week5'] = double.tryParse(value) ?? 0.0;
@@ -546,6 +582,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                 label: 'Week 10',
                 iconData: Icons.calendar_month,
                 value: scores['week10'],
+                maxValue: scoreMaximums['week10']!,
                 onChanged: (value) {
                   setState(() {
                     scores['week10'] = double.tryParse(value) ?? 0.0;
@@ -564,6 +601,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                   label: 'Coursework',
                   iconData: Icons.assignment,
                   value: scores['coursework'],
+                  maxValue: scoreMaximums['coursework']!,
                   onChanged: (value) {
                     setState(() {
                       scores['coursework'] = double.tryParse(value) ?? 0.0;
@@ -579,6 +617,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                   label: 'Lab',
                   iconData: Icons.science,
                   value: scores['lab'],
+                  maxValue: scoreMaximums['lab']!,
                   onChanged: (value) {
                     setState(() {
                       scores['lab'] = double.tryParse(value) ?? 0.0;
@@ -614,6 +653,19 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
               ),
           ],
         ),
+        const SizedBox(height: 12),
+        // Final Exam score field
+        _buildScoreField(
+          label: 'Final Exam',
+          iconData: Icons.school,
+          value: scores['finalExam'],
+          maxValue: scoreMaximums['finalExam']!,
+          onChanged: (value) {
+            setState(() {
+              scores['finalExam'] = double.tryParse(value) ?? 0.0;
+            });
+          },
+        ),
       ],
     );
   }
@@ -622,6 +674,7 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     required String label,
     required IconData iconData,
     required dynamic value,
+    required double maxValue,
     required ValueChanged<String> onChanged,
   }) {
     return Container(
@@ -639,12 +692,29 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
               children: [
                 Icon(iconData, size: 16, color: kBlue),
                 const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontFamily: 'Lexend',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontFamily: 'Lexend',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: kbabyblue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'Max: $maxValue',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: kBlue,
+                    ),
                   ),
                 ),
               ],
@@ -654,13 +724,13 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
             padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
             child: TextFormField(
               initialValue: '${value ?? 0.0}',
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                border: OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                border: const OutlineInputBorder(),
                 suffix: Text(
-                  '/100',
-                  style: TextStyle(
+                  '/$maxValue',
+                  style: const TextStyle(
                     fontSize: 12,
                     color: kGrey,
                   ),
@@ -679,8 +749,8 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
                 if (score == null) {
                   return 'Invalid number';
                 }
-                if (score < 0 || score > 100) {
-                  return 'Range: 0-100';
+                if (score < 0 || score > maxValue) {
+                  return 'Range: 0-$maxValue';
                 }
                 return null;
               },

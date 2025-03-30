@@ -5,6 +5,7 @@ class Request {
   final String comment;
   final String fileName;
   String? pdfBase64;
+  String? fileUrl;
   final bool stamp;
   final String status;
   final String studentId;
@@ -14,19 +15,21 @@ class Request {
   final String year;
   final Timestamp createdAt;
 
-  Request(
-      {required this.addressedTo,
-      required this.comment,
-      required this.fileName,
-      required this.pdfBase64,
-      required this.stamp,
-      required this.status,
-      required this.studentId,
-      required this.studentName,
-      required this.trainingScore,
-      required this.type,
-      required this.year,
-      required this.createdAt});
+  Request({
+    required this.addressedTo,
+    required this.comment,
+    required this.fileName,
+    this.pdfBase64,
+    this.fileUrl,
+    required this.stamp,
+    required this.status,
+    required this.studentId,
+    required this.studentName,
+    required this.trainingScore,
+    required this.type,
+    required this.year,
+    required this.createdAt,
+  });
 
   factory Request.fromJson(json) {
     return Request(
@@ -34,6 +37,7 @@ class Request {
       comment: json['comment'],
       fileName: json['file_name'],
       pdfBase64: json['pdfBase64'],
+      fileUrl: json['file_url'],
       stamp: json['stamp'],
       status: json['status'],
       studentId: json['student_id'],
