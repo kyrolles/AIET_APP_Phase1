@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../components/kbutton.dart';
+import '../../components/my_app_bar.dart';
 import '../../constants.dart';
 import '../../services/results_service.dart';
 import 'subject_results_dialog.dart';
@@ -25,6 +26,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   String selectedAcademicYear = 'All';
   List<String> academicYears = ['All', 'GN', '1st', '2nd', '3rd', '4th'];
   Set<String> selectedStudentIds = {};
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // For bulk operations
   bool _isBulkMode = false;
@@ -748,277 +750,108 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Assign Results"),
-        titleTextStyle: kTextStyleBold,
-        elevation: 0,
-        backgroundColor: Colors.white,
+      key: _scaffoldKey,
+      backgroundColor: Colors.white,
+      appBar: MyAppBar(
+        title: 'Results Management',
+        onpressed: () => Navigator.pop(context),
         actions: [
-          // Template management
           IconButton(
-            icon: const Icon(Icons.assignment, color: kBlue),
-            onPressed: () {
-              if (!context.mounted) return;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SemesterTemplateScreen(
-                    department: selectedDepartment,
-                    semester: selectedSemester,
-                  ),
-                ),
-              );
-            },
-            tooltip: 'Manage Templates',
+            icon: const Icon(Icons.settings, color: kBlue),
+            onPressed: _showSettingsMenu,
           ),
-          // Subjects management
-          IconButton(
-            icon: const Icon(Icons.library_books, color: kBlue),
-            onPressed: () {
-              if (!context.mounted) return;
-              if (selectedDepartment == 'All') {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Please select a department first')),
-                );
-                return;
-              }
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DepartmentSubjectsScreen(
-                    department: selectedDepartment,
-                  ),
-                ),
-              );
-            },
-            tooltip: 'Manage Subjects',
-          ),
-          const SizedBox(width: 8),
         ],
       ),
+      floatingActionButton: _isBulkMode
+          ? FloatingActionButton.extended(
+              backgroundColor: kBlue,
+              onPressed: () => _processBulkOperation(),
+              icon: const Icon(Icons.check, color: Colors.white),
+              label: const Text(
+                'Apply',
+                style: TextStyle(color: Colors.white, fontFamily: 'Lexend'),
+              ),
+            )
+          : null,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Filters section
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0D000000),
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ],
+          _buildFilters(),
+          if (_isBulkMode) _buildBulkOperationBar(),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: getStudentsStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: kBlue),
+                  );
+                }
+
+                final students = filterStudents(snapshot.data!.docs);
+
+                if (students.isEmpty) {
+                  return _buildEmptyState();
+                }
+
+                return _buildStudentsList(students);
+              },
             ),
-            margin: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: kbabyblue,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.filter_list, color: kBlue),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Filters',
-                      style: TextStyle(
-                        fontFamily: 'Lexend',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: kBlue,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                // First row - Department and Semester
-                Row(
-                  children: [
-                    // Department dropdown
-                    Expanded(
-                      child: _buildDropdownField(
-                        icon: Icons.business,
-                        label: 'Department',
-                        child: DropdownButtonFormField<String>(
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kLightGrey),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kBlue),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                          ),
-                          value: selectedDepartment,
-                          items: departments.map((String department) {
-                            return DropdownMenuItem<String>(
-                              value: department,
-                              child: Text(
-                                department,
-                                style: const TextStyle(
-                                  fontFamily: 'Lexend',
-                                  fontSize: 14,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            setState(() {
-                              selectedDepartment = value!;
-                              if (selectedStudentIds.isNotEmpty) {
-                                selectedStudentIds.clear();
-                              }
-                            });
-                          },
-                          dropdownColor: Colors.white,
-                          icon: const Icon(Icons.arrow_drop_down, color: kBlue),
-                          isExpanded: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Semester dropdown
-                    Expanded(
-                      child: _buildDropdownField(
-                        icon: Icons.event_note,
-                        label: 'Semester',
-                        child: DropdownButtonFormField<int>(
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kLightGrey),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kBlue),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                          ),
-                          value: selectedSemester,
-                          items: List.generate(10, (index) => index + 1)
-                              .map((int semester) {
-                            return DropdownMenuItem<int>(
-                              value: semester,
-                              child: Text(
-                                'Semester $semester',
-                                style: const TextStyle(
-                                  fontFamily: 'Lexend',
-                                  fontSize: 14,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (int? value) {
-                            setState(() {
-                              selectedSemester = value!;
-                            });
-                          },
-                          dropdownColor: Colors.white,
-                          icon: const Icon(Icons.arrow_drop_down, color: kBlue),
-                          isExpanded: true,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Second row - Academic Year and Search
-                Row(
-                  children: [
-                    // Academic year dropdown
-                    Expanded(
-                      child: _buildDropdownField(
-                        icon: Icons.school,
-                        label: 'Academic Year',
-                        child: DropdownButtonFormField<String>(
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kLightGrey),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kBlue),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                          ),
-                          value: selectedAcademicYear,
-                          items: academicYears.map((String year) {
-                            return DropdownMenuItem<String>(
-                              value: year,
-                              child: Text(
-                                year,
-                                style: const TextStyle(
-                                  fontFamily: 'Lexend',
-                                  fontSize: 14,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            setState(() {
-                              selectedAcademicYear = value!;
-                              if (selectedStudentIds.isNotEmpty) {
-                                selectedStudentIds.clear();
-                              }
-                            });
-                          },
-                          dropdownColor: Colors.white,
-                          icon: const Icon(Icons.arrow_drop_down, color: kBlue),
-                          isExpanded: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Search field
-                    Expanded(
-                      child: _buildDropdownField(
-                        icon: Icons.search,
-                        label: 'Search Students',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: kGreyLight),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: kGrey, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
                         child: TextField(
                           controller: _searchController,
-                          decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: kLightGrey),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: kBlue),
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                            hintText: 'Type to search...',
-                            hintStyle: const TextStyle(
+                          decoration: const InputDecoration(
+                            hintText: 'Search students...',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(
                               color: kGrey,
                               fontSize: 14,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.clear, size: 18),
-                              onPressed: () {
-                                setState(() {
-                                  _searchController.clear();
-                                  _searchQuery = '';
-                                });
-                              },
+                              fontFamily: 'Lexend',
                             ),
                           ),
                           style: const TextStyle(
@@ -1032,571 +865,62 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                           },
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Bulk actions toggle and controls
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            padding: EdgeInsets.symmetric(
-              horizontal: 16, 
-              vertical: _isBulkMode ? 12 : 8,
-            ),
-            decoration: BoxDecoration(
-              color: _isBulkMode ? kbabyblue : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: _isBulkMode ? kShadow : null,
-              border: Border.all(
-                color: _isBulkMode ? kBlue.withOpacity(0.3) : kLightGrey,
-                width: _isBulkMode ? 1.0 : 1.0,
-              ),
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                // Icon container
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _isBulkMode ? kBlue.withOpacity(0.2) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    _isBulkMode ? Icons.group_work : Icons.group_outlined,
-                    color: _isBulkMode ? kBlue : kGrey,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Title text
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isBulkMode ? 'Bulk Mode' : 'Student Results',
-                        style: TextStyle(
-                          fontFamily: 'Lexend',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                          color: _isBulkMode ? kBlue : kGrey,
-                        ),
-                      ),
-                      if (_isBulkMode)
-                        Text(
-                          '${selectedStudentIds.length} students selected',
-                          style: const TextStyle(
-                            fontFamily: 'Lexend',
-                            fontSize: 12,
-                            color: kGrey,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                // Action controls with animations
-                if (_isBulkMode) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: kLightGrey),
-                    ),
-                    child: DropdownButton<String>(
-                      value: _bulkOperationType,
-                      underline: const SizedBox(),
-                      icon: const Icon(Icons.arrow_drop_down, color: kBlue, size: 18),
-                      items: _bulkOperations.map((String operation) {
-                        return DropdownMenuItem<String>(
-                          value: operation,
-                          child: Text(
-                            operation,
-                            style: const TextStyle(
-                              fontFamily: 'Lexend',
-                              fontSize: 13,
-                              color: kGrey,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          _bulkOperationType = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  AnimatedOpacity(
-                    opacity: _bulkOperationType != 'Select Operation' ? 1.0 : 0.6,
-                    duration: const Duration(milliseconds: 300),
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.play_arrow, size: 16),
-                      label: const Text(
-                        'Apply',
-                        style: TextStyle(
-                          fontFamily: 'Lexend',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kBlue,
-                        foregroundColor: Colors.white,
-                        elevation: _bulkOperationType != 'Select Operation' ? 2 : 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                        minimumSize: const Size(0, 32),
-                      ),
-                      onPressed: _processBulkOperation,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 18),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: kGrey,
-                      padding: const EdgeInsets.all(6),
-                      minimumSize: const Size(32, 32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: const BorderSide(color: kLightGrey, width: 1),
-                      ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isBulkMode = false;
-                        selectedStudentIds.clear();
-                      });
-                    },
-                  ),
-                ] else
-                  TextButton.icon(
-                    icon: const Icon(Icons.add, size: 16),
-                    label: const Text(
-                      'Bulk Mode',
-                      style: TextStyle(
-                        fontFamily: 'Lexend',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      foregroundColor: kBlue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(color: kBlue.withOpacity(0.5)),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isBulkMode = true;
-                        _bulkOperationType = 'Select Operation';
-                      });
-                    },
-                  ),
-              ],
-            ),
-          ),
-
-          // Students list
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: getStudentsStream(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(
-                          color: kBlue,
-                          strokeWidth: 3,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Loading students...',
-                          style: TextStyle(
-                            fontFamily: 'Lexend',
-                            fontSize: 14,
-                            color: kGrey.withOpacity(0.8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error: ${snapshot.error.toString()}',
-                          style: const TextStyle(
-                            fontFamily: 'Lexend',
-                            fontSize: 14,
-                            color: Colors.red,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.people_alt_outlined,
-                          color: kGrey.withOpacity(0.6),
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No students found',
-                          style: TextStyle(
-                            fontFamily: 'Lexend',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: kGrey.withOpacity(0.8),
-                          ),
-                        ),
-                        if (_searchQuery.isNotEmpty || selectedDepartment != 'All' || selectedAcademicYear != 'All')
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              'Try adjusting your filters',
-                              style: TextStyle(
-                                fontFamily: 'Lexend',
-                                fontSize: 14,
-                                color: kGrey.withOpacity(0.7),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  );
-                }
-
-                final docs = filterStudents(snapshot.data!.docs);
-
-                if (docs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          color: kGrey.withOpacity(0.6),
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No matches found',
-                          style: TextStyle(
-                            fontFamily: 'Lexend',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: kGrey.withOpacity(0.8),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            'Try a different search term or filter',
-                            style: TextStyle(
-                              fontFamily: 'Lexend',
-                              fontSize: 14,
-                              color: kGrey.withOpacity(0.7),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return Container(
-                  margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x0D000000),
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Header with count
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Students (${docs.length})',
-                              style: const TextStyle(
-                                fontFamily: 'Lexend',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: kBlue,
-                              ),
-                            ),
-                            const Spacer(),
-                            if (_isBulkMode && selectedStudentIds.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: kbabyblue,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.check_circle,
-                                      color: kBlue,
-                                      size: 16,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${selectedStudentIds.length} selected',
-                                      style: const TextStyle(
-                                        fontFamily: 'Lexend',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: kBlue,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      // Divider
-                      const Divider(height: 1),
-                      // Students ListView
-                      Expanded(
-                        child: ListView.separated(
-                          itemCount: docs.length,
-                          separatorBuilder: (context, index) => const Divider(height: 1, indent: 16, endIndent: 16),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemBuilder: (context, index) {
-                            final userData = docs[index].data() as Map<String, dynamic>;
-                            final firstName = userData['firstName'] as String? ?? 'No Name';
-                            final lastName = userData['lastName'] as String? ?? '';
-                            final studentId = docs[index].id;
-                            final department = userData['department'] as String? ?? 'No Dept';
-                            final academicYear = userData['academicYear'] as String? ?? '';
-                            final isSelected = selectedStudentIds.contains(studentId);
-                            
-                            // First letter of name for avatar
-                            final avatarText = firstName.isNotEmpty ? firstName[0].toUpperCase() : 'S';
-                            
-                            // Generate a consistent color based on the name
-                            final colorIndex = (firstName.isNotEmpty ? firstName.codeUnitAt(0) : 0) % 5;
-                            final List<Color> avatarColors = [
-                              const Color(0xFF5E35B1), // Deep Purple
-                              const Color(0xFF00897B), // Teal
-                              const Color(0xFF039BE5), // Light Blue
-                              const Color(0xFFD81B60), // Pink
-                              const Color(0xFF6D4C41), // Brown
-                            ];
-                            final avatarColor = avatarColors[colorIndex];
-
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(
-                                  color: isSelected ? kBlue : Colors.transparent,
-                                  width: isSelected ? 1.5 : 0,
-                                ),
-                              ),
-                              color: isSelected ? kbabyblue.withOpacity(0.3) : Colors.white,
-                              elevation: 0,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(12),
-                                onTap: _isBulkMode
-                                    ? () {
-                                        setState(() {
-                                          if (isSelected) {
-                                            selectedStudentIds.remove(studentId);
-                                          } else {
-                                            selectedStudentIds.add(studentId);
-                                          }
-                                        });
-                                      }
-                                    : null,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      if (_isBulkMode)
-                                        Checkbox(
-                                          value: isSelected,
-                                          activeColor: kBlue,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          onChanged: (bool? value) {
-                                            setState(() {
-                                              if (value == true) {
-                                                selectedStudentIds.add(studentId);
-                                              } else {
-                                                selectedStudentIds.remove(studentId);
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      // Student avatar
-                                      CircleAvatar(
-                                        radius: 20,
-                                        backgroundColor: avatarColor,
-                                        child: Text(
-                                          avatarText,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '$firstName $lastName',
-                                              style: const TextStyle(
-                                                fontFamily: 'Lexend',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 8, 
-                                                    vertical: 2,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: kBlue.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: Text(
-                                                    department,
-                                                    style: TextStyle(
-                                                      fontFamily: 'Lexend',
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: kBlue.withOpacity(0.8),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 8, 
-                                                    vertical: 2,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: kOrange.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: Text(
-                                                    academicYear,
-                                                    style: TextStyle(
-                                                      fontFamily: 'Lexend',
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: kOrange.withOpacity(0.8),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      if (!_isBulkMode)
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            KButton(
-                                              text: 'Assign',
-                                              onPressed: () =>
-                                                  assignResultsForStudent(
-                                                      context, studentId),
-                                              backgroundColor: kBlue,
-                                              textColor: Colors.white,
-                                              width: 90,
-                                              height: 36,
-                                              fontSize: 13,
-                                              borderRadius: 8,
-                                              icon: Icons.assignment,
-                                              elevated: true,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            KButton(
-                                              text: 'Grades',
-                                              onPressed: () =>
-                                                  _assignGradesForStudent(
-                                                      context, studentId),
-                                              backgroundColor: Colors.white,
-                                              textColor: kBlue,
-                                              width: 90,
-                                              height: 36,
-                                              fontSize: 13,
-                                              borderColor: kBlue,
-                                              borderWidth: 1,
-                                              borderRadius: 8,
-                                              icon: Icons.grade,
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
+                      if (_searchQuery.isNotEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.clear, size: 18, color: kGrey),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
                           },
                         ),
-                      ),
                     ],
                   ),
-                );
-              },
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: Icon(
+                  _isBulkMode ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+                  color: kBlue,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isBulkMode = !_isBulkMode;
+                    if (!_isBulkMode) {
+                      selectedStudentIds.clear();
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip(
+                  label: 'Department: $selectedDepartment',
+                  icon: Icons.school,
+                  onTap: _showDepartmentPicker,
+                ),
+                const SizedBox(width: 8),
+                _buildFilterChip(
+                  label: 'Year: $selectedAcademicYear',
+                  icon: Icons.calendar_today,
+                  onTap: _showAcademicYearPicker,
+                ),
+                const SizedBox(width: 8),
+                _buildFilterChip(
+                  label: 'Semester: $selectedSemester',
+                  icon: Icons.book,
+                  onTap: _showSemesterPicker,
+                ),
+              ],
             ),
           ),
         ],
@@ -1604,38 +928,835 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     );
   }
 
-  Widget _buildDropdownField({
-    required IconData icon,
+  Widget _buildFilterChip({
     required String label,
-    required Widget child,
+    required IconData icon,
+    required VoidCallback onTap,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: kbabyblue,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kBlue.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: kBlue),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: kBlue,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Lexend',
+              ),
+            ),
+            const SizedBox(width: 2),
+            Icon(Icons.arrow_drop_down, size: 16, color: kBlue),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBulkOperationBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: kbabyblue,
+      child: Row(
+        children: [
+          Text(
+            'Bulk Operation: ',
+            style: TextStyle(
+              color: kBlue,
+              fontFamily: 'Lexend',
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: kBlue.withOpacity(0.3)),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _bulkOperationType,
+                  icon: const Icon(Icons.arrow_drop_down, color: kBlue),
+                  elevation: 2,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontFamily: 'Lexend',
+                    fontSize: 14,
+                  ),
+                  isExpanded: true,
+                  dropdownColor: Colors.white,
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _bulkOperationType = newValue;
+                      });
+                    }
+                  },
+                  items: _bulkOperations
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${selectedStudentIds.length} selected',
+            style: TextStyle(
+              color: kBlue,
+              fontFamily: 'Lexend',
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.people_outline,
+            size: 80,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No students found',
+            style: kTextStyleBold.copyWith(color: kGrey),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try adjusting your filters',
+            style: TextStyle(
+              color: kGrey,
+              fontFamily: 'Lexend',
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentsList(List<QueryDocumentSnapshot> students) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: students.length,
+      itemBuilder: (context, index) {
+        final studentData = students[index].data() as Map<String, dynamic>;
+        final studentId = students[index].id;
+        final bool isSelected = selectedStudentIds.contains(studentId);
+        
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: isSelected ? kBlue : kGreyLight,
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => _viewStudentResults(studentId, studentData),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  if (_isBulkMode)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              selectedStudentIds.remove(studentId);
+                            } else {
+                              selectedStudentIds.add(studentId);
+                            }
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? kBlue : kGreyLight,
+                              width: 2,
+                            ),
+                            color: isSelected ? kBlue : Colors.transparent,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Colors.white,
+                                )
+                              : const SizedBox(width: 14, height: 14),
+                        ),
+                      ),
+                    ),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: kbabyblue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${studentData['firstName']?[0] ?? ''}${studentData['lastName']?[0] ?? ''}',
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.bold,
+                        color: kBlue,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${studentData['firstName'] ?? ''} ${studentData['lastName'] ?? ''}',
+                          style: const TextStyle(
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'ID: ${studentData['id'] ?? 'Unknown'}',
+                          style: const TextStyle(
+                            color: kGrey,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            _buildInfoChip(
+                              label: studentData['department'] ?? 'Unknown',
+                              color: kPrimaryColor,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildInfoChip(
+                              label: studentData['academicYear'] ?? 'Unknown',
+                              color: kOrange,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildStudentActions(studentId, studentData),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoChip({required String label, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentActions(String studentId, Map<String, dynamic> studentData) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Row(
+        IconButton(
+          icon: const Icon(Icons.assignment, color: kBlue, size: 20),
+          tooltip: 'Assign Subjects',
+          onPressed: () => assignResultsForStudent(context, studentId),
+        ),
+        IconButton(
+          icon: const Icon(Icons.grade, color: kOrange, size: 20),
+          tooltip: 'Update Grades',
+          onPressed: () => _assignGradesForStudent(context, studentId),
+        ),
+      ],
+    );
+  }
+
+  void _showSettingsMenu() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: kbabyblue,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.library_books, color: kBlue),
+              ),
+              title: const Text(
+                'Manage Semester Template',
+                style: TextStyle(fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SemesterTemplateScreen(
+                      department: selectedDepartment == 'All' ? 'General' : selectedDepartment,
+                      semester: selectedSemester,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: kOrange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.subject, color: kOrange),
+              ),
+              title: const Text(
+                'Manage Department Subjects',
+                style: TextStyle(fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DepartmentSubjectsScreen(
+                      department: selectedDepartment == 'All' ? 'General' : selectedDepartment,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: kgreen.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.import_export, color: kgreen),
+              ),
+              title: const Text(
+                'Export/Import Results',
+                style: TextStyle(fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                // Add export/import functionality
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDepartmentPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Text(
+                'Select Department',
+                style: kTextStyleBold,
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: departments.length,
+                itemBuilder: (context, index) {
+                  final department = departments[index];
+                  final isSelected = selectedDepartment == department;
+                  
+                  return ListTile(
+                    leading: isSelected
+                        ? const Icon(Icons.check_circle, color: kBlue)
+                        : const Icon(Icons.circle_outlined, color: kGrey),
+                    title: Text(
+                      department,
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? kBlue : Colors.black,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        selectedDepartment = department;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAcademicYearPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Text(
+                'Select Academic Year',
+                style: kTextStyleBold,
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: academicYears.length,
+                itemBuilder: (context, index) {
+                  final year = academicYears[index];
+                  final isSelected = selectedAcademicYear == year;
+                  
+                  return ListTile(
+                    leading: isSelected
+                        ? const Icon(Icons.check_circle, color: kBlue)
+                        : const Icon(Icons.circle_outlined, color: kGrey),
+                    title: Text(
+                      year,
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? kBlue : Colors.black,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        selectedAcademicYear = year;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSemesterPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Text(
+                'Select Semester',
+                style: kTextStyleBold,
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  final semester = index + 1;
+                  final isSelected = selectedSemester == semester;
+                  
+                  return ListTile(
+                    leading: isSelected
+                        ? const Icon(Icons.check_circle, color: kBlue)
+                        : const Icon(Icons.circle_outlined, color: kGrey),
+                    title: Text(
+                      'Semester $semester',
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? kBlue : Colors.black,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        selectedSemester = semester;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _viewStudentResults(String studentId, Map<String, dynamic> studentData) async {
+    final results = await _resultsService.getSemesterResults(
+      studentId,
+      selectedSemester.toString(),
+    );
+
+    if (!mounted) return;
+
+    if (results == null || (results['subjects'] as List?)?.isEmpty == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No results found for this semester'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final subjects = results['subjects'] as List<dynamic>;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (context, scrollController) => Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 16, color: kBlue),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontFamily: 'Lexend',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: kGrey,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: kbabyblue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${studentData['firstName']?[0] ?? ''}${studentData['lastName']?[0] ?? ''}',
+                      style: const TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.bold,
+                        color: kBlue,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${studentData['firstName'] ?? ''} ${studentData['lastName'] ?? ''}',
+                          style: kTextStyleBold,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Semester $selectedSemester Results',
+                          style: const TextStyle(
+                            color: kGrey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: kbabyblue,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_graph, color: kBlue, size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'GPA: ',
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w600,
+                        color: kBlue,
+                      ),
+                    ),
+                    Text(
+                      _calculateGPA(subjects).toStringAsFixed(2),
+                      style: const TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: kBlue,
+                      ),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'Credits: ',
+                      style: TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w600,
+                        color: kBlue,
+                      ),
+                    ),
+                    Text(
+                      _calculateTotalCredits(subjects).toStringAsFixed(0),
+                      style: const TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: kBlue,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'Subject Results',
+                  style: TextStyle(
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: subjects.length,
+                  itemBuilder: (context, index) {
+                    final subject = subjects[index];
+                    final grade = subject['grade'] as String? ?? 'F';
+                    
+                    // Define grade colors
+                    final Map<String, Color> gradeColors = {
+                      'A': const Color(0xFF4CAF50),
+                      'A-': const Color(0xFF8BC34A),
+                      'B+': const Color(0xFFCDDC39),
+                      'B': const Color(0xFFFFEB3B),
+                      'B-': const Color(0xFFFFC107),
+                      'C+': const Color(0xFFFF9800),
+                      'C': const Color(0xFFFF5722),
+                      'C-': const Color(0xFFE91E63),
+                      'D+': const Color(0xFF9C27B0),
+                      'D': const Color(0xFF673AB7),
+                      'D-': const Color(0xFF3F51B5),
+                      'F': const Color(0xFFF44336),
+                    };
+                    final gradeColor = gradeColors[grade] ?? gradeColors['F']!;
+                    
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => _showSubjectResultsDialog(
+                          context,
+                          studentId,
+                          Map<String, dynamic>.from(subject),
+                          index,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: kGreyLight),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      subject['name'],
+                                      style: const TextStyle(
+                                        fontFamily: 'Lexend',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Code: ${subject['code']} • Credits: ${subject['credits']}',
+                                      style: const TextStyle(
+                                        color: kGrey,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: gradeColor.withOpacity(0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  grade,
+                                  style: TextStyle(
+                                    fontFamily: 'Lexend',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: gradeColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
-        SizedBox(
-          height: 40,
-          child: child,
-        ),
-      ],
+      ),
     );
+  }
+
+  double _calculateGPA(List<dynamic> subjects) {
+    if (subjects.isEmpty) return 0.0;
+    
+    double totalPoints = 0;
+    double totalCredits = 0;
+    
+    for (final subject in subjects) {
+      final credits = (subject['credits'] as num?)?.toDouble() ?? 0;
+      final points = (subject['points'] as num?)?.toDouble() ?? 0;
+      
+      totalPoints += credits * points;
+      totalCredits += credits;
+    }
+    
+    return totalCredits > 0 ? totalPoints / totalCredits : 0;
+  }
+
+  int _calculateTotalCredits(List<dynamic> subjects) {
+    return subjects.fold(0, (total, subject) => 
+      total + ((subject['credits'] as num?)?.toInt() ?? 0));
+  }
+
+  Future<void> _executeBulkOperation() async {
+    if (selectedStudentIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No students selected'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_bulkOperationType == 'Select Operation') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an operation'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Implement bulk operations
+    // ...
   }
 }
 
