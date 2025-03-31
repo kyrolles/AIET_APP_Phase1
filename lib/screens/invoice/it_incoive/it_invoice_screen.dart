@@ -4,6 +4,8 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/utils/safe_json_extractor.dart';
+import 'dart:developer';
 import '../../../components/my_app_bar.dart';
 
 class ItInvoiceScreen extends StatefulWidget {
@@ -35,11 +37,19 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
           if (snapshot.hasData) {
             requestsList = [];
             for (var i = 0; i < snapshot.data!.docs.length; i++) {
-              if ((snapshot.data!.docs[i]['type'] == 'Proof of enrollment' ||
-                      snapshot.data!.docs[i]['type'] == 'Tuition Fees') &&
-                  (snapshot.data!.docs[i]['status'] == 'Pending' ||
-                      snapshot.data!.docs[i]['status'] == 'No Status')) {
-                requestsList.add(Request.fromJson(snapshot.data!.docs[i]));
+              DocumentSnapshot doc = snapshot.data!.docs[i];
+              
+              // Safely get fields using utility
+              String docType = SafeDocumentSnapshot.getField(doc, 'type', '');
+              String docStatus = SafeDocumentSnapshot.getField(doc, 'status', '');
+              
+              if ((docType == 'Proof of enrollment' || docType == 'Tuition Fees') &&
+                  (docStatus == 'Pending' || docStatus == 'No Status')) {
+                try {
+                  requestsList.add(Request.fromJson(doc));
+                } catch (e) {
+                  log('Error parsing request: $e');
+                }
               }
             }
           }

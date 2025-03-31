@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/services/storage_service.dart';
 import 'package:path/path.dart' as path;
 
 import 'it_invoice_request_contanier.dart';
@@ -31,6 +32,8 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
   bool _isLoading = false;
   String? fileName;
   Map<String, dynamic>? userData;
+  File? _selectedFile;
+  final StorageService _storageService = StorageService();
 
   @override
   void initState() {
@@ -63,13 +66,13 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
           .where('role', isEqualTo: 'Student')
           .where('id', isEqualTo: widget.request.studentId)
           .get();
+      
+      if (data.docs.isEmpty) {
+        throw 'Student not found in database';
+      }
+      
       userData = data.docs.first.data();
-      // log('User doc: ${data.docs.first['id']}');
-      // if (userData.exists) {
-      //   setState(() {
-      //     userData = userDoc.data();
-      //   });
-      // }
+      log('Fetched user data: $userData');
     } catch (e) {
       _showCustomSnackBar('Error fetching user data: $e', isError: true);
     }
@@ -82,7 +85,7 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
     });
     try {
       // Validate inputs
-      if (pdfBase64 == null || pdfBase64!.isEmpty) {
+      if (_selectedFile == null) {
         throw 'Please upload a PDF file';
       }
       if (fileName == null || fileName!.isEmpty) {
@@ -91,13 +94,19 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       if (userData == null) {
         throw 'User data not available';
       }
+      
       // Get user data
       final String studentId = userData!['id'] ?? '';
       final String firstName = userData!['firstName'] ?? '';
       final String lastName = userData!['lastName'] ?? '';
       final String studentName = '$firstName$lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
+      
+      // Get user UID for storage folder - fallback to student ID if no UID found
+      final String uid = userData!['uid'] ?? userData!['user_uid'] ?? studentId;
+      
       log('Student ID: $studentId');
+      
       // Validate required fields
       if (studentId.isEmpty) {
         throw 'Student ID not found';
@@ -108,6 +117,20 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       if (academicYear.isEmpty) {
         throw 'Academic year not found';
       }
+      
+      log('Using UID for storage: $uid');
+      
+      // Upload to Firebase Storage
+      final String downloadUrl = await _storageService.uploadFile(
+        file: _selectedFile!,
+        studentUid: uid,
+        customFileName: fileName,
+      );
+      
+      // For backward compatibility, also save as base64
+      final bytes = await _selectedFile!.readAsBytes();
+      final base64String = base64Encode(bytes);
+      
       // Save to Firestore
       updateDocument(
         collectionPath: 'requests',
@@ -118,10 +141,12 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
         },
         newData: {
           'file_name': fileName,
-          'pdfBase64': pdfBase64,
+          'pdfBase64': base64String,
           'status': 'Done',
+          'file_storage_url': downloadUrl, // Add the download URL
         },
       );
+      
       Navigator.pop(context);
       _showCustomSnackBar('PDF uploaded successfully!');
     } catch (e) {
@@ -173,17 +198,21 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
                       // Get file name from path
                       setState(() {
                         fileName = path.basename(file.path!);
+                        _selectedFile = File(file.path!);
                       });
-                      final bytes = await File(file.path!).readAsBytes();
+                      
+                      // Also store base64 for backward compatibility
+                      final bytes = await _selectedFile!.readAsBytes();
                       final base64String = base64Encode(bytes);
                       setState(() {
                         pdfBase64 = base64String;
                       });
+                      
                       // Show filename in a snackbar
                       _showCustomSnackBar('Selected file: $fileName');
                     }
                   } catch (e) {
-                    _showCustomSnackBar('Error encoding PDF: $e',
+                    _showCustomSnackBar('Error processing file: $e',
                         isError: true);
                   }
                 },

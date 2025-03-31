@@ -13,37 +13,41 @@ class Request {
   final String type;
   final String year;
   final Timestamp createdAt;
+  final String? fileStorageUrl;
 
-  Request(
-      {required this.addressedTo,
-      required this.comment,
-      required this.fileName,
-      required this.pdfBase64,
-      required this.stamp,
-      required this.status,
-      required this.studentId,
-      required this.studentName,
-      required this.trainingScore,
-      required this.type,
-      required this.year,
-      required this.createdAt});
+  Request({
+    required this.addressedTo,
+    required this.comment,
+    required this.fileName,
+    this.pdfBase64,
+    required this.stamp,
+    required this.status,
+    required this.studentId,
+    required this.studentName,
+    required this.trainingScore,
+    required this.type,
+    required this.year,
+    required this.createdAt,
+    this.fileStorageUrl,
+  });
 
   factory Request.fromJson(json) {
     return Request(
-      addressedTo: json['addressed_to'],
-      comment: json['comment'],
-      fileName: json['file_name'],
+      addressedTo: json['addressed_to'] ?? '',
+      comment: json['comment'] ?? '',
+      fileName: json['file_name'] ?? '',
       pdfBase64: json['pdfBase64'],
-      stamp: json['stamp'],
-      status: json['status'],
-      studentId: json['student_id'],
-      studentName: json['student_name'],
+      stamp: json['stamp'] ?? false,
+      status: json['status'] ?? 'No Status',
+      studentId: json['student_id'] ?? '',
+      studentName: json['student_name'] ?? '',
       trainingScore: json['training_score'] is int
           ? json['training_score']
-          : int.tryParse(json['training_score']) ?? 0,
-      type: json['type'],
-      year: json['year'],
-      createdAt: json['created_at'],
+          : int.tryParse(json['training_score'] ?? '0') ?? 0,
+      type: json['type'] ?? '',
+      year: json['year'] ?? '',
+      createdAt: json['created_at'] ?? Timestamp.now(),
+      fileStorageUrl: json['file_storage_url'],
     );
   }
 }
