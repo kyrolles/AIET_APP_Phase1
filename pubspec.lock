@@ -169,6 +169,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  device_info_plus:
+    dependency: "direct main"
+    description:
+      name: device_info_plus
+      sha256: "72d146c6d7098689ff5c5f66bcf593ac11efc530095385356e131070333e64da"
+      url: "https://pub.dev"
+    source: hosted
+    version: "11.3.0"
+  device_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: device_info_plus_platform_interface
+      sha256: "0b04e02b30791224b31969eb1b50d723498f402971bff3630bca2ba839bd1ed2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.2"
   fake_async:
     dependency: transitive
     description:
@@ -632,6 +648,70 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  open_file:
+    dependency: "direct main"
+    description:
+      name: open_file
+      sha256: d17e2bddf5b278cb2ae18393d0496aa4f162142ba97d1a9e0c30d476adf99c0e
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.10"
+  open_file_android:
+    dependency: transitive
+    description:
+      name: open_file_android
+      sha256: "58141fcaece2f453a9684509a7275f231ac0e3d6ceb9a5e6de310a7dff9084aa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6"
+  open_file_ios:
+    dependency: transitive
+    description:
+      name: open_file_ios
+      sha256: "02996f01e5f6863832068e97f8f3a5ef9b613516db6897f373b43b79849e4d07"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  open_file_linux:
+    dependency: transitive
+    description:
+      name: open_file_linux
+      sha256: d189f799eecbb139c97f8bc7d303f9e720954fa4e0fa1b0b7294767e5f2d7550
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.5"
+  open_file_mac:
+    dependency: transitive
+    description:
+      name: open_file_mac
+      sha256: "1440b1e37ceb0642208cfeb2c659c6cda27b25187a90635c9d1acb7d0584d324"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  open_file_platform_interface:
+    dependency: transitive
+    description:
+      name: open_file_platform_interface
+      sha256: "101b424ca359632699a7e1213e83d025722ab668b9fd1412338221bf9b0e5757"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  open_file_web:
+    dependency: transitive
+    description:
+      name: open_file_web
+      sha256: e3dbc9584856283dcb30aef5720558b90f88036360bd078e494ab80a80130c4f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
+  open_file_windows:
+    dependency: transitive
+    description:
+      name: open_file_windows
+      sha256: d26c31ddf935a94a1a3aa43a23f4fff8a5ff4eea395fe7a8cb819cf55431c875
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   path:
     dependency: transitive
     description:
@@ -704,6 +784,54 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.4"
+  permission_handler:
+    dependency: "direct main"
+    description:
+      name: permission_handler
+      sha256: "59adad729136f01ea9e35a48f5d1395e25cba6cea552249ddbe9cf950f5d7849"
+      url: "https://pub.dev"
+    source: hosted
+    version: "11.4.0"
+  permission_handler_android:
+    dependency: transitive
+    description:
+      name: permission_handler_android
+      sha256: d3971dcdd76182a0c198c096b5db2f0884b0d4196723d21a866fc4cdea057ebc
+      url: "https://pub.dev"
+    source: hosted
+    version: "12.1.0"
+  permission_handler_apple:
+    dependency: transitive
+    description:
+      name: permission_handler_apple
+      sha256: f84a188e79a35c687c132a0a0556c254747a08561e99ab933f12f6ca71ef3c98
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.4.6"
+  permission_handler_html:
+    dependency: transitive
+    description:
+      name: permission_handler_html
+      sha256: "38f000e83355abb3392140f6bc3030660cfaef189e1f87824facb76300b4ff24"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3+5"
+  permission_handler_platform_interface:
+    dependency: transitive
+    description:
+      name: permission_handler_platform_interface
+      sha256: eb99b295153abce5d683cac8c02e22faab63e50679b937fa1bf67d58bb282878
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.3.0"
+  permission_handler_windows:
+    dependency: transitive
+    description:
+      name: permission_handler_windows
+      sha256: "1a790728016f79a41216d88672dbc5df30e686e811ad4e698bfc51f76ad91f1e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   petitparser:
     dependency: transitive
     description:
@@ -1117,6 +1245,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.10.1"
+  win32_registry:
+    dependency: transitive
+    description:
+      name: win32_registry
+      sha256: "21ec76dfc731550fd3e2ce7a33a9ea90b828fdf19a5c3bcf556fa992cfa99852"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.5"
   xdg_directories:
     dependency: transitive
     description:

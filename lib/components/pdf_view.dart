@@ -5,7 +5,6 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 class PDFViewer extends StatelessWidget {
   final String? pdfBase64;
@@ -69,34 +68,6 @@ class PDFViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Special case for external URLs that can be opened directly
-    if (pdfUrl != null && (pdfUrl!.startsWith('http://') || pdfUrl!.startsWith('https://'))) {
-      try {
-        // Launch URL directly if it's a web URL
-        launchUrl(Uri.parse(pdfUrl!));
-        // Return a close button
-        return Scaffold(
-          appBar: AppBar(title: const Text('Opening PDF...')),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Opening PDF in external viewer...'),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
-                ),
-              ],
-            ),
-          ),
-        );
-      } catch (e) {
-        log('Error launching URL: $e');
-        // Continue with normal flow if URL launch fails
-      }
-    }
-
     return FutureBuilder<String?>(
       future: _preparePdfFile(),
       builder: (context, snapshot) {
@@ -127,7 +98,28 @@ class PDFViewer extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(title: const Text('PDF Viewer')),
-          body: PDFView(filePath: snapshot.data!),
+          body: PDFView(
+            filePath: snapshot.data!,
+            enableSwipe: true,
+            swipeHorizontal: true,
+            autoSpacing: false,
+            pageFling: false,
+            pageSnap: true,
+            fitPolicy: FitPolicy.BOTH,
+            preventLinkNavigation: false, 
+            onRender: (pages) {
+              log('PDF rendered with $pages pages');
+            },
+            onError: (error) {
+              log('Error rendering PDF: $error');
+            },
+            onPageError: (page, error) {
+              log('Error on page $page: $error');
+            },
+            onViewCreated: (controller) {
+              log('PDF view created');
+            },
+          ),
         );
       },
     );

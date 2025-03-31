@@ -9,6 +9,10 @@ import 'package:graduation_project/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'dart:developer';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:open_file/open_file.dart';
 
 class TuitionFeesDownload extends StatefulWidget {
   const TuitionFeesDownload({super.key, required this.request});
@@ -24,6 +28,9 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
   bool _isDownloading = false;
   bool _canViewPdf = false;
   bool _canDownloadPdf = false;
+  double _downloadProgress = 0.0;
+  String _downloadStatus = '';
+  String? _lastDownloadedFilePath;
 
   @override
   void initState() {
@@ -59,9 +66,28 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
       );
   }
 
+  Future<void> _openDownloadedFile() async {
+    if (_lastDownloadedFilePath == null) {
+      _showSnackBar('No downloaded file to open', isError: true);
+      return;
+    }
+
+    try {
+      final result = await OpenFile.open(_lastDownloadedFilePath!);
+      if (result.type != ResultType.done) {
+        _showSnackBar('Failed to open file: ${result.message}', isError: true);
+      }
+    } catch (e) {
+      _showSnackBar('Error opening file: $e', isError: true);
+    }
+  }
+
   Future<void> _downloadFile() async {
     setState(() {
       _isDownloading = true;
+      _downloadProgress = 0.0;
+      _downloadStatus = 'Preparing download...';
+      _lastDownloadedFilePath = null;
     });
 
     try {
@@ -69,25 +95,115 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
         throw 'File storage URL is not available';
       }
 
-      final File file = await _storageService.downloadFile(
-        fileUrl: widget.request.fileStorageUrl!,
-        fileName: widget.request.fileName,
-      );
+      // Check Android version to determine appropriate permissions and storage approach
+      bool canUseExternalStorage = false;
+      if (Platform.isAndroid) {
+        final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+        final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        
+        // For Android 10 (API 29) and below
+        if (androidInfo.version.sdkInt <= 29) {
+          var status = await Permission.storage.request();
+          canUseExternalStorage = status.isGranted;
+        } else {
+          // For Android 11 (API 30) and above
+          // Use manage external storage permission for all files access
+          if (await Permission.manageExternalStorage.isGranted) {
+            canUseExternalStorage = true;
+          } else {
+            var status = await Permission.manageExternalStorage.request();
+            canUseExternalStorage = status.isGranted;
+          }
+        }
+      } else if (Platform.isIOS) {
+        // iOS doesn't need explicit permission for app document directory
+        canUseExternalStorage = true;
+      }
 
-      // Get the application documents directory
-      final Directory appDocDir = await getApplicationDocumentsDirectory();
-      final String savePath = '${appDocDir.path}/${widget.request.fileName}';
+      log('canUseExternalStorage: $canUseExternalStorage');
+      
+      // Determine where to save the file
+      String savePath;
+      if (Platform.isAndroid && canUseExternalStorage) {
+        // Try to use Download directory first on Android
+        final Directory downloadDir = Directory('/storage/emulated/0/Download');
+        if (await downloadDir.exists()) {
+          savePath = '${downloadDir.path}/${widget.request.fileName}';
+        } else {
+          // Fallback to app's external storage directory
+          final appDir = await getExternalStorageDirectory();
+          if (appDir != null) {
+            savePath = '${appDir.path}/${widget.request.fileName}';
+          } else {
+            // Last resort: app documents directory
+            final docDir = await getApplicationDocumentsDirectory();
+            savePath = '${docDir.path}/${widget.request.fileName}';
+          }
+        }
+      } else {
+        // For iOS or if Android permissions not granted, use app documents directory
+        final docDir = await getApplicationDocumentsDirectory();
+        savePath = '${docDir.path}/${widget.request.fileName}';
+      }
 
-      // Copy the downloaded file to the save path
-      await file.copy(savePath);
+      log('Will save file to: $savePath');
+      final File file = File(savePath);
 
-      _showSnackBar('File downloaded successfully to: $savePath');
-    } catch (e) {
-      _showSnackBar('Download failed: $e', isError: true);
-    } finally {
+      // Create reference from URL
+      final Reference ref = FirebaseStorage.instance.refFromURL(widget.request.fileStorageUrl!);
+      
       setState(() {
-        _isDownloading = false;
+        _downloadStatus = 'Downloading file...';
       });
+
+      // Track download progress
+      final DownloadTask downloadTask = ref.writeToFile(file);
+      
+      downloadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          _downloadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+          _downloadStatus = '${(_downloadProgress * 100).toStringAsFixed(1)}% downloaded';
+        });
+      });
+
+      // Wait for the download to complete
+      await downloadTask;
+
+      setState(() {
+        _downloadStatus = 'Download complete!';
+        _downloadProgress = 1.0;
+        _lastDownloadedFilePath = savePath;
+      });
+
+      // Format a more user-friendly path for display
+      String displayPath = savePath;
+      if (Platform.isAndroid && savePath.contains('/storage/emulated/0/Download')) {
+        displayPath = 'Downloads/${widget.request.fileName}';
+      } else if (Platform.isAndroid && !canUseExternalStorage) {
+        displayPath = 'App Storage/${widget.request.fileName} (Needs permission for external access)';
+      } else if (Platform.isIOS) {
+        displayPath = 'Files App/${widget.request.fileName}';
+      }
+
+      _showSnackBar('File saved to: $displayPath');
+      log('File saved successfully to: $savePath');
+    } catch (e) {
+      setState(() {
+        _downloadStatus = 'Download failed';
+      });
+      _showSnackBar('Download failed: $e', isError: true);
+      log('Download error: $e');
+    } finally {
+      // For this case, don't hide immediately to let user open the file
+      if (_lastDownloadedFilePath == null) {
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() {
+              _isDownloading = false;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -146,29 +262,78 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
           // ),
           StudentContainer(
             button: (BuildContext context) {
-              return Row(
+              return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  KButton(
-                    onPressed: _canViewPdf ? () => _viewPdf(context) : null,
-                    text: 'View',
-                    backgroundColor: _canViewPdf 
-                        ? const Color.fromRGBO(6, 147, 241, 1)
-                        : Colors.grey,
-                    width: 80,
-                    height: 50,
-                    fontSize: 16.55,
-                    margin: const EdgeInsets.only(right: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      KButton(
+                        onPressed: _canViewPdf ? () => _viewPdf(context) : null,
+                        text: 'View',
+                        backgroundColor: _canViewPdf 
+                            ? const Color.fromRGBO(6, 147, 241, 1)
+                            : Colors.grey,
+                        width: 80,
+                        height: 50,
+                        fontSize: 16.55,
+                        margin: const EdgeInsets.only(right: 8),
+                      ),
+                      KButton(
+                        onPressed: _canDownloadPdf && !_isDownloading ? _downloadFile : null,
+                        text: _isDownloading ? 'Downloading' : 'Download',
+                        backgroundColor: _canDownloadPdf ? kgreen : Colors.grey,
+                        width: 115,
+                        height: 50,
+                        fontSize: 16.55,
+                        margin: const EdgeInsets.only(top: 8, bottom: 8),
+                      ),
+                    ],
                   ),
-                  KButton(
-                    onPressed: _canDownloadPdf && !_isDownloading ? _downloadFile : null,
-                    text: _isDownloading ? 'Downloading...' : 'Download',
-                    backgroundColor: _canDownloadPdf ? kgreen : Colors.grey,
-                    width: 115,
-                    height: 50,
-                    fontSize: 16.55,
-                    margin: const EdgeInsets.only(top: 8, bottom: 8),
-                  ),
+                  if (_isDownloading) ...[
+                    const SizedBox(height: 8),
+                    Text(_downloadStatus, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: double.infinity,
+                      constraints: const BoxConstraints(maxWidth: 195), // Match the width of the buttons above
+                      child: LinearProgressIndicator(
+                        value: _downloadProgress,
+                        backgroundColor: Colors.grey[300],
+                        valueColor: const AlwaysStoppedAnimation<Color>(kgreen),
+                      ),
+                    ),
+                    if (_lastDownloadedFilePath != null) ...[
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: _openDownloadedFile,
+                        icon: const Icon(Icons.folder_open, size: 16),
+                        label: const Text('Open Downloaded File'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _isDownloading = false;
+                          });
+                        },
+                        child: const Text('Close'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.grey,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ],
                 ],
               );
             },
