@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/screens/announcement/all_announcement_appear_on_one_screen.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
@@ -32,9 +33,13 @@ void main() async {
   const storage = FlutterSecureStorage();
   String? token = await storage.read(key: 'token');
 
-  runApp(MyApp(
-    isLoggedIn: token != null,
-  ));
+  runApp(
+    ProviderScope(
+      child: MyApp(
+        isLoggedIn: token != null,
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

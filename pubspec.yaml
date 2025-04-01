@@ -63,6 +63,7 @@ dependencies:
   permission_handler: ^11.4.0
   device_info_plus: ^11.3.0
   open_file: ^3.5.10
+  flutter_riverpod: ^2.5.1
 
 dev_dependencies:
   flutter_test:
