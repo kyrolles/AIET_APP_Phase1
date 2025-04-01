@@ -21,6 +21,25 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   String? comment;
   String? currentStatus;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool _canViewPdf = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFileAvailability();
+  }
+
+  void _checkFileAvailability() {
+    // Check if we can view the PDF (either via storage URL or base64)
+    _canViewPdf = (widget.request.fileStorageUrl != null && 
+        widget.request.fileStorageUrl!.isNotEmpty) || 
+        (widget.request.pdfBase64 != null && 
+        widget.request.pdfBase64!.isNotEmpty);
+    
+    log('Can view PDF: $_canViewPdf');
+    log('fileStorageUrl: ${widget.request.fileStorageUrl}');
+    log('pdfBase64 available: ${widget.request.pdfBase64 != null && widget.request.pdfBase64!.isNotEmpty}');
+  }
 
   Future<void> updateDocument({
     required String collectionPath,
@@ -69,6 +88,22 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
     }
   }
 
+  void _viewPdf(BuildContext context) {
+    try {
+      log('Opening PDF viewer');
+      PDFViewer.open(
+        context,
+        pdfUrl: widget.request.fileStorageUrl,
+        pdfBase64: widget.request.pdfBase64,
+      );
+    } catch (e) {
+      log('Error viewing PDF: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error viewing PDF: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -97,21 +132,11 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                 StudentContainer(
                   button: (BuildContext context) {
                     return KButton(
-                      onPressed: () {
-                        if (widget.request.pdfBase64 != null) {
-                          PDFViewer.open(
-                            context,
-                            widget.request.pdfBase64!,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('PDF data is not available')),
-                          );
-                        }
-                      },
+                      onPressed: _canViewPdf ? () => _viewPdf(context) : null,
                       text: 'view',
-                      backgroundColor: const Color.fromRGBO(6, 147, 241, 1),
+                      backgroundColor: _canViewPdf
+                          ? const Color.fromRGBO(6, 147, 241, 1)
+                          : Colors.grey,
                       width: 115,
                       height: 50,
                       fontSize: 16.55,
@@ -171,7 +196,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                 ),
                 const SizedBox(height: 29),
                 Row(
-                  spacing: 15,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Flexible(
                       child: KButton(

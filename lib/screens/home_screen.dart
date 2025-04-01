@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:graduation_project/screens/drawer/app_drawer.dart';
 import '../components/activities_list_view.dart';
+import '../components/schedule/home_schedule_view.dart';
 import '../components/text_link.dart';
 import '../constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -122,6 +123,22 @@ class HomeScreenState extends State<HomeScreen> {
             child: AnnouncementList(
               scrollDirection: Axis.vertical,
               showOnlyLast: true,
+            ),
+          ),
+          // Schedule Section
+          SliverToBoxAdapter(
+            child: TextLink(
+              text: 'My Schedule',
+              textLink: 'View All',
+              onTap: () {
+                // Navigate to full schedule view if needed
+              },
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: HomeScheduleView(),
             ),
           ),
         ],

@@ -10,6 +10,7 @@ import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/student_invoice/tuition_fees_download.dart';
+import 'package:graduation_project/utils/safe_json_extractor.dart';
 import '../../../components/my_app_bar.dart';
 import 'proof_of_enrollment.dart';
 import 'tuition_fees_request.dart';
@@ -35,7 +36,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void initState() {
     super.initState();
     fetchUserId();
-    // email = FirebaseAuth.instance.currentUser?.email;
   }
 
   Future<void> fetchUserId() async {
@@ -53,7 +53,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         if (querySnapshot.docs.isNotEmpty) {
           DocumentSnapshot userDoc = querySnapshot.docs.first;
           setState(() {
-            studentId = userDoc['id'];
+            studentId = SafeDocumentSnapshot.getField(userDoc, 'id', '');
           });
         }
       }
@@ -62,28 +62,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     }
   }
 
-  Future<String> getStuentId() async {
-    final QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
-    Future<String> stuentid = snapshot.docs[0]['id'];
-    return stuentid;
-    // print(studentId);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
         title: 'Invoice',
         onpressed: () => Navigator.pop(context),
-        // actions: [
-        //   IconButton(
-        //     onPressed: () => Navigator.pushNamed(context, '/invoice/archive'),
-        //     icon: const Icon(Icons.archive),
-        //   ),
-        // ],
       ),
       body: StreamBuilder<QuerySnapshot>(
           stream: _requestsStream,
@@ -91,12 +75,19 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             if (snapshot.hasData) {
               requestsList = [];
               for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                if (snapshot.data!.docs[i]['student_id'] == studentId &&
-                    (snapshot.data!.docs[i]['type'] == 'Proof of enrollment' ||
-                        snapshot.data!.docs[i]['type'] == 'Tuition Fees')) {
-                  requestsList.add(
-                    Request.fromJson(snapshot.data!.docs[i]),
-                  );
+                DocumentSnapshot doc = snapshot.data!.docs[i];
+                
+                // Safely get fields using utility
+                String docStudentId = SafeDocumentSnapshot.getField(doc, 'student_id', '');
+                String docType = SafeDocumentSnapshot.getField(doc, 'type', '');
+                
+                if (docStudentId == studentId &&
+                    (docType == 'Proof of enrollment' || docType == 'Tuition Fees')) {
+                  try {
+                    requestsList.add(Request.fromJson(doc));
+                  } catch (e) {
+                    log('Error parsing request: $e');
+                  }
                 }
               }
             }
@@ -112,7 +103,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 const SizedBox(
                   height: 8,
                 ),
-                // archiveButton(context),
                 const Padding(
                   padding: EdgeInsets.only(left: 16.0),
                   child: Text(
@@ -131,162 +121,76 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  List<StudentContainer> showRequestsList() {
-    List<StudentContainer> requests = [];
-    for (var i = 0; i < requestsList.length; i++) {
-      requests.add(
-        StudentContainer(
-          onTap: (context) {
-            if (requestsList[i].type == 'Proof of enrollment') {
-              showModalSheetForRequestStatusOfProofOfEnrollment(
-                  requestsList[i]);
-            } else if (requestsList[i].type == 'Tuition Fees') {
-              showModalSheetForRequestStatusOfTuitionFees(requestsList[i]);
-            }
-          },
-          title: requestsList[i].type,
-          image: requestsList[i].type == 'Tuition Fees'
-              ? 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png'
-              : 'assets/images/image 29 (2).png',
-          status: requestsList[i].status,
-          statusColor: requestsList[i].status == 'Pending'
-              ? const Color(0XFFFFDD29)
-              : requestsList[i].status == 'Rejected'
-                  ? const Color(0XFFFF7648)
-                  : requestsList[i].status == 'Done'
-                      ? const Color(0xFF34C759)
-                      : kGreyLight,
-        ),
-      );
-    }
-    return requests;
-  }
-
-  Future<dynamic> showModalSheetForRequestStatusOfTuitionFees(Request request) {
-    return showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        builder: (context) {
-          return request.status == 'Done'
-              ? TuitionFeesDownload(request: request)
-              : Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 32.0, horizontal: 12.0),
-                  child: KButton(
-                    onPressed: () {
-                      FirebaseFirestore.instance
-                          .collection('requests')
-                          .where('student_id', isEqualTo: request.studentId)
-                          .where('type', isEqualTo: request.type)
-                          .where('created_at', isEqualTo: request.createdAt)
-                          .get()
-                          .then(
-                        (value) {
-                          value.docs.first.reference.delete();
-                        },
-                      );
-                      Navigator.pop(context);
-                    },
-                    text: 'Delete',
-                    fontSize: 21.7,
-                    textColor: Colors.white,
-                    backgroundColor: Colors.red,
-                    borderColor: Colors.white,
-                  ),
-                );
-        });
-  }
-
-  Future<dynamic> showModalSheetForRequestStatusOfProofOfEnrollment(
-      Request request) {
-    return showModalBottomSheet(
-      backgroundColor: Colors.white,
-      context: context,
-      builder: (context) {
-        return SizedBox(
+  List<Widget> showRequestsList() {
+    if (requestsList.isEmpty) {
+      return [
+        const Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              spacing: 40,
-              children: <Widget>[
-                Text(
-                  request.type,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0XFF6C7072),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        request.status == 'Pending'
-                            ? 'Your request is currently under review.'
-                            : request.status == 'Rejected'
-                                ? 'Your request has been rejected due to insufficient information.'
-                                : request.status == 'Done'
-                                    ? 'Go to Student Affairs to receive your application.'
-                                    : 'Status not yet assigned.',
-                        style: const TextStyle(fontSize: 18),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 0),
-              ],
-            ),
+            padding: EdgeInsets.all(16.0),
+            child: Text('No requests found'),
+          ),
+        )
+      ];
+    }
+    
+    List<Widget> requestsWidgets = [];
+    for (Request request in requestsList) {
+      if (request.type == 'Tuition Fees') {
+        requestsWidgets.add(
+          StudentContainer(
+            onTap: (BuildContext context) {
+              showModalBottomSheet<void>(
+                backgroundColor: const Color(0XFFF1F1F2),
+                context: context,
+                builder: (BuildContext context) {
+                  return TuitionFeesDownload(request: request);
+                },
+              );
+            },
+            name: request.studentName,
+            status: request.status,
+            statusColor: request.status == 'Pending'
+                ? Colors.yellow
+                : request.status == 'Rejected'
+                    ? Colors.red
+                    : request.status == 'Done'
+                        ? const Color(0xFF34C759)
+                        : kGreyLight,
+            id: request.studentId,
+            year: request.year,
+            title: request.fileName.isEmpty ? 'Tuition Fees Request' : request.fileName,
+            image: 'assets/project_image/pdf.png',
+            pdfBase64: request.pdfBase64,
           ),
         );
-      },
-    );
-  }
-
-  GestureDetector archiveButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/invoice/archive');
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0XFF888C94),
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: const Row(
-          children: [
-            Icon(
-              Icons.archive,
-              color: Colors.white,
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'Archive',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontFamily: 'Lexend',
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+      } else if (request.type == 'Proof of enrollment') {
+        requestsWidgets.add(StudentContainer(
+          onTap: (BuildContext context) {},
+          name: request.studentName,
+          status: request.status,
+          statusColor: request.status == 'Pending'
+              ? Colors.yellow
+              : request.status == 'Rejected'
+                  ? Colors.red
+                  : request.status == 'Done'
+                      ? const Color(0xFF34C759)
+                      : kGreyLight,
+          id: request.studentId,
+          year: request.year,
+          title: "Proof of enrollment, To: ${request.addressedTo}",
+          image: 'assets/project_image/pdf.png',
+          pdfBase64: request.pdfBase64,
+        ));
+      }
+    }
+    return requestsWidgets;
   }
 
   ServiceItem proofOfEnrollmentButton(BuildContext context) {
     return ServiceItem(
       title: 'Proof of enrollment',
-      imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-      backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
+      imageUrl: 'assets/images/paragraph.png',
+      backgroundColor: const Color.fromRGBO(241, 196, 15, 1),
       onPressed: () {
         showModalBottomSheet<void>(
           backgroundColor: const Color(0XFFF1F1F2),
