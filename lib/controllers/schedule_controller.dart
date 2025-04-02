@@ -141,6 +141,26 @@ class ScheduleController extends StateNotifier<ScheduleState> {
     }
   }
   
+  /// Refresh the schedule data from Firestore
+  Future<void> refreshSchedule() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    
+    try {
+      // Force a fresh fetch from Firestore, not from cache
+      final semester = await _scheduleService.getCurrentSemester(forceRefresh: true);
+      
+      state = state.copyWith(
+        isLoading: false,
+        semester: semester,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to refresh schedule: $e',
+      );
+    }
+  }
+  
   void toggleWeekType() {
     final newWeekType = state.selectedWeekType == WeekType.ODD
         ? WeekType.EVEN

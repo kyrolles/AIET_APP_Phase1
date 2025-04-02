@@ -18,19 +18,21 @@ class ScheduleService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Get the current semester
-  Future<Semester> getCurrentSemester() async {
+  Future<Semester> getCurrentSemester({bool forceRefresh = false}) async {
     try {
       // Get or create active semester
-      final String semesterId = await _getOrCreateActiveSemester();
+      final String semesterId = await _getOrCreateActiveSemester(forceRefresh: forceRefresh);
       if (semesterId.isEmpty) {
         return await _getDefaultSemester();
       }
 
-      // Get semester data
+      // Get semester data with optional cache control
       final semesterDoc = await _firestore
           .collection('semesters')
           .doc(semesterId)
-          .get();
+          .get(forceRefresh 
+              ? GetOptions(source: Source.server) 
+              : GetOptions(source: Source.serverAndCache));
           
       if (!semesterDoc.exists) {
         return await _getDefaultSemester();
@@ -38,12 +40,14 @@ class ScheduleService {
       
       final semesterData = semesterDoc.data() as Map<String, dynamic>;
       
-      // Get all sessions for this semester
+      // Get all sessions for this semester with optional cache control
       final QuerySnapshot sessionsSnapshot = await _firestore
           .collection('semesters')
           .doc(semesterId)
           .collection('sessions')
-          .get();
+          .get(forceRefresh 
+              ? GetOptions(source: Source.server) 
+              : GetOptions(source: Source.serverAndCache));
       
       final sessions = sessionsSnapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -101,6 +105,16 @@ class ScheduleService {
   // Default semester for testing or when no data is available
   Future<Semester> _getDefaultSemester() async {
     try {
+      // Try to create a semester in Firestore if none exists
+      final String semesterId = await _createDefaultSemester();
+      if (semesterId.isNotEmpty) {
+        // Successfully created, now fetch it
+        print('Created default semester in Firestore');
+        return await getCurrentSemester(forceRefresh: true);
+      }
+      
+      // If creation failed, fall back to JSON
+      print('Falling back to JSON for semester data');
       final String jsonData = await rootBundle.loadString('lib/data/schedule_data.json');
       final Map<String, dynamic> data = json.decode(jsonData);
       final semesterData = data['currentSemester'];
@@ -122,6 +136,71 @@ class ScheduleService {
         name: '2nd Semester(2024-2025)',
         sessions: _getMockSessionsHardcoded(),
       );
+    }
+  }
+  
+  // Create a default semester with sessions from JSON
+  Future<String> _createDefaultSemester() async {
+    try {
+      // Create the semester document
+      final semesterData = {
+        'name': '2nd Semester(2024-2025)',
+        'isActive': true,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      
+      final semesterRef = await _firestore
+          .collection('semesters')
+          .add(semesterData);
+          
+      // Read sessions from JSON
+      final String jsonData = await rootBundle.loadString('lib/data/schedule_data.json');
+      final Map<String, dynamic> data = json.decode(jsonData);
+      final Map<String, dynamic> semesterJson = data['currentSemester'];
+      final List<dynamic> sessionsJson = semesterJson['sessions'] as List<dynamic>;
+      
+      // Batch write all sessions
+      final WriteBatch batch = _firestore.batch();
+      
+      for (final sessionJson in sessionsJson) {
+        // Prepare Firestore-compatible data
+        final Map<String, dynamic> sessionData = {
+          'courseName': sessionJson['courseName'],
+          'courseCode': sessionJson['courseCode'] ?? '',
+          'instructor': sessionJson['instructor'] ?? '',
+          'location': sessionJson['location'] ?? '',
+          'day': sessionJson['day'],
+          'periodNumber': sessionJson['periodNumber'],
+          'weekType': sessionJson['weekType'],
+          'classIdentifier': {
+            'year': sessionJson['classIdentifier']['year'],
+            'department': sessionJson['classIdentifier']['department'],
+            'section': sessionJson['classIdentifier']['section'],
+          },
+          'isLab': sessionJson['isLab'] ?? false,
+          'isTutorial': sessionJson['isTutorial'] ?? false,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+        
+        // Create a new session document reference
+        final sessionRef = _firestore
+            .collection('semesters')
+            .doc(semesterRef.id)
+            .collection('sessions')
+            .doc();
+            
+        // Add to batch
+        batch.set(sessionRef, sessionData);
+      }
+      
+      // Commit the batch
+      await batch.commit();
+      
+      return semesterRef.id;
+    } catch (e) {
+      print('Error creating default semester: $e');
+      return '';
     }
   }
 
@@ -583,14 +662,16 @@ class ScheduleService {
 
   /// Gets or creates an active semester document
   /// Returns the semester ID, or empty string if failed
-  Future<String> _getOrCreateActiveSemester() async {
+  Future<String> _getOrCreateActiveSemester({bool forceRefresh = false}) async {
     try {
       // Try to get existing active semester
       final QuerySnapshot semesterDoc = await _firestore
           .collection('semesters')
           .where('isActive', isEqualTo: true)
           .limit(1)
-          .get();
+          .get(forceRefresh 
+              ? GetOptions(source: Source.server) 
+              : GetOptions(source: Source.serverAndCache));
       
       // If exists, return its ID
       if (semesterDoc.docs.isNotEmpty) {

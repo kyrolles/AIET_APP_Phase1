@@ -125,6 +125,21 @@ class HomeScheduleView extends ConsumerWidget {
             ],
           ),
           const Spacer(),
+          // Refresh button to sync with Firestore
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            color: kPrimaryColor,
+            onPressed: () {
+              ref.read(scheduleControllerProvider.notifier).refreshSchedule();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Refreshing schedule from server...'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+            tooltip: 'Refresh Schedule',
+          ),
           IconButton(
             icon: const Icon(Icons.swap_horiz),
             color: kPrimaryColor,
@@ -206,6 +221,38 @@ class HomeScheduleView extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      // Week type and refresh controls
+                      Consumer(
+                        builder: (context, ref, _) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                scheduleState.selectedWeekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.refresh),
+                                color: kPrimaryColor,
+                                onPressed: () {
+                                  ref.read(scheduleControllerProvider.notifier).refreshSchedule();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Refreshing schedule from server...'),
+                                      duration: Duration(seconds: 1),
+                                    ),
+                                  );
+                                },
+                                tooltip: 'Refresh Schedule',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       // Full schedule display
                       Expanded(
                         child: scheduleState.classIdentifier != null
