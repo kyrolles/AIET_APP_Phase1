@@ -173,6 +173,27 @@ class ClassSession {
       isTutorial: json['isTutorial'] ?? false,
     );
   }
+  
+  // Convert session to JSON for caching
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'courseName': courseName,
+      'courseCode': courseCode,
+      'instructor': instructor,
+      'location': location,
+      'day': day.name,
+      'periodNumber': periodNumber,
+      'weekType': weekType.name,
+      'classIdentifier': {
+        'year': classIdentifier.year,
+        'department': classIdentifier.department.name,
+        'section': classIdentifier.section,
+      },
+      'isLab': isLab,
+      'isTutorial': isTutorial,
+    };
+  }
 }
 
 class Semester {
@@ -191,5 +212,13 @@ class Semester {
       name: json['name'],
       sessions: sessionsList.map((session) => ClassSession.fromJson(session)).toList(),
     );
+  }
+  
+  // Convert semester to JSON for caching
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'sessions': sessions.map((session) => session.toJson()).toList(),
+    };
   }
 } 

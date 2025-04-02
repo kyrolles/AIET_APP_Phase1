@@ -9,6 +9,8 @@ class ScheduleState {
   final ClassIdentifier? classIdentifier;
   final WeekType selectedWeekType;
   final String? errorMessage;
+  final bool isRefreshCooldown;
+  final int cooldownRemainingMin;
   
   ScheduleState({
     this.isLoading = false,
@@ -16,6 +18,8 @@ class ScheduleState {
     this.classIdentifier,
     this.selectedWeekType = WeekType.ODD,
     this.errorMessage,
+    this.isRefreshCooldown = false,
+    this.cooldownRemainingMin = 0,
   });
   
   ScheduleState copyWith({
@@ -24,6 +28,8 @@ class ScheduleState {
     ClassIdentifier? classIdentifier,
     WeekType? selectedWeekType,
     String? errorMessage,
+    bool? isRefreshCooldown,
+    int? cooldownRemainingMin,
   }) {
     return ScheduleState(
       isLoading: isLoading ?? this.isLoading,
@@ -31,6 +37,8 @@ class ScheduleState {
       classIdentifier: classIdentifier ?? this.classIdentifier,
       selectedWeekType: selectedWeekType ?? this.selectedWeekType,
       errorMessage: errorMessage,
+      isRefreshCooldown: isRefreshCooldown ?? this.isRefreshCooldown,
+      cooldownRemainingMin: cooldownRemainingMin ?? this.cooldownRemainingMin,
     );
   }
   
@@ -121,19 +129,46 @@ class ScheduleController extends StateNotifier<ScheduleState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
-      final semester = await _scheduleService.getCurrentSemester();
+      // Get the student's class identifier first
       final classIdentifier = await _scheduleService.getStudentClassIdentifier();
+      
+      if (classIdentifier == null) {
+        print('No class identifier available for current user, using default');
+        // Use a default class identifier if none found
+        state = state.copyWith(
+          classIdentifier: ClassIdentifier(
+            year: 4,
+            department: Department.C,
+            section: 2,
+          ),
+        );
+      } else {
+        print('Found class identifier: ${classIdentifier.year}${classIdentifier.department.name}${classIdentifier.section}');
+        // Set the class identifier from user data
+        state = state.copyWith(classIdentifier: classIdentifier);
+      }
+      
+      // Now fetch the semester data
+      final semester = await _scheduleService.getCurrentSemester();
+      
+      // Get filtered session count for logging
+      final filteredSessionCount = semester.sessions.where((session) =>
+        session.classIdentifier.year == state.classIdentifier!.year &&
+        session.classIdentifier.department == state.classIdentifier!.department &&
+        session.classIdentifier.section == state.classIdentifier!.section
+      ).length;
+      
+      print('Loaded ${semester.sessions.length} total sessions, ${filteredSessionCount} for current class');
       
       state = state.copyWith(
         isLoading: false,
         semester: semester,
-        classIdentifier: classIdentifier ?? ClassIdentifier(
-          year: 4,
-          department: Department.C,
-          section: 2,
-        ), // Default to 4C2 if user info not available
       );
+      
+      // Update refresh status
+      await _updateRefreshStatus();
     } catch (e) {
+      print('Failed to load schedule: $e');
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to load schedule: $e',
@@ -146,19 +181,68 @@ class ScheduleController extends StateNotifier<ScheduleState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
+      // First check if we need to refresh the class identifier
+      final classIdentifier = await _scheduleService.getStudentClassIdentifier();
+      if (classIdentifier != null) {
+        // Update the class identifier if it's different
+        if (state.classIdentifier == null ||
+            classIdentifier.year != state.classIdentifier!.year ||
+            classIdentifier.department != state.classIdentifier!.department ||
+            classIdentifier.section != state.classIdentifier!.section) {
+          print('Class identifier changed, updating to: ${classIdentifier.year}${classIdentifier.department.name}${classIdentifier.section}');
+          state = state.copyWith(classIdentifier: classIdentifier);
+        }
+      }
+      
       // Force a fresh fetch from Firestore, not from cache
       final semester = await _scheduleService.getCurrentSemester(forceRefresh: true);
+      
+      // Get filtered session count for logging
+      final filteredSessionCount = semester.sessions.where((session) =>
+        session.classIdentifier.year == state.classIdentifier!.year &&
+        session.classIdentifier.department == state.classIdentifier!.department &&
+        session.classIdentifier.section == state.classIdentifier!.section
+      ).length;
+      
+      print('Refreshed ${semester.sessions.length} total sessions, ${filteredSessionCount} for current class');
       
       state = state.copyWith(
         isLoading: false,
         semester: semester,
       );
+      
+      // Update refresh status after refresh
+      await _updateRefreshStatus();
     } catch (e) {
+      print('Failed to refresh schedule: $e');
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to refresh schedule: $e',
       );
     }
+  }
+  
+  /// Get and update the refresh status in the state
+  Future<void> _updateRefreshStatus() async {
+    try {
+      final refreshStatus = await _scheduleService.getRefreshStatus();
+      
+      state = state.copyWith(
+        isRefreshCooldown: refreshStatus['inCooldown'],
+        cooldownRemainingMin: refreshStatus['cooldownRemainingMin'],
+      );
+    } catch (e) {
+      print('Error updating refresh status: $e');
+    }
+  }
+  
+  /// Check if refresh is available or in cooldown
+  /// Returns a message with cooldown information if applicable
+  String? getRefreshMessage() {
+    if (state.isRefreshCooldown) {
+      return 'Refresh limit reached. Try again in ${state.cooldownRemainingMin} minutes.';
+    }
+    return null;
   }
   
   void toggleWeekType() {

@@ -11,15 +11,48 @@ import 'package:cloud_firestore/cloud_firestore.dart'
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/schedule_model.dart';
 
 class ScheduleService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  // Cache keys
+  static const String _cacheKeySemester = 'cached_semester';
+  static const String _cacheKeyLastRefresh = 'last_refresh_time';
+  static const String _cacheKeyRefreshCount = 'refresh_count_today';
+  static const String _cacheKeyRefreshDay = 'refresh_count_day';
+  
+  // Refresh limits
+  static const int _maxRefreshCount = 3;
+  static const Duration _refreshCooldown = Duration(minutes: 15);
 
   // Get the current semester
   Future<Semester> getCurrentSemester({bool forceRefresh = false}) async {
     try {
+      // Check refresh limits if force refresh is requested
+      if (forceRefresh) {
+        final canRefresh = await _checkRefreshLimits();
+        if (!canRefresh) {
+          // If we hit refresh limits, use cached data instead
+          final cachedSemester = await _getCachedSemester();
+          if (cachedSemester != null) {
+            return cachedSemester;
+          }
+          // If no cache, proceed with fetch but don't count it as a refresh
+          forceRefresh = false;
+        }
+      }
+      
+      // Try to get cached data first if not forcing refresh
+      if (!forceRefresh) {
+        final cachedSemester = await _getCachedSemester();
+        if (cachedSemester != null) {
+          return cachedSemester;
+        }
+      }
+
       // Get or create active semester
       final String semesterId = await _getOrCreateActiveSemester(forceRefresh: forceRefresh);
       if (semesterId.isEmpty) {
@@ -55,13 +88,175 @@ class ScheduleService {
         return ClassSession.fromJson(data);
       }).toList();
       
-      return Semester(
+      final semester = Semester(
         name: semesterData['name'] ?? '2nd Semester(2024-2025)',
         sessions: sessions,
       );
+      
+      // Cache the semester data
+      if (forceRefresh) {
+        await _incrementRefreshCount();
+      }
+      await _cacheSemester(semester);
+      
+      return semester;
     } catch (e) {
       print('Error getting current semester: $e');
+      
+      // Try to get cached data on error
+      final cachedSemester = await _getCachedSemester();
+      if (cachedSemester != null) {
+        return cachedSemester;
+      }
+      
       return await _getDefaultSemester();
+    }
+  }
+
+  // Cache the semester data locally
+  Future<void> _cacheSemester(Semester semester) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Convert semester to JSON
+      final Map<String, dynamic> semesterMap = {
+        'name': semester.name,
+        'sessions': semester.sessions.map((session) => session.toJson()).toList(),
+      };
+      
+      // Save to SharedPreferences
+      await prefs.setString(_cacheKeySemester, jsonEncode(semesterMap));
+      await prefs.setInt(_cacheKeyLastRefresh, DateTime.now().millisecondsSinceEpoch);
+      
+      print('Semester data cached successfully');
+    } catch (e) {
+      print('Error caching semester data: $e');
+    }
+  }
+  
+  // Get cached semester data
+  Future<Semester?> _getCachedSemester() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? cachedData = prefs.getString(_cacheKeySemester);
+      
+      if (cachedData == null || cachedData.isEmpty) {
+        return null;
+      }
+      
+      final Map<String, dynamic> semesterMap = jsonDecode(cachedData);
+      final List<dynamic> sessionsJson = semesterMap['sessions'] as List<dynamic>;
+      
+      final List<ClassSession> sessions = sessionsJson.map((sessionJson) {
+        return ClassSession.fromJson(sessionJson);
+      }).toList();
+      
+      return Semester(
+        name: semesterMap['name'],
+        sessions: sessions,
+      );
+    } catch (e) {
+      print('Error reading cached semester data: $e');
+      return null;
+    }
+  }
+  
+  // Check if we can refresh based on limits
+  Future<bool> _checkRefreshLimits() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get the current day
+      final today = DateTime.now().day;
+      final storedDay = prefs.getInt(_cacheKeyRefreshDay) ?? -1;
+      
+      // If it's a new day, reset the counter
+      if (today != storedDay) {
+        await prefs.setInt(_cacheKeyRefreshCount, 0);
+        await prefs.setInt(_cacheKeyRefreshDay, today);
+        return true;
+      }
+      
+      // Check refresh count
+      final refreshCount = prefs.getInt(_cacheKeyRefreshCount) ?? 0;
+      if (refreshCount < _maxRefreshCount) {
+        return true;
+      }
+      
+      // If we've hit the max, check cooldown period
+      final lastRefresh = prefs.getInt(_cacheKeyLastRefresh) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      
+      if (now - lastRefresh > _refreshCooldown.inMilliseconds) {
+        return true;
+      }
+      
+      // Still in cooldown
+      print('Refresh limit reached. Please try again later.');
+      return false;
+    } catch (e) {
+      print('Error checking refresh limits: $e');
+      return true; // On error, allow refresh
+    }
+  }
+  
+  // Increment the refresh counter
+  Future<void> _incrementRefreshCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get the current day
+      final today = DateTime.now().day;
+      final storedDay = prefs.getInt(_cacheKeyRefreshDay) ?? -1;
+      
+      // If it's a new day, reset the counter
+      if (today != storedDay) {
+        await prefs.setInt(_cacheKeyRefreshCount, 1);
+        await prefs.setInt(_cacheKeyRefreshDay, today);
+        return;
+      }
+      
+      // Increment counter
+      final refreshCount = prefs.getInt(_cacheKeyRefreshCount) ?? 0;
+      await prefs.setInt(_cacheKeyRefreshCount, refreshCount + 1);
+      await prefs.setInt(_cacheKeyLastRefresh, DateTime.now().millisecondsSinceEpoch);
+    } catch (e) {
+      print('Error incrementing refresh count: $e');
+    }
+  }
+
+  // Get the refresh status for UI feedback
+  Future<Map<String, dynamic>> getRefreshStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      final refreshCount = prefs.getInt(_cacheKeyRefreshCount) ?? 0;
+      final lastRefresh = prefs.getInt(_cacheKeyLastRefresh) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      
+      // Calculate time remaining in cooldown
+      int cooldownRemaining = 0;
+      if (refreshCount >= _maxRefreshCount) {
+        cooldownRemaining = _refreshCooldown.inMilliseconds - (now - lastRefresh);
+        cooldownRemaining = cooldownRemaining > 0 ? cooldownRemaining : 0;
+      }
+      
+      return {
+        'refreshCount': refreshCount,
+        'maxRefreshCount': _maxRefreshCount,
+        'inCooldown': cooldownRemaining > 0,
+        'cooldownRemainingMs': cooldownRemaining,
+        'cooldownRemainingMin': (cooldownRemaining / 60000).ceil(),
+      };
+    } catch (e) {
+      print('Error getting refresh status: $e');
+      return {
+        'refreshCount': 0,
+        'maxRefreshCount': _maxRefreshCount,
+        'inCooldown': false,
+        'cooldownRemainingMs': 0,
+        'cooldownRemainingMin': 0,
+      };
     }
   }
 
@@ -71,30 +266,60 @@ class ScheduleService {
       final user = _auth.currentUser;
       if (user == null) return null;
 
+      // Get the user document with improved error logging
+      print('Fetching class identifier for user: ${user.email}');
       final userDoc = await _firestore
           .collection('users')
           .where('email', isEqualTo: user.email)
           .limit(1)
-          .get();
+          .get(GetOptions(source: Source.server)); // Force server fetch to get latest data
 
-      if (userDoc.docs.isEmpty) return null;
-
-      final userData = userDoc.docs.first.data();
-      
-      // Check if user has class information
-      if (!userData.containsKey('academicYear') || 
-          !userData.containsKey('department') ||
-          !userData.containsKey('section')) {
+      if (userDoc.docs.isEmpty) {
+        print('No user document found for email: ${user.email}');
         return null;
       }
 
+      final userData = userDoc.docs.first.data();
+      print('User data fetched: ${userData.toString()}');
+      
+      // Check if user has class information with appropriate type conversion
+      if (!userData.containsKey('academicYear') && !userData.containsKey('year')) {
+        print('User missing academic year field');
+        return null;
+      }
+      
+      if (!userData.containsKey('department')) {
+        print('User missing department field');
+        return null;
+      }
+      
+      if (!userData.containsKey('section')) {
+        print('User missing section field');
+        return null;
+      }
+
+      // Try to get academic year from multiple possible field names
+      final year = userData['academicYear'] ?? userData['year'] ?? 0;
+      // Ensure year is an integer
+      final int academicYear = year is int ? year : int.tryParse(year.toString()) ?? 0;
+      
+      // Get department, ensuring it's a valid string
+      final String deptString = userData['department']?.toString() ?? 'G';
+      
+      // Get section, ensuring it's an integer
+      final section = userData['section'] ?? 1;
+      final int sectionNumber = section is int ? section : int.tryParse(section.toString()) ?? 1;
+      
+      print('Creating ClassIdentifier with year: $academicYear, department: $deptString, section: $sectionNumber');
+      
+      // Create class identifier with proper data conversion
       return ClassIdentifier(
-        year: userData['academicYear'] ?? 0,
+        year: academicYear,
         department: Department.values.firstWhere(
-          (d) => d.name == userData['department'],
+          (d) => d.name == deptString,
           orElse: () => Department.G,
         ),
-        section: userData['section'] ?? 1,
+        section: sectionNumber,
       );
     } catch (e) {
       print('Error getting student class identifier: $e');
@@ -105,6 +330,13 @@ class ScheduleService {
   // Default semester for testing or when no data is available
   Future<Semester> _getDefaultSemester() async {
     try {
+      // First check if there's a cached semester
+      final cachedSemester = await _getCachedSemester();
+      if (cachedSemester != null && cachedSemester.sessions.isNotEmpty) {
+        print('Using cached semester as fallback');
+        return cachedSemester;
+      }
+      
       // Try to create a semester in Firestore if none exists
       final String semesterId = await _createDefaultSemester();
       if (semesterId.isNotEmpty) {
@@ -113,28 +345,33 @@ class ScheduleService {
         return await getCurrentSemester(forceRefresh: true);
       }
       
-      // If creation failed, fall back to JSON
-      print('Falling back to JSON for semester data');
-      final String jsonData = await rootBundle.loadString('lib/data/schedule_data.json');
-      final Map<String, dynamic> data = json.decode(jsonData);
-      final semesterData = data['currentSemester'];
+      // If creation failed, fall back to hardcoded data
+      print('Falling back to hardcoded data for semester');
       
-      final List<dynamic> sessionsJson = semesterData['sessions'] as List<dynamic>;
-      
-      final List<ClassSession> sessions = sessionsJson.map((sessionJson) {
-        return ClassSession.fromJson(sessionJson);
-      }).toList();
-      
-      return Semester(
-        name: semesterData['name'],
-        sessions: sessions,
-      );
+      // Try using mock data directly
+      try {
+        final mockSessions = _getMockSessionsHardcoded();
+        // Add more mock sessions for testing to cover multiple classes
+        final mockSessions2 = _getAdditionalMockSessions();
+        
+        return Semester(
+          name: '2nd Semester(2024-2025)',
+          sessions: [...mockSessions, ...mockSessions2],
+        );
+      } catch (innerError) {
+        print('Error creating hardcoded semester data: $innerError');
+        // Last resort - empty semester with just a few sessions
+        return Semester(
+          name: '2nd Semester(2024-2025)',
+          sessions: _getMinimalMockSessions(),
+        );
+      }
     } catch (e) {
-      print('Error loading schedule data from JSON: $e');
-      // Fallback to hardcoded data if JSON loading fails
+      print('Error loading default semester data: $e');
+      // Last resort - empty semester with just a few sessions
       return Semester(
         name: '2nd Semester(2024-2025)',
-        sessions: _getMockSessionsHardcoded(),
+        sessions: _getMinimalMockSessions(),
       );
     }
   }
@@ -227,6 +464,102 @@ class ScheduleService {
       ),
       // Adding just one sample session for fallback
       // For complete data, the app will use the JSON file
+    ];
+  }
+
+  // Additional mock sessions to ensure every department has at least one
+  List<ClassSession> _getAdditionalMockSessions() {
+    final List<ClassSession> sessions = [];
+    
+    // Create sessions for each department and year
+    for (int year = 1; year <= 4; year++) {
+      for (final dept in Department.values) {
+        for (int section = 1; section <= 2; section++) {
+          final classId = ClassIdentifier(
+            year: year,
+            department: dept,
+            section: section,
+          );
+          
+          sessions.add(ClassSession(
+            id: 'mock_${year}${dept.name}${section}_1',
+            courseName: 'Course for ${year}${dept.name}${section}',
+            courseCode: 'CC${year}${dept.name}${section}',
+            instructor: 'Dr. Instructor',
+            location: 'Room ${year}${dept.name}${section}',
+            day: DayOfWeek.MONDAY,
+            periodNumber: 1,
+            weekType: WeekType.ODD,
+            classIdentifier: classId,
+          ));
+          
+          sessions.add(ClassSession(
+            id: 'mock_${year}${dept.name}${section}_2',
+            courseName: 'Another Course',
+            courseCode: 'AC${year}${dept.name}${section}',
+            instructor: 'Dr. Professor',
+            location: 'Lab ${year}${dept.name}${section}',
+            day: DayOfWeek.WEDNESDAY,
+            periodNumber: 3,
+            weekType: WeekType.EVEN,
+            classIdentifier: classId,
+          ));
+        }
+      }
+    }
+    
+    return sessions;
+  }
+  
+  // Absolute minimal mock sessions as last resort
+  List<ClassSession> _getMinimalMockSessions() {
+    // Just create one session for each common department
+    return [
+      ClassSession(
+        id: 'min_4C2',
+        courseName: 'Computer Engineering',
+        courseCode: 'CE400',
+        instructor: 'Dr. Smith',
+        location: 'Room 101',
+        day: DayOfWeek.MONDAY,
+        periodNumber: 1,
+        weekType: WeekType.ODD,
+        classIdentifier: ClassIdentifier(
+          year: 4,
+          department: Department.C,
+          section: 2,
+        ),
+      ),
+      ClassSession(
+        id: 'min_4E1',
+        courseName: 'Communication Systems',
+        courseCode: 'CE401',
+        instructor: 'Dr. Jones',
+        location: 'Room 102',
+        day: DayOfWeek.TUESDAY,
+        periodNumber: 2,
+        weekType: WeekType.ODD,
+        classIdentifier: ClassIdentifier(
+          year: 4,
+          department: Department.E,
+          section: 1,
+        ),
+      ),
+      ClassSession(
+        id: 'min_3C1',
+        courseName: 'Data Structures',
+        courseCode: 'CE301',
+        instructor: 'Dr. Brown',
+        location: 'Room 103',
+        day: DayOfWeek.WEDNESDAY,
+        periodNumber: 3,
+        weekType: WeekType.EVEN,
+        classIdentifier: ClassIdentifier(
+          year: 3,
+          department: Department.C,
+          section: 1,
+        ),
+      ),
     ];
   }
 

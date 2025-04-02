@@ -27,19 +27,80 @@ class HomeScheduleView extends ConsumerWidget {
     // If there's an error, show error message
     if (scheduleState.errorMessage != null) {
       return Center(
-        child: Text(
-          scheduleState.errorMessage!,
-          style: const TextStyle(color: Colors.red),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              scheduleState.errorMessage!,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(scheduleControllerProvider.notifier).refreshSchedule();
+              },
+              child: const Text('Try Again'),
+            ),
+          ],
         ),
       );
     }
     
     // If no class identifier yet, show message
     if (scheduleState.classIdentifier == null) {
-      return const Center(
-        child: Text(
-          'No schedule information available',
-          style: TextStyle(color: kGrey),
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'No schedule information available.\nMake sure your profile has your academic year, department, and section set.',
+              style: TextStyle(color: kGrey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(scheduleControllerProvider.notifier).refreshSchedule();
+              },
+              child: const Text('Refresh'),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    // Check if we have any sessions for the student's class and selected week
+    final allSessionsForClass = scheduleState.getFilteredSessions();
+    if (allSessionsForClass.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: kGrey.withOpacity(0.3)),
+        ),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildScheduleHeader(weekType, scheduleState, context, ref),
+            const SizedBox(height: 16),
+            Text(
+              'No sessions found for ${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section} in the ${weekType == WeekType.ODD ? "Odd" : "Even"} week.',
+              style: const TextStyle(color: kGrey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(scheduleControllerProvider.notifier).toggleWeekType();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Check Other Week'),
+            ),
+          ],
         ),
       );
     }
@@ -130,13 +191,27 @@ class HomeScheduleView extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             color: kPrimaryColor,
             onPressed: () {
-              ref.read(scheduleControllerProvider.notifier).refreshSchedule();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Refreshing schedule from server...'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
+              final controller = ref.read(scheduleControllerProvider.notifier);
+              final refreshMessage = controller.getRefreshMessage();
+              
+              if (refreshMessage != null) {
+                // Show cooldown message if in cooldown
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(refreshMessage),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                // Refresh if not in cooldown
+                controller.refreshSchedule();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Refreshing schedule from server...'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              }
             },
             tooltip: 'Refresh Schedule',
           ),
@@ -239,13 +314,27 @@ class HomeScheduleView extends ConsumerWidget {
                                 icon: const Icon(Icons.refresh),
                                 color: kPrimaryColor,
                                 onPressed: () {
-                                  ref.read(scheduleControllerProvider.notifier).refreshSchedule();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Refreshing schedule from server...'),
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
+                                  final controller = ref.read(scheduleControllerProvider.notifier);
+                                  final refreshMessage = controller.getRefreshMessage();
+                                  
+                                  if (refreshMessage != null) {
+                                    // Show cooldown message if in cooldown
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(refreshMessage),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  } else {
+                                    // Refresh if not in cooldown
+                                    controller.refreshSchedule();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Refreshing schedule from server...'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  }
                                 },
                                 tooltip: 'Refresh Schedule',
                               ),
