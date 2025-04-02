@@ -1,4 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' 
+    show 
+      FirebaseFirestore, 
+      QuerySnapshot, 
+      DocumentSnapshot, 
+      FieldValue, 
+      WriteBatch, 
+      SetOptions, 
+      GetOptions, 
+      Source;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
@@ -11,19 +20,25 @@ class ScheduleService {
   // Get the current semester
   Future<Semester> getCurrentSemester() async {
     try {
-      final QuerySnapshot semesterDoc = await _firestore
-          .collection('semesters')
-          .where('isActive', isEqualTo: true)
-          .limit(1)
-          .get();
-
-      if (semesterDoc.docs.isEmpty) {
+      // Get or create active semester
+      final String semesterId = await _getOrCreateActiveSemester();
+      if (semesterId.isEmpty) {
         return await _getDefaultSemester();
       }
 
-      final semesterId = semesterDoc.docs.first.id;
-      final semesterData = semesterDoc.docs.first.data() as Map<String, dynamic>;
+      // Get semester data
+      final semesterDoc = await _firestore
+          .collection('semesters')
+          .doc(semesterId)
+          .get();
+          
+      if (!semesterDoc.exists) {
+        return await _getDefaultSemester();
+      }
       
+      final semesterData = semesterDoc.data() as Map<String, dynamic>;
+      
+      // Get all sessions for this semester
       final QuerySnapshot sessionsSnapshot = await _firestore
           .collection('semesters')
           .doc(semesterId)
@@ -234,6 +249,372 @@ class ScheduleService {
     } catch (e) {
       print('Error organizing students into sections: $e');
       throw e; // Rethrow to handle in the UI
+    }
+  }
+  
+  // Admin methods for schedule management
+  
+  /// Adds or updates a class session in the current semester
+  /// Returns true if successful, false otherwise
+  Future<bool> addOrUpdateClassSession(ClassSession session) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+      
+      // Check if user is admin with batch query
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return false;
+      
+      // Get or create active semester - use cache for performance
+      final String semesterId = await _getOrCreateActiveSemester();
+      if (semesterId.isEmpty) return false;
+      
+      // Prepare session data
+      final sessionData = {
+        'courseName': session.courseName,
+        'courseCode': session.courseCode,
+        'instructor': session.instructor,
+        'location': session.location,
+        'day': session.day.name,
+        'periodNumber': session.periodNumber,
+        'weekType': session.weekType.name,
+        'classIdentifier': {
+          'year': session.classIdentifier.year,
+          'department': session.classIdentifier.department.name,
+          'section': session.classIdentifier.section,
+        },
+        'isLab': session.isLab,
+        'isTutorial': session.isTutorial,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': user.email,
+      };
+      
+      // Add or update the session
+      if (session.id.isEmpty || session.id == 'new') {
+        await _firestore
+            .collection('semesters')
+            .doc(semesterId)
+            .collection('sessions')
+            .add(sessionData);
+      } else {
+        await _firestore
+            .collection('semesters')
+            .doc(semesterId)
+            .collection('sessions')
+            .doc(session.id)
+            .set(sessionData, SetOptions(merge: true));
+      }
+      
+      return true;
+    } catch (e) {
+      print('Error adding/updating class session: $e');
+      return false;
+    }
+  }
+
+  /// Deletes a class session from the current semester
+  /// Returns true if successful, false otherwise
+  Future<bool> deleteClassSession(String sessionId) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return false;
+      
+      // Get active semester
+      final String semesterId = await _getOrCreateActiveSemester();
+      if (semesterId.isEmpty) return false;
+      
+      // Delete the session
+      await _firestore
+          .collection('semesters')
+          .doc(semesterId)
+          .collection('sessions')
+          .doc(sessionId)
+          .delete();
+      
+      return true;
+    } catch (e) {
+      print('Error deleting class session: $e');
+      return false;
+    }
+  }
+
+  /// Adds a day off session for a specific class, day and week type
+  /// Returns true if successful, false otherwise
+  Future<bool> addDayOff(DayOfWeek day, WeekType weekType, ClassIdentifier classIdentifier) async {
+    final session = ClassSession(
+      id: 'new',
+      courseName: 'DAY OFF',
+      courseCode: '',
+      instructor: '',
+      location: '',
+      day: day,
+      periodNumber: 1, // Can be any period, we use 1 as default
+      weekType: weekType,
+      classIdentifier: classIdentifier,
+      isLab: false,
+      isTutorial: false,
+    );
+    
+    return await addOrUpdateClassSession(session);
+  }
+
+  /// Gets all available class identifiers (year, department, section combinations)
+  /// Returns empty list if failed or user is not admin
+  Future<List<ClassIdentifier>> getAllClassIdentifiers() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return [];
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return [];
+      
+      // Use a more efficient approach - get all sections directly from academic year collection
+      final QuerySnapshot yearsSnapshot = await _firestore
+          .collection('academicYears')
+          .get(GetOptions(source: Source.serverAndCache));
+      
+      final List<ClassIdentifier> classIdentifiers = [];
+      
+      for (final yearDoc in yearsSnapshot.docs) {
+        final yearData = yearDoc.data() as Map<String, dynamic>;
+        final int academicYear = int.tryParse(yearDoc.id) ?? 0;
+        
+        if (yearData.containsKey('departments')) {
+          final departments = yearData['departments'] as List<dynamic>;
+          
+          for (final deptData in departments) {
+            final String deptCode = deptData['code'] ?? '';
+            final int sectionCount = deptData['sectionCount'] ?? 1;
+            
+            final department = Department.values.firstWhere(
+              (d) => d.name == deptCode,
+              orElse: () => Department.G,
+            );
+            
+            // Add each section for this department and year
+            for (int sectionNumber = 1; sectionNumber <= sectionCount; sectionNumber++) {
+              classIdentifiers.add(ClassIdentifier(
+                year: academicYear,
+                department: department,
+                section: sectionNumber,
+              ));
+            }
+          }
+        }
+      }
+      
+      // If no class identifiers found using academicYears collection,
+      // fall back to getting them from users collection
+      if (classIdentifiers.isEmpty) {
+        final Map<String, Set<int>> sectionsMap = {};
+        
+        final usersSnapshot = await _firestore
+            .collection('users')
+            .where('role', isEqualTo: 'Student')
+            .get();
+        
+        for (final doc in usersSnapshot.docs) {
+          final userData = doc.data();
+          
+          if (userData.containsKey('academicYear') && 
+              userData.containsKey('department') && 
+              userData.containsKey('section')) {
+            
+            final int year = userData['academicYear'] ?? 0;
+            final String deptCode = userData['department'] ?? 'G';
+            final int section = userData['section'] ?? 1;
+            
+            final key = '$year-$deptCode';
+            if (!sectionsMap.containsKey(key)) {
+              sectionsMap[key] = {};
+            }
+            sectionsMap[key]!.add(section);
+          }
+        }
+        
+        // Convert the map to class identifiers
+        for (final key in sectionsMap.keys) {
+          final parts = key.split('-');
+          final int year = int.tryParse(parts[0]) ?? 0;
+          final department = Department.values.firstWhere(
+            (d) => d.name == parts[1],
+            orElse: () => Department.G,
+          );
+          
+          for (final section in sectionsMap[key]!) {
+            classIdentifiers.add(ClassIdentifier(
+              year: year,
+              department: department,
+              section: section,
+            ));
+          }
+        }
+      }
+      
+      // If still no class identifiers found, provide default ones
+      if (classIdentifiers.isEmpty) {
+        print('No class identifiers found in database, using default values');
+        
+        // Add default classes for each department and year
+        for (int year = 1; year <= 4; year++) {
+          for (final dept in Department.values) {
+            // Add 2 sections for each year-department combination
+            for (int section = 1; section <= 2; section++) {
+              classIdentifiers.add(ClassIdentifier(
+                year: year,
+                department: dept,
+                section: section,
+              ));
+            }
+          }
+        }
+      }
+      
+      return classIdentifiers;
+    } catch (e) {
+      print('Error getting class identifiers: $e');
+      // Return default class identifiers on error
+      final List<ClassIdentifier> defaultIdentifiers = [];
+      defaultIdentifiers.add(ClassIdentifier(
+        year: 4,
+        department: Department.C,
+        section: 2,
+      ));
+      defaultIdentifiers.add(ClassIdentifier(
+        year: 4,
+        department: Department.E,
+        section: 1,
+      ));
+      defaultIdentifiers.add(ClassIdentifier(
+        year: 3,
+        department: Department.C,
+        section: 1,
+      ));
+      
+      return defaultIdentifiers;
+    }
+  }
+  
+  /// Adds multiple sessions for a class at once
+  /// This is more efficient than adding sessions one by one
+  Future<bool> addMultipleSessions(List<ClassSession> sessions) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return false;
+      
+      // Get active semester
+      final String semesterId = await _getOrCreateActiveSemester();
+      if (semesterId.isEmpty) return false;
+      
+      // Use batch write for better performance
+      final WriteBatch batch = _firestore.batch();
+      
+      for (final session in sessions) {
+        final sessionData = {
+          'courseName': session.courseName,
+          'courseCode': session.courseCode,
+          'instructor': session.instructor,
+          'location': session.location,
+          'day': session.day.name,
+          'periodNumber': session.periodNumber,
+          'weekType': session.weekType.name,
+          'classIdentifier': {
+            'year': session.classIdentifier.year,
+            'department': session.classIdentifier.department.name,
+            'section': session.classIdentifier.section,
+          },
+          'isLab': session.isLab,
+          'isTutorial': session.isTutorial,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'updatedBy': user.email,
+        };
+        
+        final docRef = _firestore
+            .collection('semesters')
+            .doc(semesterId)
+            .collection('sessions')
+            .doc(); // Auto-generate ID
+            
+        batch.set(docRef, sessionData);
+      }
+      
+      // Commit the batch
+      await batch.commit();
+      
+      return true;
+    } catch (e) {
+      print('Error adding multiple sessions: $e');
+      return false;
+    }
+  }
+
+  /// Gets or creates an active semester document
+  /// Returns the semester ID, or empty string if failed
+  Future<String> _getOrCreateActiveSemester() async {
+    try {
+      // Try to get existing active semester
+      final QuerySnapshot semesterDoc = await _firestore
+          .collection('semesters')
+          .where('isActive', isEqualTo: true)
+          .limit(1)
+          .get();
+      
+      // If exists, return its ID
+      if (semesterDoc.docs.isNotEmpty) {
+        return semesterDoc.docs.first.id;
+      }
+      
+      print('No active semester found, creating one');
+      
+      // Create a new semester document
+      final semesterData = {
+        'name': '2nd Semester(2024-2025)',
+        'isActive': true,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      
+      final docRef = await _firestore
+          .collection('semesters')
+          .add(semesterData);
+      
+      return docRef.id;
+    } catch (e) {
+      print('Error getting or creating active semester: $e');
+      return '';
     }
   }
 } 
