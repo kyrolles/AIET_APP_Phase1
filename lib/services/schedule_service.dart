@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import '../models/schedule_model.dart';
 
 class ScheduleService {
@@ -16,7 +18,7 @@ class ScheduleService {
           .get();
 
       if (semesterDoc.docs.isEmpty) {
-        return _getDefaultSemester();
+        return await _getDefaultSemester();
       }
 
       final semesterId = semesterDoc.docs.first.id;
@@ -40,7 +42,7 @@ class ScheduleService {
       );
     } catch (e) {
       print('Error getting current semester: $e');
-      return _getDefaultSemester();
+      return await _getDefaultSemester();
     }
   }
 
@@ -82,15 +84,34 @@ class ScheduleService {
   }
 
   // Default semester for testing or when no data is available
-  Semester _getDefaultSemester() {
-    return Semester(
-      name: '2nd Semester(2024-2025)',
-      sessions: _getMockSessions(),
-    );
+  Future<Semester> _getDefaultSemester() async {
+    try {
+      final String jsonData = await rootBundle.loadString('lib/data/schedule_data.json');
+      final Map<String, dynamic> data = json.decode(jsonData);
+      final semesterData = data['currentSemester'];
+      
+      final List<dynamic> sessionsJson = semesterData['sessions'] as List<dynamic>;
+      
+      final List<ClassSession> sessions = sessionsJson.map((sessionJson) {
+        return ClassSession.fromJson(sessionJson);
+      }).toList();
+      
+      return Semester(
+        name: semesterData['name'],
+        sessions: sessions,
+      );
+    } catch (e) {
+      print('Error loading schedule data from JSON: $e');
+      // Fallback to hardcoded data if JSON loading fails
+      return Semester(
+        name: '2nd Semester(2024-2025)',
+        sessions: _getMockSessionsHardcoded(),
+      );
+    }
   }
 
-  // Mock schedule data for testing
-  List<ClassSession> _getMockSessions() {
+  // Hardcoded fallback data in case JSON loading fails
+  List<ClassSession> _getMockSessionsHardcoded() {
     final classId4C2 = ClassIdentifier(
       year: 4,
       department: Department.C,
@@ -110,233 +131,109 @@ class ScheduleService {
         weekType: WeekType.ODD,
         classIdentifier: classId4C2,
       ),
-      ClassSession(
-        id: 's2',
-        courseName: 'Expert System Application',
-        courseCode: 'L-CE406',
-        instructor: 'Dr. Hatem Mohamed Abdel Kader',
-        location: 'LR2( B-4-05)',
-        day: DayOfWeek.SATURDAY,
-        periodNumber: 3,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's3',
-        courseName: 'Expert System Application',
-        courseCode: 'L-CE406',
-        instructor: 'Dr. Hatem Mohamed Abdel Kader',
-        location: 'LR2( B-4-05)',
-        day: DayOfWeek.SATURDAY,
-        periodNumber: 4,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-      ),
-      
-      // Sunday sessions
-      ClassSession(
-        id: 's4',
-        courseName: 'Computer Graphics',
-        courseCode: 'L-CE402',
-        instructor: 'Dr. Somaya Ahmed Mohamed',
-        location: 'M5',
-        day: DayOfWeek.SUNDAY,
-        periodNumber: 1,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's5',
-        courseName: 'Computer Graphics',
-        courseCode: 'L-CE402',
-        instructor: 'Dr. Somaya Ahmed Mohamed',
-        location: 'M5',
-        day: DayOfWeek.SUNDAY,
-        periodNumber: 1,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's6',
-        courseName: 'Computer Graphics',
-        courseCode: 'L-CE402',
-        instructor: 'Dr. Somaya Ahmed Mohamed',
-        location: 'M5',
-        day: DayOfWeek.SUNDAY,
-        periodNumber: 2,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's7',
-        courseName: 'Image Processing Lab',
-        courseCode: '',
-        instructor: 'Eng Mazen',
-        location: 'B3 (A-0-20)',
-        day: DayOfWeek.SUNDAY,
-        periodNumber: 2,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-        isLab: true,
-      ),
-      ClassSession(
-        id: 's8',
-        courseName: 'Image Processing',
-        courseCode: 'L-ECE454',
-        instructor: 'Dr. Amr Hassan Yassein',
-        location: 'M9',
-        day: DayOfWeek.SUNDAY,
-        periodNumber: 3,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      
-      // Monday - Day off
-      ClassSession(
-        id: 's9',
-        courseName: 'DAY OFF',
-        courseCode: '',
-        instructor: '',
-        location: '',
-        day: DayOfWeek.MONDAY,
-        periodNumber: 1,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      
-      // Tuesday sessions
-      ClassSession(
-        id: 's10',
-        courseName: 'Computer Network Tut',
-        courseCode: '',
-        instructor: 'Eng Menna Allah Ibraheem',
-        location: 'CR6',
-        day: DayOfWeek.TUESDAY,
-        periodNumber: 1,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-        isTutorial: true,
-      ),
-      ClassSession(
-        id: 's11',
-        courseName: 'Image Processing',
-        courseCode: 'L-ECE454',
-        instructor: 'Dr. Amr Hassan Yassein',
-        location: 'M9',
-        day: DayOfWeek.TUESDAY,
-        periodNumber: 2,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's12',
-        courseName: 'Computer Graphics Tut',
-        courseCode: '',
-        instructor: 'Eng Ayman M Kamal',
-        location: 'CR3',
-        day: DayOfWeek.TUESDAY,
-        periodNumber: 3,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-        isTutorial: true,
-      ),
-      ClassSession(
-        id: 's13',
-        courseName: 'Image Processing Tut',
-        courseCode: '',
-        instructor: 'Eng Mazen',
-        location: 'CR9',
-        day: DayOfWeek.TUESDAY,
-        periodNumber: 3,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-        isTutorial: true,
-      ),
-      
-      // Wednesday sessions
-      ClassSession(
-        id: 's14',
-        courseName: 'Engineering Management',
-        courseCode: 'L-EM442',
-        instructor: 'Dr Hadeer Ragab abdelMonem',
-        location: 'M3',
-        day: DayOfWeek.WEDNESDAY,
-        periodNumber: 1,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's15',
-        courseName: 'Expert System Application Lab',
-        courseCode: '',
-        instructor: 'Eng Menna Allah Ibraheem',
-        location: 'B2 (A-0-19)',
-        day: DayOfWeek.WEDNESDAY,
-        periodNumber: 3,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-        isLab: true,
-      ),
-      ClassSession(
-        id: 's16',
-        courseName: 'Expert System Application Tut',
-        courseCode: '',
-        instructor: 'Eng Menna Allah Ibraheem',
-        location: 'CR2',
-        day: DayOfWeek.WEDNESDAY,
-        periodNumber: 3,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-        isTutorial: true,
-      ),
-      
-      // Thursday sessions
-      ClassSession(
-        id: 's17',
-        courseName: 'Computer Network',
-        courseCode: 'L-CE414',
-        instructor: 'Dr. Amira Salah Eldin EL Batouty',
-        location: 'M4',
-        day: DayOfWeek.THURSDAY,
-        periodNumber: 1,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's18',
-        courseName: 'Computer Network',
-        courseCode: 'L-CE414',
-        instructor: 'Dr. Amira Salah Eldin EL Batouty',
-        location: 'M4',
-        day: DayOfWeek.THURSDAY,
-        periodNumber: 2,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      ClassSession(
-        id: 's19',
-        courseName: 'Computer Network Lab',
-        courseCode: '',
-        instructor: 'Eng Menna Allah Ibraheem',
-        location: 'B2 (A-0-19)',
-        day: DayOfWeek.THURSDAY,
-        periodNumber: 3,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-        isLab: true,
-      ),
-      ClassSession(
-        id: 's20',
-        courseName: 'Computer Graphics Lab',
-        courseCode: '',
-        instructor: 'Eng Ayman M Kamal',
-        location: 'B2 (A-0-19)',
-        day: DayOfWeek.THURSDAY,
-        periodNumber: 3,
-        weekType: WeekType.EVEN,
-        classIdentifier: classId4C2,
-        isLab: true,
-      ),
+      // Adding just one sample session for fallback
+      // For complete data, the app will use the JSON file
     ];
+  }
+
+  // Organize students into sections by department with a maximum of 30 students per section
+  Future<void> organizeStudentsIntoSections() async {
+    try {
+      // 1. Fetch all users from the users collection
+      final QuerySnapshot usersSnapshot = await _firestore
+          .collection('users')
+          .where('role', isEqualTo: 'Student')
+          .get();
+      
+      if (usersSnapshot.docs.isEmpty) {
+        print('No students found to organize into sections');
+        return;
+      }
+      
+      // 2. Group users by department
+      final Map<String, List<DocumentSnapshot>> usersByDepartment = {};
+      
+      for (final doc in usersSnapshot.docs) {
+        final userData = doc.data() as Map<String, dynamic>;
+        if (!userData.containsKey('department')) continue;
+        
+        final String department = userData['department'] ?? 'General';
+        if (!usersByDepartment.containsKey(department)) {
+          usersByDepartment[department] = [];
+        }
+        usersByDepartment[department]!.add(doc);
+      }
+      
+      // 3. Process each department and create sections
+      for (final department in usersByDepartment.keys) {
+        // Sort students alphabetically by name
+        usersByDepartment[department]!.sort((a, b) {
+          final aData = a.data() as Map<String, dynamic>;
+          final bData = b.data() as Map<String, dynamic>;
+          
+          // Use name field if available, otherwise construct from firstName and lastName
+          final String aName = aData['name'] ?? 
+              '${aData['firstName'] ?? ''} ${aData['lastName'] ?? ''}';
+          final String bName = bData['name'] ?? 
+              '${bData['firstName'] ?? ''} ${bData['lastName'] ?? ''}';
+              
+          return aName.compareTo(bName);
+        });
+        
+        // Calculate how many sections we need
+        final int studentCount = usersByDepartment[department]!.length;
+        final int sectionCount = (studentCount / 30).ceil();
+        
+        // Create section batches for this department
+        for (int sectionNumber = 1; sectionNumber <= sectionCount; sectionNumber++) {
+          final int startIndex = (sectionNumber - 1) * 30;
+          final int endIndex = startIndex + 30 > studentCount ? studentCount : startIndex + 30;
+          
+          // Get students for this section
+          final sectionStudents = usersByDepartment[department]!.sublist(startIndex, endIndex);
+          
+          // Create a section document
+          final sectionRef = _firestore
+              .collection('sections')
+              .doc(department)
+              .collection('sectionsList')
+              .doc('section_$sectionNumber');
+          
+          // Create a map of student data to store in the section
+          final List<Map<String, dynamic>> studentsData = sectionStudents.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return {
+              'id': doc.id,
+              'name': data['name'] ?? '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}',
+              'email': data['email'] ?? '',
+              'academicYear': data['academicYear'] ?? 0,
+              'department': data['department'] ?? '',
+              'section': sectionNumber,
+            };
+          }).toList();
+          
+          // Save the section data
+          await sectionRef.set({
+            'sectionNumber': sectionNumber,
+            'department': department,
+            'studentCount': sectionStudents.length,
+            'students': studentsData,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+          
+          // Update each student's document with their assigned section
+          for (final studentDoc in sectionStudents) {
+            await _firestore.collection('users').doc(studentDoc.id).update({
+              'section': sectionNumber
+            });
+          }
+        }
+      }
+      
+      print('Successfully organized students into sections');
+    } catch (e) {
+      print('Error organizing students into sections: $e');
+      throw e; // Rethrow to handle in the UI
+    }
   }
 } 

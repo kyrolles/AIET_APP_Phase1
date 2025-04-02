@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/my_app_bar.dart';
 import 'package:uuid/uuid.dart';
 import '../services/results_service.dart';
+import '../services/schedule_service.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -14,6 +15,7 @@ class CreateUserScreen extends StatefulWidget {
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
   final ResultsService _resultsService = ResultsService();
+  final ScheduleService _scheduleService = ScheduleService();
 
   // Controllers for each text field
   final TextEditingController _firstNameController = TextEditingController();
@@ -59,7 +61,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _birthDateController.clear();
     setState(() {
       selectedRole = 'IT';
-      selectedDepartment = '';
+      selectedDepartment = 'CE';
       isPasswordVisible = false;
     });
   }
@@ -348,6 +350,22 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                         : const Text('Create Account'),
                   ),
                 ),
+                
+                // Add organize sections button
+                const SizedBox(height: 24),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _organizeStudentSections,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: const Text('Organize Students Into Sections'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -500,5 +518,58 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         ),
       ],
     );
+  }
+
+  // Add this method for organizing students into sections
+  Future<void> _organizeStudentSections() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Organizing students into sections...'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      // Call the service method to organize students
+      await _scheduleService.organizeStudentsIntoSections();
+      
+      // Close the dialog
+      Navigator.of(context).pop();
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All students have been organized into sections!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      // Close the dialog
+      Navigator.of(context).pop();
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error organizing sections: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 5),
+        ),
+      );
+      print('Error organizing sections: $e');
+    }
   }
 }

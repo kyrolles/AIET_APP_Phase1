@@ -1,0 +1,347 @@
+{
+  "currentSemester": {
+    "name": "2nd Semester(2024-2025)",
+    "sessions": [
+      {
+        "id": "s1",
+        "courseName": "Expert System Application",
+        "courseCode": "L-CE406",
+        "instructor": "Dr. Hatem Mohamed Abdel Kader",
+        "location": "LR2( B-4-05)",
+        "day": "SATURDAY",
+        "periodNumber": 3,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s2",
+        "courseName": "Expert System Application",
+        "courseCode": "L-CE406",
+        "instructor": "Dr. Hatem Mohamed Abdel Kader",
+        "location": "LR2( B-4-05)",
+        "day": "SATURDAY",
+        "periodNumber": 3,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s3",
+        "courseName": "Expert System Application",
+        "courseCode": "L-CE406",
+        "instructor": "Dr. Hatem Mohamed Abdel Kader",
+        "location": "LR2( B-4-05)",
+        "day": "SATURDAY",
+        "periodNumber": 4,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s4",
+        "courseName": "Computer Graphics",
+        "courseCode": "L-CE402",
+        "instructor": "Dr. Somaya Ahmed Mohamed",
+        "location": "M5",
+        "day": "SUNDAY",
+        "periodNumber": 1,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s5",
+        "courseName": "Computer Graphics",
+        "courseCode": "L-CE402",
+        "instructor": "Dr. Somaya Ahmed Mohamed",
+        "location": "M5",
+        "day": "SUNDAY",
+        "periodNumber": 1,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s6",
+        "courseName": "Computer Graphics",
+        "courseCode": "L-CE402",
+        "instructor": "Dr. Somaya Ahmed Mohamed",
+        "location": "M5",
+        "day": "SUNDAY",
+        "periodNumber": 2,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s7",
+        "courseName": "Image Processing Lab",
+        "courseCode": "",
+        "instructor": "Eng Mazen",
+        "location": "B3 (A-0-20)",
+        "day": "SUNDAY",
+        "periodNumber": 2,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": true,
+        "isTutorial": false
+      },
+      {
+        "id": "s8",
+        "courseName": "Image Processing",
+        "courseCode": "L-ECE454",
+        "instructor": "Dr. Amr Hassan Yassein",
+        "location": "M9",
+        "day": "SUNDAY",
+        "periodNumber": 3,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s9",
+        "courseName": "DAY OFF",
+        "courseCode": "",
+        "instructor": "",
+        "location": "",
+        "day": "MONDAY",
+        "periodNumber": 1,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s10",
+        "courseName": "Computer Network Tut",
+        "courseCode": "",
+        "instructor": "Eng Menna Allah Ibraheem",
+        "location": "CR6",
+        "day": "TUESDAY",
+        "periodNumber": 1,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": true
+      },
+      {
+        "id": "s11",
+        "courseName": "Image Processing",
+        "courseCode": "L-ECE454",
+        "instructor": "Dr. Amr Hassan Yassein",
+        "location": "M9",
+        "day": "TUESDAY",
+        "periodNumber": 2,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s12",
+        "courseName": "Computer Graphics Tut",
+        "courseCode": "",
+        "instructor": "Eng Ayman M Kamal",
+        "location": "CR3",
+        "day": "TUESDAY",
+        "periodNumber": 3,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": true
+      },
+      {
+        "id": "s13",
+        "courseName": "Image Processing Tut",
+        "courseCode": "",
+        "instructor": "Eng Mazen",
+        "location": "CR9",
+        "day": "TUESDAY",
+        "periodNumber": 3,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": true
+      },
+      {
+        "id": "s14",
+        "courseName": "Engineering Management",
+        "courseCode": "L-EM442",
+        "instructor": "Dr Hadeer Ragab abdelMonem",
+        "location": "M3",
+        "day": "WEDNESDAY",
+        "periodNumber": 1,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s15",
+        "courseName": "Expert System Application Lab",
+        "courseCode": "",
+        "instructor": "Eng Menna Allah Ibraheem",
+        "location": "B2 (A-0-19)",
+        "day": "WEDNESDAY",
+        "periodNumber": 3,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": true,
+        "isTutorial": false
+      },
+      {
+        "id": "s16",
+        "courseName": "Expert System Application Tut",
+        "courseCode": "",
+        "instructor": "Eng Menna Allah Ibraheem",
+        "location": "CR2",
+        "day": "WEDNESDAY",
+        "periodNumber": 3,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": true
+      },
+      {
+        "id": "s17",
+        "courseName": "Computer Network",
+        "courseCode": "L-CE414",
+        "instructor": "Dr. Amira Salah Eldin EL Batouty",
+        "location": "M4",
+        "day": "THURSDAY",
+        "periodNumber": 1,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s18",
+        "courseName": "Computer Network",
+        "courseCode": "L-CE414",
+        "instructor": "Dr. Amira Salah Eldin EL Batouty",
+        "location": "M4",
+        "day": "THURSDAY",
+        "periodNumber": 2,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": false,
+        "isTutorial": false
+      },
+      {
+        "id": "s19",
+        "courseName": "Computer Network Lab",
+        "courseCode": "",
+        "instructor": "Eng Menna Allah Ibraheem",
+        "location": "B2 (A-0-19)",
+        "day": "THURSDAY",
+        "periodNumber": 3,
+        "weekType": "ODD",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": true,
+        "isTutorial": false
+      },
+      {
+        "id": "s20",
+        "courseName": "Computer Graphics Lab",
+        "courseCode": "",
+        "instructor": "Eng Ayman M Kamal",
+        "location": "B2 (A-0-19)",
+        "day": "THURSDAY",
+        "periodNumber": 3,
+        "weekType": "EVEN",
+        "classIdentifier": {
+          "year": 4,
+          "department": "C",
+          "section": 2
+        },
+        "isLab": true,
+        "isTutorial": false
+      }
+    ]
+  }
+} 
