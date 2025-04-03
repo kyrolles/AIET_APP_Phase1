@@ -37,6 +37,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final _uuid = const Uuid();
 
   @override
+  void initState() {
+    super.initState();
+    // Set default value for academicYear
+    _academicYearController.text = '1st';
+  }
+
+  @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
@@ -57,7 +64,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _passwordController.clear();
     _phoneController.clear();
     _idController.clear();
-    _academicYearController.clear();
+    _academicYearController.text = '1st';  // Set default value for academicYear
     _birthDateController.clear();
     setState(() {
       selectedRole = 'IT';
@@ -325,10 +332,38 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField(
-                          controller: _academicYearController,
-                          label: 'Academic Year',
-                          hintText: 'enter Academic Year'),
+                      const Text(
+                        'Academic Year',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        value: _academicYearController.text.isEmpty ? '1st' : _academicYearController.text,
+                        items: const [
+                          DropdownMenuItem(value: 'GN', child: Text('General')),
+                          DropdownMenuItem(value: '1st', child: Text('1st Year')),
+                          DropdownMenuItem(value: '2nd', child: Text('2nd Year')),
+                          DropdownMenuItem(value: '3rd', child: Text('3rd Year')),
+                          DropdownMenuItem(value: '4th', child: Text('4th Year')),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _academicYearController.text = value!;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Academic Year is required';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -367,27 +402,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                         Icon(Icons.group_work),
                         SizedBox(width: 8),
                         Text('Organize Students Into Sections'),
-                      ],
-                    ),
-                  ),
-                ),
-                
-                // Add migrate sections button
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ElevatedButton(
-                    onPressed: _migrateSections,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40),
-                      backgroundColor: const Color(0xFF2EC4B6),
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.sync),
-                        SizedBox(width: 8),
-                        Text('Migrate Sections to New Structure'),
                       ],
                     ),
                   ),
@@ -546,7 +560,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     );
   }
 
-  // Add this method for organizing students into sections
+  // Method for organizing students into sections - already uses the new structure logic
   Future<void> _organizeStudentSections() async {
     showDialog(
       context: context,
@@ -596,59 +610,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         ),
       );
       print('Error organizing sections: $e');
-    }
-  }
-
-  // Add this method for migrating sections
-  Future<void> _migrateSections() async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const Dialog(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Migrating sections...'),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    try {
-      // Call the service method to migrate sections
-      await _scheduleService.migrateSections();
-      
-      // Close the dialog
-      Navigator.of(context).pop();
-      
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sections have been migrated successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
-    } catch (e) {
-      // Close the dialog
-      Navigator.of(context).pop();
-      
-      // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error migrating sections: $e'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 5),
-        ),
-      );
-      print('Error migrating sections: $e');
     }
   }
 }

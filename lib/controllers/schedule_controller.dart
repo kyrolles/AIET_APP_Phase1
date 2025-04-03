@@ -67,8 +67,37 @@ class ScheduleState {
   // Get today's sessions
   List<ClassSession> getTodaySessions() {
     final today = DateTime.now().weekday;
+    
     // Convert DateTime weekday (1-7, starting with Monday) to our DayOfWeek enum
-    final dayOfWeek = DayOfWeek.values[today == 7 ? 0 : today]; // Adjust for Sunday
+    // In DateTime: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday
+    // In our DayOfWeek: 0=SATURDAY, 1=SUNDAY, 2=MONDAY, 3=TUESDAY, 4=WEDNESDAY, 5=THURSDAY
+    DayOfWeek dayOfWeek;
+    
+    switch (today) {
+      case 1: // Monday
+        dayOfWeek = DayOfWeek.MONDAY;
+        break;
+      case 2: // Tuesday
+        dayOfWeek = DayOfWeek.TUESDAY;
+        break;
+      case 3: // Wednesday
+        dayOfWeek = DayOfWeek.WEDNESDAY;
+        break;
+      case 4: // Thursday
+        dayOfWeek = DayOfWeek.THURSDAY;
+        break;
+      case 5: // Friday (not in our enum, so no classes)
+        // Return empty list for Friday since it's not in our enum
+        return [];
+      case 6: // Saturday
+        dayOfWeek = DayOfWeek.SATURDAY;
+        break;
+      case 7: // Sunday
+        dayOfWeek = DayOfWeek.SUNDAY;
+        break;
+      default:
+        dayOfWeek = DayOfWeek.MONDAY; // Default to Monday
+    }
     
     return getFilteredSessions().where((session) => 
       session.day == dayOfWeek
@@ -82,12 +111,52 @@ class ScheduleState {
     final today = now.weekday;
     final currentHour = now.hour;
     
-    // Convert DateTime weekday (1-7, starting with Monday) to our DayOfWeek enum
-    final todayIndex = today == 7 ? 0 : today; // Adjust for Sunday
-    final tomorrowIndex = (todayIndex + 1) % 6; // Wrap around to Saturday
+    // Convert DateTime weekday to our DayOfWeek enum
+    DayOfWeek todayOfWeek;
+    DayOfWeek tomorrowOfWeek;
     
-    final todayOfWeek = DayOfWeek.values[todayIndex];
-    final tomorrowOfWeek = DayOfWeek.values[tomorrowIndex];
+    // Map today to our DayOfWeek enum
+    switch (today) {
+      case 1: // Monday
+        todayOfWeek = DayOfWeek.MONDAY;
+        tomorrowOfWeek = DayOfWeek.TUESDAY;
+        break;
+      case 2: // Tuesday
+        todayOfWeek = DayOfWeek.TUESDAY;
+        tomorrowOfWeek = DayOfWeek.WEDNESDAY;
+        break;
+      case 3: // Wednesday
+        todayOfWeek = DayOfWeek.WEDNESDAY;
+        tomorrowOfWeek = DayOfWeek.THURSDAY;
+        break;
+      case 4: // Thursday
+        todayOfWeek = DayOfWeek.THURSDAY;
+        tomorrowOfWeek = DayOfWeek.SATURDAY; // Skip Friday
+        break;
+      case 5: // Friday (not in our enum)
+        todayOfWeek = DayOfWeek.MONDAY; // Placeholder, won't be used
+        tomorrowOfWeek = DayOfWeek.SATURDAY;
+        break;
+      case 6: // Saturday
+        todayOfWeek = DayOfWeek.SATURDAY;
+        tomorrowOfWeek = DayOfWeek.SUNDAY;
+        break;
+      case 7: // Sunday
+        todayOfWeek = DayOfWeek.SUNDAY;
+        tomorrowOfWeek = DayOfWeek.MONDAY;
+        break;
+      default:
+        todayOfWeek = DayOfWeek.MONDAY;
+        tomorrowOfWeek = DayOfWeek.TUESDAY;
+    }
+    
+    // Handle Friday specially - skip to Saturday classes
+    if (today == 5) {
+      return getFilteredSessions().where((session) => 
+        session.day == tomorrowOfWeek
+      ).toList()
+        ..sort((a, b) => a.periodNumber.compareTo(b.periodNumber));
+    }
     
     // Get all sessions for today that haven't happened yet
     final todaySessions = getFilteredSessions().where((session) {
