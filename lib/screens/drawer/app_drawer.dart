@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
+import '../admin/schedule_management_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final Function() onLogout;
@@ -43,6 +44,33 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
               ),
+              
+              // Admin-only menu items
+              if (userRole == 'Admin') ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 25.0),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.schedule,
+                      size: 30,
+                    ),
+                    title: const Text(
+                      "Schedule Management",
+                      style: kTextStyleBold,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context); // Close drawer first
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ScheduleManagementScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+              
               // Attendance option removed
               const Padding(
                 padding: EdgeInsets.only(left: 25.0),

@@ -146,6 +146,72 @@ class ClassSession {
   
   // Factory method to create a session from JSON data
   factory ClassSession.fromJson(Map<String, dynamic> json) {
+    // First extract the classIdentifier data
+    final classIdentifierData = json['classIdentifier'] as Map<String, dynamic>;
+    
+    // Handle year which might be a string like 'GN', '1st', '2nd', etc.
+    int year;
+    if (classIdentifierData['year'] is String) {
+      final String yearString = classIdentifierData['year'].toString();
+      // Convert year string to int
+      switch (yearString.trim().toLowerCase()) {
+        case 'gn':
+          year = 0;
+          break;
+        case '1st':
+          year = 1;
+          break;
+        case '2nd':
+          year = 2;
+          break;
+        case '3rd':
+          year = 3;
+          break;
+        case '4th':
+          year = 4;
+          break;
+        default:
+          // Try to parse as int if it's just a number
+          year = int.tryParse(yearString) ?? 0;
+      }
+    } else {
+      // It's already an int
+      year = classIdentifierData['year'] ?? 0;
+    }
+    
+    // Handle department which might be a full code like 'CE', 'EME', etc.
+    final String deptCode = classIdentifierData['department']?.toString() ?? 'G';
+    Department department;
+    
+    // Convert department code to enum
+    switch (deptCode.trim().toUpperCase()) {
+      case 'CE':
+        department = Department.C;
+        break;
+      case 'EME':
+        department = Department.M;
+        break;
+      case 'IE':
+        department = Department.I;
+        break;
+      case 'ECE':
+        department = Department.E;
+        break;
+      case 'GN':
+        department = Department.G;
+        break;
+      default:
+        // Check if it's already a single letter matching our enum
+        if (deptCode.length == 1) {
+          department = Department.values.firstWhere(
+            (d) => d.name == deptCode,
+            orElse: () => Department.G,
+          );
+        } else {
+          department = Department.G;
+        }
+    }
+    
     return ClassSession(
       id: json['id'],
       courseName: json['courseName'],
@@ -162,34 +228,102 @@ class ClassSession {
         orElse: () => WeekType.ODD,
       ),
       classIdentifier: ClassIdentifier(
-        year: json['classIdentifier']['year'],
-        department: Department.values.firstWhere(
-          (d) => d.name == json['classIdentifier']['department'],
-          orElse: () => Department.G,
-        ),
-        section: json['classIdentifier']['section'],
+        year: year,
+        department: department,
+        section: classIdentifierData['section'],
       ),
       isLab: json['isLab'] ?? false,
       isTutorial: json['isTutorial'] ?? false,
     );
   }
+  
+  // Convert session to JSON for caching
+  Map<String, dynamic> toJson() {
+    // For caching, we keep the integer representation of year and single-letter department
+    // This is fine for local caching as we'll convert back to appropriate formats when sending to Firestore
+    return {
+      'id': id,
+      'courseName': courseName,
+      'courseCode': courseCode,
+      'instructor': instructor,
+      'location': location,
+      'day': day.name,
+      'periodNumber': periodNumber,
+      'weekType': weekType.name,
+      'classIdentifier': {
+        'year': classIdentifier.year,
+        'department': classIdentifier.department.name,
+        'section': classIdentifier.section,
+      },
+      'isLab': isLab,
+      'isTutorial': isTutorial,
+    };
+  }
 }
 
 class Semester {
+  final String id; // Firestore document ID
   final String name; // e.g., "2nd Semester(2024-2025)"
   final List<ClassSession> sessions;
+  final int semesterNumber; // 1 for 1st semester, 2 for 2nd semester
+  final String academicYear; // e.g., "2024-2025"
+  final bool isActive; // Whether this is the currently active semester
   
   Semester({
+    this.id = '',
     required this.name,
     required this.sessions,
+    this.semesterNumber = 2, // Default to 2nd semester
+    this.academicYear = '2024-2025', // Default academic year
+    this.isActive = false,
   });
   
   // Factory method to create a semester from JSON data
   factory Semester.fromJson(Map<String, dynamic> json) {
     final List<dynamic> sessionsList = json['sessions'] ?? [];
+    
+    // Extract semester number and academic year from name if available
+    final String name = json['name'] ?? '2nd Semester(2024-2025)';
+    int semesterNumber = json['semesterNumber'] ?? 2;
+    String academicYear = json['academicYear'] ?? '2024-2025';
+    
+    // If semester number and academic year are not directly available,
+    // try to parse them from the name
+    if (!json.containsKey('semesterNumber') || !json.containsKey('academicYear')) {
+      // Parse from name like "1st Semester(2024-2025)"
+      if (name.contains('1st')) {
+        semesterNumber = 1;
+      } else if (name.contains('2nd')) {
+        semesterNumber = 2;
+      }
+      
+      // Extract academic year from name if in parentheses
+      final RegExp yearRegex = RegExp(r'\(([0-9\-]+)\)');
+      final match = yearRegex.firstMatch(name);
+      if (match != null && match.groupCount >= 1) {
+        academicYear = match.group(1) ?? academicYear;
+      }
+    }
+    
     return Semester(
-      name: json['name'],
+      id: json['id'] ?? '',
+      name: name,
+      semesterNumber: semesterNumber,
+      academicYear: academicYear,
+      isActive: json['isActive'] ?? false,
       sessions: sessionsList.map((session) => ClassSession.fromJson(session)).toList(),
     );
+  }
+  
+  // Convert semester to JSON for caching
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'semesterNumber': semesterNumber,
+      'academicYear': academicYear,
+      'isActive': isActive,
+      'sessions': sessions.map((session) => session.toJson()).toList(),
+    };
   }
 } 
