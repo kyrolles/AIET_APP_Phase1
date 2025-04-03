@@ -146,6 +146,72 @@ class ClassSession {
   
   // Factory method to create a session from JSON data
   factory ClassSession.fromJson(Map<String, dynamic> json) {
+    // First extract the classIdentifier data
+    final classIdentifierData = json['classIdentifier'] as Map<String, dynamic>;
+    
+    // Handle year which might be a string like 'GN', '1st', '2nd', etc.
+    int year;
+    if (classIdentifierData['year'] is String) {
+      final String yearString = classIdentifierData['year'].toString();
+      // Convert year string to int
+      switch (yearString.trim().toLowerCase()) {
+        case 'gn':
+          year = 0;
+          break;
+        case '1st':
+          year = 1;
+          break;
+        case '2nd':
+          year = 2;
+          break;
+        case '3rd':
+          year = 3;
+          break;
+        case '4th':
+          year = 4;
+          break;
+        default:
+          // Try to parse as int if it's just a number
+          year = int.tryParse(yearString) ?? 0;
+      }
+    } else {
+      // It's already an int
+      year = classIdentifierData['year'] ?? 0;
+    }
+    
+    // Handle department which might be a full code like 'CE', 'EME', etc.
+    final String deptCode = classIdentifierData['department']?.toString() ?? 'G';
+    Department department;
+    
+    // Convert department code to enum
+    switch (deptCode.trim().toUpperCase()) {
+      case 'CE':
+        department = Department.C;
+        break;
+      case 'EME':
+        department = Department.M;
+        break;
+      case 'IE':
+        department = Department.I;
+        break;
+      case 'ECE':
+        department = Department.E;
+        break;
+      case 'GN':
+        department = Department.G;
+        break;
+      default:
+        // Check if it's already a single letter matching our enum
+        if (deptCode.length == 1) {
+          department = Department.values.firstWhere(
+            (d) => d.name == deptCode,
+            orElse: () => Department.G,
+          );
+        } else {
+          department = Department.G;
+        }
+    }
+    
     return ClassSession(
       id: json['id'],
       courseName: json['courseName'],
@@ -162,12 +228,9 @@ class ClassSession {
         orElse: () => WeekType.ODD,
       ),
       classIdentifier: ClassIdentifier(
-        year: json['classIdentifier']['year'],
-        department: Department.values.firstWhere(
-          (d) => d.name == json['classIdentifier']['department'],
-          orElse: () => Department.G,
-        ),
-        section: json['classIdentifier']['section'],
+        year: year,
+        department: department,
+        section: classIdentifierData['section'],
       ),
       isLab: json['isLab'] ?? false,
       isTutorial: json['isTutorial'] ?? false,
@@ -176,6 +239,8 @@ class ClassSession {
   
   // Convert session to JSON for caching
   Map<String, dynamic> toJson() {
+    // For caching, we keep the integer representation of year and single-letter department
+    // This is fine for local caching as we'll convert back to appropriate formats when sending to Firestore
     return {
       'id': id,
       'courseName': courseName,

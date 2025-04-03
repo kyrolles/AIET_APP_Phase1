@@ -299,31 +299,102 @@ class ScheduleService {
       }
 
       // Try to get academic year from multiple possible field names
-      final year = userData['academicYear'] ?? userData['year'] ?? 0;
-      // Ensure year is an integer
-      final int academicYear = year is int ? year : int.tryParse(year.toString()) ?? 0;
+      final String yearString = (userData['academicYear'] ?? userData['year'] ?? 'GN').toString();
+      
+      // Convert string year format to integer
+      int academicYear = _convertAcademicYearStringToInt(yearString);
       
       // Get department, ensuring it's a valid string
-      final String deptString = userData['department']?.toString() ?? 'G';
+      final String deptString = userData['department']?.toString() ?? 'GN';
+      
+      // Convert department code (CE, EME, etc.) to Department enum
+      final Department department = _convertDepartmentCodeToEnum(deptString);
       
       // Get section, ensuring it's an integer
       final section = userData['section'] ?? 1;
       final int sectionNumber = section is int ? section : int.tryParse(section.toString()) ?? 1;
       
-      print('Creating ClassIdentifier with year: $academicYear, department: $deptString, section: $sectionNumber');
+      print('Creating ClassIdentifier with year: $academicYear, department: ${department.name}, section: $sectionNumber');
       
       // Create class identifier with proper data conversion
       return ClassIdentifier(
         year: academicYear,
-        department: Department.values.firstWhere(
-          (d) => d.name == deptString,
-          orElse: () => Department.G,
-        ),
+        department: department,
         section: sectionNumber,
       );
     } catch (e) {
       print('Error getting student class identifier: $e');
       return null;
+    }
+  }
+
+  // Helper method to convert department codes from Firestore to Department enum
+  Department _convertDepartmentCodeToEnum(String deptCode) {
+    switch (deptCode.trim().toUpperCase()) {
+      case 'CE':
+        return Department.C;
+      case 'EME':
+        return Department.M;
+      case 'IE':
+        return Department.I;
+      case 'ECE':
+        return Department.E;
+      case 'GN':
+        return Department.G;
+      default:
+        // Check if it's already a single letter that matches our enum
+        if (deptCode.length == 1) {
+          try {
+            return Department.values.firstWhere(
+              (d) => d.name == deptCode,
+              orElse: () => Department.G,
+            );
+          } catch (_) {
+            return Department.G;
+          }
+        }
+        // Default to General if unrecognized
+        return Department.G;
+    }
+  }
+
+  // Helper method to convert Department enum to Firestore department code
+  String _convertDepartmentEnumToCode(Department department) {
+    switch (department) {
+      case Department.C:
+        return 'CE';
+      case Department.M:
+        return 'EME';
+      case Department.I:
+        return 'IE';
+      case Department.E:
+        return 'ECE';
+      case Department.G:
+        return 'GN';
+    }
+  }
+
+  // Helper method to convert academic year strings to integers
+  int _convertAcademicYearStringToInt(String yearString) {
+    switch (yearString.trim().toLowerCase()) {
+      case 'gn':
+        return 0;
+      case '1st':
+        return 1;
+      case '2nd':
+        return 2;
+      case '3rd':
+        return 3;
+      case '4th':
+        return 4;
+      default:
+        // Try to parse as int if it's just a number
+        final intValue = int.tryParse(yearString);
+        if (intValue != null && intValue >= 0 && intValue <= 4) {
+          return intValue;
+        }
+        // Default to general (0) if unrecognized
+        return 0;
     }
   }
 
@@ -345,33 +416,18 @@ class ScheduleService {
         return await getCurrentSemester(forceRefresh: true);
       }
       
-      // If creation failed, fall back to hardcoded data
-      print('Falling back to hardcoded data for semester');
-      
-      // Try using mock data directly
-      try {
-        final mockSessions = _getMockSessionsHardcoded();
-        // Add more mock sessions for testing to cover multiple classes
-        final mockSessions2 = _getAdditionalMockSessions();
-        
-        return Semester(
-          name: '2nd Semester(2024-2025)',
-          sessions: [...mockSessions, ...mockSessions2],
-        );
-      } catch (innerError) {
-        print('Error creating hardcoded semester data: $innerError');
-        // Last resort - empty semester with just a few sessions
-        return Semester(
-          name: '2nd Semester(2024-2025)',
-          sessions: _getMinimalMockSessions(),
-        );
-      }
-    } catch (e) {
-      print('Error loading default semester data: $e');
-      // Last resort - empty semester with just a few sessions
+      // If creation failed, fall back to empty semester
+      print('Failed to create default semester, returning empty semester');
       return Semester(
         name: '2nd Semester(2024-2025)',
-        sessions: _getMinimalMockSessions(),
+        sessions: [],
+      );
+    } catch (e) {
+      print('Error loading default semester data: $e');
+      // Last resort - empty semester
+      return Semester(
+        name: '2nd Semester(2024-2025)',
+        sessions: [],
       );
     }
   }
@@ -390,177 +446,12 @@ class ScheduleService {
       final semesterRef = await _firestore
           .collection('semesters')
           .add(semesterData);
-          
-      // Read sessions from JSON
-      final String jsonData = await rootBundle.loadString('lib/data/schedule_data.json');
-      final Map<String, dynamic> data = json.decode(jsonData);
-      final Map<String, dynamic> semesterJson = data['currentSemester'];
-      final List<dynamic> sessionsJson = semesterJson['sessions'] as List<dynamic>;
-      
-      // Batch write all sessions
-      final WriteBatch batch = _firestore.batch();
-      
-      for (final sessionJson in sessionsJson) {
-        // Prepare Firestore-compatible data
-        final Map<String, dynamic> sessionData = {
-          'courseName': sessionJson['courseName'],
-          'courseCode': sessionJson['courseCode'] ?? '',
-          'instructor': sessionJson['instructor'] ?? '',
-          'location': sessionJson['location'] ?? '',
-          'day': sessionJson['day'],
-          'periodNumber': sessionJson['periodNumber'],
-          'weekType': sessionJson['weekType'],
-          'classIdentifier': {
-            'year': sessionJson['classIdentifier']['year'],
-            'department': sessionJson['classIdentifier']['department'],
-            'section': sessionJson['classIdentifier']['section'],
-          },
-          'isLab': sessionJson['isLab'] ?? false,
-          'isTutorial': sessionJson['isTutorial'] ?? false,
-          'createdAt': FieldValue.serverTimestamp(),
-        };
-        
-        // Create a new session document reference
-        final sessionRef = _firestore
-            .collection('semesters')
-            .doc(semesterRef.id)
-            .collection('sessions')
-            .doc();
-            
-        // Add to batch
-        batch.set(sessionRef, sessionData);
-      }
-      
-      // Commit the batch
-      await batch.commit();
       
       return semesterRef.id;
     } catch (e) {
       print('Error creating default semester: $e');
       return '';
     }
-  }
-
-  // Hardcoded fallback data in case JSON loading fails
-  List<ClassSession> _getMockSessionsHardcoded() {
-    final classId4C2 = ClassIdentifier(
-      year: 4,
-      department: Department.C,
-      section: 2,
-    );
-    
-    return [
-      // Saturday sessions
-      ClassSession(
-        id: 's1',
-        courseName: 'Expert System Application',
-        courseCode: 'L-CE406',
-        instructor: 'Dr. Hatem Mohamed Abdel Kader',
-        location: 'LR2( B-4-05)',
-        day: DayOfWeek.SATURDAY,
-        periodNumber: 3,
-        weekType: WeekType.ODD,
-        classIdentifier: classId4C2,
-      ),
-      // Adding just one sample session for fallback
-      // For complete data, the app will use the JSON file
-    ];
-  }
-
-  // Additional mock sessions to ensure every department has at least one
-  List<ClassSession> _getAdditionalMockSessions() {
-    final List<ClassSession> sessions = [];
-    
-    // Create sessions for each department and year
-    for (int year = 1; year <= 4; year++) {
-      for (final dept in Department.values) {
-        for (int section = 1; section <= 2; section++) {
-          final classId = ClassIdentifier(
-            year: year,
-            department: dept,
-            section: section,
-          );
-          
-          sessions.add(ClassSession(
-            id: 'mock_${year}${dept.name}${section}_1',
-            courseName: 'Course for ${year}${dept.name}${section}',
-            courseCode: 'CC${year}${dept.name}${section}',
-            instructor: 'Dr. Instructor',
-            location: 'Room ${year}${dept.name}${section}',
-            day: DayOfWeek.MONDAY,
-            periodNumber: 1,
-            weekType: WeekType.ODD,
-            classIdentifier: classId,
-          ));
-          
-          sessions.add(ClassSession(
-            id: 'mock_${year}${dept.name}${section}_2',
-            courseName: 'Another Course',
-            courseCode: 'AC${year}${dept.name}${section}',
-            instructor: 'Dr. Professor',
-            location: 'Lab ${year}${dept.name}${section}',
-            day: DayOfWeek.WEDNESDAY,
-            periodNumber: 3,
-            weekType: WeekType.EVEN,
-            classIdentifier: classId,
-          ));
-        }
-      }
-    }
-    
-    return sessions;
-  }
-  
-  // Absolute minimal mock sessions as last resort
-  List<ClassSession> _getMinimalMockSessions() {
-    // Just create one session for each common department
-    return [
-      ClassSession(
-        id: 'min_4C2',
-        courseName: 'Computer Engineering',
-        courseCode: 'CE400',
-        instructor: 'Dr. Smith',
-        location: 'Room 101',
-        day: DayOfWeek.MONDAY,
-        periodNumber: 1,
-        weekType: WeekType.ODD,
-        classIdentifier: ClassIdentifier(
-          year: 4,
-          department: Department.C,
-          section: 2,
-        ),
-      ),
-      ClassSession(
-        id: 'min_4E1',
-        courseName: 'Communication Systems',
-        courseCode: 'CE401',
-        instructor: 'Dr. Jones',
-        location: 'Room 102',
-        day: DayOfWeek.TUESDAY,
-        periodNumber: 2,
-        weekType: WeekType.ODD,
-        classIdentifier: ClassIdentifier(
-          year: 4,
-          department: Department.E,
-          section: 1,
-        ),
-      ),
-      ClassSession(
-        id: 'min_3C1',
-        courseName: 'Data Structures',
-        courseCode: 'CE301',
-        instructor: 'Dr. Brown',
-        location: 'Room 103',
-        day: DayOfWeek.WEDNESDAY,
-        periodNumber: 3,
-        weekType: WeekType.EVEN,
-        classIdentifier: ClassIdentifier(
-          year: 3,
-          department: Department.C,
-          section: 1,
-        ),
-      ),
-    ];
   }
 
   // Organize students into sections by department with a maximum of 30 students per section
@@ -687,6 +578,12 @@ class ScheduleService {
       final String semesterId = await _getOrCreateActiveSemester();
       if (semesterId.isEmpty) return false;
       
+      // Get year string representation for Firestore storage
+      final String yearString = _convertYearIntToString(session.classIdentifier.year);
+      
+      // Get department code for Firestore storage
+      final String deptCode = _convertDepartmentEnumToCode(session.classIdentifier.department);
+      
       // Prepare session data
       final sessionData = {
         'courseName': session.courseName,
@@ -697,8 +594,8 @@ class ScheduleService {
         'periodNumber': session.periodNumber,
         'weekType': session.weekType.name,
         'classIdentifier': {
-          'year': session.classIdentifier.year,
-          'department': session.classIdentifier.department.name,
+          'year': yearString, // Store as string format in Firestore
+          'department': deptCode, // Store as full department code in Firestore
           'section': session.classIdentifier.section,
         },
         'isLab': session.isLab,
@@ -727,6 +624,24 @@ class ScheduleService {
     } catch (e) {
       print('Error adding/updating class session: $e');
       return false;
+    }
+  }
+
+  // Helper method to convert year integer to string format for Firestore
+  String _convertYearIntToString(int year) {
+    switch (year) {
+      case 0:
+        return 'GN';
+      case 1:
+        return '1st';
+      case 2:
+        return '2nd';
+      case 3:
+        return '3rd';
+      case 4:
+        return '4th';
+      default:
+        return 'GN';
     }
   }
 
@@ -812,7 +727,10 @@ class ScheduleService {
       
       for (final yearDoc in yearsSnapshot.docs) {
         final yearData = yearDoc.data() as Map<String, dynamic>;
-        final int academicYear = int.tryParse(yearDoc.id) ?? 0;
+        
+        // Convert the year string (like '1st', '2nd', etc.) to int
+        final String yearString = yearDoc.id;
+        final int academicYear = _convertAcademicYearStringToInt(yearString);
         
         if (yearData.containsKey('departments')) {
           final departments = yearData['departments'] as List<dynamic>;
@@ -821,10 +739,8 @@ class ScheduleService {
             final String deptCode = deptData['code'] ?? '';
             final int sectionCount = deptData['sectionCount'] ?? 1;
             
-            final department = Department.values.firstWhere(
-              (d) => d.name == deptCode,
-              orElse: () => Department.G,
-            );
+            // Convert department code to enum using our helper method
+            final department = _convertDepartmentCodeToEnum(deptCode);
             
             // Add each section for this department and year
             for (int sectionNumber = 1; sectionNumber <= sectionCount; sectionNumber++) {
@@ -855,11 +771,17 @@ class ScheduleService {
               userData.containsKey('department') && 
               userData.containsKey('section')) {
             
-            final int year = userData['academicYear'] ?? 0;
-            final String deptCode = userData['department'] ?? 'G';
+            // Convert year string to int
+            final String yearString = userData['academicYear'].toString();
+            final int year = _convertAcademicYearStringToInt(yearString);
+            
+            // Convert department code to enum
+            final String deptCode = userData['department'] ?? 'GN';
+            final Department department = _convertDepartmentCodeToEnum(deptCode);
+            
             final int section = userData['section'] ?? 1;
             
-            final key = '$year-$deptCode';
+            final key = '$year-${department.name}';
             if (!sectionsMap.containsKey(key)) {
               sectionsMap[key] = {};
             }
@@ -886,23 +808,21 @@ class ScheduleService {
         }
       }
       
-      // If still no class identifiers found, provide default ones
+      // If still no class identifiers found, provide default ones for key years/departments
       if (classIdentifiers.isEmpty) {
         print('No class identifiers found in database, using default values');
         
-        // Add default classes for each department and year
-        for (int year = 1; year <= 4; year++) {
-          for (final dept in Department.values) {
-            // Add 2 sections for each year-department combination
-            for (int section = 1; section <= 2; section++) {
-              classIdentifiers.add(ClassIdentifier(
-                year: year,
-                department: dept,
-                section: section,
-              ));
-            }
-          }
-        }
+        // Add default classes for common year-department combinations
+        classIdentifiers.add(ClassIdentifier(
+          year: 4,
+          department: Department.C,
+          section: 1,
+        ));
+        classIdentifiers.add(ClassIdentifier(
+          year: 4,
+          department: Department.E,
+          section: 1,
+        ));
       }
       
       return classIdentifiers;
@@ -913,16 +833,11 @@ class ScheduleService {
       defaultIdentifiers.add(ClassIdentifier(
         year: 4,
         department: Department.C,
-        section: 2,
+        section: 1,
       ));
       defaultIdentifiers.add(ClassIdentifier(
         year: 4,
         department: Department.E,
-        section: 1,
-      ));
-      defaultIdentifiers.add(ClassIdentifier(
-        year: 3,
-        department: Department.C,
         section: 1,
       ));
       
@@ -955,6 +870,12 @@ class ScheduleService {
       final WriteBatch batch = _firestore.batch();
       
       for (final session in sessions) {
+        // Convert year to string format for Firestore
+        final String yearString = _convertYearIntToString(session.classIdentifier.year);
+        
+        // Convert department to full code for Firestore
+        final String deptCode = _convertDepartmentEnumToCode(session.classIdentifier.department);
+        
         final sessionData = {
           'courseName': session.courseName,
           'courseCode': session.courseCode,
@@ -964,8 +885,8 @@ class ScheduleService {
           'periodNumber': session.periodNumber,
           'weekType': session.weekType.name,
           'classIdentifier': {
-            'year': session.classIdentifier.year,
-            'department': session.classIdentifier.department.name,
+            'year': yearString, // Store as string format in Firestore
+            'department': deptCode, // Store as full department code in Firestore
             'section': session.classIdentifier.section,
           },
           'isLab': session.isLab,

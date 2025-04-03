@@ -92,13 +92,13 @@ class HomeScheduleView extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(scheduleControllerProvider.notifier).toggleWeekType();
+                _showFullWeekSchedule(context, scheduleState);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Check Other Week'),
+              child: const Text('View Full Week'),
             ),
           ],
         ),
@@ -255,138 +255,41 @@ class HomeScheduleView extends ConsumerWidget {
   Widget _buildViewFullScheduleButton(BuildContext context, ScheduleState scheduleState) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: GestureDetector(
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => DraggableScrollableSheet(
-              initialChildSize: 0.9,
-              maxChildSize: 0.9,
-              minChildSize: 0.5,
-              builder: (_, controller) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+      child: Column(
+        children: [
+          // View full week schedule button
+          GestureDetector(
+            onTap: () {
+              _showFullWeekSchedule(context, scheduleState);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: kPrimaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: kPrimaryColor.withOpacity(0.3)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'View Full Week',
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      // Bottom sheet handle
-                      Container(
-                        width: 40,
-                        height: 5,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(2.5),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Weekly Schedule',
-                        style: TextStyle(
-                          fontFamily: 'Lexend',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Week type and refresh controls
-                      Consumer(
-                        builder: (context, ref, _) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                scheduleState.selectedWeekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
-                                style: TextStyle(
-                                  color: kPrimaryColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.refresh),
-                                color: kPrimaryColor,
-                                onPressed: () {
-                                  final controller = ref.read(scheduleControllerProvider.notifier);
-                                  final refreshMessage = controller.getRefreshMessage();
-                                  
-                                  if (refreshMessage != null) {
-                                    // Show cooldown message if in cooldown
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(refreshMessage),
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  } else {
-                                    // Refresh if not in cooldown
-                                    controller.refreshSchedule();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Refreshing schedule from server...'),
-                                        duration: Duration(seconds: 1),
-                                      ),
-                                    );
-                                  }
-                                },
-                                tooltip: 'Refresh Schedule',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Full schedule display
-                      Expanded(
-                        child: scheduleState.classIdentifier != null
-                            ? WeeklyScheduleView(
-                                weekType: scheduleState.selectedWeekType,
-                                classIdentifier: scheduleState.classIdentifier!,
-                                sessions: scheduleState.getFilteredSessions(),
-                              )
-                            : const Center(
-                                child: Text('No schedule available'),
-                              ),
-                      ),
-                    ],
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.calendar_month,
+                    size: 18,
+                    color: kPrimaryColor,
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: kPrimaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: kPrimaryColor.withOpacity(0.3)),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'View Full Schedule',
-                style: TextStyle(
-                  color: kPrimaryColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.calendar_month,
-                size: 18,
-                color: kPrimaryColor,
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
@@ -394,5 +297,125 @@ class HomeScheduleView extends ConsumerWidget {
   String _getCurrentDayName() {
     final now = DateTime.now();
     return DateFormat('EEEE').format(now);
+  }
+  
+  // Helper method to show the full week schedule
+  void _showFullWeekSchedule(BuildContext context, ScheduleState scheduleState) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        builder: (_, controller) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Bottom sheet handle
+                Container(
+                  width: 40,
+                  height: 5,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Weekly Schedule',
+                  style: TextStyle(
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Week type and refresh controls
+                Consumer(
+                  builder: (context, ref, _) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          scheduleState.selectedWeekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            // Add toggle week type button
+                            IconButton(
+                              icon: const Icon(Icons.swap_horiz),
+                              color: kPrimaryColor,
+                              onPressed: () {
+                                ref.read(scheduleControllerProvider.notifier).toggleWeekType();
+                              },
+                              tooltip: 'Toggle Week Type',
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.refresh),
+                              color: kPrimaryColor,
+                              onPressed: () {
+                                final controller = ref.read(scheduleControllerProvider.notifier);
+                                final refreshMessage = controller.getRefreshMessage();
+                                
+                                if (refreshMessage != null) {
+                                  // Show cooldown message if in cooldown
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(refreshMessage),
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                } else {
+                                  // Refresh if not in cooldown
+                                  controller.refreshSchedule();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Refreshing schedule from server...'),
+                                      duration: Duration(seconds: 1),
+                                    ),
+                                  );
+                                }
+                              },
+                              tooltip: 'Refresh Schedule',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Full schedule display
+                Expanded(
+                  child: scheduleState.classIdentifier != null
+                      ? WeeklyScheduleView(
+                          weekType: scheduleState.selectedWeekType,
+                          classIdentifier: scheduleState.classIdentifier!,
+                          sessions: scheduleState.getFilteredSessions(),
+                        )
+                      : const Center(
+                          child: Text('No schedule available'),
+                        ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 } 
