@@ -262,19 +262,55 @@ class ClassSession {
 }
 
 class Semester {
+  final String id; // Firestore document ID
   final String name; // e.g., "2nd Semester(2024-2025)"
   final List<ClassSession> sessions;
+  final int semesterNumber; // 1 for 1st semester, 2 for 2nd semester
+  final String academicYear; // e.g., "2024-2025"
+  final bool isActive; // Whether this is the currently active semester
   
   Semester({
+    this.id = '',
     required this.name,
     required this.sessions,
+    this.semesterNumber = 2, // Default to 2nd semester
+    this.academicYear = '2024-2025', // Default academic year
+    this.isActive = false,
   });
   
   // Factory method to create a semester from JSON data
   factory Semester.fromJson(Map<String, dynamic> json) {
     final List<dynamic> sessionsList = json['sessions'] ?? [];
+    
+    // Extract semester number and academic year from name if available
+    final String name = json['name'] ?? '2nd Semester(2024-2025)';
+    int semesterNumber = json['semesterNumber'] ?? 2;
+    String academicYear = json['academicYear'] ?? '2024-2025';
+    
+    // If semester number and academic year are not directly available,
+    // try to parse them from the name
+    if (!json.containsKey('semesterNumber') || !json.containsKey('academicYear')) {
+      // Parse from name like "1st Semester(2024-2025)"
+      if (name.contains('1st')) {
+        semesterNumber = 1;
+      } else if (name.contains('2nd')) {
+        semesterNumber = 2;
+      }
+      
+      // Extract academic year from name if in parentheses
+      final RegExp yearRegex = RegExp(r'\(([0-9\-]+)\)');
+      final match = yearRegex.firstMatch(name);
+      if (match != null && match.groupCount >= 1) {
+        academicYear = match.group(1) ?? academicYear;
+      }
+    }
+    
     return Semester(
-      name: json['name'],
+      id: json['id'] ?? '',
+      name: name,
+      semesterNumber: semesterNumber,
+      academicYear: academicYear,
+      isActive: json['isActive'] ?? false,
       sessions: sessionsList.map((session) => ClassSession.fromJson(session)).toList(),
     );
   }
@@ -282,7 +318,11 @@ class Semester {
   // Convert semester to JSON for caching
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
+      'semesterNumber': semesterNumber,
+      'academicYear': academicYear,
+      'isActive': isActive,
       'sessions': sessions.map((session) => session.toJson()).toList(),
     };
   }

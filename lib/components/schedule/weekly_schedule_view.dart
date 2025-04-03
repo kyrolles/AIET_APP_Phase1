@@ -7,12 +7,14 @@ class WeeklyScheduleView extends StatelessWidget {
   final WeekType weekType;
   final ClassIdentifier classIdentifier;
   final List<ClassSession> sessions;
+  final String semesterName;
   
   const WeeklyScheduleView({
     Key? key,
     required this.weekType,
     required this.classIdentifier,
     required this.sessions,
+    this.semesterName = '',
   }) : super(key: key);
   
   @override
@@ -21,6 +23,21 @@ class WeeklyScheduleView extends StatelessWidget {
       length: 6, // 6 days from Saturday to Thursday
       child: Column(
         children: [
+          // Semester name header
+          if (semesterName.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                semesterName,
+                style: const TextStyle(
+                  fontFamily: 'Lexend',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            
           // Tab bar for days
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),

@@ -6,6 +6,7 @@ import '../services/schedule_service.dart';
 class ScheduleState {
   final bool isLoading;
   final Semester? semester;
+  final List<Semester> availableSemesters; // All available semesters
   final ClassIdentifier? classIdentifier;
   final WeekType selectedWeekType;
   final String? errorMessage;
@@ -15,6 +16,7 @@ class ScheduleState {
   ScheduleState({
     this.isLoading = false,
     this.semester,
+    this.availableSemesters = const [],
     this.classIdentifier,
     this.selectedWeekType = WeekType.ODD,
     this.errorMessage,
@@ -25,6 +27,7 @@ class ScheduleState {
   ScheduleState copyWith({
     bool? isLoading,
     Semester? semester,
+    List<Semester>? availableSemesters,
     ClassIdentifier? classIdentifier,
     WeekType? selectedWeekType,
     String? errorMessage,
@@ -34,6 +37,7 @@ class ScheduleState {
     return ScheduleState(
       isLoading: isLoading ?? this.isLoading,
       semester: semester ?? this.semester,
+      availableSemesters: availableSemesters ?? this.availableSemesters,
       classIdentifier: classIdentifier ?? this.classIdentifier,
       selectedWeekType: selectedWeekType ?? this.selectedWeekType,
       errorMessage: errorMessage,
@@ -148,7 +152,20 @@ class ScheduleController extends StateNotifier<ScheduleState> {
         state = state.copyWith(classIdentifier: classIdentifier);
       }
       
-      // Now fetch the semester data
+      // Get all available semesters (with empty sessions lists for performance)
+      final availableSemesters = await _scheduleService.getAllSemesters();
+      
+      // Check if we have any semesters available - if not, don't try to load a specific one yet
+      if (availableSemesters.isEmpty) {
+        state = state.copyWith(
+          isLoading: false,
+          availableSemesters: [],
+          errorMessage: 'No semesters available. Please create a semester first.'
+        );
+        return;
+      }
+      
+      // Now fetch the current semester data with sessions
       final semester = await _scheduleService.getCurrentSemester();
       
       // Get filtered session count for logging
@@ -163,6 +180,7 @@ class ScheduleController extends StateNotifier<ScheduleState> {
       state = state.copyWith(
         isLoading: false,
         semester: semester,
+        availableSemesters: availableSemesters,
       );
       
       // Update refresh status
@@ -172,6 +190,102 @@ class ScheduleController extends StateNotifier<ScheduleState> {
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to load schedule: $e',
+      );
+    }
+  }
+  
+  // Change the current semester
+  Future<void> changeSemester(String semesterId) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    
+    try {
+      // Save the selected semester ID in preferences
+      await _scheduleService.setSelectedSemesterId(semesterId);
+      
+      // Load the selected semester
+      final semester = await _scheduleService.getSemesterById(semesterId);
+      
+      state = state.copyWith(
+        isLoading: false,
+        semester: semester,
+      );
+    } catch (e) {
+      print('Failed to change semester: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to change semester: $e',
+      );
+    }
+  }
+  
+  // For admins: set a semester as active
+  Future<bool> setActiveSemester(String semesterId) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    
+    try {
+      final result = await _scheduleService.setSemesterActive(semesterId);
+      
+      if (result) {
+        // Refresh the list of available semesters
+        final availableSemesters = await _scheduleService.getAllSemesters(forceRefresh: true);
+        
+        // Load the now-active semester
+        final semester = await _scheduleService.getSemesterById(semesterId, forceRefresh: true);
+        
+        state = state.copyWith(
+          isLoading: false,
+          semester: semester,
+          availableSemesters: availableSemesters,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Failed to set active semester. Permission denied.',
+        );
+      }
+      
+      return result;
+    } catch (e) {
+      print('Failed to set active semester: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to set active semester: $e',
+      );
+      return false;
+    }
+  }
+  
+  // Refresh all semester data
+  Future<void> refreshAllSemesterData() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    
+    try {
+      // Get all available semesters
+      final availableSemesters = await _scheduleService.getAllSemesters(forceRefresh: true);
+      
+      // Refresh the current semester
+      final currentSemesterId = state.semester?.id ?? '';
+      Semester semester;
+      
+      if (currentSemesterId.isNotEmpty) {
+        semester = await _scheduleService.getSemesterById(currentSemesterId, forceRefresh: true);
+      } else {
+        semester = await _scheduleService.getCurrentSemester(forceRefresh: true);
+      }
+      
+      state = state.copyWith(
+        isLoading: false,
+        semester: semester,
+        availableSemesters: availableSemesters,
+      );
+      
+      // Update refresh status
+      await _updateRefreshStatus();
+    } catch (e) {
+      print('Failed to refresh all semester data: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to refresh semester data: $e',
       );
     }
   }

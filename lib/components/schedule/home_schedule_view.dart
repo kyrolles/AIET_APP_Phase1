@@ -38,9 +38,32 @@ class HomeScheduleView extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(scheduleControllerProvider.notifier).refreshSchedule();
+                ref.read(scheduleControllerProvider.notifier).refreshAllSemesterData();
               },
-              child: const Text('Try Again'),
+              child: const Text('Refresh'),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    // Check for empty semesters list
+    if (scheduleState.availableSemesters.isEmpty || scheduleState.semester == null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'No semester data available. Please contact an administrator.',
+              style: TextStyle(color: kGrey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(scheduleControllerProvider.notifier).refreshAllSemesterData();
+              },
+              child: const Text('Refresh'),
             ),
           ],
         ),
@@ -140,10 +163,141 @@ class HomeScheduleView extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
+    return Column(
+      children: [
+        // Semester selector
+        if (scheduleState.availableSemesters.isNotEmpty)
+          _buildSemesterSelector(scheduleState, context, ref),
+        
+        // Main header with day and week type
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: kPrimaryColor.withOpacity(0.1),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+          ),
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'My Schedule - ${_getCurrentDayName()}',
+                    style: const TextStyle(
+                      fontFamily: 'Lexend',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        weekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section}',
+                        style: const TextStyle(
+                          color: kGrey,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const Spacer(),
+              // Refresh button to sync with Firestore
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                color: kPrimaryColor,
+                onPressed: () {
+                  final controller = ref.read(scheduleControllerProvider.notifier);
+                  final refreshMessage = controller.getRefreshMessage();
+                  
+                  if (refreshMessage != null) {
+                    // Show cooldown message if in cooldown
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(refreshMessage),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  } else {
+                    // Refresh if not in cooldown
+                    controller.refreshSchedule();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Refreshing schedule from server...'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                },
+                tooltip: 'Refresh Schedule',
+              ),
+              IconButton(
+                icon: const Icon(Icons.swap_horiz),
+                color: kPrimaryColor,
+                onPressed: () {
+                  ref.read(scheduleControllerProvider.notifier).toggleWeekType();
+                },
+                tooltip: 'Toggle Week Type',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildSemesterSelector(
+    ScheduleState scheduleState, 
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    // If no semesters available, don't show the selector
+    if (scheduleState.availableSemesters.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    
+    // Sort semesters: active first, then by academic year and semester number
+    final sortedSemesters = List<Semester>.from(scheduleState.availableSemesters)
+      ..sort((a, b) {
+        // Active semester first
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        
+        // Then by academic year (descending)
+        final yearCompare = b.academicYear.compareTo(a.academicYear);
+        if (yearCompare != 0) return yearCompare;
+        
+        // Then by semester number (descending)
+        return b.semesterNumber.compareTo(a.semesterNumber);
+      });
+    
+    // Make sure the current semester ID is in the list of available semesters
+    // If not, use the first semester in the sorted list
+    String selectedSemesterId = scheduleState.semester?.id ?? '';
+    bool validSelection = sortedSemesters.any((sem) => sem.id == selectedSemesterId);
+    
+    if (!validSelection && sortedSemesters.isNotEmpty) {
+      selectedSemesterId = sortedSemesters.first.id;
+    }
+    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: kPrimaryColor.withOpacity(0.1),
+        color: Colors.white,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -151,77 +305,44 @@ class HomeScheduleView extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'My Schedule - ${_getCurrentDayName()}',
-                style: const TextStyle(
+          const Text(
+            'Semester:',
+            style: TextStyle(
+              fontFamily: 'Lexend',
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedSemesterId,
+                isExpanded: true,
+                isDense: true,
+                icon: const Icon(Icons.arrow_drop_down),
+                style: TextStyle(
                   fontFamily: 'Lexend',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: kPrimaryColor,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Text(
-                    weekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                onChanged: (String? newValue) {
+                  if (newValue != null && newValue != scheduleState.semester?.id) {
+                    ref.read(scheduleControllerProvider.notifier).changeSemester(newValue);
+                  }
+                },
+                items: sortedSemesters.map<DropdownMenuItem<String>>((Semester semester) {
+                  return DropdownMenuItem<String>(
+                    value: semester.id,
+                    child: Text(
+                      semester.name + (semester.isActive ? ' (Active)' : ''),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section}',
-                    style: const TextStyle(
-                      color: kGrey,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
-            ],
-          ),
-          const Spacer(),
-          // Refresh button to sync with Firestore
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            color: kPrimaryColor,
-            onPressed: () {
-              final controller = ref.read(scheduleControllerProvider.notifier);
-              final refreshMessage = controller.getRefreshMessage();
-              
-              if (refreshMessage != null) {
-                // Show cooldown message if in cooldown
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(refreshMessage),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              } else {
-                // Refresh if not in cooldown
-                controller.refreshSchedule();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Refreshing schedule from server...'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-              }
-            },
-            tooltip: 'Refresh Schedule',
-          ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz),
-            color: kPrimaryColor,
-            onPressed: () {
-              ref.read(scheduleControllerProvider.notifier).toggleWeekType();
-            },
-            tooltip: 'Toggle Week Type',
+            ),
           ),
         ],
       ),
@@ -406,6 +527,7 @@ class HomeScheduleView extends ConsumerWidget {
                           weekType: scheduleState.selectedWeekType,
                           classIdentifier: scheduleState.classIdentifier!,
                           sessions: scheduleState.getFilteredSessions(),
+                          semesterName: scheduleState.semester?.name ?? '',
                         )
                       : const Center(
                           child: Text('No schedule available'),
