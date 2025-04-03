@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../components/my_app_bar.dart';
 import 'package:uuid/uuid.dart';
 import '../services/results_service.dart';
+import '../services/schedule_service.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -14,6 +15,7 @@ class CreateUserScreen extends StatefulWidget {
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
   final ResultsService _resultsService = ResultsService();
+  final ScheduleService _scheduleService = ScheduleService();
 
   // Controllers for each text field
   final TextEditingController _firstNameController = TextEditingController();
@@ -33,6 +35,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
   final _uuid = const Uuid();
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default value for academicYear
+    _academicYearController.text = '1st';
+  }
 
   @override
   void dispose() {
@@ -55,11 +64,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _passwordController.clear();
     _phoneController.clear();
     _idController.clear();
-    _academicYearController.clear();
+    _academicYearController.text = '1st';  // Set default value for academicYear
     _birthDateController.clear();
     setState(() {
       selectedRole = 'IT';
-      selectedDepartment = '';
+      selectedDepartment = 'CE';
       isPasswordVisible = false;
     });
   }
@@ -323,10 +332,38 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField(
-                          controller: _academicYearController,
-                          label: 'Academic Year',
-                          hintText: 'enter Academic Year'),
+                      const Text(
+                        'Academic Year',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        value: _academicYearController.text.isEmpty ? '1st' : _academicYearController.text,
+                        items: const [
+                          DropdownMenuItem(value: 'GN', child: Text('General')),
+                          DropdownMenuItem(value: '1st', child: Text('1st Year')),
+                          DropdownMenuItem(value: '2nd', child: Text('2nd Year')),
+                          DropdownMenuItem(value: '3rd', child: Text('3rd Year')),
+                          DropdownMenuItem(value: '4th', child: Text('4th Year')),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _academicYearController.text = value!;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Academic Year is required';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -346,6 +383,27 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     child: isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text('Create Account'),
+                  ),
+                ),
+                
+                // Add organize sections button
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ElevatedButton(
+                    onPressed: _organizeStudentSections,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(40),
+                      backgroundColor: const Color(0xFF4B39EF),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.group_work),
+                        SizedBox(width: 8),
+                        Text('Organize Students Into Sections'),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -500,5 +558,58 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         ),
       ],
     );
+  }
+
+  // Method for organizing students into sections - already uses the new structure logic
+  Future<void> _organizeStudentSections() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Organizing students into sections...'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      // Call the service method to organize students
+      await _scheduleService.organizeStudentsIntoSections();
+      
+      // Close the dialog
+      Navigator.of(context).pop();
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All students have been organized into sections!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      // Close the dialog
+      Navigator.of(context).pop();
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error organizing sections: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 5),
+        ),
+      );
+      print('Error organizing sections: $e');
+    }
   }
 }
