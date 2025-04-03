@@ -54,22 +54,32 @@ class ScheduleService {
         }
       }
 
-      // Check if user has a selected semester ID in preferences
-      final String? selectedSemesterId = await _getSelectedSemesterId();
+      // Check if user is admin
+      final user = _auth.currentUser;
+      final bool isAdmin = await _checkIfUserIsAdmin(user?.email);
+      
       String semesterId;
       
-      if (selectedSemesterId != null && selectedSemesterId.isNotEmpty) {
-        // Use the selected semester ID
-        semesterId = selectedSemesterId;
+      // Only check for selected semester if user is an admin
+      if (isAdmin) {
+        final String? selectedSemesterId = await _getSelectedSemesterId();
         
-        // Verify the semester exists
-        final semesterExists = await _checkSemesterExists(semesterId);
-        if (!semesterExists) {
-          // If not, fall back to active semester
+        if (selectedSemesterId != null && selectedSemesterId.isNotEmpty) {
+          // Use the selected semester ID
+          semesterId = selectedSemesterId;
+          
+          // Verify the semester exists
+          final semesterExists = await _checkSemesterExists(semesterId);
+          if (!semesterExists) {
+            // If not, fall back to active semester
+            semesterId = await _getOrCreateActiveSemester(forceRefresh: forceRefresh);
+          }
+        } else {
+          // Get or create active semester for admin
           semesterId = await _getOrCreateActiveSemester(forceRefresh: forceRefresh);
         }
       } else {
-        // Get or create active semester
+        // For students, always use the active semester
         semesterId = await _getOrCreateActiveSemester(forceRefresh: forceRefresh);
       }
       
@@ -130,6 +140,31 @@ class ScheduleService {
       
       return await _getDefaultSemester();
     }
+  }
+
+  // Helper method to check if user is admin
+  Future<bool> _checkIfUserIsAdmin(String? email) async {
+    if (email == null || email.isEmpty) return false;
+    
+    try {
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get(GetOptions(source: Source.serverAndCache));
+      
+      return userDoc.docs.isNotEmpty;
+    } catch (e) {
+      print('Error checking if user is admin: $e');
+      return false;
+    }
+  }
+
+  // Public method to check if current user is admin
+  Future<bool> isCurrentUserAdmin() async {
+    final user = _auth.currentUser;
+    return await _checkIfUserIsAdmin(user?.email);
   }
 
   // Cache the semester data locally

@@ -165,8 +165,8 @@ class HomeScheduleView extends ConsumerWidget {
   ) {
     return Column(
       children: [
-        // Semester selector
-        if (scheduleState.availableSemesters.isNotEmpty)
+        // Semester selector - only show for admin users
+        if (scheduleState.availableSemesters.isNotEmpty && scheduleState.isAdmin)
           _buildSemesterSelector(scheduleState, context, ref),
         
         // Main header with day and week type

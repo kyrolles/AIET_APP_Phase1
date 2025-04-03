@@ -12,6 +12,7 @@ class ScheduleState {
   final String? errorMessage;
   final bool isRefreshCooldown;
   final int cooldownRemainingMin;
+  final bool isAdmin; // Indicates if the current user is an admin
   
   ScheduleState({
     this.isLoading = false,
@@ -22,6 +23,7 @@ class ScheduleState {
     this.errorMessage,
     this.isRefreshCooldown = false,
     this.cooldownRemainingMin = 0,
+    this.isAdmin = false,
   });
   
   ScheduleState copyWith({
@@ -33,6 +35,7 @@ class ScheduleState {
     String? errorMessage,
     bool? isRefreshCooldown,
     int? cooldownRemainingMin,
+    bool? isAdmin,
   }) {
     return ScheduleState(
       isLoading: isLoading ?? this.isLoading,
@@ -43,6 +46,7 @@ class ScheduleState {
       errorMessage: errorMessage,
       isRefreshCooldown: isRefreshCooldown ?? this.isRefreshCooldown,
       cooldownRemainingMin: cooldownRemainingMin ?? this.cooldownRemainingMin,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
   
@@ -133,6 +137,9 @@ class ScheduleController extends StateNotifier<ScheduleState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
+      // Check if current user is admin
+      final isAdmin = await _scheduleService.isCurrentUserAdmin();
+      
       // Get the student's class identifier first
       final classIdentifier = await _scheduleService.getStudentClassIdentifier();
       
@@ -145,11 +152,15 @@ class ScheduleController extends StateNotifier<ScheduleState> {
             department: Department.C,
             section: 2,
           ),
+          isAdmin: isAdmin,
         );
       } else {
         print('Found class identifier: ${classIdentifier.year}${classIdentifier.department.name}${classIdentifier.section}');
         // Set the class identifier from user data
-        state = state.copyWith(classIdentifier: classIdentifier);
+        state = state.copyWith(
+          classIdentifier: classIdentifier,
+          isAdmin: isAdmin,
+        );
       }
       
       // Get all available semesters (with empty sessions lists for performance)
@@ -160,7 +171,8 @@ class ScheduleController extends StateNotifier<ScheduleState> {
         state = state.copyWith(
           isLoading: false,
           availableSemesters: [],
-          errorMessage: 'No semesters available. Please create a semester first.'
+          errorMessage: 'No semesters available. Please create a semester first.',
+          isAdmin: isAdmin,
         );
         return;
       }
@@ -181,6 +193,7 @@ class ScheduleController extends StateNotifier<ScheduleState> {
         isLoading: false,
         semester: semester,
         availableSemesters: availableSemesters,
+        isAdmin: isAdmin,
       );
       
       // Update refresh status
