@@ -352,18 +352,44 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                 ),
                 
                 // Add organize sections button
-                const SizedBox(height: 24),
-                Center(
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ElevatedButton(
                     onPressed: _organizeStudentSections,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: const Size(double.infinity, 50),
+                      minimumSize: const Size.fromHeight(40),
+                      backgroundColor: const Color(0xFF4B39EF),
+                      foregroundColor: Colors.white,
                     ),
-                    child: const Text('Organize Students Into Sections'),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.group_work),
+                        SizedBox(width: 8),
+                        Text('Organize Students Into Sections'),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Add migrate sections button
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ElevatedButton(
+                    onPressed: _migrateSections,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(40),
+                      backgroundColor: const Color(0xFF2EC4B6),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.sync),
+                        SizedBox(width: 8),
+                        Text('Migrate Sections to New Structure'),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -570,6 +596,59 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         ),
       );
       print('Error organizing sections: $e');
+    }
+  }
+
+  // Add this method for migrating sections
+  Future<void> _migrateSections() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Migrating sections...'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      // Call the service method to migrate sections
+      await _scheduleService.migrateSections();
+      
+      // Close the dialog
+      Navigator.of(context).pop();
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sections have been migrated successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      // Close the dialog
+      Navigator.of(context).pop();
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error migrating sections: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 5),
+        ),
+      );
+      print('Error migrating sections: $e');
     }
   }
 }

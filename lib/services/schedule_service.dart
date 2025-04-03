@@ -508,9 +508,199 @@ class ScheduleService {
     }
   }
 
-  // Organize students into sections by department with a maximum of 30 students per section
+  // Check if the collection is using the old section structure and needs migration
+  Future<bool> _checkIfSectionsMigrationNeeded() async {
+    try {
+      // Check if we have any sections in the old structure
+      final QuerySnapshot oldSectionsSnapshot = await _firestore
+          .collection('sections')
+          .get();
+      
+      if (oldSectionsSnapshot.docs.isEmpty) {
+        // No sections at all, no migration needed
+        return false;
+      }
+      
+      // Check if any sections have the old structure (sectionsList directly under department)
+      for (final deptDoc in oldSectionsSnapshot.docs) {
+        final oldStructureCollections = await _firestore
+            .collection('sections')
+            .doc(deptDoc.id)
+            .collection('sectionsList')
+            .limit(1)
+            .get();
+        
+        // If we found any sections in the old structure, migration is needed
+        if (oldStructureCollections.docs.isNotEmpty) {
+          return true;
+        }
+      }
+      
+      // Check if any departments have the new structure (academicYears collection)
+      bool foundNewStructure = false;
+      for (final deptDoc in oldSectionsSnapshot.docs) {
+        final newStructureCollections = await _firestore
+            .collection('sections')
+            .doc(deptDoc.id)
+            .collection('academicYears')
+            .limit(1)
+            .get();
+        
+        if (newStructureCollections.docs.isNotEmpty) {
+          foundNewStructure = true;
+          break;
+        }
+      }
+      
+      // If we found no old structure sections but have new structure,
+      // migration is not needed
+      if (foundNewStructure) {
+        return false;
+      }
+      
+      // Otherwise, we need migration
+      return true;
+    } catch (e) {
+      print('Error checking if sections migration is needed: $e');
+      return false;
+    }
+  }
+  
+  // Migrate from old sections structure to new structure
+  Future<void> migrateSectionsToNewStructure() async {
+    try {
+      final needsMigration = await _checkIfSectionsMigrationNeeded();
+      if (!needsMigration) {
+        print('No migration needed, sections are already in the new structure');
+        return;
+      }
+      
+      print('Starting sections migration to new structure...');
+      
+      // Get all departments in the old structure
+      final QuerySnapshot departmentsSnapshot = await _firestore
+          .collection('sections')
+          .get();
+      
+      if (departmentsSnapshot.docs.isEmpty) {
+        print('No sections found to migrate');
+        return;
+      }
+      
+      // Process each department
+      for (final deptDoc in departmentsSnapshot.docs) {
+        final String department = deptDoc.id;
+        
+        // Get all sections for this department
+        final QuerySnapshot sectionsSnapshot = await _firestore
+            .collection('sections')
+            .doc(department)
+            .collection('sectionsList')
+            .get();
+        
+        // If no sections, continue to next department
+        if (sectionsSnapshot.docs.isEmpty) continue;
+        
+        // Group students by academic year
+        final Map<String, List<Map<String, dynamic>>> studentsByYear = {};
+        
+        // Process each section
+        for (final sectionDoc in sectionsSnapshot.docs) {
+          final sectionData = sectionDoc.data() as Map<String, dynamic>;
+          
+          if (sectionData.containsKey('students') && sectionData['students'] is List) {
+            final students = sectionData['students'] as List<dynamic>;
+            
+            // Process each student
+            for (final student in students) {
+              if (student is Map<String, dynamic>) {
+                final String academicYear = student['academicYear']?.toString() ?? '1st';
+                
+                if (!studentsByYear.containsKey(academicYear)) {
+                  studentsByYear[academicYear] = [];
+                }
+                
+                studentsByYear[academicYear]!.add(student);
+              }
+            }
+          }
+        }
+        
+        // Now create sections in the new structure
+        for (final academicYear in studentsByYear.keys) {
+          final students = studentsByYear[academicYear]!;
+          
+          // Calculate how many sections we need
+          final int studentCount = students.length;
+          final int sectionCount = (studentCount / 30).ceil();
+          
+          print('Creating $sectionCount sections for $department, $academicYear with $studentCount students');
+          
+          // Create sections
+          for (int sectionNumber = 1; sectionNumber <= sectionCount; sectionNumber++) {
+            final int startIndex = (sectionNumber - 1) * 30;
+            final int endIndex = startIndex + 30 > studentCount ? studentCount : startIndex + 30;
+            
+            // Get students for this section
+            final sectionStudents = students.sublist(startIndex, endIndex);
+            
+            // Create section document
+            final sectionRef = _firestore
+                .collection('sections')
+                .doc(department)
+                .collection('academicYears')
+                .doc(academicYear)
+                .collection('sectionsList')
+                .doc('section_$sectionNumber');
+            
+            // Save section data
+            await sectionRef.set({
+              'sectionNumber': sectionNumber,
+              'department': department,
+              'academicYear': academicYear,
+              'studentCount': sectionStudents.length,
+              'students': sectionStudents,
+              'updatedAt': FieldValue.serverTimestamp(),
+              'migratedFromOld': true,
+            });
+            
+            // Update student documents with new section
+            for (final student in sectionStudents) {
+              if (student.containsKey('id')) {
+                try {
+                  await _firestore.collection('users').doc(student['id']).update({
+                    'section': sectionNumber,
+                    'academicYear': academicYear,
+                  });
+                } catch (e) {
+                  print('Error updating student ${student['id']}: $e');
+                }
+              }
+            }
+          }
+        }
+        
+        print('Migration completed for department $department');
+      }
+      
+      print('Migration of sections to new structure completed successfully');
+    } catch (e) {
+      print('Error migrating sections: $e');
+      throw e;
+    }
+  }
+  
+  // Modified organize students method to detect and handle migration if needed
   Future<void> organizeStudentsIntoSections() async {
     try {
+      // Check if migration is needed
+      final needsMigration = await _checkIfSectionsMigrationNeeded();
+      if (needsMigration) {
+        // Migrate old structure to new structure
+        await migrateSectionsToNewStructure();
+      }
+      
+      // Continue with regular organization
       // 1. Fetch all users from the users collection
       final QuerySnapshot usersSnapshot = await _firestore
           .collection('users')
@@ -522,87 +712,149 @@ class ScheduleService {
         return;
       }
       
-      // 2. Group users by department
-      final Map<String, List<DocumentSnapshot>> usersByDepartment = {};
+      // 2. Group users by department and academic year
+      final Map<String, Map<String, List<DocumentSnapshot>>> usersByDeptAndYear = {};
       
       for (final doc in usersSnapshot.docs) {
         final userData = doc.data() as Map<String, dynamic>;
         if (!userData.containsKey('department')) continue;
         
         final String department = userData['department'] ?? 'General';
-        if (!usersByDepartment.containsKey(department)) {
-          usersByDepartment[department] = [];
+        final String academicYear = userData['academicYear']?.toString() ?? '1st';
+        
+        // Initialize department map if it doesn't exist
+        if (!usersByDeptAndYear.containsKey(department)) {
+          usersByDeptAndYear[department] = {};
         }
-        usersByDepartment[department]!.add(doc);
+        
+        // Initialize academic year list if it doesn't exist
+        if (!usersByDeptAndYear[department]!.containsKey(academicYear)) {
+          usersByDeptAndYear[department]![academicYear] = [];
+        }
+        
+        // Add student to the appropriate department and year
+        usersByDeptAndYear[department]![academicYear]!.add(doc);
       }
       
-      // 3. Process each department and create sections
-      for (final department in usersByDepartment.keys) {
-        // Sort students alphabetically by name
-        usersByDepartment[department]!.sort((a, b) {
-          final aData = a.data() as Map<String, dynamic>;
-          final bData = b.data() as Map<String, dynamic>;
+      // 3. Process each department and academic year to create sections
+      for (final department in usersByDeptAndYear.keys) {
+        for (final academicYear in usersByDeptAndYear[department]!.keys) {
+          final students = usersByDeptAndYear[department]![academicYear]!;
           
-          // Use name field if available, otherwise construct from firstName and lastName
-          final String aName = aData['name'] ?? 
-              '${aData['firstName'] ?? ''} ${aData['lastName'] ?? ''}';
-          final String bName = bData['name'] ?? 
-              '${bData['firstName'] ?? ''} ${bData['lastName'] ?? ''}';
-              
-          return aName.compareTo(bName);
-        });
-        
-        // Calculate how many sections we need
-        final int studentCount = usersByDepartment[department]!.length;
-        final int sectionCount = (studentCount / 30).ceil();
-        
-        // Create section batches for this department
-        for (int sectionNumber = 1; sectionNumber <= sectionCount; sectionNumber++) {
-          final int startIndex = (sectionNumber - 1) * 30;
-          final int endIndex = startIndex + 30 > studentCount ? studentCount : startIndex + 30;
+          // Skip if no students in this department/year
+          if (students.isEmpty) continue;
           
-          // Get students for this section
-          final sectionStudents = usersByDepartment[department]!.sublist(startIndex, endIndex);
-          
-          // Create a section document
-          final sectionRef = _firestore
-              .collection('sections')
-              .doc(department)
-              .collection('sectionsList')
-              .doc('section_$sectionNumber');
-          
-          // Create a map of student data to store in the section
-          final List<Map<String, dynamic>> studentsData = sectionStudents.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return {
-              'id': doc.id,
-              'name': data['name'] ?? '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}',
-              'email': data['email'] ?? '',
-              'academicYear': data['academicYear'] ?? 0,
-              'department': data['department'] ?? '',
-              'section': sectionNumber,
-            };
-          }).toList();
-          
-          // Save the section data
-          await sectionRef.set({
-            'sectionNumber': sectionNumber,
-            'department': department,
-            'studentCount': sectionStudents.length,
-            'students': studentsData,
-            'updatedAt': FieldValue.serverTimestamp(),
+          // Sort students alphabetically by name
+          students.sort((a, b) {
+            final aData = a.data() as Map<String, dynamic>;
+            final bData = b.data() as Map<String, dynamic>;
+            
+            // Use name field if available, otherwise construct from firstName and lastName
+            final String aName = aData['name'] ?? 
+                '${aData['firstName'] ?? ''} ${aData['lastName'] ?? ''}';
+            final String bName = bData['name'] ?? 
+                '${bData['firstName'] ?? ''} ${bData['lastName'] ?? ''}';
+                
+            return aName.compareTo(bName);
           });
           
-          // Update each student's document with their assigned section
-          for (final studentDoc in sectionStudents) {
-            await _firestore.collection('users').doc(studentDoc.id).update({
-              'section': sectionNumber
+          // Calculate how many sections we need for this department/year
+          final int studentCount = students.length;
+          final int sectionCount = (studentCount / 30).ceil();
+          
+          print('Creating $sectionCount sections for $department, $academicYear with $studentCount students');
+          
+          // Create section batches for this department/year
+          for (int sectionNumber = 1; sectionNumber <= sectionCount; sectionNumber++) {
+            final int startIndex = (sectionNumber - 1) * 30;
+            final int endIndex = startIndex + 30 > studentCount ? studentCount : startIndex + 30;
+            
+            // Get students for this section
+            final sectionStudents = students.sublist(startIndex, endIndex);
+            
+            // Create a section document with updated path structure
+            final sectionRef = _firestore
+                .collection('sections')
+                .doc(department)
+                .collection('academicYears')
+                .doc(academicYear)
+                .collection('sectionsList')
+                .doc('section_$sectionNumber');
+            
+            // Create a map of student data to store in the section
+            final List<Map<String, dynamic>> studentsData = sectionStudents.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return {
+                'id': doc.id,
+                'name': data['name'] ?? '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}',
+                'email': data['email'] ?? '',
+                'academicYear': academicYear,
+                'department': department,
+                'section': sectionNumber,
+              };
+            }).toList();
+            
+            // Save the section data
+            await sectionRef.set({
+              'sectionNumber': sectionNumber,
+              'department': department,
+              'academicYear': academicYear,
+              'studentCount': sectionStudents.length,
+              'students': studentsData,
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
+            
+            // Update each student's document with their assigned section
+            for (final studentDoc in sectionStudents) {
+              final studentData = studentDoc.data() as Map<String, dynamic>;
+              final Map<String, dynamic> updateData = {
+                'section': sectionNumber
+              };
+              
+              // Also update academicYear if it doesn't match
+              if (studentData['academicYear']?.toString() != academicYear) {
+                updateData['academicYear'] = academicYear;
+              }
+              
+              await _firestore.collection('users').doc(studentDoc.id).update(updateData);
+            }
+          }
+        }
+      }
+      
+      // 4. Create empty sections for any missing academic years in each department
+      final academicYears = ['1st', '2nd', '3rd', '4th'];
+      
+      for (final department in usersByDeptAndYear.keys) {
+        for (final academicYear in academicYears) {
+          // Check if this academic year exists for this department
+          if (!usersByDeptAndYear[department]!.containsKey(academicYear) || 
+              usersByDeptAndYear[department]![academicYear]!.isEmpty) {
+            
+            // Create an empty section document as a placeholder
+            final sectionRef = _firestore
+                .collection('sections')
+                .doc(department)
+                .collection('academicYears')
+                .doc(academicYear)
+                .collection('sectionsList')
+                .doc('section_1');
+            
+            // Save the empty section data
+            await sectionRef.set({
+              'sectionNumber': 1,
+              'department': department,
+              'academicYear': academicYear,
+              'studentCount': 0,
+              'students': [],
+              'updatedAt': FieldValue.serverTimestamp(),
+              'isEmpty': true,
             });
           }
         }
       }
       
-      print('Successfully organized students into sections');
+      print('Successfully organized students into sections by department and academic year');
     } catch (e) {
       print('Error organizing students into sections: $e');
       throw e; // Rethrow to handle in the UI
@@ -837,7 +1089,61 @@ class ScheduleService {
       }
       
       // If no class identifiers found using academicYears collection,
-      // fall back to getting them from users collection
+      // try getting them from our new sections structure
+      if (classIdentifiers.isEmpty) {
+        try {
+          // Get all departments
+          final deptSnapshot = await _firestore
+              .collection('sections')
+              .get();
+              
+          for (final deptDoc in deptSnapshot.docs) {
+            final String department = deptDoc.id;
+            final Department deptEnum = _convertDepartmentCodeToEnum(department);
+            
+            // Get all academic years for this department
+            final yearsSnapshot = await _firestore
+                .collection('sections')
+                .doc(department)
+                .collection('academicYears')
+                .get();
+                
+            for (final yearDoc in yearsSnapshot.docs) {
+              final String yearString = yearDoc.id;
+              final int year = _convertAcademicYearStringToInt(yearString);
+              
+              // Get sections for this department and year
+              final sectionsSnapshot = await _firestore
+                  .collection('sections')
+                  .doc(department)
+                  .collection('academicYears')
+                  .doc(yearString)
+                  .collection('sectionsList')
+                  .get();
+                  
+              for (final sectionDoc in sectionsSnapshot.docs) {
+                final sectionData = sectionDoc.data();
+                final int sectionNumber = sectionData['sectionNumber'] ?? 1;
+                
+                // Only add non-empty sections or if all sections are empty
+                if (!sectionData.containsKey('isEmpty') || 
+                    sectionData['isEmpty'] != true || 
+                    sectionsSnapshot.docs.length <= 1) {
+                  classIdentifiers.add(ClassIdentifier(
+                    year: year,
+                    department: deptEnum,
+                    section: sectionNumber,
+                  ));
+                }
+              }
+            }
+          }
+        } catch (e) {
+          print('Error getting class identifiers from sections: $e');
+        }
+      }
+      
+      // If still no class identifiers, fall back to getting them from users collection
       if (classIdentifiers.isEmpty) {
         final Map<String, Set<int>> sectionsMap = {};
         
@@ -890,38 +1196,45 @@ class ScheduleService {
         }
       }
       
-      // If still no class identifiers found, provide default ones for key years/departments
+      // If still no class identifiers found, provide default ones
       if (classIdentifiers.isEmpty) {
         print('No class identifiers found in database, using default values');
         
-        // Add default classes for common year-department combinations
-        classIdentifiers.add(ClassIdentifier(
-          year: 4,
-          department: Department.C,
-          section: 1,
-        ));
-        classIdentifiers.add(ClassIdentifier(
-          year: 4,
-          department: Department.E,
-          section: 1,
-        ));
+        // Add default class identifiers for all departments and years
+        final departments = [Department.C, Department.E, Department.M, Department.I];
+        final years = [1, 2, 3, 4];
+        
+        for (final dept in departments) {
+          for (final year in years) {
+            classIdentifiers.add(ClassIdentifier(
+              year: year,
+              department: dept,
+              section: 1,
+            ));
+          }
+        }
       }
       
       return classIdentifiers;
     } catch (e) {
       print('Error getting class identifiers: $e');
+      
       // Return default class identifiers on error
       final List<ClassIdentifier> defaultIdentifiers = [];
-      defaultIdentifiers.add(ClassIdentifier(
-        year: 4,
-        department: Department.C,
-        section: 1,
-      ));
-      defaultIdentifiers.add(ClassIdentifier(
-        year: 4,
-        department: Department.E,
-        section: 1,
-      ));
+      
+      // Add default class identifiers for all departments and years
+      final departments = [Department.C, Department.E, Department.M, Department.I];
+      final years = [1, 2, 3, 4];
+      
+      for (final dept in departments) {
+        for (final year in years) {
+          defaultIdentifiers.add(ClassIdentifier(
+            year: year,
+            department: dept,
+            section: 1,
+          ));
+        }
+      }
       
       return defaultIdentifiers;
     }
@@ -1600,5 +1913,10 @@ class ScheduleService {
       print('Error cloning semester: $e');
       return '';
     }
+  }
+
+  // Public method to migrate sections to new structure
+  Future<void> migrateSections() async {
+    await migrateSectionsToNewStructure();
   }
 } 
