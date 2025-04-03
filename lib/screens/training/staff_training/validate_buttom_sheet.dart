@@ -30,15 +30,27 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   }
 
   void _checkFileAvailability() {
-    // Check if we can view the PDF (either via storage URL or base64)
-    _canViewPdf = (widget.request.fileStorageUrl != null && 
-        widget.request.fileStorageUrl!.isNotEmpty) || 
-        (widget.request.pdfBase64 != null && 
-        widget.request.pdfBase64!.isNotEmpty);
-    
-    log('Can view PDF: $_canViewPdf');
-    log('fileStorageUrl: ${widget.request.fileStorageUrl}');
-    log('pdfBase64 available: ${widget.request.pdfBase64 != null && widget.request.pdfBase64!.isNotEmpty}');
+    try {
+      // Check if we can view the PDF (either via storage URL or base64)
+      final hasStorageUrl = widget.request.fileStorageUrl != null && 
+          widget.request.fileStorageUrl!.isNotEmpty;
+      
+      final hasBase64 = widget.request.pdfBase64 != null && 
+          widget.request.pdfBase64!.isNotEmpty;
+      
+      setState(() {
+        _canViewPdf = hasStorageUrl || hasBase64;
+      });
+      
+      log('Can view PDF: $_canViewPdf');
+      log('Has fileStorageUrl: $hasStorageUrl');
+      log('Has pdfBase64: $hasBase64');
+    } catch (e) {
+      log('Error checking file availability: $e');
+      setState(() {
+        _canViewPdf = false;
+      });
+    }
   }
 
   Future<void> updateDocument({
@@ -91,6 +103,15 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   void _viewPdf(BuildContext context) {
     try {
       log('Opening PDF viewer');
+      log('fileStorageUrl: ${widget.request.fileStorageUrl}');
+      log('pdfBase64 length: ${widget.request.pdfBase64?.length ?? 0}');
+      
+      // Check if at least one source is available
+      if ((widget.request.fileStorageUrl == null || widget.request.fileStorageUrl!.isEmpty) &&
+          (widget.request.pdfBase64 == null || widget.request.pdfBase64!.isEmpty)) {
+        throw Exception('No PDF data available');
+      }
+      
       PDFViewer.open(
         context,
         pdfUrl: widget.request.fileStorageUrl,
