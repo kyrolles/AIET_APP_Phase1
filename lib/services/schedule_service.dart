@@ -1277,4 +1277,293 @@ class ScheduleService {
       return false;
     }
   }
+
+  /// Creates a new semester in Firestore
+  /// Returns the new semester ID if successful, empty string if failed
+  Future<String> createNewSemester({
+    required String name,
+    required int semesterNumber,
+    required String academicYear,
+    bool isActive = false,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return '';
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return '';
+      
+      // Create the semester document
+      final semesterData = {
+        'name': name,
+        'semesterNumber': semesterNumber,
+        'academicYear': academicYear,
+        'isActive': isActive,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'createdBy': user.email,
+      };
+      
+      // If making this semester active, deactivate all others
+      if (isActive) {
+        final batch = _firestore.batch();
+        
+        // First, get all active semesters
+        final activeSemesters = await _firestore
+            .collection('semesters')
+            .where('isActive', isEqualTo: true)
+            .get();
+        
+        // Deactivate all currently active semesters
+        for (final doc in activeSemesters.docs) {
+          batch.update(doc.reference, {
+            'isActive': false,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
+        
+        // Add the new semester
+        final newSemesterRef = _firestore.collection('semesters').doc();
+        batch.set(newSemesterRef, semesterData);
+        
+        // Commit the batch
+        await batch.commit();
+        
+        return newSemesterRef.id;
+      } else {
+        // Just add the semester without changing active status
+        final docRef = await _firestore
+            .collection('semesters')
+            .add(semesterData);
+        
+        return docRef.id;
+      }
+    } catch (e) {
+      print('Error creating new semester: $e');
+      return '';
+    }
+  }
+
+  /// Updates a semester's details
+  /// Returns true if successful, false otherwise
+  Future<bool> updateSemesterDetails(String semesterId, {
+    String? name,
+    int? semesterNumber,
+    String? academicYear,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return false;
+      
+      // Verify the semester exists
+      final semesterExists = await _checkSemesterExists(semesterId);
+      if (!semesterExists) return false;
+      
+      // Prepare update data
+      final Map<String, dynamic> updateData = {
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': user.email,
+      };
+      
+      // Add optional fields if provided
+      if (name != null) updateData['name'] = name;
+      if (semesterNumber != null) updateData['semesterNumber'] = semesterNumber;
+      if (academicYear != null) updateData['academicYear'] = academicYear;
+      
+      // Update the semester
+      await _firestore
+          .collection('semesters')
+          .doc(semesterId)
+          .update(updateData);
+      
+      return true;
+    } catch (e) {
+      print('Error updating semester details: $e');
+      return false;
+    }
+  }
+  
+  /// Deletes a semester and all its sessions
+  /// Returns true if successful, false otherwise
+  Future<bool> deleteSemester(String semesterId) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return false;
+      
+      // Verify the semester exists
+      final semesterDoc = await _firestore
+          .collection('semesters')
+          .doc(semesterId)
+          .get();
+      
+      if (!semesterDoc.exists) return false;
+      
+      // Check if this is the active semester - prevent deleting active semester
+      final semesterData = semesterDoc.data() as Map<String, dynamic>;
+      if (semesterData['isActive'] == true) {
+        print('Cannot delete active semester');
+        return false;
+      }
+      
+      // Delete all sessions first (batched in groups to handle large collections)
+      final sessionsSnapshot = await _firestore
+          .collection('semesters')
+          .doc(semesterId)
+          .collection('sessions')
+          .get();
+      
+      // Process in batches of 500 (Firestore batch limit)
+      final int batchSize = 500;
+      final List<List<DocumentSnapshot>> batches = [];
+      
+      for (var i = 0; i < sessionsSnapshot.docs.length; i += batchSize) {
+        final end = (i + batchSize < sessionsSnapshot.docs.length) 
+            ? i + batchSize 
+            : sessionsSnapshot.docs.length;
+        batches.add(sessionsSnapshot.docs.sublist(i, end));
+      }
+      
+      // Delete each batch
+      for (final batch in batches) {
+        final writeBatch = _firestore.batch();
+        for (final doc in batch) {
+          writeBatch.delete(doc.reference);
+        }
+        await writeBatch.commit();
+      }
+      
+      // Finally delete the semester document
+      await _firestore
+          .collection('semesters')
+          .doc(semesterId)
+          .delete();
+      
+      return true;
+    } catch (e) {
+      print('Error deleting semester: $e');
+      return false;
+    }
+  }
+
+  /// Clone a semester (copy all sessions to a new semester)
+  /// Returns the new semester ID if successful, empty string if failed
+  Future<String> cloneSemester(String sourceSemesterId, {
+    required String newName,
+    required int newSemesterNumber,
+    required String newAcademicYear,
+    bool makeActive = false,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return '';
+      
+      // Check if user is admin
+      final userDoc = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .where('role', isEqualTo: 'Admin')
+          .limit(1)
+          .get();
+      
+      if (userDoc.docs.isEmpty) return '';
+      
+      // Verify the source semester exists
+      final sourceSemesterDoc = await _firestore
+          .collection('semesters')
+          .doc(sourceSemesterId)
+          .get();
+      
+      if (!sourceSemesterDoc.exists) return '';
+      
+      // Create the new semester
+      final newSemesterId = await createNewSemester(
+        name: newName,
+        semesterNumber: newSemesterNumber,
+        academicYear: newAcademicYear,
+        isActive: makeActive,
+      );
+      
+      if (newSemesterId.isEmpty) return '';
+      
+      // Get all sessions from the source semester
+      final sessionsSnapshot = await _firestore
+          .collection('semesters')
+          .doc(sourceSemesterId)
+          .collection('sessions')
+          .get();
+      
+      // If there are no sessions to copy, return the new semester ID
+      if (sessionsSnapshot.docs.isEmpty) return newSemesterId;
+      
+      // Copy sessions in batches
+      final int batchSize = 500; // Firestore batch limit
+      final List<List<DocumentSnapshot>> batches = [];
+      
+      for (var i = 0; i < sessionsSnapshot.docs.length; i += batchSize) {
+        final end = (i + batchSize < sessionsSnapshot.docs.length) 
+            ? i + batchSize 
+            : sessionsSnapshot.docs.length;
+        batches.add(sessionsSnapshot.docs.sublist(i, end));
+      }
+      
+      // Process each batch
+      for (final batchDocs in batches) {
+        final writeBatch = _firestore.batch();
+        
+        for (final sourceDoc in batchDocs) {
+          final sourceData = sourceDoc.data() as Map<String, dynamic>;
+          
+          // Create a new document reference
+          final newDocRef = _firestore
+              .collection('semesters')
+              .doc(newSemesterId)
+              .collection('sessions')
+              .doc();
+          
+          // Remove any fields we don't want to copy
+          final Map<String, dynamic> newData = Map<String, dynamic>.from(sourceData);
+          newData.remove('id'); // ID will be set by Firestore
+          newData['updatedAt'] = FieldValue.serverTimestamp();
+          newData['createdAt'] = FieldValue.serverTimestamp();
+          newData['updatedBy'] = user.email;
+          
+          writeBatch.set(newDocRef, newData);
+        }
+        
+        await writeBatch.commit();
+      }
+      
+      return newSemesterId;
+    } catch (e) {
+      print('Error cloning semester: $e');
+      return '';
+    }
+  }
 } 

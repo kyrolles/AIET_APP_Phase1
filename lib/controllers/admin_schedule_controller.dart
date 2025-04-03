@@ -425,6 +425,241 @@ class AdminScheduleController extends StateNotifier<AdminScheduleState> {
       return false;
     }
   }
+  
+  /// Create a new semester
+  Future<bool> createNewSemester({
+    required String name,
+    required int semesterNumber,
+    required String academicYear,
+    bool isActive = false,
+  }) async {
+    state = state.copyWith(isSaving: true, errorMessage: null, successMessage: null);
+    
+    try {
+      final semesterId = await _scheduleService.createNewSemester(
+        name: name,
+        semesterNumber: semesterNumber,
+        academicYear: academicYear,
+        isActive: isActive,
+      );
+      
+      if (semesterId.isNotEmpty) {
+        // Refresh all semesters to reflect the updates
+        final updatedSemesters = await _scheduleService.getAllSemesters(forceRefresh: true);
+        
+        // If the new semester was set as active, load it
+        if (isActive) {
+          final newSemester = await _scheduleService.getSemesterById(semesterId);
+          
+          state = state.copyWith(
+            isSaving: false,
+            semester: newSemester,
+            availableSemesters: updatedSemesters,
+            selectedSemesterId: semesterId,
+            successMessage: 'New semester created successfully',
+          );
+        } else {
+          state = state.copyWith(
+            isSaving: false,
+            availableSemesters: updatedSemesters,
+            successMessage: 'New semester created successfully',
+          );
+        }
+        return true;
+      } else {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: 'Failed to create new semester. Permission denied.',
+        );
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'Error creating new semester: $e',
+      );
+      return false;
+    }
+  }
+  
+  /// Update semester details
+  Future<bool> updateSemesterDetails(String semesterId, {
+    String? name,
+    int? semesterNumber,
+    String? academicYear,
+  }) async {
+    state = state.copyWith(isSaving: true, errorMessage: null, successMessage: null);
+    
+    try {
+      final result = await _scheduleService.updateSemesterDetails(
+        semesterId, 
+        name: name,
+        semesterNumber: semesterNumber,
+        academicYear: academicYear,
+      );
+      
+      if (result) {
+        // Refresh all semesters to reflect the update
+        final updatedSemesters = await _scheduleService.getAllSemesters(forceRefresh: true);
+        
+        // If the updated semester is the currently selected one, reload it
+        if (semesterId == state.selectedSemesterId) {
+          final updatedSemester = await _scheduleService.getSemesterById(semesterId);
+          
+          state = state.copyWith(
+            isSaving: false,
+            semester: updatedSemester,
+            availableSemesters: updatedSemesters,
+            successMessage: 'Semester updated successfully',
+          );
+        } else {
+          state = state.copyWith(
+            isSaving: false,
+            availableSemesters: updatedSemesters,
+            successMessage: 'Semester updated successfully',
+          );
+        }
+        return true;
+      } else {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: 'Failed to update semester. Permission denied.',
+        );
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'Error updating semester: $e',
+      );
+      return false;
+    }
+  }
+  
+  /// Delete a semester
+  Future<bool> deleteSemester(String semesterId) async {
+    state = state.copyWith(isSaving: true, errorMessage: null, successMessage: null);
+    
+    try {
+      final result = await _scheduleService.deleteSemester(semesterId);
+      
+      if (result) {
+        // Refresh all semesters to reflect the deletion
+        final updatedSemesters = await _scheduleService.getAllSemesters(forceRefresh: true);
+        
+        // If the deleted semester was the selected one, select a different semester
+        if (semesterId == state.selectedSemesterId) {
+          // Find a new semester to select
+          String newSelectedId = '';
+          if (updatedSemesters.isNotEmpty) {
+            final activeSemester = updatedSemesters.firstWhere(
+              (s) => s.isActive, 
+              orElse: () => updatedSemesters.first
+            );
+            newSelectedId = activeSemester.id ?? '';
+          }
+          
+          // Load the new semester if one exists
+          if (newSelectedId.isNotEmpty) {
+            final newSemester = await _scheduleService.getSemesterById(newSelectedId);
+            
+            state = state.copyWith(
+              isSaving: false,
+              semester: newSemester,
+              availableSemesters: updatedSemesters,
+              selectedSemesterId: newSelectedId,
+              successMessage: 'Semester deleted successfully',
+            );
+          } else {
+            // No semesters left
+            state = state.copyWith(
+              isSaving: false,
+              semester: null,
+              availableSemesters: [],
+              selectedSemesterId: null,
+              successMessage: 'Semester deleted successfully',
+            );
+          }
+        } else {
+          state = state.copyWith(
+            isSaving: false,
+            availableSemesters: updatedSemesters,
+            successMessage: 'Semester deleted successfully',
+          );
+        }
+        return true;
+      } else {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: 'Failed to delete semester. May be active or permission denied.',
+        );
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'Error deleting semester: $e',
+      );
+      return false;
+    }
+  }
+  
+  /// Clone a semester
+  Future<bool> cloneSemester(String sourceSemesterId, {
+    required String newName,
+    required int newSemesterNumber,
+    required String newAcademicYear,
+    bool makeActive = false,
+  }) async {
+    state = state.copyWith(isSaving: true, errorMessage: null, successMessage: null);
+    
+    try {
+      final newSemesterId = await _scheduleService.cloneSemester(
+        sourceSemesterId,
+        newName: newName,
+        newSemesterNumber: newSemesterNumber,
+        newAcademicYear: newAcademicYear,
+        makeActive: makeActive,
+      );
+      
+      if (newSemesterId.isNotEmpty) {
+        // Refresh all semesters to reflect the new addition
+        final updatedSemesters = await _scheduleService.getAllSemesters(forceRefresh: true);
+        
+        // If the new semester is active or if requested, switch to it
+        if (makeActive) {
+          final newSemester = await _scheduleService.getSemesterById(newSemesterId);
+          
+          state = state.copyWith(
+            isSaving: false,
+            semester: newSemester,
+            availableSemesters: updatedSemesters,
+            selectedSemesterId: newSemesterId,
+            successMessage: 'Semester cloned successfully',
+          );
+        } else {
+          state = state.copyWith(
+            isSaving: false,
+            availableSemesters: updatedSemesters,
+            successMessage: 'Semester cloned successfully',
+          );
+        }
+        return true;
+      } else {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: 'Failed to clone semester. Permission denied.',
+        );
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'Error cloning semester: $e',
+      );
+      return false;
+    }
+  }
 }
 
 // Provider

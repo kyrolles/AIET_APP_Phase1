@@ -155,24 +155,41 @@ class ScheduleManagementScreen extends ConsumerWidget {
     );
   }
   
-  // Build the semester selector dropdown with set active button
+  // Build the semester selector dropdown with management buttons
   Widget _buildSemesterSelector(
     AdminScheduleState state,
     AdminScheduleController controller,
   ) {
-    // If no semesters are available, show a placeholder
+    // If no semesters are available, show a placeholder and create button
     if (state.availableSemesters.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: const Row(
-          children: [
-            Text('No semesters available'),
-          ],
-        ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Row(
+              children: [
+                Text('No semesters available'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Builder(
+            builder: (ctx) => ElevatedButton.icon(
+              icon: const Icon(Icons.add),
+              label: const Text('Create New Semester'),
+              onPressed: () => _showCreateSemesterDialog(ctx, controller),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ),
+        ],
       );
     }
     
@@ -206,73 +223,339 @@ class ScheduleManagementScreen extends ConsumerWidget {
       });
     }
     
-    return Row(
+    // Get the currently selected semester object
+    final selectedSemester = state.selectedSemester;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(4),
+        // Dropdown and Set Active button
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: ButtonTheme(
+                    alignedDropdown: true,
+                    child: DropdownButton<String>(
+                      value: isValidSelection ? selectedId : (sortedSemesters.isNotEmpty ? sortedSemesters.first.id : null),
+                      isExpanded: true,
+                      isDense: true,
+                      items: sortedSemesters.map((semester) {
+                        return DropdownMenuItem<String>(
+                          value: semester.id,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  semester.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (semester.isActive)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Text(
+                                    'Active',
+                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? semesterId) {
+                        if (semesterId != null) {
+                          controller.selectSemester(semesterId);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
             ),
-            child: DropdownButtonHideUnderline(
-              child: ButtonTheme(
-                alignedDropdown: true,
-                child: DropdownButton<String>(
-                  value: isValidSelection ? selectedId : (sortedSemesters.isNotEmpty ? sortedSemesters.first.id : null),
-                  isExpanded: true,
-                  isDense: true,
-                  items: sortedSemesters.map((semester) {
-                    return DropdownMenuItem<String>(
-                      value: semester.id,
-                      child: Row(
+            const SizedBox(width: 8),
+            // Set active button
+            ElevatedButton(
+              onPressed: state.selectedSemesterId == null || 
+                        state.selectedSemester?.isActive == true ? 
+                        null : () {
+                          controller.setActiveSemester(state.selectedSemesterId!);
+                        },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.green,
+              ),
+              child: const Text('Set Active'),
+            ),
+          ],
+        ),
+        
+        // Show semester details if one is selected
+        if (selectedSemester != null) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              semester.name,
-                              overflow: TextOverflow.ellipsis,
+                          Text(
+                            selectedSemester.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
-                          if (semester.isActive)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(12),
+                          if (selectedSemester.academicYear != null)
+                            Text(
+                              'Academic Year: ${selectedSemester.academicYear}',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
                               ),
-                              child: const Text(
-                                'Active',
-                                style: TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                          if (selectedSemester.semesterNumber != null)
+                            Text(
+                              'Semester Number: ${selectedSemester.semesterNumber}',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
                               ),
                             ),
                         ],
                       ),
-                    );
-                  }).toList(),
-                  onChanged: (String? semesterId) {
-                    if (semesterId != null) {
-                      controller.selectSemester(semesterId);
-                    }
-                  },
+                    ),
+                    // Session count badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${selectedSemester.sessions.length} Sessions',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue.shade800,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 8),
+                // Semester actions row
+                Builder(
+                  builder: (ctx) => Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.edit, size: 16),
+                        label: const Text('Edit'),
+                        onPressed: () => _showEditSemesterDialog(
+                          ctx, 
+                          controller,
+                          selectedSemester,
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.content_copy, size: 16),
+                        label: const Text('Clone'),
+                        onPressed: () => _showCloneSemesterDialog(
+                          ctx, 
+                          controller,
+                          selectedSemester,
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.purple,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.delete, size: 16),
+                        label: const Text('Delete'),
+                        onPressed: selectedSemester.isActive ? null : () => _showDeleteSemesterDialog(
+                          ctx, 
+                          controller,
+                          selectedSemester,
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          disabledForegroundColor: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        
+        // Create new semester button
+        const SizedBox(height: 8),
+        Builder(
+          builder: (ctx) => ElevatedButton.icon(
+            icon: const Icon(Icons.add),
+            label: const Text('Create New Semester'),
+            onPressed: () => _showCreateSemesterDialog(ctx, controller),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        // Set active button
-        ElevatedButton(
-          onPressed: state.selectedSemesterId == null || 
-                    state.selectedSemester?.isActive == true ? 
-                    null : () {
-                      controller.setActiveSemester(state.selectedSemesterId!);
-                    },
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.green,
-          ),
-          child: const Text('Set Active'),
-        ),
       ],
+    );
+  }
+  
+  // Show dialog to create a new semester
+  void _showCreateSemesterDialog(
+    BuildContext context,
+    AdminScheduleController controller,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => SemesterDialog(
+        title: 'Create New Semester',
+        isCreating: true,
+        onSave: (name, semesterNumber, academicYear, isActive) async {
+          final success = await controller.createNewSemester(
+            name: name,
+            semesterNumber: semesterNumber,
+            academicYear: academicYear,
+            isActive: isActive,
+          );
+          
+          if (success && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+      ),
+    );
+  }
+  
+  // Show dialog to edit a semester
+  void _showEditSemesterDialog(
+    BuildContext context,
+    AdminScheduleController controller,
+    Semester semester,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => SemesterDialog(
+        title: 'Edit Semester',
+        isEditing: true,
+        initialName: semester.name,
+        initialSemesterNumber: semester.semesterNumber,
+        initialAcademicYear: semester.academicYear,
+        isActive: semester.isActive,
+        onSave: (name, semesterNumber, academicYear, _) async {
+          final success = await controller.updateSemesterDetails(
+            semester.id!,
+            name: name, 
+            semesterNumber: semesterNumber,
+            academicYear: academicYear,
+          );
+          
+          if (success && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+      ),
+    );
+  }
+  
+  // Show dialog to clone a semester
+  void _showCloneSemesterDialog(
+    BuildContext context,
+    AdminScheduleController controller,
+    Semester sourceSemester,
+  ) {
+    final now = DateTime.now();
+    final defaultAcademicYear = '${now.year}-${now.year + 1}';
+    
+    showDialog(
+      context: context,
+      builder: (context) => SemesterDialog(
+        title: 'Clone Semester',
+        isCloning: true,
+        initialName: 'Copy of ${sourceSemester.name}',
+        initialSemesterNumber: sourceSemester.semesterNumber,
+        initialAcademicYear: defaultAcademicYear,
+        onSave: (name, semesterNumber, academicYear, makeActive) async {
+          final success = await controller.cloneSemester(
+            sourceSemester.id!,
+            newName: name,
+            newSemesterNumber: semesterNumber,
+            newAcademicYear: academicYear,
+            makeActive: makeActive,
+          );
+          
+          if (success && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+      ),
+    );
+  }
+  
+  // Show dialog to confirm semester deletion
+  void _showDeleteSemesterDialog(
+    BuildContext context,
+    AdminScheduleController controller,
+    Semester semester,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Semester?'),
+        content: Text(
+          'Are you sure you want to delete "${semester.name}"?\n\n'
+          'This will permanently delete all ${semester.sessions.length} sessions associated with this semester.\n\n'
+          'This action cannot be undone.'
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+            onPressed: () async {
+              final success = await controller.deleteSemester(semester.id!);
+              if (success && context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -1010,6 +1293,174 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
               widget.onAdd(sessions);
             }
           },
+        ),
+      ],
+    );
+  }
+}
+
+// Dialog for creating, editing or cloning semesters
+class SemesterDialog extends StatefulWidget {
+  final String title;
+  final String? initialName;
+  final int? initialSemesterNumber;
+  final String? initialAcademicYear;
+  final bool isActive;
+  final bool isCreating;
+  final bool isEditing;
+  final bool isCloning;
+  final Function(String name, int semesterNumber, String academicYear, bool isActive) onSave;
+
+  const SemesterDialog({
+    Key? key,
+    required this.title,
+    this.initialName,
+    this.initialSemesterNumber,
+    this.initialAcademicYear,
+    this.isActive = false,
+    this.isCreating = false,
+    this.isEditing = false,
+    this.isCloning = false,
+    required this.onSave,
+  }) : super(key: key);
+
+  @override
+  State<SemesterDialog> createState() => _SemesterDialogState();
+}
+
+class _SemesterDialogState extends State<SemesterDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _nameController;
+  late TextEditingController _academicYearController;
+  late int _semesterNumber;
+  late bool _isActive;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.initialName ?? '');
+    _academicYearController = TextEditingController(text: widget.initialAcademicYear ?? _getCurrentAcademicYear());
+    _semesterNumber = widget.initialSemesterNumber ?? 1;
+    _isActive = widget.isActive;
+  }
+
+  String _getCurrentAcademicYear() {
+    final now = DateTime.now();
+    final year = now.month >= 9 ? now.year : now.year - 1;
+    return '$year-${year + 1}';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _academicYearController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Semester Name *',
+                  border: OutlineInputBorder(),
+                  hintText: 'e.g., 1st Semester (2024-2025)',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Semester name is required';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _academicYearController,
+                decoration: const InputDecoration(
+                  labelText: 'Academic Year *',
+                  border: OutlineInputBorder(),
+                  hintText: 'e.g., 2024-2025',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Academic year is required';
+                  }
+                  
+                  // Validate format (optional)
+                  final yearPattern = RegExp(r'^\d{4}-\d{4}$');
+                  if (!yearPattern.hasMatch(value)) {
+                    return 'Format should be YYYY-YYYY';
+                  }
+                  
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<int>(
+                decoration: const InputDecoration(
+                  labelText: 'Semester Number *',
+                  border: OutlineInputBorder(),
+                ),
+                value: _semesterNumber,
+                items: List.generate(4, (index) {
+                  final number = index + 1;
+                  final suffix = number == 1 ? 'st' : number == 2 ? 'nd' : number == 3 ? 'rd' : 'th';
+                  return DropdownMenuItem(
+                    value: number,
+                    child: Text('$number$suffix Semester'),
+                  );
+                }),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _semesterNumber = value;
+                    });
+                  }
+                },
+              ),
+              if (widget.isCreating || widget.isCloning) ...[
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: const Text('Set as Active Semester'),
+                  subtitle: const Text('This will deactivate any currently active semester'),
+                  value: _isActive,
+                  onChanged: (value) {
+                    setState(() {
+                      _isActive = value;
+                    });
+                  },
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState?.validate() ?? false) {
+              widget.onSave(
+                _nameController.text,
+                _semesterNumber,
+                _academicYearController.text,
+                _isActive,
+              );
+            }
+          },
+          child: Text(widget.isEditing ? 'Update' : (widget.isCloning ? 'Clone' : 'Create')),
         ),
       ],
     );
