@@ -89,6 +89,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Semester selector
+          const Text('Select Semester', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          _buildSemesterSelector(state, controller),
+          const SizedBox(height: 16),
+          
           // Class selector
           const Text('Select Class', style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
@@ -146,6 +152,127 @@ class ScheduleManagementScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+  
+  // Build the semester selector dropdown with set active button
+  Widget _buildSemesterSelector(
+    AdminScheduleState state,
+    AdminScheduleController controller,
+  ) {
+    // If no semesters are available, show a placeholder
+    if (state.availableSemesters.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Row(
+          children: [
+            Text('No semesters available'),
+          ],
+        ),
+      );
+    }
+    
+    // Sort semesters: active first, then by descending semester number
+    final sortedSemesters = List<Semester>.from(state.availableSemesters)
+      ..sort((a, b) {
+        // Active semester first
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        
+        // Then by academic year (descending)
+        final yearA = a.academicYear ?? "";
+        final yearB = b.academicYear ?? "";
+        final yearCompare = yearB.compareTo(yearA);
+        if (yearCompare != 0) return yearCompare;
+        
+        // Then by semester number (descending)
+        final semA = a.semesterNumber ?? 0;
+        final semB = b.semesterNumber ?? 0;
+        return semB.compareTo(semA);
+      });
+    
+    // Make sure there's a valid selection
+    final selectedId = state.selectedSemesterId ?? '';
+    final isValidSelection = sortedSemesters.any((sem) => sem.id == selectedId);
+    
+    if (!isValidSelection && sortedSemesters.isNotEmpty) {
+      // Schedule the selection for after the build
+      Future.microtask(() {
+        controller.selectSemester(sortedSemesters.first.id ?? '');
+      });
+    }
+    
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: ButtonTheme(
+                alignedDropdown: true,
+                child: DropdownButton<String>(
+                  value: isValidSelection ? selectedId : (sortedSemesters.isNotEmpty ? sortedSemesters.first.id : null),
+                  isExpanded: true,
+                  isDense: true,
+                  items: sortedSemesters.map((semester) {
+                    return DropdownMenuItem<String>(
+                      value: semester.id,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              semester.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (semester.isActive)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Text(
+                                'Active',
+                                style: TextStyle(color: Colors.white, fontSize: 12),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? semesterId) {
+                    if (semesterId != null) {
+                      controller.selectSemester(semesterId);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        // Set active button
+        ElevatedButton(
+          onPressed: state.selectedSemesterId == null || 
+                    state.selectedSemester?.isActive == true ? 
+                    null : () {
+                      controller.setActiveSemester(state.selectedSemesterId!);
+                    },
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+          ),
+          child: const Text('Set Active'),
+        ),
+      ],
     );
   }
 

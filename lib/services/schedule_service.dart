@@ -578,7 +578,7 @@ class ScheduleService {
   
   /// Adds or updates a class session in the current semester
   /// Returns true if successful, false otherwise
-  Future<bool> addOrUpdateClassSession(ClassSession session) async {
+  Future<bool> addOrUpdateClassSession(ClassSession session, {String? targetSemesterId}) async {
     try {
       final user = _auth.currentUser;
       if (user == null) return false;
@@ -593,8 +593,22 @@ class ScheduleService {
       
       if (userDoc.docs.isEmpty) return false;
       
-      // Get or create active semester - use cache for performance
-      final String semesterId = await _getOrCreateActiveSemester();
+      // Use the provided semesterId if available, otherwise get the active semester
+      String semesterId = '';
+      if (targetSemesterId != null && targetSemesterId.isNotEmpty) {
+        // Verify the semester exists
+        final semesterExists = await _checkSemesterExists(targetSemesterId);
+        if (semesterExists) {
+          semesterId = targetSemesterId;
+        } else {
+          print('Specified semester does not exist: $targetSemesterId');
+          return false;
+        }
+      } else {
+        // Get or create active semester - use cache for performance
+        semesterId = await _getOrCreateActiveSemester();
+      }
+      
       if (semesterId.isEmpty) return false;
       
       // Get year string representation for Firestore storage
@@ -666,7 +680,7 @@ class ScheduleService {
 
   /// Deletes a class session from the current semester
   /// Returns true if successful, false otherwise
-  Future<bool> deleteClassSession(String sessionId) async {
+  Future<bool> deleteClassSession(String sessionId, {String? targetSemesterId}) async {
     try {
       final user = _auth.currentUser;
       if (user == null) return false;
@@ -681,8 +695,22 @@ class ScheduleService {
       
       if (userDoc.docs.isEmpty) return false;
       
-      // Get active semester
-      final String semesterId = await _getOrCreateActiveSemester();
+      // Use the provided semesterId if available, otherwise get the active semester
+      String semesterId = '';
+      if (targetSemesterId != null && targetSemesterId.isNotEmpty) {
+        // Verify the semester exists
+        final semesterExists = await _checkSemesterExists(targetSemesterId);
+        if (semesterExists) {
+          semesterId = targetSemesterId;
+        } else {
+          print('Specified semester does not exist: $targetSemesterId');
+          return false;
+        }
+      } else {
+        // Get active semester
+        semesterId = await _getOrCreateActiveSemester();
+      }
+      
       if (semesterId.isEmpty) return false;
       
       // Delete the session
@@ -702,7 +730,7 @@ class ScheduleService {
 
   /// Adds a day off session for a specific class, day and week type
   /// Returns true if successful, false otherwise
-  Future<bool> addDayOff(DayOfWeek day, WeekType weekType, ClassIdentifier classIdentifier) async {
+  Future<bool> addDayOff(DayOfWeek day, WeekType weekType, ClassIdentifier classIdentifier, {String? targetSemesterId}) async {
     final session = ClassSession(
       id: 'new',
       courseName: 'DAY OFF',
@@ -717,7 +745,7 @@ class ScheduleService {
       isTutorial: false,
     );
     
-    return await addOrUpdateClassSession(session);
+    return await addOrUpdateClassSession(session, targetSemesterId: targetSemesterId);
   }
 
   /// Gets all available class identifiers (year, department, section combinations)
@@ -866,7 +894,7 @@ class ScheduleService {
   
   /// Adds multiple sessions for a class at once
   /// This is more efficient than adding sessions one by one
-  Future<bool> addMultipleSessions(List<ClassSession> sessions) async {
+  Future<bool> addMultipleSessions(List<ClassSession> sessions, {String? targetSemesterId}) async {
     try {
       final user = _auth.currentUser;
       if (user == null) return false;
@@ -881,8 +909,22 @@ class ScheduleService {
       
       if (userDoc.docs.isEmpty) return false;
       
-      // Get active semester
-      final String semesterId = await _getOrCreateActiveSemester();
+      // Use the provided semesterId if available, otherwise get the active semester
+      String semesterId = '';
+      if (targetSemesterId != null && targetSemesterId.isNotEmpty) {
+        // Verify the semester exists
+        final semesterExists = await _checkSemesterExists(targetSemesterId);
+        if (semesterExists) {
+          semesterId = targetSemesterId;
+        } else {
+          print('Specified semester does not exist: $targetSemesterId');
+          return false;
+        }
+      } else {
+        // Get active semester
+        semesterId = await _getOrCreateActiveSemester();
+      }
+      
       if (semesterId.isEmpty) return false;
       
       // Use batch write for better performance
