@@ -101,16 +101,18 @@ class HomeScheduleView extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: kGrey.withOpacity(0.3)),
         ),
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           children: [
             _buildScheduleHeader(weekType, scheduleState, context, ref),
             const SizedBox(height: 16),
-            Text(
-              'No sessions found for ${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section} in the ${weekType == WeekType.ODD ? "Odd" : "Even"} week.',
-              style: const TextStyle(color: kGrey),
-              textAlign: TextAlign.center,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'No sessions found for ${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section} in the ${weekType == WeekType.ODD ? "Odd" : "Even"} week.',
+                style: const TextStyle(color: kGrey),
+                textAlign: TextAlign.center,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -123,6 +125,7 @@ class HomeScheduleView extends ConsumerWidget {
               ),
               child: const Text('View Full Week'),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       );
@@ -132,27 +135,29 @@ class HomeScheduleView extends ConsumerWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
       ),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        children: [
-          // Header with current day and week type
-          _buildScheduleHeader(weekType, scheduleState, context, ref),
-          
-          // Show today's schedule
-          if (todaySessions.isNotEmpty)
-            _buildTodaySchedule(todaySessions)
-          else
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'No classes scheduled for today (${_getCurrentDayName()}).',
-                style: const TextStyle(color: kGrey),
-              ),
-            ),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header with current day and week type
+            _buildScheduleHeader(weekType, scheduleState, context, ref),
             
-          // View full schedule button
-          _buildViewFullScheduleButton(context, scheduleState),
-        ],
+            // Show today's schedule
+            if (todaySessions.isNotEmpty)
+              _buildTodaySchedule(todaySessions)
+            else
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'No classes scheduled for today (${_getCurrentDayName()}).',
+                  style: const TextStyle(color: kGrey),
+                ),
+              ),
+              
+            // View full schedule button
+            _buildViewFullScheduleButton(context, scheduleState),
+          ],
+        ),
       ),
     );
   }
@@ -181,41 +186,46 @@ class HomeScheduleView extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'My Schedule - ${_getCurrentDayName()}',
-                    style: const TextStyle(
-                      fontFamily: 'Lexend',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'My Schedule - ${_getCurrentDayName()}',
+                      style: const TextStyle(
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        weekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          weekType == WeekType.ODD ? 'Odd Week' : 'Even Week',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section}',
-                        style: const TextStyle(
-                          color: kGrey,
-                          fontSize: 14,
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            '${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section}',
+                            style: const TextStyle(
+                              color: kGrey,
+                              fontSize: 14,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
               // Refresh button to sync with Firestore
               IconButton(
                 icon: const Icon(Icons.refresh),
@@ -244,6 +254,8 @@ class HomeScheduleView extends ConsumerWidget {
                   }
                 },
                 tooltip: 'Refresh Schedule',
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
               ),
               IconButton(
                 icon: const Icon(Icons.swap_horiz),
@@ -252,6 +264,8 @@ class HomeScheduleView extends ConsumerWidget {
                   ref.read(scheduleControllerProvider.notifier).toggleWeekType();
                 },
                 tooltip: 'Toggle Week Type',
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
               ),
             ],
           ),
@@ -296,9 +310,9 @@ class HomeScheduleView extends ConsumerWidget {
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
@@ -366,7 +380,7 @@ class HomeScheduleView extends ConsumerWidget {
         ),
         // List of today's sessions
         ...todaySessions.map((session) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: ClassSessionCard(session: session),
         )).toList(),
       ],
@@ -384,6 +398,7 @@ class HomeScheduleView extends ConsumerWidget {
               _showFullWeekSchedule(context, scheduleState);
             },
             child: Container(
+              width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
                 color: kPrimaryColor.withOpacity(0.1),
@@ -485,6 +500,8 @@ class HomeScheduleView extends ConsumerWidget {
                                 ref.read(scheduleControllerProvider.notifier).toggleWeekType();
                               },
                               tooltip: 'Toggle Week Type',
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(8),
                             ),
                             IconButton(
                               icon: const Icon(Icons.refresh),
@@ -513,6 +530,8 @@ class HomeScheduleView extends ConsumerWidget {
                                 }
                               },
                               tooltip: 'Refresh Schedule',
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(8),
                             ),
                           ],
                         ),

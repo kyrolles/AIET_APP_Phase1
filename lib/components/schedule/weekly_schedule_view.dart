@@ -46,6 +46,7 @@ class WeeklyScheduleView extends StatelessWidget {
               borderRadius: BorderRadius.circular(25),
             ),
             child: TabBar(
+              isScrollable: false,
               tabs: DayOfWeek.values.map((day) => _buildDayTab(day)).toList(),
               indicator: BoxDecoration(
                 color: kPrimaryColor,
@@ -57,6 +58,7 @@ class WeeklyScheduleView extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerHeight: 0,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 2),
             ),
           ),
           const SizedBox(height: 16),
@@ -74,11 +76,17 @@ class WeeklyScheduleView extends StatelessWidget {
   
   Widget _buildDayTab(DayOfWeek day) {
     return Tab(
-      child: Text(
-        day.shortName,
-        style: const TextStyle(
-          fontFamily: 'Lexend',
-          fontSize: 14,
+      height: 40,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          day.shortName,
+          style: const TextStyle(
+            fontFamily: 'Lexend',
+            fontSize: 12,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.visible,
         ),
       ),
     );
@@ -103,7 +111,10 @@ class WeeklyScheduleView extends StatelessWidget {
       itemCount: daySessions.length,
       itemBuilder: (context, index) {
         final session = daySessions[index];
-        return ClassSessionCard(session: session);
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: ClassSessionCard(session: session),
+        );
       },
     );
   }

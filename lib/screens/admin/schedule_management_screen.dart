@@ -102,12 +102,16 @@ class ScheduleManagementScreen extends ConsumerWidget {
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              isDense: true,
             ),
             value: state.selectedClassIdentifier,
             items: state.classIdentifiers.map((classId) {
               return DropdownMenuItem(
                 value: classId,
-                child: Text('${classId.year}${classId.department.name}${classId.section}'),
+                child: Text(
+                  '${classId.year}${classId.department.name}${classId.section}',
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
             onChanged: (value) {
@@ -115,14 +119,17 @@ class ScheduleManagementScreen extends ConsumerWidget {
                 controller.selectClassIdentifier(value);
               }
             },
+            isExpanded: true,
           ),
           const SizedBox(height: 16),
           
           // Week type selector
-          Row(
+          Wrap(
+            spacing: 8,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               const Text('Week Type:', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(width: 16),
               ChoiceChip(
                 label: const Text('ODD'),
                 selected: state.selectedWeekType == WeekType.ODD,
@@ -131,8 +138,8 @@ class ScheduleManagementScreen extends ConsumerWidget {
                     controller.toggleWeekType();
                   }
                 },
+                visualDensity: VisualDensity.compact,
               ),
-              const SizedBox(width: 8),
               ChoiceChip(
                 label: const Text('EVEN'),
                 selected: state.selectedWeekType == WeekType.EVEN,
@@ -141,12 +148,16 @@ class ScheduleManagementScreen extends ConsumerWidget {
                     controller.toggleWeekType();
                   }
                 },
+                visualDensity: VisualDensity.compact,
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               ElevatedButton.icon(
-                icon: const Icon(Icons.add),
+                icon: const Icon(Icons.add, size: 16),
                 label: const Text('Bulk Add'),
                 onPressed: () => _showBulkAddDialog(context, state, controller),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
             ],
           ),
@@ -180,12 +191,13 @@ class ScheduleManagementScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Builder(
             builder: (ctx) => ElevatedButton.icon(
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add, size: 16),
               label: const Text('Create New Semester'),
               onPressed: () => _showCreateSemesterDialog(ctx, controller),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
             ),
           ),
@@ -254,6 +266,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                                 child: Text(
                                   semester.name,
                                   overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ),
                               if (semester.isActive)
@@ -265,7 +278,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                                   ),
                                   child: const Text(
                                     'Active',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    style: TextStyle(color: Colors.white, fontSize: 10),
                                   ),
                                 ),
                             ],
@@ -293,8 +306,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               ),
-              child: const Text('Set Active'),
+              child: const Text(
+                'Set Active',
+                style: TextStyle(fontSize: 12),
+              ),
             ),
           ],
         ),
@@ -325,6 +342,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                           if (selectedSemester.academicYear != null)
                             Text(
@@ -333,6 +351,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           if (selectedSemester.semesterNumber != null)
                             Text(
@@ -341,6 +360,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                         ],
                       ),
@@ -365,12 +385,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 // Semester actions row
                 Builder(
-                  builder: (ctx) => Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  builder: (ctx) => Wrap(
+                    spacing: 4,
                     children: [
                       TextButton.icon(
                         icon: const Icon(Icons.edit, size: 16),
-                        label: const Text('Edit'),
+                        label: const Text('Edit', style: TextStyle(fontSize: 12)),
                         onPressed: () => _showEditSemesterDialog(
                           ctx, 
                           controller,
@@ -378,12 +398,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
                         ),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         ),
                       ),
                       TextButton.icon(
                         icon: const Icon(Icons.content_copy, size: 16),
-                        label: const Text('Clone'),
+                        label: const Text('Clone', style: TextStyle(fontSize: 12)),
                         onPressed: () => _showCloneSemesterDialog(
                           ctx, 
                           controller,
@@ -391,12 +411,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
                         ),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.purple,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         ),
                       ),
                       TextButton.icon(
                         icon: const Icon(Icons.delete, size: 16),
-                        label: const Text('Delete'),
+                        label: const Text('Delete', style: TextStyle(fontSize: 12)),
                         onPressed: selectedSemester.isActive ? null : () => _showDeleteSemesterDialog(
                           ctx, 
                           controller,
@@ -404,7 +424,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                         ),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           disabledForegroundColor: Colors.grey.withOpacity(0.5),
                         ),
                       ),
@@ -420,12 +440,13 @@ class ScheduleManagementScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         Builder(
           builder: (ctx) => ElevatedButton.icon(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, size: 16),
             label: const Text('Create New Semester'),
             onPressed: () => _showCreateSemesterDialog(ctx, controller),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
         ),
@@ -610,11 +631,20 @@ class ScheduleManagementScreen extends ConsumerWidget {
         },
         title: Row(
           children: [
-            Text(day.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              flex: 2,
+              child: Text(
+                day.name, 
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             const SizedBox(width: 8),
             Chip(
               label: Text('${sessions.length} sessions'),
               backgroundColor: sessions.isEmpty ? Colors.grey.shade200 : Colors.blue.shade100,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+              visualDensity: VisualDensity.compact,
             ),
             const Spacer(),
             IconButton(
@@ -625,6 +655,9 @@ class ScheduleManagementScreen extends ConsumerWidget {
                 controller,
                 initialDay: day,
               ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              visualDensity: VisualDensity.compact,
             ),
             IconButton(
               icon: const Icon(Icons.event_busy, color: Colors.orange),
@@ -633,6 +666,9 @@ class ScheduleManagementScreen extends ConsumerWidget {
                 day,
                 controller,
               ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              visualDensity: VisualDensity.compact,
             ),
           ],
         ),
@@ -673,34 +709,47 @@ class ScheduleManagementScreen extends ConsumerWidget {
           fontWeight: FontWeight.bold,
           color: isDayOff ? Colors.orange : null,
         ),
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (session.courseCode.isNotEmpty)
-            Text(session.courseCode),
+            Text(
+              session.courseCode,
+              overflow: TextOverflow.ellipsis,
+            ),
           Text(
             'Period ${session.periodNumber} • ${session.instructor.isNotEmpty ? session.instructor : 'No instructor'} • ${session.location.isNotEmpty ? session.location : 'No location'}',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
           ),
-          Row(
+          Wrap(
+            spacing: 4,
             children: [
               if (session.isLab)
                 Chip(
-                  label: const Text('Lab'),
+                  label: const Text(
+                    'Lab',
+                    style: TextStyle(fontSize: 12),
+                  ),
                   backgroundColor: Colors.purple.shade100,
                   labelStyle: TextStyle(color: Colors.purple.shade900),
                   padding: EdgeInsets.zero,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
                 ),
-              if (session.isLab && session.isTutorial)
-                const SizedBox(width: 4),
               if (session.isTutorial)
                 Chip(
-                  label: const Text('Tutorial'),
+                  label: const Text(
+                    'Tutorial',
+                    style: TextStyle(fontSize: 12),
+                  ),
                   backgroundColor: Colors.teal.shade100,
                   labelStyle: TextStyle(color: Colors.teal.shade900),
                   padding: EdgeInsets.zero,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
                 ),
             ],
           ),
@@ -716,6 +765,9 @@ class ScheduleManagementScreen extends ConsumerWidget {
               session,
               controller,
             ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
           ),
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
@@ -724,6 +776,9 @@ class ScheduleManagementScreen extends ConsumerWidget {
               session,
               controller,
             ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
           ),
         ],
       ),
