@@ -94,13 +94,15 @@ class MyApp extends StatelessWidget {
         '/all_announcement': (context) =>
             const AllAnnouncementAppearOnOneScreen(),
         '/clinicStudentScreen': (context) => const ClinicScreen(),
-        
+
         '/clinicStudentScreen/newAppointmentScreen': (context) =>
             const NewAppointmentScreen(),
         // Add these routes to your routes map
         '/doctorClinicScreen': (context) => const DoctorClinicScreen(),
-        '/doctorClinicScreen/completedAppointmentsScreen': (context) => const CompletedAppointmentsScreen(),
-        '/doctorClinicScreen/pendingAppointmentsScreen': (context) => const PendingAppointmentsScreen(),
+        '/doctorClinicScreen/completedAppointmentsScreen': (context) =>
+            const CompletedAppointmentsScreen(),
+        '/doctorClinicScreen/pendingAppointmentsScreen': (context) =>
+            const PendingAppointmentsScreen(),
       },
     );
   }
