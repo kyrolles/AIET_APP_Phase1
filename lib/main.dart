@@ -25,8 +25,6 @@ import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart';
 import 'package:graduation_project/screens/attendance/attendance_router.dart';
 
-import 'screens/offline_screen.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
