@@ -25,6 +25,8 @@ import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart';
 import 'package:graduation_project/screens/attendance/attendance_router.dart';
 
+import 'screens/offline_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -94,13 +96,15 @@ class MyApp extends StatelessWidget {
         '/all_announcement': (context) =>
             const AllAnnouncementAppearOnOneScreen(),
         '/clinicStudentScreen': (context) => const ClinicScreen(),
-        
+
         '/clinicStudentScreen/newAppointmentScreen': (context) =>
             const NewAppointmentScreen(),
         // Add these routes to your routes map
         '/doctorClinicScreen': (context) => const DoctorClinicScreen(),
-        '/doctorClinicScreen/completedAppointmentsScreen': (context) => const CompletedAppointmentsScreen(),
-        '/doctorClinicScreen/pendingAppointmentsScreen': (context) => const PendingAppointmentsScreen(),
+        '/doctorClinicScreen/completedAppointmentsScreen': (context) =>
+            const CompletedAppointmentsScreen(),
+        '/doctorClinicScreen/pendingAppointmentsScreen': (context) =>
+            const PendingAppointmentsScreen(),
       },
     );
   }
