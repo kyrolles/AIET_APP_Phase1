@@ -22,18 +22,24 @@ class PDFViewer extends StatelessWidget {
       if (pdfUrl != null && pdfUrl!.isNotEmpty) {
         try {
           log('Loading PDF from URL: $pdfUrl');
-          final response = await http.get(Uri.parse(pdfUrl!));
-          
-          if (response.statusCode == 200) {
-            final tempDir = await getTemporaryDirectory();
-            final tempFile = File(
-                '${tempDir.path}/temp_url_${DateTime.now().millisecondsSinceEpoch}.pdf');
-            await tempFile.writeAsBytes(response.bodyBytes);
-            log('PDF loaded from URL successfully');
-            return tempFile.path;
+          // Check if URL is valid
+          if (!pdfUrl!.startsWith('http://') && !pdfUrl!.startsWith('https://')) {
+            log('Invalid URL format: $pdfUrl');
+            // Fall back to base64
           } else {
-            log('Failed to load PDF from URL: ${response.statusCode}');
-            // Fall back to base64 if URL doesn't work
+            final response = await http.get(Uri.parse(pdfUrl!));
+            
+            if (response.statusCode == 200) {
+              final tempDir = await getTemporaryDirectory();
+              final tempFile = File(
+                  '${tempDir.path}/temp_url_${DateTime.now().millisecondsSinceEpoch}.pdf');
+              await tempFile.writeAsBytes(response.bodyBytes);
+              log('PDF loaded from URL successfully');
+              return tempFile.path;
+            } else {
+              log('Failed to load PDF from URL: ${response.statusCode}');
+              // Fall back to base64 if URL doesn't work
+            }
           }
         } catch (e) {
           log('Error loading PDF from URL: $e');

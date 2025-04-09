@@ -31,23 +31,36 @@ class Request {
     this.fileStorageUrl,
   });
 
-  factory Request.fromJson(json) {
+  factory Request.fromJson(dynamic json) {
+    // Convert document snapshot to Map if needed
+    final Map<String, dynamic> data = json is DocumentSnapshot 
+        ? json.data() as Map<String, dynamic> 
+        : json as Map<String, dynamic>;
+    
+    // Safe getter function to handle missing fields
+    T? safeGet<T>(String key) {
+      try {
+        return data.containsKey(key) ? data[key] as T : null;
+      } catch (e) {
+        print('Error getting $key: $e');
+        return null;
+      }
+    }
+    
     return Request(
-      addressedTo: json['addressed_to'] ?? '',
-      comment: json['comment'] ?? '',
-      fileName: json['file_name'] ?? '',
-      pdfBase64: json['pdfBase64'],
-      stamp: json['stamp'] ?? false,
-      status: json['status'] ?? 'No Status',
-      studentId: json['student_id'] ?? '',
-      studentName: json['student_name'] ?? '',
-      trainingScore: json['training_score'] is int
-          ? json['training_score']
-          : int.tryParse(json['training_score'] ?? '0') ?? 0,
-      type: json['type'] ?? '',
-      year: json['year'] ?? '',
-      createdAt: json['created_at'] ?? Timestamp.now(),
-      fileStorageUrl: json['file_storage_url'],
+      addressedTo: safeGet<String>('addressed_to') ?? '',
+      comment: safeGet<String>('comment') ?? '',
+      fileName: safeGet<String>('file_name') ?? '',
+      pdfBase64: safeGet<String>('pdfBase64'),
+      stamp: safeGet<bool>('stamp') ?? false,
+      status: safeGet<String>('status') ?? 'No Status',
+      studentId: safeGet<String>('student_id') ?? '',
+      studentName: safeGet<String>('student_name') ?? '',
+      trainingScore: safeGet<int>('training_score') ?? 0,
+      type: safeGet<String>('type') ?? '',
+      year: safeGet<String>('year') ?? '',
+      createdAt: safeGet<Timestamp>('created_at') ?? Timestamp.now(),
+      fileStorageUrl: safeGet<String>('file_storage_url') ?? '',
     );
   }
 }

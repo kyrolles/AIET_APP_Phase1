@@ -77,39 +77,39 @@ class KButton extends StatelessWidget {
           child: Padding(
             padding: padding ??
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                if (svgPath != null)
-                  Align(
-                    alignment:
-                        text != null ? Alignment.centerLeft : Alignment.center,
-                    child: SvgPicture.asset(
-                      svgPath!,
-                      width: svgWidth, // Customizable SVG width
-                      height: svgHeight, // Customizable SVG height
-                    ),
-                  ),
-                if (icon != null)
-                  Align(
-                    alignment:
-                        text != null ? Alignment.centerLeft : Alignment.center,
-                    child: Icon(
-                      icon,
-                      color: textColor,
-                      size: svgWidth ?? 20,
-                    ),
-                  ),
-                if (text != null)
-                  Row(
-                    mainAxisAlignment: (svgPath != null || icon != null) 
-                        ? MainAxisAlignment.center 
-                        : MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (svgPath != null || icon != null) 
-                        const SizedBox(width: 28),
-                      Flexible(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (svgPath != null)
+                      Align(
+                        alignment:
+                            text != null ? Alignment.centerLeft : Alignment.center,
+                        child: SvgPicture.asset(
+                          svgPath!,
+                          width: svgWidth, // Customizable SVG width
+                          height: svgHeight, // Customizable SVG height
+                          placeholderBuilder: (BuildContext context) => Container(
+                            padding: const EdgeInsets.all(4.0),
+                            child: const CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
+                    if (icon != null)
+                      Align(
+                        alignment:
+                            text != null ? Alignment.centerLeft : Alignment.center,
+                        child: Icon(
+                          icon,
+                          color: textColor,
+                          size: svgWidth ?? 20,
+                        ),
+                      ),
+                    if (text != null)
+                      Container(
+                        width: constraints.maxWidth,
+                        alignment: Alignment.center,
                         child: Text(
                           text!,
                           style: TextStyle(
@@ -123,9 +123,9 @@ class KButton extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ],
-                  ),
-              ],
+                  ],
+                );
+              }
             ),
           ),
         ),
