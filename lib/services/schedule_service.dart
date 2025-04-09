@@ -27,7 +27,7 @@ class ScheduleService {
   
   // Refresh limits
   static const int _maxRefreshCount = 3;
-  static const Duration _refreshCooldown = Duration(minutes: 15);
+  static const Duration _refreshCooldown = Duration(minutes: 5);
 
   // Get the current semester
   Future<Semester> getCurrentSemester({bool forceRefresh = false}) async {
