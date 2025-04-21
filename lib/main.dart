@@ -70,7 +70,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(isUserLoggedIn: isLoggedIn),
+      // home: SplashScreen(isUserLoggedIn: isLoggedIn),
+      home: const HomeScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
