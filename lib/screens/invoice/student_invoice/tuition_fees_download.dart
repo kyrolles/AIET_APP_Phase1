@@ -5,9 +5,7 @@ import 'package:graduation_project/components/pdf_view.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
-import 'package:graduation_project/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 import 'dart:developer';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,7 +22,6 @@ class TuitionFeesDownload extends StatefulWidget {
 }
 
 class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
-  final StorageService _storageService = StorageService();
   bool _isDownloading = false;
   bool _canViewPdf = false;
   bool _canDownloadPdf = false;
@@ -40,15 +37,15 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
 
   void _checkFileAvailability() {
     // Check if we can view the PDF (either via storage URL or base64)
-    _canViewPdf = (widget.request.fileStorageUrl != null && 
-        widget.request.fileStorageUrl!.isNotEmpty) || 
-        (widget.request.pdfBase64 != null && 
-        widget.request.pdfBase64!.isNotEmpty);
-        
+    _canViewPdf = (widget.request.fileStorageUrl != null &&
+            widget.request.fileStorageUrl!.isNotEmpty) ||
+        (widget.request.pdfBase64 != null &&
+            widget.request.pdfBase64!.isNotEmpty);
+
     // Check if we can download the PDF (requires storage URL)
-    _canDownloadPdf = widget.request.fileStorageUrl != null && 
+    _canDownloadPdf = widget.request.fileStorageUrl != null &&
         widget.request.fileStorageUrl!.isNotEmpty;
-        
+
     log('Can view PDF: $_canViewPdf, Can download PDF: $_canDownloadPdf');
     log('fileStorageUrl: ${widget.request.fileStorageUrl}');
     log('pdfBase64 available: ${widget.request.pdfBase64 != null && widget.request.pdfBase64!.isNotEmpty}');
@@ -91,7 +88,8 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
     });
 
     try {
-      if (widget.request.fileStorageUrl == null || widget.request.fileStorageUrl!.isEmpty) {
+      if (widget.request.fileStorageUrl == null ||
+          widget.request.fileStorageUrl!.isEmpty) {
         throw 'File storage URL is not available';
       }
 
@@ -100,7 +98,7 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
       if (Platform.isAndroid) {
         final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
         final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        
+
         // For Android 10 (API 29) and below
         if (androidInfo.version.sdkInt <= 29) {
           var status = await Permission.storage.request();
@@ -121,7 +119,7 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
       }
 
       log('canUseExternalStorage: $canUseExternalStorage');
-      
+
       // Determine where to save the file
       String savePath;
       if (Platform.isAndroid && canUseExternalStorage) {
@@ -150,19 +148,21 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
       final File file = File(savePath);
 
       // Create reference from URL
-      final Reference ref = FirebaseStorage.instance.refFromURL(widget.request.fileStorageUrl!);
-      
+      final Reference ref =
+          FirebaseStorage.instance.refFromURL(widget.request.fileStorageUrl!);
+
       setState(() {
         _downloadStatus = 'Downloading file...';
       });
 
       // Track download progress
       final DownloadTask downloadTask = ref.writeToFile(file);
-      
+
       downloadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
         setState(() {
           _downloadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-          _downloadStatus = '${(_downloadProgress * 100).toStringAsFixed(1)}% downloaded';
+          _downloadStatus =
+              '${(_downloadProgress * 100).toStringAsFixed(1)}% downloaded';
         });
       });
 
@@ -177,10 +177,12 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
 
       // Format a more user-friendly path for display
       String displayPath = savePath;
-      if (Platform.isAndroid && savePath.contains('/storage/emulated/0/Download')) {
+      if (Platform.isAndroid &&
+          savePath.contains('/storage/emulated/0/Download')) {
         displayPath = 'Downloads/${widget.request.fileName}';
       } else if (Platform.isAndroid && !canUseExternalStorage) {
-        displayPath = 'App Storage/${widget.request.fileName} (Needs permission for external access)';
+        displayPath =
+            'App Storage/${widget.request.fileName} (Needs permission for external access)';
       } else if (Platform.isIOS) {
         displayPath = 'Files App/${widget.request.fileName}';
       }
@@ -271,7 +273,7 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                       KButton(
                         onPressed: _canViewPdf ? () => _viewPdf(context) : null,
                         text: 'View',
-                        backgroundColor: _canViewPdf 
+                        backgroundColor: _canViewPdf
                             ? const Color.fromRGBO(6, 147, 241, 1)
                             : Colors.grey,
                         width: 80,
@@ -280,7 +282,9 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                         margin: const EdgeInsets.only(right: 8),
                       ),
                       KButton(
-                        onPressed: _canDownloadPdf && !_isDownloading ? _downloadFile : null,
+                        onPressed: _canDownloadPdf && !_isDownloading
+                            ? _downloadFile
+                            : null,
                         text: _isDownloading ? 'Downloading' : 'Download',
                         backgroundColor: _canDownloadPdf ? kgreen : Colors.grey,
                         width: 115,
@@ -296,7 +300,9 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                     const SizedBox(height: 4),
                     Container(
                       width: double.infinity,
-                      constraints: const BoxConstraints(maxWidth: 195), // Match the width of the buttons above
+                      constraints: const BoxConstraints(
+                          maxWidth:
+                              195), // Match the width of the buttons above
                       child: LinearProgressIndicator(
                         value: _downloadProgress,
                         backgroundColor: Colors.grey[300],
@@ -311,7 +317,8 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                         label: const Text('Open Downloaded File'),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           textStyle: const TextStyle(fontSize: 12),
@@ -323,21 +330,24 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                             _isDownloading = false;
                           });
                         },
-                        child: const Text('Close'),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.grey,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           textStyle: const TextStyle(fontSize: 12),
                         ),
+                        child: const Text('Close'),
                       ),
                     ],
                   ],
                 ],
               );
             },
-            title: widget.request.fileName.isEmpty ? 'No file uploaded yet' : widget.request.fileName,
+            title: widget.request.fileName.isEmpty
+                ? 'No file uploaded yet'
+                : widget.request.fileName,
             image: 'assets/project_image/pdf.png',
           ),
           // Padding(

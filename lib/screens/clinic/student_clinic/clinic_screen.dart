@@ -5,6 +5,7 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:intl/intl.dart';
 
 class ClinicScreen extends StatelessWidget {
@@ -53,29 +54,29 @@ class _ClinicBodyState extends State<ClinicBody> {
 
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      
+
       if (user == null) {
         setState(() {
           isLoading = false;
         });
         return;
       }
-      
+
       String userId = user.uid;
-      
+
       // Simple query to get all appointments for this user
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('clinic_appointments')
           .where('userId', isEqualTo: userId)
           .get();
-      
+
       List<Map<String, dynamic>> tempAppointments = [];
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
         tempAppointments.add(data);
       }
-      
+
       // Sort appointments: pending first, then by date
       tempAppointments.sort((a, b) {
         if (a['status'] == 'pending' && b['status'] != 'pending') {
@@ -106,7 +107,6 @@ class _ClinicBodyState extends State<ClinicBody> {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: [
-          
           Container(
             height: 450,
             decoration: BoxDecoration(
@@ -115,13 +115,12 @@ class _ClinicBodyState extends State<ClinicBody> {
             ),
             child: Stack(
               children: [
-                
                 const Positioned(
                   top: 30,
                   left: 25,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children:  [
+                    children: [
                       Text(
                         'Book your',
                         style: TextStyle(
@@ -141,8 +140,6 @@ class _ClinicBodyState extends State<ClinicBody> {
                     ],
                   ),
                 ),
-                
-                
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -157,14 +154,11 @@ class _ClinicBodyState extends State<ClinicBody> {
               ],
             ),
           ),
-          
           const SizedBox(height: 16),
-          
-         
           KButton(
             onPressed: () {
               Navigator.pushNamed(
-                  context, '/clinicStudentScreen/newAppointmentScreen')
+                      context, '/clinicStudentScreen/newAppointmentScreen')
                   .then((_) {
                 fetchUserAppointments();
               });
@@ -172,10 +166,7 @@ class _ClinicBodyState extends State<ClinicBody> {
             text: 'New Appointment',
             backgroundColor: const Color(0xFF39A0FF),
           ),
-          
           const SizedBox(height: 24),
-          
-          
           const Text(
             'Your Appointments',
             style: TextStyle(
@@ -183,10 +174,7 @@ class _ClinicBodyState extends State<ClinicBody> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          
           const SizedBox(height: 16),
-          
-          
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : appointments.isEmpty
@@ -202,12 +190,16 @@ class _ClinicBodyState extends State<ClinicBody> {
                       itemCount: appointments.length,
                       itemBuilder: (context, index) {
                         final appointment = appointments[index];
-                        
-                        DateTime appointmentDate = DateTime.parse(appointment['date']);
-                        String dayNumber = DateFormat('d').format(appointmentDate);
-                        String dayName = DateFormat('EEEE').format(appointmentDate);
-                        String monthName = DateFormat('MMMM').format(appointmentDate);
-                        
+
+                        DateTime appointmentDate =
+                            DateTime.parse(appointment['date']);
+                        String dayNumber =
+                            DateFormat('d').format(appointmentDate);
+                        String dayName =
+                            DateFormat('EEEE').format(appointmentDate);
+                        String monthName =
+                            DateFormat('MMMM').format(appointmentDate);
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
@@ -251,7 +243,8 @@ class _ClinicBodyState extends State<ClinicBody> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'Date',
@@ -272,7 +265,8 @@ class _ClinicBodyState extends State<ClinicBody> {
                                           ),
                                           const SizedBox(width: 16),
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 dayName,
@@ -293,15 +287,15 @@ class _ClinicBodyState extends State<ClinicBody> {
                                         ],
                                       ),
                                       const SizedBox(height: 16),
-                                      Row(
+                                      const Row(
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.medical_services_outlined,
                                             size: 18,
                                             color: Colors.grey,
                                           ),
-                                          const SizedBox(width: 8),
-                                          const Text(
+                                          SizedBox(width: 8),
+                                          Text(
                                             'Room 2-168',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -311,7 +305,8 @@ class _ClinicBodyState extends State<ClinicBody> {
                                       ),
                                       const SizedBox(height: 16),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.symmetric(
@@ -319,52 +314,71 @@ class _ClinicBodyState extends State<ClinicBody> {
                                               vertical: 6,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: appointment['status'] == 'cancelled'
+                                              color: appointment['status'] ==
+                                                      'cancelled'
                                                   ? const Color(0xFFFFEBEB)
-                                                  : appointment['status'] == 'completed'
+                                                  : appointment['status'] ==
+                                                          'completed'
                                                       ? const Color(0xFFE8F5E9)
                                                       : const Color(0xFFFFF8EB),
-                                              borderRadius: BorderRadius.circular(20),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
                                             child: Text(
-                                              getStatusText(appointment['status']),
+                                              getStatusText(
+                                                  appointment['status']),
                                               style: TextStyle(
-                                                color: appointment['status'] == 'cancelled'
+                                                color: appointment['status'] ==
+                                                        'cancelled'
                                                     ? Colors.red
-                                                    : appointment['status'] == 'completed'
+                                                    : appointment['status'] ==
+                                                            'completed'
                                                         ? Colors.green
-                                                        : const Color(0xFFFF9500),
+                                                        : const Color(
+                                                            0xFFFF9500),
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ),
-                                          if (appointment['status'] == 'pending')
+                                          if (appointment['status'] ==
+                                              'pending')
                                             TextButton(
                                               onPressed: () {
                                                 showDialog(
                                                   context: context,
-                                                  builder: (context) => AlertDialog(
-                                                    title: const Text('Cancel Appointment'),
+                                                  builder: (context) =>
+                                                      AlertDialog(
+                                                    title: const Text(
+                                                        'Cancel Appointment'),
                                                     content: const Text(
                                                         'Are you sure you want to cancel this appointment?'),
                                                     actions: [
                                                       TextButton(
                                                         onPressed: () {
-                                                          Navigator.pop(context);
+                                                          Navigator.pop(
+                                                              context);
                                                         },
                                                         child: const Text('No'),
                                                       ),
                                                       TextButton(
                                                         onPressed: () async {
-                                                          Navigator.pop(context);
-                                                          await FirebaseFirestore.instance
-                                                              .collection('clinic_appointments')
-                                                              .doc(appointment['id'])
-                                                              .update({'status': 'cancelled'});
+                                                          Navigator.pop(
+                                                              context);
+                                                          await FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'clinic_appointments')
+                                                              .doc(appointment[
+                                                                  'id'])
+                                                              .update({
+                                                            'status':
+                                                                'cancelled'
+                                                          });
                                                           fetchUserAppointments();
                                                         },
-                                                        child: const Text('Yes'),
+                                                        child:
+                                                            const Text('Yes'),
                                                       ),
                                                     ],
                                                   ),
@@ -374,7 +388,9 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                 foregroundColor: Colors.red,
                                                 padding: EdgeInsets.zero,
                                                 minimumSize: Size.zero,
-                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                tapTargetSize:
+                                                    MaterialTapTargetSize
+                                                        .shrinkWrap,
                                               ),
                                               child: const Text(
                                                 'Cancel',
