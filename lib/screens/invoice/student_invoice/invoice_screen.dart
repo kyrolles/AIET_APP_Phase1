@@ -9,7 +9,6 @@ import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/student_invoice/tuition_fees_download.dart';
-import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:graduation_project/utils/safe_json_extractor.dart';
 import '../../../components/my_app_bar.dart';
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
@@ -70,60 +69,57 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         title: 'Invoice',
         onpressed: () => Navigator.pop(context),
       ),
-      body: ReusableOffline(
-        child: StreamBuilder<QuerySnapshot>(
-            stream: _requestsStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                requestsList = [];
-                for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                  DocumentSnapshot doc = snapshot.data!.docs[i];
+      body: StreamBuilder<QuerySnapshot>(
+          stream: _requestsStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              requestsList = [];
+              for (var i = 0; i < snapshot.data!.docs.length; i++) {
+                DocumentSnapshot doc = snapshot.data!.docs[i];
 
-                  // Safely get fields using utility
-                  String docStudentId =
-                      SafeDocumentSnapshot.getField(doc, 'student_id', '');
-                  String docType =
-                      SafeDocumentSnapshot.getField(doc, 'type', '');
+                // Safely get fields using utility
+                String docStudentId =
+                    SafeDocumentSnapshot.getField(doc, 'student_id', '');
+                String docType = SafeDocumentSnapshot.getField(doc, 'type', '');
 
-                  if (docStudentId == studentId &&
-                      (docType == 'Proof of enrollment' ||
-                          docType == 'Tuition Fees')) {
-                    try {
-                      requestsList.add(Request.fromJson(doc));
-                    } catch (e) {
-                      log('Error parsing request: $e');
-                    }
+                if (docStudentId == studentId &&
+                    (docType == 'Proof of enrollment' ||
+                        docType == 'Tuition Fees')) {
+                  try {
+                    requestsList.add(Request.fromJson(doc));
+                  } catch (e) {
+                    log('Error parsing request: $e');
                   }
                 }
               }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListContainer(
-                    title: 'Status',
-                    listOfWidgets: showRequestsList(),
-                  ),
-                  const Divider(
-                      color: kLightGrey, indent: 10, endIndent: 10, height: 10),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16.0),
-                    child: Text(
-                      'Ask for',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListContainer(
+                  title: 'Status',
+                  listOfWidgets: showRequestsList(),
+                ),
+                const Divider(
+                    color: kLightGrey, indent: 10, endIndent: 10, height: 10),
+                const SizedBox(
+                  height: 8,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Text(
+                    'Ask for',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  tuitionFeesButton(context, requestsList),
-                  proofOfEnrollmentButton(context),
-                ],
-              );
-            }),
-      ),
+                ),
+                tuitionFeesButton(context, requestsList),
+                proofOfEnrollmentButton(context),
+              ],
+            );
+          }),
     );
   }
 

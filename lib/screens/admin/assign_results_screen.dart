@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import '../../components/kbutton.dart';
 import '../../components/my_app_bar.dart';
 import '../../constants.dart';
@@ -45,8 +47,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   }
 
   Stream<QuerySnapshot> getStudentsStream() {
-    Query query = FirebaseFirestore.instance.collection('users').where('role',
-        isEqualTo: 'Student');
+    Query query = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'Student');
 
     if (selectedDepartment != 'All') {
       query = query.where('department', isEqualTo: selectedDepartment);
@@ -242,13 +245,13 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       if (!await _resultsService.isUserAdmin()) {
         throw Exception('Only admins can modify results');
       }
-      
+
       if (!context.mounted) return;
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .get();
-          
+
       if (!userDoc.exists) throw Exception('Student not found');
       final userData = userDoc.data()!;
 
@@ -258,21 +261,21 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           .doc(userId)
           .collection('semesters')
           .doc(selectedSemester.toString());
-          
+
       var results = await _resultsService.getSemesterResults(
           userId, selectedSemester.toString());
-          
+
       if (!context.mounted) return;
       if (results == null) {
         final subjects = await _getDepartmentSubjects(userData['department']);
-        
+
         await resultDoc.set({
           "semesterNumber": selectedSemester,
           "department": userData['department'],
           "lastUpdated": FieldValue.serverTimestamp(),
           "subjects": subjects,
         }, SetOptions(merge: true));
-        
+
         if (!context.mounted) return;
         results = await _resultsService.getSemesterResults(
             userId, selectedSemester.toString());
@@ -305,9 +308,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     }
 
     final List<dynamic> subjects = results['subjects'];
-    
+
     if (!context.mounted) return;
-    
+
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -372,7 +375,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Code: ${subject['code']}'),
-                            Text('Grade: ${subject['grade']} (${subject['points']})'),
+                            Text(
+                                'Grade: ${subject['grade']} (${subject['points']})'),
                           ],
                         ),
                         trailing: Row(
@@ -424,7 +428,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           FirebaseFirestore.instance.collection('users').doc(id).get()));
 
       if (!context.mounted) return;
-      
+
       final differentDepartments = selectedStudents
           .where((doc) => doc.data()?['department'] != selectedDepartment)
           .toList();
@@ -510,23 +514,23 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
             onPressed: () async {
               try {
                 Navigator.pop(context);
-                
+
                 await _resultsService.batchAssignResults(
                   studentIds: selectedStudentIds.toList(),
                   department: selectedDepartment,
                   semester: selectedSemester,
                   subjects: departmentSubjects,
                 );
-                
+
                 if (!context.mounted) return;
-                
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Subjects assigned successfully'),
                     backgroundColor: kgreen,
                   ),
                 );
-                
+
                 this.setState(() {
                   selectedStudentIds.clear();
                   _isBulkMode = false;
@@ -548,12 +552,23 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   Future<void> _bulkUpdateGrades() async {
     // Show a dialog to select a grade to apply to all students
     final grades = [
-      'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'
+      'A',
+      'A-',
+      'B+',
+      'B',
+      'B-',
+      'C+',
+      'C',
+      'C-',
+      'D+',
+      'D',
+      'D-',
+      'F'
     ];
     String selectedGrade = 'C';
-    
+
     if (!context.mounted) return;
-    
+
     await showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -580,7 +595,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              const Text('This will update the grade for all subjects for the selected students.'),
+              const Text(
+                  'This will update the grade for all subjects for the selected students.'),
             ],
           ),
           actions: [
@@ -595,27 +611,28 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               ),
               onPressed: () async {
                 Navigator.pop(context);
-                
+
                 try {
                   final batch = FirebaseFirestore.instance.batch();
-                  
+
                   for (final studentId in selectedStudentIds) {
                     final resultRef = FirebaseFirestore.instance
                         .collection('results')
                         .doc(studentId)
                         .collection('semesters')
                         .doc(selectedSemester.toString());
-                    
+
                     final resultDoc = await resultRef.get();
                     if (resultDoc.exists) {
                       final data = resultDoc.data() as Map<String, dynamic>;
                       if (data.containsKey('subjects')) {
-                        final List<dynamic> subjects = List.from(data['subjects']);
+                        final List<dynamic> subjects =
+                            List.from(data['subjects']);
                         for (int i = 0; i < subjects.length; i++) {
                           subjects[i]['grade'] = selectedGrade;
                           subjects[i]['points'] = _gradeToPoints(selectedGrade);
                         }
-                        
+
                         batch.update(resultRef, {
                           'subjects': subjects,
                           'lastUpdated': FieldValue.serverTimestamp()
@@ -623,9 +640,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       }
                     }
                   }
-                  
+
                   await batch.commit();
-                  
+
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -654,7 +671,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
 
   Future<void> _bulkResetScores() async {
     if (!context.mounted) return;
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -669,8 +686,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
             const Text('• Reset all grades to F'),
             const Text('• Keep subject assignments intact'),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.', 
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            const Text('This action cannot be undone.',
+                style:
+                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -685,33 +703,38 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
             ),
             onPressed: () async {
               Navigator.pop(context);
-              
+
               try {
                 final batch = FirebaseFirestore.instance.batch();
-                
+
                 for (final studentId in selectedStudentIds) {
                   final resultRef = FirebaseFirestore.instance
                       .collection('results')
                       .doc(studentId)
                       .collection('semesters')
                       .doc(selectedSemester.toString());
-                  
+
                   final resultDoc = await resultRef.get();
                   if (resultDoc.exists) {
                     final data = resultDoc.data() as Map<String, dynamic>;
                     if (data.containsKey('subjects')) {
-                      final List<dynamic> subjects = List.from(data['subjects']);
+                      final List<dynamic> subjects =
+                          List.from(data['subjects']);
                       for (int i = 0; i < subjects.length; i++) {
                         subjects[i]['grade'] = 'F';
                         subjects[i]['points'] = 0.0;
                         subjects[i]['scores'] = {
                           'week5': 0.0,
                           'week10': 0.0,
-                          'coursework': subjects[i]['scores']['coursework'] != null ? 0.0 : null,
-                          'lab': subjects[i]['scores']['lab'] != null ? 0.0 : null,
+                          'coursework':
+                              subjects[i]['scores']['coursework'] != null
+                                  ? 0.0
+                                  : null,
+                          'lab':
+                              subjects[i]['scores']['lab'] != null ? 0.0 : null,
                         };
                       }
-                      
+
                       batch.update(resultRef, {
                         'subjects': subjects,
                         'lastUpdated': FieldValue.serverTimestamp()
@@ -719,9 +742,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                     }
                   }
                 }
-                
+
                 await batch.commit();
-                
+
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -773,41 +796,43 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               ),
             )
           : null,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildFilters(),
-          if (_isBulkMode) _buildBulkOperationBar(),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: getStudentsStream(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error: ${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  );
-                }
+      body: ReusableOffline(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildFilters(),
+            if (_isBulkMode) _buildBulkOperationBar(),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: getStudentsStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: kBlue),
-                  );
-                }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: kBlue),
+                    );
+                  }
 
-                final students = filterStudents(snapshot.data!.docs);
+                  final students = filterStudents(snapshot.data!.docs);
 
-                if (students.isEmpty) {
-                  return _buildEmptyState();
-                }
+                  if (students.isEmpty) {
+                    return _buildEmptyState();
+                  }
 
-                return _buildStudentsList(students);
-              },
+                  return _buildStudentsList(students);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -884,7 +909,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               const SizedBox(width: 8),
               IconButton(
                 icon: Icon(
-                  _isBulkMode ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+                  _isBulkMode
+                      ? Icons.check_box_outlined
+                      : Icons.check_box_outline_blank,
                   color: kBlue,
                 ),
                 onPressed: () {
@@ -1070,7 +1097,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         final studentData = students[index].data() as Map<String, dynamic>;
         final studentId = students[index].id;
         final bool isSelected = selectedStudentIds.contains(studentId);
-        
+
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           elevation: 0,
@@ -1202,7 +1229,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     );
   }
 
-  Widget _buildStudentActions(String studentId, Map<String, dynamic> studentData) {
+  Widget _buildStudentActions(
+      String studentId, Map<String, dynamic> studentData) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1221,12 +1249,12 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   }
 
   void _showSettingsMenu() {
-    showModalBottomSheet(
+    OfflineAwareBottomSheet.show(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
+      onlineContent: Container(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1242,7 +1270,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               ),
               title: const Text(
                 'Manage Semester Template',
-                style: TextStyle(fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontFamily: 'Lexend', fontWeight: FontWeight.w600),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -1250,7 +1279,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => SemesterTemplateScreen(
-                      department: selectedDepartment == 'All' ? 'General' : selectedDepartment,
+                      department: selectedDepartment == 'All'
+                          ? 'General'
+                          : selectedDepartment,
                       semester: selectedSemester,
                     ),
                   ),
@@ -1268,7 +1299,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               ),
               title: const Text(
                 'Manage Department Subjects',
-                style: TextStyle(fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontFamily: 'Lexend', fontWeight: FontWeight.w600),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -1276,7 +1308,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => DepartmentSubjectsScreen(
-                      department: selectedDepartment == 'All' ? 'General' : selectedDepartment,
+                      department: selectedDepartment == 'All'
+                          ? 'General'
+                          : selectedDepartment,
                     ),
                   ),
                 );
@@ -1293,7 +1327,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               ),
               title: const Text(
                 'Export/Import Results',
-                style: TextStyle(fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontFamily: 'Lexend', fontWeight: FontWeight.w600),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -1304,6 +1339,96 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         ),
       ),
     );
+    // showModalBottomSheet(
+    //   context: context,
+    //   shape: const RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    //   ),
+    //   builder: (context) => Container(
+    //     padding: const EdgeInsets.all(16),
+    //     child: Column(
+    //       mainAxisSize: MainAxisSize.min,
+    //       children: [
+    //         ListTile(
+    //           leading: Container(
+    //             padding: const EdgeInsets.all(8),
+    //             decoration: BoxDecoration(
+    //               color: kbabyblue,
+    //               borderRadius: BorderRadius.circular(8),
+    //             ),
+    //             child: const Icon(Icons.library_books, color: kBlue),
+    //           ),
+    //           title: const Text(
+    //             'Manage Semester Template',
+    //             style: TextStyle(
+    //                 fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+    //           ),
+    //           onTap: () {
+    //             Navigator.pop(context);
+    //             Navigator.push(
+    //               context,
+    //               MaterialPageRoute(
+    //                 builder: (context) => SemesterTemplateScreen(
+    //                   department: selectedDepartment == 'All'
+    //                       ? 'General'
+    //                       : selectedDepartment,
+    //                   semester: selectedSemester,
+    //                 ),
+    //               ),
+    //             );
+    //           },
+    //         ),
+    //         ListTile(
+    //           leading: Container(
+    //             padding: const EdgeInsets.all(8),
+    //             decoration: BoxDecoration(
+    //               color: kOrange.withOpacity(0.1),
+    //               borderRadius: BorderRadius.circular(8),
+    //             ),
+    //             child: Icon(Icons.subject, color: kOrange),
+    //           ),
+    //           title: const Text(
+    //             'Manage Department Subjects',
+    //             style: TextStyle(
+    //                 fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+    //           ),
+    //           onTap: () {
+    //             Navigator.pop(context);
+    //             Navigator.push(
+    //               context,
+    //               MaterialPageRoute(
+    //                 builder: (context) => DepartmentSubjectsScreen(
+    //                   department: selectedDepartment == 'All'
+    //                       ? 'General'
+    //                       : selectedDepartment,
+    //                 ),
+    //               ),
+    //             );
+    //           },
+    //         ),
+    //         ListTile(
+    //           leading: Container(
+    //             padding: const EdgeInsets.all(8),
+    //             decoration: BoxDecoration(
+    //               color: kgreen.withOpacity(0.1),
+    //               borderRadius: BorderRadius.circular(8),
+    //             ),
+    //             child: Icon(Icons.import_export, color: kgreen),
+    //           ),
+    //           title: const Text(
+    //             'Export/Import Results',
+    //             style: TextStyle(
+    //                 fontFamily: 'Lexend', fontWeight: FontWeight.w600),
+    //           ),
+    //           onTap: () {
+    //             Navigator.pop(context);
+    //             // Add export/import functionality
+    //           },
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 
   void _showDepartmentPicker() {
@@ -1330,7 +1455,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 itemBuilder: (context, index) {
                   final department = departments[index];
                   final isSelected = selectedDepartment == department;
-                  
+
                   return ListTile(
                     leading: isSelected
                         ? const Icon(Icons.check_circle, color: kBlue)
@@ -1339,7 +1464,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       department,
                       style: TextStyle(
                         fontFamily: 'Lexend',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected ? kBlue : Colors.black,
                       ),
                     ),
@@ -1383,7 +1509,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 itemBuilder: (context, index) {
                   final year = academicYears[index];
                   final isSelected = selectedAcademicYear == year;
-                  
+
                   return ListTile(
                     leading: isSelected
                         ? const Icon(Icons.check_circle, color: kBlue)
@@ -1392,7 +1518,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       year,
                       style: TextStyle(
                         fontFamily: 'Lexend',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected ? kBlue : Colors.black,
                       ),
                     ),
@@ -1436,7 +1563,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 itemBuilder: (context, index) {
                   final semester = index + 1;
                   final isSelected = selectedSemester == semester;
-                  
+
                   return ListTile(
                     leading: isSelected
                         ? const Icon(Icons.check_circle, color: kBlue)
@@ -1445,7 +1572,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       'Semester $semester',
                       style: TextStyle(
                         fontFamily: 'Lexend',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected ? kBlue : Colors.black,
                       ),
                     ),
@@ -1465,7 +1593,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     );
   }
 
-  Future<void> _viewStudentResults(String studentId, Map<String, dynamic> studentData) async {
+  Future<void> _viewStudentResults(
+      String studentId, Map<String, dynamic> studentData) async {
     final results = await _resultsService.getSemesterResults(
       studentId,
       selectedSemester.toString(),
@@ -1616,7 +1745,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                   itemBuilder: (context, index) {
                     final subject = subjects[index];
                     final grade = subject['grade'] as String? ?? 'F';
-                    
+
                     // Define grade colors
                     final Map<String, Color> gradeColors = {
                       'A': const Color(0xFF4CAF50),
@@ -1633,7 +1762,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       'F': const Color(0xFFF44336),
                     };
                     final gradeColor = gradeColors[grade] ?? gradeColors['F']!;
-                    
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(
@@ -1714,24 +1843,26 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
 
   double _calculateGPA(List<dynamic> subjects) {
     if (subjects.isEmpty) return 0.0;
-    
+
     double totalPoints = 0;
     double totalCredits = 0;
-    
+
     for (final subject in subjects) {
       final credits = (subject['credits'] as num?)?.toDouble() ?? 0;
       final points = (subject['points'] as num?)?.toDouble() ?? 0;
-      
+
       totalPoints += credits * points;
       totalCredits += credits;
     }
-    
+
     return totalCredits > 0 ? totalPoints / totalCredits : 0;
   }
 
   int _calculateTotalCredits(List<dynamic> subjects) {
-    return subjects.fold(0, (total, subject) => 
-      total + ((subject['credits'] as num?)?.toInt() ?? 0));
+    return subjects.fold(
+        0,
+        (total, subject) =>
+            total + ((subject['credits'] as num?)?.toInt() ?? 0));
   }
 
   Future<void> _executeBulkOperation() async {
@@ -1759,4 +1890,3 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     // ...
   }
 }
-

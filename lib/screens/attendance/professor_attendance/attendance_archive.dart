@@ -5,6 +5,7 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/add_student_bottom_sheet.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -146,7 +147,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
       'subjectName': widget.subjectName,
       'period': widget.period,
       'docId': currentDocId,
-      'timestamp': originalTimestamp 
+      'timestamp': originalTimestamp
     });
     setState(() {});
   }
@@ -154,12 +155,9 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
   void removeStudent(int index) async {
     try {
       if (currentDocId != null) {
-        
-        DocumentSnapshot attendanceDoc = await _firestore
-            .collection('attendance')
-            .doc(currentDocId)
-            .get();
-        
+        DocumentSnapshot attendanceDoc =
+            await _firestore.collection('attendance').doc(currentDocId).get();
+
         if (!attendanceDoc.exists) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -169,10 +167,11 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
           );
           return;
         }
-        
-        Map<String, dynamic> data = attendanceDoc.data() as Map<String, dynamic>;
+
+        Map<String, dynamic> data =
+            attendanceDoc.data() as Map<String, dynamic>;
         List<dynamic> studentList = data['studentList'] ?? [];
-        
+
         if (index >= studentList.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -182,20 +181,18 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
           );
           return;
         }
-        
-        
-        Map<String, dynamic> studentToRemove = Map<String, dynamic>.from(studentList[index]);
-        
-        
+
+        Map<String, dynamic> studentToRemove =
+            Map<String, dynamic>.from(studentList[index]);
+
         setState(() {
           attendanceList.removeAt(index);
         });
-        
-        
+
         await _firestore.collection('attendance').doc(currentDocId).update({
           'studentList': FieldValue.arrayRemove([studentToRemove])
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Student removed successfully'),
@@ -250,14 +247,55 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
         title: 'Attendance',
         onpressed: () => Navigator.pop(context),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Center(
+      body: ReusableOffline(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: qrData != null
+                      ? QrImageView(
+                          data: qrData!,
+                          version: QrVersions.auto,
+                          size: 180,
+                          backgroundColor: Colors.white,
+                        )
+                      : const SizedBox(
+                          height: 180,
+                          width: 180,
+                          child: Center(child: Text('QR Code')),
+                        ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Attendance List',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ),
+            Expanded(
               child: Container(
-                padding: const EdgeInsets.all(24),
+                margin: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -269,116 +307,77 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                     ),
                   ],
                 ),
-                child: qrData != null
-                    ? QrImageView(
-                        data: qrData!,
-                        version: QrVersions.auto,
-                        size: 180,
-                        backgroundColor: Colors.white,
-                      )
-                    : const SizedBox(
-                        height: 180,
-                        width: 180,
-                        child: Center(child: Text('QR Code')),
+                child: ListView.builder(
+                  itemCount: attendanceList.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.grey[100],
+                        child: Icon(Icons.person, color: Colors.grey[400]),
                       ),
+                      title: Text(
+                        attendanceList[index]['name']!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'ID: ${attendanceList[index]['id']} - Year: ${attendanceList[index]['academicYear']}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => removeStudent(index),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Attendance List',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[800],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: KButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return AddStudentBottomSheet(
+                              documentId: currentDocId!,
+                            );
+                          },
+                        );
+                      },
+                      text: 'Add Stu +',
+                      fontSize: 20,
+                      textColor: Colors.black87,
+                      backgroundColor: Colors.black12,
+                      borderColor: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: KButton(
+                      onPressed: confirmAttendance,
+                      text: 'Confirm',
+                      fontSize: 20,
+                      textColor: Colors.white,
+                      backgroundColor: kBlue,
+                      borderColor: Colors.white,
+                    ),
                   ),
                 ],
               ),
-              child: ListView.builder(
-                itemCount: attendanceList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.grey[100],
-                      child: Icon(Icons.person, color: Colors.grey[400]),
-                    ),
-                    title: Text(
-                      attendanceList[index]['name']!,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'ID: ${attendanceList[index]['id']} - Year: ${attendanceList[index]['academicYear']}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => removeStudent(index),
-                    ),
-                  );
-                },
-              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: KButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return AddStudentBottomSheet(
-                            documentId: currentDocId!, 
-                          );
-                        },
-                      );
-                    },
-                    text: 'Add Stu +',
-                    fontSize: 20,
-                    textColor: Colors.black87,
-                    backgroundColor: Colors.black12,
-                    borderColor: Colors.black87,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: KButton(
-                    onPressed: confirmAttendance,
-                    text: 'Confirm',
-                    fontSize: 20,
-                    textColor: Colors.white,
-                    backgroundColor: kBlue,
-                    borderColor: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

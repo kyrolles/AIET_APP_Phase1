@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
 
@@ -144,69 +145,65 @@ class RequestContainer extends StatelessWidget {
   }
 
   Future<void> showModalBottomSheetForProofOfEnrollment(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return OfflineAwareBottomSheet.show(
       backgroundColor: const Color(0XFFF1F1F2),
       context: context,
-      builder: (BuildContext context) {
-        return ProofOfEnrollmentSheetScreen(
-          request: request,
-          doneFunctionality: () {
-            updateDocument(
-              collectionPath: 'requests',
-              searchCriteria: {
-                'student_id': request.studentId,
-                'addressed_to': request.addressedTo,
-              },
-              newData: {
-                'status': 'Done',
-              },
-            );
-            Navigator.pop(context);
-          },
-          rejectedFunctionality: () {
-            updateDocument(
-              collectionPath: 'requests',
-              searchCriteria: {
-                'student_id': request.studentId,
-                'addressed_to': request.addressedTo,
-              },
-              newData: {
-                'status': 'Rejected',
-              },
-            );
-            Navigator.pop(context);
-          },
-          pendingFunctionality: () {
-            updateDocument(
-              collectionPath: 'requests',
-              searchCriteria: {
-                'student_id': request.studentId,
-                'addressed_to': request.addressedTo,
-              },
-              newData: {
-                'status': 'Pending',
-              },
-            );
-            Navigator.pop(context);
-          },
-        );
-      },
+      onlineContent: ProofOfEnrollmentSheetScreen(
+        request: request,
+        doneFunctionality: () {
+          updateDocument(
+            collectionPath: 'requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+            },
+            newData: {
+              'status': 'Done',
+            },
+          );
+          Navigator.pop(context);
+        },
+        rejectedFunctionality: () {
+          updateDocument(
+            collectionPath: 'requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+            },
+            newData: {
+              'status': 'Rejected',
+            },
+          );
+          Navigator.pop(context);
+        },
+        pendingFunctionality: () {
+          updateDocument(
+            collectionPath: 'requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+            },
+            newData: {
+              'status': 'Pending',
+            },
+          );
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
   Future<dynamic> showModalBottomSheetForTuitionFees(BuildContext context) {
-    return showModalBottomSheet(
+    return OfflineAwareBottomSheet.show(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (BuildContext context) {
-        return TuitionFeesSheet(
-          request: request,
-          doneFunctionality: () {},
-        );
-      },
+      onlineContent: TuitionFeesSheet(
+        request: request,
+        doneFunctionality: () {},
+      ),
     );
   }
 }

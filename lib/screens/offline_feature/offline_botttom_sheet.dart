@@ -35,7 +35,7 @@ class OfflineBottomSheet extends StatelessWidget {
             ),
           ),
           const Text(
-            "There are no bottons to push\nJust turn off your internet.",
+            "There are no bottons to push\nJust turn on your internet.",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

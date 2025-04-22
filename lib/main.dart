@@ -8,7 +8,6 @@ import 'package:graduation_project/screens/clinic/student_clinic/clinic_screen.d
 import 'package:graduation_project/screens/clinic/student_clinic/new_appointment_screen.dart';
 import 'package:graduation_project/screens/drawer/qr_code_screen.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_archive.dart';
-import 'package:graduation_project/screens/splash_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/create_announcement.dart';
 import 'package:graduation_project/screens/training/staff_training/archive_validate_screen.dart';
 import 'package:graduation_project/screens/training/staff_training/staff_student_training_screen.dart';

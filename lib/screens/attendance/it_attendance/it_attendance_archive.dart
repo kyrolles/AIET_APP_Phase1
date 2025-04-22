@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/attendance_model.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 
 class ITAttendanceArchive extends StatefulWidget {
   const ITAttendanceArchive({Key? key}) : super(key: key);
@@ -25,51 +26,53 @@ class _ITAttendanceArchiveState extends State<ITAttendanceArchive> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        // Remove the orderBy clause to avoid requiring an index
-        stream: _firestore
-            .collection('attendance')
-            .where('status', isEqualTo: 'approved')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: ReusableOffline(
+        child: StreamBuilder<QuerySnapshot>(
+          // Remove the orderBy clause to avoid requiring an index
+          stream: _firestore
+              .collection('attendance')
+              .where('status', isEqualTo: 'approved')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text(
-                'No approved attendance records found',
-                style: TextStyle(fontSize: 16, color: kGrey),
-              ),
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No approved attendance records found',
+                  style: TextStyle(fontSize: 16, color: kGrey),
+                ),
+              );
+            }
+
+            // Convert documents to AttendanceModel objects
+            List<AttendanceModel> attendanceList = snapshot.data!.docs
+                .map((doc) => AttendanceModel.fromJson(doc))
+                .toList();
+
+            // Sort the list by approvalTimestamp (newest first)
+            attendanceList.sort((a, b) {
+              if (a.approvalTimestamp == null) return 1;
+              if (b.approvalTimestamp == null) return -1;
+              return b.approvalTimestamp!.compareTo(a.approvalTimestamp!);
+            });
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: attendanceList.length,
+              itemBuilder: (context, index) {
+                final attendance = attendanceList[index];
+                return ArchivedAttendanceCard(attendance: attendance);
+              },
             );
-          }
-
-          // Convert documents to AttendanceModel objects
-          List<AttendanceModel> attendanceList = snapshot.data!.docs
-              .map((doc) => AttendanceModel.fromJson(doc))
-              .toList();
-
-          // Sort the list by approvalTimestamp (newest first)
-          attendanceList.sort((a, b) {
-            if (a.approvalTimestamp == null) return 1;
-            if (b.approvalTimestamp == null) return -1;
-            return b.approvalTimestamp!.compareTo(a.approvalTimestamp!);
-          });
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: attendanceList.length,
-            itemBuilder: (context, index) {
-              final attendance = attendanceList[index];
-              return ArchivedAttendanceCard(attendance: attendance);
-            },
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -107,7 +110,8 @@ class ArchivedAttendanceCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -171,7 +175,8 @@ class ArchivedAttendanceCard extends StatelessWidget {
             ExpansionTile(
               title: const Text('View Student List'),
               children: [
-                if (attendance.studentsList != null && attendance.studentsList!.isNotEmpty)
+                if (attendance.studentsList != null &&
+                    attendance.studentsList!.isNotEmpty)
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -183,11 +188,11 @@ class ArchivedAttendanceCard extends StatelessWidget {
                         title: Text(student['name'] ?? 'Unknown'),
                         subtitle: Text(student['id'] ?? 'No ID'),
                         trailing: Icon(
-                          student['status'] == 'present' 
-                              ? Icons.check_circle 
+                          student['status'] == 'present'
+                              ? Icons.check_circle
                               : Icons.cancel,
-                          color: student['status'] == 'present' 
-                              ? Colors.green 
+                          color: student['status'] == 'present'
+                              ? Colors.green
                               : Colors.red,
                         ),
                       );
@@ -208,7 +213,7 @@ class ArchivedAttendanceCard extends StatelessWidget {
 
   String _formatTimestamp(String timestamp) {
     if (timestamp.isEmpty) return "Unknown";
-    
+
     try {
       final DateTime dateTime = DateTime.parse(timestamp);
       return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
