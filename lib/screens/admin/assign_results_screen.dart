@@ -23,7 +23,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   final ResultsService _resultsService = ResultsService();
   String selectedDepartment = 'All';
   int selectedSemester = 1;
-  final List<String> departments = ['All', 'General', 'CE', 'ECE', 'ME', 'IE'];
+  final List<String> departments = ['All', 'General', 'CE', 'ECE', 'EME', 'IE'];
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String selectedAcademicYear = 'All';
@@ -40,9 +40,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   final List<String> _bulkOperations = [
     'Select Operation',
     'Assign Subjects',
-    'Update Grades',
-    'Reset Scores',
-    'Upload Excel' // New bulk operation for Excel upload
+    'Reset Scores'
   ];
 
   @override
@@ -427,17 +425,6 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   }
 
   // Show admin options FAB menu
-  Widget _buildAdminFAB() {
-    if (!_canModifyResults) return Container();
-    
-    return FloatingActionButton(
-      onPressed: () {
-        _showAdminOptions();
-      },
-      child: const Icon(Icons.admin_panel_settings),
-    );
-  }
-
   void _showAdminOptions() {
     showModalBottomSheet(
       context: context,
@@ -594,7 +581,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                     style: TextStyle(color: Colors.white, fontFamily: 'Lexend'),
                   ),
                 )
-              : _buildAdminFAB(),
+              : null,
       body: _isProcessingExcel
           ? Center(
               child: Column(
@@ -1043,11 +1030,6 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           icon: const Icon(Icons.assignment, color: kBlue, size: 20),
           tooltip: 'Assign Subjects',
           onPressed: () => assignResultsForStudent(context, studentId),
-        ),
-        IconButton(
-          icon: const Icon(Icons.grade, color: kOrange, size: 20),
-          tooltip: 'View Grades',
-          onPressed: () => _showStudentResults(context, studentId),
         ),
       ],
     );
@@ -1504,20 +1486,235 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       return;
     }
 
-    if (_bulkOperationType == 'Upload Excel') {
-      _showExcelUploadDialog(context);
-      return;
-    }
+    // Show a progress indicator
+    setState(() {
+      _isProcessingExcel = true;
+      _processingMessage = 'Processing ${_bulkOperationType}...';
+    });
 
-    // Handle other bulk operations here...
-    // For now, we only implement the Excel upload functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('This bulk operation is not yet implemented'),
-      ),
-    );
+    try {
+      if (_bulkOperationType == 'Assign Subjects') {
+        await _bulkAssignSubjects();
+      } else if (_bulkOperationType == 'Reset Scores') {
+        await _bulkResetScores();
+      }
+
+      // Hide progress indicator
+      setState(() {
+        _isProcessingExcel = false;
+        _processingMessage = '';
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_bulkOperationType} completed successfully'),
+          backgroundColor: kgreen,
+        ),
+      );
+    } catch (e) {
+      // Hide progress indicator
+      setState(() {
+        _isProcessingExcel = false;
+        _processingMessage = '';
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Bulk assign subjects to selected students
+  Future<void> _bulkAssignSubjects() async {
+    int successCount = 0;
+    int failCount = 0;
+    
+    // Get the students' department and subjects
+    final List<Map<String, dynamic>> studentsData = [];
+    
+    for (String studentId in selectedStudentIds) {
+      try {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(studentId)
+            .get();
+            
+        if (userDoc.exists) {
+          final userData = userDoc.data()!;
+          studentsData.add({
+            'id': studentId,
+            'department': userData['department'] ?? 'General',
+          });
+        }
+      } catch (e) {
+        debugPrint('Error getting student data: $e');
+        failCount++;
+      }
+    }
+    
+    // Show dialog to select subjects by department
+    final List<String> uniqueDepartments = studentsData
+      .map((data) => data['department'] as String)
+      .toSet()
+      .toList();
+      
+    // If there are multiple departments, we need to handle each separately
+    for (String department in uniqueDepartments) {
+      final studentsInDepartment = studentsData
+        .where((data) => data['department'] == department)
+        .toList();
+        
+      if (studentsInDepartment.isEmpty) continue;
+      
+      // Show dialog to select subjects for this department
+      if (!mounted) break;
+      
+      // Get existing subject codes for the first student to use as initial selection
+      List<String> initialSelectedSubjectCodes = [];
+      try {
+        final currentSubjectsData = await _resultsService.getStudentSubjects(
+          studentsInDepartment.first['id'],
+          selectedSemester.toString(),
+        );
+        
+        initialSelectedSubjectCodes = currentSubjectsData
+            .map((subject) => subject['code'] as String)
+            .toList();
+      } catch (e) {
+        debugPrint('Error getting initial subjects: $e');
+        // Continue with empty initial selection
+      }
+      
+      final bool? shouldContinue = await showDialog<bool>(
+        context: context,
+        builder: (context) => SubjectSelectionDialog(
+          userId: studentsInDepartment.first['id'],
+          department: department,
+          semester: selectedSemester,
+          initiallySelectedSubjects: initialSelectedSubjectCodes,
+        ),
+      );
+      
+      if (shouldContinue != true) continue;
+      
+      // Apply subjects to all students in this department
+      for (var studentData in studentsInDepartment) {
+        try {
+          // Get updated subject codes from the student we used for selection
+          final updatedSubjectsData = await _resultsService.getStudentSubjects(
+            studentsInDepartment.first['id'],
+            selectedSemester.toString(),
+          );
+          
+          // Get the department subjects in the proper format for other students
+          final subjects = await _getDepartmentSubjects(department);
+          
+          // Filter to only include the selected subjects
+          final List<String> selectedCodes = updatedSubjectsData
+              .map((subject) => subject['code'] as String)
+              .toList();
+              
+          final List<Map<String, dynamic>> selectedSubjects = subjects
+              .where((subject) => selectedCodes.contains(subject['code']))
+              .toList();
+          
+          // Update the student's semester with these subjects
+          DocumentReference resultDoc = FirebaseFirestore.instance
+              .collection('results')
+              .doc(studentData['id'])
+              .collection('semesters')
+              .doc(selectedSemester.toString());
+
+          await resultDoc.set({
+            "semesterNumber": selectedSemester,
+            "department": department,
+            "lastUpdated": FieldValue.serverTimestamp(),
+            "subjects": selectedSubjects,
+          }, SetOptions(merge: true));
+          
+          successCount++;
+        } catch (e) {
+          debugPrint('Error assigning subjects to student: $e');
+          failCount++;
+        }
+      }
+    }
+    
+    setState(() {
+      _processingMessage = 'Completed: $successCount successful, $failCount failed';
+    });
   }
   
+  // Bulk reset scores for all selected students
+  Future<void> _bulkResetScores() async {
+    int successCount = 0;
+    int failCount = 0;
+    
+    for (String studentId in selectedStudentIds) {
+      try {
+        // Get current student results
+        final results = await _resultsService.getSemesterResults(
+          studentId, 
+          selectedSemester.toString()
+        );
+        
+        if (results == null || (results['subjects'] as List?)?.isEmpty == true) {
+          continue; // Skip if no results exist
+        }
+        
+        // Reset scores for each subject
+        List<Map<String, dynamic>> subjects = 
+          List<Map<String, dynamic>>.from(results['subjects'] as List);
+        
+        for (int i = 0; i < subjects.length; i++) {
+          final subject = subjects[i];
+          
+          // Reset the scores while maintaining the structure
+          Map<String, dynamic> scores = Map<String, dynamic>.from(subject['scores'] as Map);
+          
+          // Reset scores to 0.0
+          if (scores.containsKey('week5')) scores['week5'] = 0.0;
+          if (scores.containsKey('week10')) scores['week10'] = 0.0;
+          if (scores.containsKey('classwork')) scores['classwork'] = 0.0;
+          if (scores.containsKey('coursework')) scores['coursework'] = 0.0;
+          if (scores.containsKey('labExam')) scores['labExam'] = 0.0;
+          if (scores.containsKey('lab')) scores['lab'] = 0.0;
+          if (scores.containsKey('finalExam')) scores['finalExam'] = 0.0;
+          
+          // Reset grade and points
+          subjects[i]['grade'] = 'F';
+          subjects[i]['points'] = 0.0;
+          subjects[i]['scores'] = scores;
+        }
+        
+        // Update the document with reset scores
+        await FirebaseFirestore.instance
+          .collection('results')
+          .doc(studentId)
+          .collection('semesters')
+          .doc(selectedSemester.toString())
+          .update({
+            'subjects': subjects,
+            'lastUpdated': FieldValue.serverTimestamp(),
+          });
+          
+        successCount++;
+      } catch (e) {
+        debugPrint('Error resetting scores: $e');
+        failCount++;
+      }
+    }
+    
+    setState(() {
+      _processingMessage = 'Completed: $successCount successful, $failCount failed';
+    });
+  }
+
   // Method to show student results in a dialog
   Future<void> _showStudentResults(BuildContext context, String userId) async {
     try {
