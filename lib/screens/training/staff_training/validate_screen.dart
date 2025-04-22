@@ -8,6 +8,8 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
 
+import '../../offline_feature/reusable_offline_bottom_sheet.dart';
+
 class ValidateScreen extends StatefulWidget {
   const ValidateScreen({super.key});
 
@@ -29,12 +31,10 @@ class _ValidateScreenState extends State<ValidateScreen> {
     return requestsList.map((request) {
       return StudentContainer(
         onTap: (BuildContext context) {
-          showModalBottomSheet(
-            backgroundColor: const Color.fromRGBO(250, 250, 250, 0.93),
+          OfflineAwareBottomSheet.show(
             context: context,
-            builder: (BuildContext context) {
-              return ValidateButtomSheet(request: request);
-            },
+            onlineContent: ValidateButtomSheet(request: request),
+            backgroundColor: const Color.fromRGBO(250, 250, 250, 0.93),
           );
         },
         name: request.studentName,

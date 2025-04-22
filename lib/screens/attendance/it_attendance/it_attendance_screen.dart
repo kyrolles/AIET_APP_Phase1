@@ -4,6 +4,7 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/attendance_model.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/attendance/it_attendance/it_attendance_archive.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 
 class ITAttendanceScreen extends StatefulWidget {
   const ITAttendanceScreen({Key? key}) : super(key: key);
@@ -46,101 +47,107 @@ class _ITAttendanceScreenState extends State<ITAttendanceScreen> {
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          
-          const SizedBox(height: 16),
-          
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-             
-              stream: _firestore
-                  .collection('attendance')
-                  .where('status', isEqualTo: 'pending')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: kbabyblue),
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.error_outline, size: 60, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error: ${snapshot.error}',
-                          style: const TextStyle(fontSize: 16, color: kGrey),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check_circle_outline, size: 80, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'No pending attendance records',
-                          style: TextStyle(fontSize: 18, color: kGrey, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'All attendance records have been processed',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                
-                List<AttendanceModel> attendanceList = snapshot.data!.docs
-                    .map((doc) => AttendanceModel.fromJson(doc))
-                    .toList();
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: attendanceList.length,
-                  itemBuilder: (context, index) {
-                    final attendance = attendanceList[index];
-                    return AttendanceCard(
-                      attendance: attendance,
-                      onEdit: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AttendanceArchive(
-                              subjectName: attendance.subjectName,
-                              period: attendance.period,
-                              existingDocId: attendance.id,
-                            ),
-                          ),
-                        );
-                      },
-                      onApprove: () => _showApproveConfirmation(context, attendance),
+      body: ReusableOffline(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _firestore
+                    .collection('attendance')
+                    .where('status', isEqualTo: 'pending')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: kbabyblue),
                     );
-                  },
-                );
-              },
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.error_outline,
+                              size: 60, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(fontSize: 16, color: kGrey),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_circle_outline,
+                              size: 80, color: Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No pending attendance records',
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: kGrey,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'All attendance records have been processed',
+                            style: TextStyle(
+                                fontSize: 14, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  List<AttendanceModel> attendanceList = snapshot.data!.docs
+                      .map((doc) => AttendanceModel.fromJson(doc))
+                      .toList();
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: attendanceList.length,
+                    itemBuilder: (context, index) {
+                      final attendance = attendanceList[index];
+                      return AttendanceCard(
+                        attendance: attendance,
+                        onEdit: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AttendanceArchive(
+                                subjectName: attendance.subjectName,
+                                period: attendance.period,
+                                existingDocId: attendance.id,
+                              ),
+                            ),
+                          );
+                        },
+                        onApprove: () =>
+                            _showApproveConfirmation(context, attendance),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  void _showApproveConfirmation(BuildContext context, AttendanceModel attendance) {
+  void _showApproveConfirmation(
+      BuildContext context, AttendanceModel attendance) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
@@ -173,7 +180,7 @@ class _ITAttendanceScreenState extends State<ITAttendanceScreen> {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       await _firestore.collection('attendance').doc(docId).update({
         'status': 'approved',
@@ -223,7 +230,6 @@ class AttendanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -241,11 +247,10 @@ class AttendanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50, 
+              color: Colors.blue.shade50,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -253,7 +258,7 @@ class AttendanceCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.class_, color: kDarkBlue, size: 22), 
+                const Icon(Icons.class_, color: kDarkBlue, size: 22),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -283,22 +288,20 @@ class AttendanceCard extends StatelessWidget {
               ],
             ),
           ),
-          
-         
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoRow(Icons.person, 'Professor', attendance.profName ?? "Unknown"),
+                _buildInfoRow(Icons.person, 'Professor',
+                    attendance.profName ?? "Unknown"),
                 const SizedBox(height: 12),
-                _buildInfoRow(Icons.people, 'Students', '${attendance.studentsList?.length ?? 0}'),
+                _buildInfoRow(Icons.people, 'Students',
+                    '${attendance.studentsList?.length ?? 0}'),
                 const SizedBox(height: 12),
-                _buildInfoRow(Icons.access_time, 'Submitted', _formatTimestamp(attendance.timestamp ?? "")),
-                
+                _buildInfoRow(Icons.access_time, 'Submitted',
+                    _formatTimestamp(attendance.timestamp ?? "")),
                 const SizedBox(height: 20),
-                
-               
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -309,8 +312,10 @@ class AttendanceCard extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.indigo,
                         backgroundColor: Colors.indigo.shade50,
-                        side: const BorderSide(color: Colors.indigo, width: 1.5),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        side:
+                            const BorderSide(color: Colors.indigo, width: 1.5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -321,7 +326,8 @@ class AttendanceCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         elevation: 2,
                       ),
                     ),
@@ -338,7 +344,7 @@ class AttendanceCard extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: Colors.black54), 
+        Icon(icon, size: 18, color: Colors.black54),
         const SizedBox(width: 8),
         Text(
           '$label: ',
@@ -363,7 +369,7 @@ class AttendanceCard extends StatelessWidget {
 
   String _formatTimestamp(String timestamp) {
     if (timestamp.isEmpty) return "Unknown";
-    
+
     try {
       final DateTime dateTime = DateTime.parse(timestamp);
       return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';

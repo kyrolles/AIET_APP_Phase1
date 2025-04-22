@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import 'professor_qr_code_scanner_screen.dart';
 import 'add_student_manually_bottom_sheet.dart';
 
 class AddStudentBottomSheet extends StatelessWidget {
   final String documentId;
-  
+
   const AddStudentBottomSheet({
     super.key,
     required this.documentId,
@@ -25,14 +26,12 @@ class AddStudentBottomSheet extends StatelessWidget {
           const SizedBox(height: 20),
           KButton(
             onPressed: () {
-              showModalBottomSheet(
+              OfflineAwareBottomSheet.show(
                 context: context,
                 isScrollControlled: true,
-                builder: (BuildContext context) {
-                  return AddStudentManuallyBottmSheet(
-                    documentId: documentId,
-                  );
-                },
+                onlineContent: AddStudentManuallyBottmSheet(
+                  documentId: documentId,
+                ),
               );
             },
             text: 'Manual',

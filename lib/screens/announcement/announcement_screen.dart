@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart'; // For PDF file picking
 import 'dart:io';
@@ -188,7 +189,7 @@ class AnnouncementScreenState extends State<AnnouncementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Services',
+        title: 'Create Announcement',
         actions: [
           IconButton(
             icon: const Icon(Icons.send),
@@ -199,92 +200,94 @@ class AnnouncementScreenState extends State<AnnouncementScreen> {
           Navigator.pop(context);
         },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Title input field
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _titleController,
-                textDirection: _isArabic(_titleController.text)
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-                onChanged: (value) {
-                  setState(() {});
-                },
-                decoration: InputDecoration(
-                  hintText: 'Enter announcement title',
-                  hintTextDirection: _isArabic(_titleController.text)
-                      ? TextDirection.rtl
-                      : TextDirection.ltr,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ),
-            // Description input field
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _descriptionController,
-                maxLines: 5,
-                textDirection: _isArabic(_descriptionController.text)
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-                onChanged: (value) {
-                  setState(() {});
-                },
-                decoration: InputDecoration(
-                  hintText: 'Write your announcement here...',
-                  hintTextDirection: _isArabic(_descriptionController.text)
-                      ? TextDirection.rtl
-                      : TextDirection.ltr,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ),
-            // Image upload button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _pickImage,
-                child: const Text(
-                  'Upload Image',
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ),
-            ),
-            // PDF upload button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _pickPDF,
-                child: const Text(
-                  'Upload PDF',
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ),
-            ),
-            // Display the selected image
-            if (_image != null)
+      body: ReusableOffline(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Title input field
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Image.file(
-                  _image!,
-                  height: 150,
-                  fit: BoxFit.cover,
+                child: TextField(
+                  controller: _titleController,
+                  textDirection: _isArabic(_titleController.text)
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Enter announcement title',
+                    hintTextDirection: _isArabic(_titleController.text)
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    border: const OutlineInputBorder(),
+                  ),
                 ),
               ),
-            // Display the selected PDF file name
-            if (_pdfFile != null)
+              // Description input field
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Selected PDF: ${_pdfFile!.path.split('/').last}',
-                  style: const TextStyle(fontSize: 16),
+                child: TextField(
+                  controller: _descriptionController,
+                  maxLines: 5,
+                  textDirection: _isArabic(_descriptionController.text)
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Write your announcement here...',
+                    hintTextDirection: _isArabic(_descriptionController.text)
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    border: const OutlineInputBorder(),
+                  ),
                 ),
               ),
-          ],
+              // Image upload button
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: _pickImage,
+                  child: const Text(
+                    'Upload Image',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ),
+              // PDF upload button
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: _pickPDF,
+                  child: const Text(
+                    'Upload PDF',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ),
+              // Display the selected image
+              if (_image != null)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Image.file(
+                    _image!,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              // Display the selected PDF file name
+              if (_pdfFile != null)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Selected PDF: ${_pdfFile!.path.split('/').last}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

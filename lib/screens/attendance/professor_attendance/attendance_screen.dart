@@ -8,6 +8,8 @@ import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/attendance/attendance_model.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_item.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 
 import 'attendance_buttom_sheet.dart';
 
@@ -30,7 +32,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
         title: const Text('Delete Attendance'),
-        content: const Text('Are you sure you want to delete this attendance record? This action cannot be undone.'),
+        content: const Text(
+            'Are you sure you want to delete this attendance record? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -54,7 +57,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       await attendance.doc(documentId).delete();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Attendance record deleted successfully')),
+          const SnackBar(
+              content: Text('Attendance record deleted successfully')),
         );
       }
     } catch (e) {
@@ -91,79 +95,82 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       appBar: MyAppBar(
           title: 'Attendance', onpressed: () => Navigator.pop(context)),
-      body: Column(
-        children: [
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('attendance')
-                .where('status', isEqualTo: 'none')
-                .snapshots(),
-            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return showLoadingIndicator();
-              }
-              
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${snapshot.error}'),
-                );
-              }
-              
-              if (snapshot.hasData) {
-                final docs = snapshot.data!.docs;
-                
-                return ListContainer(
-                  title: 'Current attendance',
-                  listOfWidgets: docs.map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    
-                    List? studentsList;
-                    if (data.containsKey('studentList')) {
-                      studentsList = data['studentList'] as List?;
-                    } else if (data.containsKey('studentsList')) {
-                      studentsList = data['studentsList'] as List?;
-                    }
-                    
-                    final studentCount = studentsList?.length ?? 0;
-                    
-                    return CurrentAttendanceItem(
-                      subject: data['subjectName'] ?? '',
-                      period: data['period'] ?? '',
-                      startTime: '9:00',
-                      endTime: '10:30',
-                      total: studentCount,
-                      ontapOnReview: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AttendanceArchive(
-                              subjectName: data['subjectName'] ?? '',
-                              period: data['period'] ?? '',
-                              existingDocId: doc.id,
+      body: ReusableOffline(
+        child: Column(
+          children: [
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('attendance')
+                  .where('status', isEqualTo: 'none')
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return showLoadingIndicator();
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  final docs = snapshot.data!.docs;
+
+                  return ListContainer(
+                    title: 'Current attendance',
+                    listOfWidgets: docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+
+                      List? studentsList;
+                      if (data.containsKey('studentList')) {
+                        studentsList = data['studentList'] as List?;
+                      } else if (data.containsKey('studentsList')) {
+                        studentsList = data['studentsList'] as List?;
+                      }
+
+                      final studentCount = studentsList?.length ?? 0;
+
+                      return CurrentAttendanceItem(
+                        subject: data['subjectName'] ?? '',
+                        period: data['period'] ?? '',
+                        startTime: '9:00',
+                        endTime: '10:30',
+                        total: studentCount,
+                        ontapOnReview: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AttendanceArchive(
+                                subjectName: data['subjectName'] ?? '',
+                                period: data['period'] ?? '',
+                                existingDocId: doc.id,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      ontapOnSend: () => _updateAttendanceStatus(doc.id),
-                      onDelete: () => _showDeleteConfirmation(context, doc.id),
-                    );
-                  }).toList(),
-                  emptyMessage: 'No recent attendance found',
-                );
-              } else {
-                return showLoadingIndicator();
-              }
-            },
-          ),
-          const Divider(
-            color: kLightGrey,
-            indent: 10,
-            endIndent: 10,
-            height: 10,
-          ),
-          generateQRcodeButton(context),
-          const SizedBox(height: 10),
-        ],
+                          );
+                        },
+                        ontapOnSend: () => _updateAttendanceStatus(doc.id),
+                        onDelete: () =>
+                            _showDeleteConfirmation(context, doc.id),
+                      );
+                    }).toList(),
+                    emptyMessage: 'No recent attendance found',
+                  );
+                } else {
+                  return showLoadingIndicator();
+                }
+              },
+            ),
+            const Divider(
+              color: kLightGrey,
+              indent: 10,
+              endIndent: 10,
+              height: 10,
+            ),
+            generateQRcodeButton(context),
+            const SizedBox(height: 10),
+          ],
+        ),
       ),
     );
   }
@@ -181,11 +188,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           imageUrl: 'assets/project_image/qr-code.png',
           backgroundColor: kDarkBlue,
           onPressed: () {
-            showModalBottomSheet(
+            OfflineAwareBottomSheet.show(
               context: context,
-              builder: (BuildContext context) {
-                return const AttendanceButtomSheet(defaultStatus: 'none');
-              },
+              onlineContent: const AttendanceButtomSheet(defaultStatus: 'none'),
             );
           },
         ),
