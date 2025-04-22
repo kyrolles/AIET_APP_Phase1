@@ -5,7 +5,6 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:intl/intl.dart';
 
 class ClinicScreen extends StatelessWidget {

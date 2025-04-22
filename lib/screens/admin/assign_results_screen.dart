@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../components/kbutton.dart';
 import '../../components/my_app_bar.dart';
@@ -63,8 +65,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   }
 
   Stream<QuerySnapshot> getStudentsStream() {
-    Query query = FirebaseFirestore.instance.collection('users').where('role',
-        isEqualTo: 'Student');
+    Query query = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'Student');
 
     if (selectedDepartment != 'All') {
       query = query.where('department', isEqualTo: selectedDepartment);
@@ -704,7 +707,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               const SizedBox(width: 8),
               IconButton(
                 icon: Icon(
-                  _isBulkMode ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+                  _isBulkMode
+                      ? Icons.check_box_outlined
+                      : Icons.check_box_outline_blank,
                   color: kBlue,
                 ),
                 onPressed: () {
@@ -890,7 +895,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         final studentData = students[index].data() as Map<String, dynamic>;
         final studentId = students[index].id;
         final bool isSelected = selectedStudentIds.contains(studentId);
-        
+
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           elevation: 0,
@@ -1022,7 +1027,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     );
   }
 
-  Widget _buildStudentActions(String studentId, Map<String, dynamic> studentData) {
+  Widget _buildStudentActions(
+      String studentId, Map<String, dynamic> studentData) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1059,7 +1065,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 itemBuilder: (context, index) {
                   final department = departments[index];
                   final isSelected = selectedDepartment == department;
-                  
+
                   return ListTile(
                     leading: isSelected
                         ? const Icon(Icons.check_circle, color: kBlue)
@@ -1068,7 +1074,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       department,
                       style: TextStyle(
                         fontFamily: 'Lexend',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected ? kBlue : Colors.black,
                       ),
                     ),
@@ -1112,7 +1119,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 itemBuilder: (context, index) {
                   final year = academicYears[index];
                   final isSelected = selectedAcademicYear == year;
-                  
+
                   return ListTile(
                     leading: isSelected
                         ? const Icon(Icons.check_circle, color: kBlue)
@@ -1121,7 +1128,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       year,
                       style: TextStyle(
                         fontFamily: 'Lexend',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected ? kBlue : Colors.black,
                       ),
                     ),
@@ -1165,7 +1173,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                 itemBuilder: (context, index) {
                   final semester = index + 1;
                   final isSelected = selectedSemester == semester;
-                  
+
                   return ListTile(
                     leading: isSelected
                         ? const Icon(Icons.check_circle, color: kBlue)
@@ -1174,7 +1182,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       'Semester $semester',
                       style: TextStyle(
                         fontFamily: 'Lexend',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected ? kBlue : Colors.black,
                       ),
                     ),
@@ -1347,7 +1356,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                   itemBuilder: (context, index) {
                     final subject = subjects[index];
                     final grade = subject['grade'] as String? ?? 'F';
-                    
+
                     // Define grade colors
                     final Map<String, Color> gradeColors = {
                       'A': const Color(0xFF4CAF50),
@@ -1364,7 +1373,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                       'F': const Color(0xFFF44336),
                     };
                     final gradeColor = gradeColors[grade] ?? gradeColors['F']!;
-                    
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(
@@ -1445,24 +1454,26 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
 
   double _calculateGPA(List<dynamic> subjects) {
     if (subjects.isEmpty) return 0.0;
-    
+
     double totalPoints = 0;
     double totalCredits = 0;
-    
+
     for (final subject in subjects) {
       final credits = (subject['credits'] as num?)?.toDouble() ?? 0;
       final points = (subject['points'] as num?)?.toDouble() ?? 0;
-      
+
       totalPoints += credits * points;
       totalCredits += credits;
     }
-    
+
     return totalCredits > 0 ? totalPoints / totalCredits : 0;
   }
 
   int _calculateTotalCredits(List<dynamic> subjects) {
-    return subjects.fold(0, (total, subject) => 
-      total + ((subject['credits'] as num?)?.toInt() ?? 0));
+    return subjects.fold(
+        0,
+        (total, subject) =>
+            total + ((subject['credits'] as num?)?.toInt() ?? 0));
   }
 
   Future<void> _processBulkOperation() async {

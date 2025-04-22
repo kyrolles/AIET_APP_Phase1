@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import '../components/my_app_bar.dart';
 import 'package:uuid/uuid.dart';
 import '../services/results_service.dart';
@@ -64,7 +65,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     _passwordController.clear();
     _phoneController.clear();
     _idController.clear();
-    _academicYearController.text = '1st';  // Set default value for academicYear
+    _academicYearController.text = '1st'; // Set default value for academicYear
     _birthDateController.clear();
     setState(() {
       selectedRole = 'IT';
@@ -109,14 +110,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             'qrCode': qrData,
             'profileImage': '',
           };
-          
+
           // Add additional fields for roles that need them
           if (selectedRole != 'Doctor') {
             userData['department'] = selectedDepartment;
             userData['id'] = _idController.text;
             userData['academicYear'] = _academicYearController.text;
             userData['birthDate'] = _birthDateController.text;
-            
+
             if (selectedRole == 'Student') {
               userData['totalTrainingScore'] = 0;
             }
@@ -176,237 +177,249 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         title: 'Create User',
         onpressed: () => Navigator.pop(context),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Role',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
+      body: ReusableOffline(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Role',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                  value: selectedRole,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'IT',
-                      child: Text('IT'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Professor',
-                      child: Text('Professor'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Assistant',
-                      child: Text('Assistant'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Student',
-                      child: Text('Student'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Secretary',
-                      child: Text('Secretary'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Training Unit',
-                      child: Text('Training Unit'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Student Affair',
-                      child: Text('Student Affair'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Doctor',
-                      child: Text('Doctor'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Admin',
-                      child: Text('Admin'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedRole = value!;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                    controller: _firstNameController,
-                    label: 'First name',
-                    hintText: 'enter First name'),
-                const SizedBox(height: 16),
-                _buildTextField(
-                    controller: _lastNameController,
-                    label: 'Last name',
-                    hintText: 'enter Last name'),
-                const SizedBox(height: 16),
-                _buildTextField(
-                    controller: _emailController,
-                    label: 'Email',
-                    hintText: 'enter Email'),
-                const SizedBox(height: 16),
-                _buildPasswordField(controller: _passwordController),
-                const SizedBox(height: 16),
-                _buildTextField(
-                    controller: _phoneController,
-                    label: 'Phone',
-                    hintText: 'enter Phone'),
-                const SizedBox(height: 16),
-                // Conditionally show Department dropdown
-                Visibility(
-                  visible: !isRoleWithNoExtraFields,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Department',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w400),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        value: selectedDepartment,
-                        items: const [
-                          DropdownMenuItem(
-                              value: 'General', child: Text('General')),
-                          DropdownMenuItem(value: 'CE', child: Text('CE')),
-                          DropdownMenuItem(value: 'ECE', child: Text('ECE')),
-                          DropdownMenuItem(value: 'IE', child: Text('IE')),
-                          DropdownMenuItem(value: 'EME', child: Text('EME')),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            selectedDepartment = value!;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Department is required';
-                          }
-                          return null;
-                        },
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    value: selectedRole,
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'IT',
+                        child: Text('IT'),
                       ),
-                      const SizedBox(height: 16),
+                      DropdownMenuItem(
+                        value: 'Professor',
+                        child: Text('Professor'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Assistant',
+                        child: Text('Assistant'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Student',
+                        child: Text('Student'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Secretary',
+                        child: Text('Secretary'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Training Unit',
+                        child: Text('Training Unit'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Student Affair',
+                        child: Text('Student Affair'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Doctor',
+                        child: Text('Doctor'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Admin',
+                        child: Text('Admin'),
+                      ),
                     ],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedRole = value!;
+                      });
+                    },
                   ),
-                ),
-                // Conditionally show ID field
-                Visibility(
-                  visible: !isRoleWithNoExtraFields,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTextField(
-                          controller: _idController,
-                          label: 'ID',
-                          hintText: 'ex: 20060785'),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-                // Conditionally show Academic Year field
-                Visibility(
-                  visible: !isRoleWithNoExtraFields,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Academic Year',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        value: _academicYearController.text.isEmpty ? '1st' : _academicYearController.text,
-                        items: const [
-                          DropdownMenuItem(value: 'GN', child: Text('General')),
-                          DropdownMenuItem(value: '1st', child: Text('1st Year')),
-                          DropdownMenuItem(value: '2nd', child: Text('2nd Year')),
-                          DropdownMenuItem(value: '3rd', child: Text('3rd Year')),
-                          DropdownMenuItem(value: '4th', child: Text('4th Year')),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _academicYearController.text = value!;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Academic Year is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-                _buildDateField(controller: _birthDateController),
-                const SizedBox(height: 24),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : createAccount,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Create Account'),
-                  ),
-                ),
-                
-                // Add organize sections button
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ElevatedButton(
-                    onPressed: _organizeStudentSections,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40),
-                      backgroundColor: const Color(0xFF4B39EF),
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                      controller: _firstNameController,
+                      label: 'First name',
+                      hintText: 'enter First name'),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                      controller: _lastNameController,
+                      label: 'Last name',
+                      hintText: 'enter Last name'),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                      controller: _emailController,
+                      label: 'Email',
+                      hintText: 'enter Email'),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(controller: _passwordController),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                      controller: _phoneController,
+                      label: 'Phone',
+                      hintText: 'enter Phone'),
+                  const SizedBox(height: 16),
+                  // Conditionally show Department dropdown
+                  Visibility(
+                    visible: !isRoleWithNoExtraFields,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.group_work),
-                        SizedBox(width: 8),
-                        Text('Organize Students Into Sections'),
+                        const Text(
+                          'Department',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          value: selectedDepartment,
+                          items: const [
+                            DropdownMenuItem(
+                                value: 'General', child: Text('General')),
+                            DropdownMenuItem(value: 'CE', child: Text('CE')),
+                            DropdownMenuItem(value: 'ECE', child: Text('ECE')),
+                            DropdownMenuItem(value: 'IE', child: Text('IE')),
+                            DropdownMenuItem(value: 'EME', child: Text('EME')),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedDepartment = value!;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Department is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  // Conditionally show ID field
+                  Visibility(
+                    visible: !isRoleWithNoExtraFields,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTextField(
+                            controller: _idController,
+                            label: 'ID',
+                            hintText: 'ex: 20060785'),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                  // Conditionally show Academic Year field
+                  Visibility(
+                    visible: !isRoleWithNoExtraFields,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Academic Year',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          value: _academicYearController.text.isEmpty
+                              ? '1st'
+                              : _academicYearController.text,
+                          items: const [
+                            DropdownMenuItem(
+                                value: 'GN', child: Text('General')),
+                            DropdownMenuItem(
+                                value: '1st', child: Text('1st Year')),
+                            DropdownMenuItem(
+                                value: '2nd', child: Text('2nd Year')),
+                            DropdownMenuItem(
+                                value: '3rd', child: Text('3rd Year')),
+                            DropdownMenuItem(
+                                value: '4th', child: Text('4th Year')),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _academicYearController.text = value!;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Academic Year is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                  _buildDateField(controller: _birthDateController),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : createAccount,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text('Create Account'),
+                    ),
+                  ),
+
+                  // Add organize sections button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ElevatedButton(
+                      onPressed: _organizeStudentSections,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(40),
+                        backgroundColor: const Color(0xFF4B39EF),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.group_work),
+                          SizedBox(width: 8),
+                          Text('Organize Students Into Sections'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -518,16 +531,19 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               onPressed: () async {
                 final DateTime? pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now().subtract(const Duration(days: 6570)), // Set initial date to 18 years ago
+                  initialDate: DateTime.now().subtract(const Duration(
+                      days: 6570)), // Set initial date to 18 years ago
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
                 if (pickedDate != null) {
                   // Calculate age
-                  final age = DateTime.now().difference(pickedDate).inDays / 365;
+                  final age =
+                      DateTime.now().difference(pickedDate).inDays / 365;
                   if (age < 18) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('User must be at least 18 years old')),
+                      const SnackBar(
+                          content: Text('User must be at least 18 years old')),
                     );
                     return;
                   }
@@ -585,10 +601,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     try {
       // Call the service method to organize students
       await _scheduleService.organizeStudentsIntoSections();
-      
+
       // Close the dialog
       Navigator.of(context).pop();
-      
+
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -600,7 +616,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     } catch (e) {
       // Close the dialog
       Navigator.of(context).pop();
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 
@@ -85,70 +84,68 @@ class TrianingDetailsScreen extends StatelessWidget {
         title: 'Training Details',
         onpressed: () => Navigator.pop(context),
       ),
-      body: ReusableOffline(
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('training_announcements')
-              .doc(announcementId)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Center(child: Text('Error loading details'));
-            }
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('training_announcements')
+            .doc(announcementId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error loading details'));
+          }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            final data = snapshot.data!.data() as Map<String, dynamic>;
+          final data = snapshot.data!.data() as Map<String, dynamic>;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (data['logo'] != null)
-                    Center(
-                      child: Image.memory(
-                        base64Decode(data['logo']),
-                        height: 200,
-                        fit: BoxFit.contain,
-                      ),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (data['logo'] != null)
+                  Center(
+                    child: Image.memory(
+                      base64Decode(data['logo']),
+                      height: 200,
+                      fit: BoxFit.contain,
                     ),
-                  const SizedBox(height: 20),
-                  Text(
-                    data['companyName'] ?? 'Unknown Company',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
+                const SizedBox(height: 20),
+                Text(
+                  data['companyName'] ?? 'Unknown Company',
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  data['description'] ?? 'No description available',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Important Links:',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                _buildClickableLinks(
+                    context, data['links'] ?? 'No links available'),
+                if (data['image'] != null) ...[
                   const SizedBox(height: 16),
-                  Text(
-                    data['description'] ?? 'No description available',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Important Links:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildClickableLinks(
-                      context, data['links'] ?? 'No links available'),
-                  if (data['image'] != null) ...[
-                    const SizedBox(height: 16),
-                    Center(
-                      child: Image.memory(
-                        base64Decode(data['image']),
-                        height: 200,
-                        fit: BoxFit.contain,
-                      ),
+                  Center(
+                    child: Image.memory(
+                      base64Decode(data['image']),
+                      height: 200,
+                      fit: BoxFit.contain,
                     ),
-                  ],
+                  ),
                 ],
-              ),
-            );
-          },
-        ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
