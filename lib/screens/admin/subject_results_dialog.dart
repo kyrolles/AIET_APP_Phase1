@@ -57,19 +57,41 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     editedSubject = Map<String, dynamic>.from(widget.subject);
     // Ensure grade has a default value if null
     editedSubject['grade'] ??= 'F';
+    // Ensure credits exist but don't display the field
+    editedSubject['credits'] ??= 4;
     // Initialize scores if null
     editedSubject['scores'] ??= {
       'week5': 0.0,
       'week10': 0.0,
-      'coursework': 0.0,
-      'lab': 0.0,
+      'classwork': 0.0,
+      'labExam': 0.0,
+      'finalExam': 0.0,
     };
+    
+    // Make sure finalExam exists
+    final scores = editedSubject['scores'] as Map<String, dynamic>;
+    scores['finalExam'] ??= 0.0;
+    
+    // Calculate initial scores and grades
+    Future.microtask(() => _updateCalculations());
   }
 
   void _updateGrade(String newGrade) {
     setState(() {
       editedSubject['grade'] = newGrade;
       editedSubject['points'] = gradePoints[newGrade] ?? 0.0;
+      
+      // Make sure any manually selected grade is preserved
+      // This overrides the auto-calculated grade from _updateCalculations
+      editedSubject['manualGradeOverride'] = true;
+      
+      // Update totalPoints to reflect new grade
+      double points = gradePoints[newGrade] ?? 0.0;
+      editedSubject['points'] = points;
+      
+      // Calculate GPA contribution
+      double credits = (editedSubject['credits'] as num?)?.toDouble() ?? 4.0;
+      editedSubject['totalGPA'] = points * credits;
     });
   }
 
@@ -77,36 +99,40 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     final scores = editedSubject['scores'] as Map<String, dynamic>;
     double week5 = (scores['week5'] as num?)?.toDouble() ?? 0.0;
     double week10 = (scores['week10'] as num?)?.toDouble() ?? 0.0;
-    double coursework = (scores['coursework'] as num?)?.toDouble() ?? 0.0;
-    double lab = (scores['lab'] as num?)?.toDouble() ?? 0.0;
+    double classwork = (scores['classwork'] as num?)?.toDouble() ?? (scores['coursework'] as num?)?.toDouble() ?? 0.0;
+    double labExam = (scores['labExam'] as num?)?.toDouble() ?? (scores['lab'] as num?)?.toDouble() ?? 0.0;
+    double finalExam = (scores['finalExam'] as num?)?.toDouble() ?? 0.0;
     
-    // Normalize the scores to a total of 100
-    double totalScore = 0.0;
-    double week5Weight = 0.2;  // 20%
-    double week10Weight = 0.2; // 20%
+    // Maximum possible scores
+    double maxWeek5 = 8.0;
+    double maxWeek10 = 12.0;
+    double maxClasswork = 10.0;
+    double maxLabExam = 10.0;
+    double maxFinalExam = 60.0;
     
-    bool hasLab = widget.subject['hasLab'] ?? false;
-    bool hasCoursework = widget.subject['hasCoursework'] ?? false;
+    // Normalize the scores to a total of 100%
+    double totalPossible = maxWeek5 + maxWeek10 + maxFinalExam;
+    double totalObtained = week5 + week10 + finalExam;
     
-    if (hasLab && hasCoursework) {
-      double labWeight = 0.3;      // 30%
-      double courseworkWeight = 0.3; // 30%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight) + 
-                  (lab * labWeight) + (coursework * courseworkWeight);
-    } else if (hasLab) {
-      double labWeight = 0.6;      // 60%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight) + (lab * labWeight);
-    } else if (hasCoursework) {
-      double courseworkWeight = 0.6; // 60%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight) + (coursework * courseworkWeight);
-    } else {
-      // Adjust weights if no lab or coursework
-      week5Weight = 0.5;  // 50%
-      week10Weight = 0.5; // 50%
-      totalScore = (week5 * week5Weight) + (week10 * week10Weight);
+    bool hasLabExam = scores['labExam'] != null || scores['lab'] != null;
+    bool hasClasswork = scores['classwork'] != null || scores['coursework'] != null;
+    
+    if (hasLabExam) {
+      totalPossible += maxLabExam;
+      totalObtained += labExam;
     }
     
-    return totalScore;
+    if (hasClasswork) {
+      totalPossible += maxClasswork;
+      totalObtained += classwork;
+    }
+    
+    // Calculate percentage
+    if (totalPossible > 0) {
+      return (totalObtained / totalPossible) * 100.0;
+    } else {
+      return 0.0;
+    }
   }
 
   Color _getScoreColor(double score) {
@@ -437,32 +463,119 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
               const SizedBox(height: 16),
               
               // Scores Section
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: kLightGrey),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Scores',
                       style: TextStyle(
-                        fontFamily: 'Lexend',
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
-                    const Spacer(),
-                    // Info icon with tooltip
-                    Tooltip(
-                      message: 'Scores should be between 0-100',
-                      child: Icon(
-                        Icons.info_outline,
-                        size: 16,
-                        color: kBlue,
-                      ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildScoreField(
+                            label: 'Week 5',
+                            iconData: Icons.calendar_today,
+                            value: (editedSubject['scores'] as Map<String, dynamic>)['week5'],
+                            onChanged: (value) {
+                              setState(() {
+                                (editedSubject['scores'] as Map<String, dynamic>)['week5'] = double.tryParse(value) ?? 0.0;
+                                _updateCalculations();
+                              });
+                            },
+                            maxValue: 8.0,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildScoreField(
+                            label: 'Week 10',
+                            iconData: Icons.calendar_today,
+                            value: (editedSubject['scores'] as Map<String, dynamic>)['week10'],
+                            onChanged: (value) {
+                              setState(() {
+                                (editedSubject['scores'] as Map<String, dynamic>)['week10'] = double.tryParse(value) ?? 0.0;
+                                _updateCalculations();
+                              });
+                            },
+                            maxValue: 12.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildScoreField(
+                            label: 'Classwork',
+                            iconData: Icons.assignment,
+                            value: (editedSubject['scores'] as Map<String, dynamic>)['classwork'] ?? 
+                                  (editedSubject['scores'] as Map<String, dynamic>)['coursework'],
+                            onChanged: (value) {
+                              setState(() {
+                                (editedSubject['scores'] as Map<String, dynamic>)['classwork'] = double.tryParse(value) ?? 0.0;
+                                // For backward compatibility
+                                (editedSubject['scores'] as Map<String, dynamic>)['coursework'] = null;
+                                _updateCalculations();
+                              });
+                            },
+                            maxValue: 10.0,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildScoreField(
+                            label: 'Lab Exam',
+                            iconData: Icons.science,
+                            value: (editedSubject['scores'] as Map<String, dynamic>)['labExam'] ?? 
+                                  (editedSubject['scores'] as Map<String, dynamic>)['lab'],
+                            onChanged: (value) {
+                              setState(() {
+                                (editedSubject['scores'] as Map<String, dynamic>)['labExam'] = double.tryParse(value) ?? 0.0;
+                                // For backward compatibility
+                                (editedSubject['scores'] as Map<String, dynamic>)['lab'] = null;
+                                _updateCalculations();
+                              });
+                            },
+                            maxValue: 10.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildScoreField(
+                            label: 'Final Exam',
+                            iconData: Icons.edit_document,
+                            value: (editedSubject['scores'] as Map<String, dynamic>)['finalExam'],
+                            onChanged: (value) {
+                              setState(() {
+                                (editedSubject['scores'] as Map<String, dynamic>)['finalExam'] = double.tryParse(value) ?? 0.0;
+                                _updateCalculations();
+                              });
+                            },
+                            maxValue: 60.0,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              _buildScoreFields(),
               const SizedBox(height: 20),
               
               // Actions
@@ -519,112 +632,15 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
     );
   }
 
-  Widget _buildScoreFields() {
-    final scores = editedSubject['scores'] as Map<String, dynamic>;
-    final bool hasLab = widget.subject['hasLab'] ?? false;
-    final bool hasCoursework = widget.subject['hasCoursework'] ?? false;
-    
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildScoreField(
-                label: 'Week 5',
-                iconData: Icons.calendar_today,
-                value: scores['week5'],
-                onChanged: (value) {
-                  setState(() {
-                    scores['week5'] = double.tryParse(value) ?? 0.0;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildScoreField(
-                label: 'Week 10',
-                iconData: Icons.calendar_month,
-                value: scores['week10'],
-                onChanged: (value) {
-                  setState(() {
-                    scores['week10'] = double.tryParse(value) ?? 0.0;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            if (hasCoursework)
-              Expanded(
-                child: _buildScoreField(
-                  label: 'Coursework',
-                  iconData: Icons.assignment,
-                  value: scores['coursework'],
-                  onChanged: (value) {
-                    setState(() {
-                      scores['coursework'] = double.tryParse(value) ?? 0.0;
-                    });
-                  },
-                ),
-              ),
-            if (hasCoursework && hasLab)
-              const SizedBox(width: 12),
-            if (hasLab)
-              Expanded(
-                child: _buildScoreField(
-                  label: 'Lab',
-                  iconData: Icons.science,
-                  value: scores['lab'],
-                  onChanged: (value) {
-                    setState(() {
-                      scores['lab'] = double.tryParse(value) ?? 0.0;
-                    });
-                  },
-                ),
-              ),
-            if (!hasCoursework && !hasLab)
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: kGreyLight),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.info_outline, size: 16, color: kGrey),
-                      const SizedBox(width: 8),
-                      Text(
-                        'No additional components',
-                        style: TextStyle(
-                          fontFamily: 'Lexend',
-                          fontSize: 12,
-                          color: kGrey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ],
-    );
-  }
-
   Widget _buildScoreField({
     required String label,
     required IconData iconData,
     required dynamic value,
     required ValueChanged<String> onChanged,
+    double maxValue = 100.0,
   }) {
     return Container(
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -633,62 +649,130 @@ class _SubjectResultsDialogState extends State<SubjectResultsDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-            child: Row(
-              children: [
-                Icon(iconData, size: 16, color: kBlue),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontFamily: 'Lexend',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+          Row(
+            children: [
+              Icon(iconData, size: 16, color: kBlue),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'Lexend',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            child: TextFormField(
-              initialValue: '${value ?? 0.0}',
-              decoration: const InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                border: OutlineInputBorder(),
-                suffix: Text(
-                  '/100',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: kGrey,
-                  ),
+          const SizedBox(height: 8),
+          TextFormField(
+            initialValue: value?.toString() ?? '0',
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              isDense: true,
+              border: const OutlineInputBorder(),
+              suffix: Text(
+                '/$maxValue',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: kGrey,
                 ),
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(
-                fontFamily: 'Lexend',
-                fontSize: 14,
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Required';
-                }
-                final score = double.tryParse(value);
-                if (score == null) {
-                  return 'Invalid number';
-                }
-                if (score < 0 || score > 100) {
-                  return 'Range: 0-100';
-                }
-                return null;
-              },
-              onChanged: onChanged,
             ),
+            style: const TextStyle(
+              fontFamily: 'Lexend',
+              fontSize: 14,
+            ),
+            onChanged: (value) {
+              onChanged(value);
+              _updateCalculations();
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Required';
+              }
+              
+              double? score = double.tryParse(value);
+              if (score == null) {
+                return 'Invalid number';
+              }
+              if (score < 0 || score > maxValue) {
+                return 'Range: 0-$maxValue';
+              }
+              return null;
+            },
           ),
         ],
       ),
     );
+  }
+
+  void _updateCalculations() {
+    // First, cap all scores at their maximum values
+    Map<String, dynamic> scores = Map<String, dynamic>.from(editedSubject['scores'] as Map<String, dynamic>);
+    
+    // Define maximum values
+    final maxValues = {
+      'week5': 8.0,
+      'week10': 12.0,
+      'classwork': 10.0,
+      'coursework': 10.0,
+      'labExam': 10.0,
+      'lab': 10.0,
+      'finalExam': 60.0,
+    };
+    
+    // Cap values at their maximums
+    for (final key in scores.keys.toList()) {
+      if (scores[key] != null && maxValues.containsKey(key)) {
+        double value = (scores[key] as num).toDouble();
+        double max = maxValues[key]!;
+        scores[key] = value > max ? max : value;
+      }
+    }
+    
+    // Calculate total score as a percentage of 100
+    double totalScore = _calculateTotalScore();
+    
+    // If there's no manual grade override, calculate the grade based on total score
+    if (editedSubject['manualGradeOverride'] != true) {
+      String grade = _getRecommendedGrade(totalScore);
+      double points = gradePoints[grade] ?? 0.0;
+      double credits = (editedSubject['credits'] as num?)?.toDouble() ?? 4.0;
+      
+      setState(() {
+        // Make sure we have the proper key names
+        if (scores.containsKey('coursework')) {
+          scores['classwork'] = scores['coursework'];
+          scores.remove('coursework');
+        }
+        if (scores.containsKey('lab')) {
+          scores['labExam'] = scores['lab'];
+          scores.remove('lab');
+        }
+        
+        editedSubject['scores'] = scores;
+        editedSubject['grade'] = grade;
+        editedSubject['points'] = points;
+        editedSubject['totalPoints'] = totalScore;
+        editedSubject['totalGPA'] = points * credits;
+      });
+    } else {
+      // Just update the scores but keep the manually selected grade
+      setState(() {
+        // Make sure we have the proper key names
+        if (scores.containsKey('coursework')) {
+          scores['classwork'] = scores['coursework'];
+          scores.remove('coursework');
+        }
+        if (scores.containsKey('lab')) {
+          scores['labExam'] = scores['lab'];
+          scores.remove('lab');
+        }
+        
+        editedSubject['scores'] = scores;
+        editedSubject['totalPoints'] = totalScore;
+      });
+    }
   }
 }

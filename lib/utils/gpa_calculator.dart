@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class GPACalculator {
   static final Map<String, double> gradePoints = {
+    'A+': 4.0,
     'A': 4.0,
     'A-': 3.7,
     'B+': 3.3,
@@ -35,9 +36,17 @@ class GPACalculator {
         List<dynamic> subjects = semData['subjects'] ?? [];
 
         for (var subject in subjects) {
-          double credits = (subject['credits'] ?? 4).toDouble();
-          String grade = subject['grade'] ?? 'F';
-          double points = gradePoints[grade] ?? 0.0;
+          double credits = (subject['credits'] ?? 3).toDouble();
+          
+          // Use pre-calculated points if available
+          double points;
+          if (subject.containsKey('points')) {
+            points = (subject['points'] as num).toDouble();
+          } else {
+            // Otherwise calculate from grade
+            String grade = subject['grade'] ?? 'F';
+            points = gradePoints[grade.toUpperCase()] ?? 0.0;
+          }
 
           totalPoints += credits * points;
           totalCredits += credits;
@@ -74,9 +83,17 @@ class GPACalculator {
         List<dynamic> subjects = semData['subjects'] ?? [];
 
         for (var subject in subjects) {
-          double credits = (subject['credits'] ?? 4).toDouble();
-          String grade = subject['grade'] ?? 'F';
-          double points = gradePoints[grade] ?? 0.0;
+          double credits = (subject['credits'] ?? 3).toDouble();
+          
+          // Use pre-calculated points if available
+          double points;
+          if (subject.containsKey('points')) {
+            points = (subject['points'] as num).toDouble();
+          } else {
+            // Otherwise calculate from grade
+            String grade = subject['grade'] ?? 'F';
+            points = gradePoints[grade.toUpperCase()] ?? 0.0;
+          }
 
           totalPoints += credits * points;
           totalCredits += credits;
