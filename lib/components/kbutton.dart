@@ -32,20 +32,20 @@ class KButton extends StatelessWidget {
     this.backgroundColor = const Color(0xFFE5E5E5), // Default background color
     this.rippleColor, // Optional ripple color
     this.width, // Null by default for extendable width
-    this.height = 48, // Updated default height
+    this.height = 62, // Updated default height
     this.onPressed, // Null for non-clickable buttons
     this.borderWidth, // Optional border width
     this.borderColor, // Optional border color
-    this.fontSize = 14, // Updated default font size for text
-    this.svgWidth = 20, // Updated default SVG width
-    this.svgHeight = 20, // Updated default SVG height
+    this.fontSize = 25, // Updated default font size for text
+    this.svgWidth = 30, // Updated default SVG width
+    this.svgHeight = 30, // Updated default SVG height
     this.backgroundImage, // Optional background image
     this.padding, // Allow overriding default padding
     this.margin, // Optional margin
     this.elevated = false, // No elevation by default
     this.icon, // Optional icon
     this.gradient, // Optional gradient
-    this.borderRadius = 12, // Default border radius
+    this.borderRadius = 15,
   });
 
   @override
@@ -77,56 +77,56 @@ class KButton extends StatelessWidget {
           child: Padding(
             padding: padding ??
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    if (svgPath != null)
-                      Align(
-                        alignment:
-                            text != null ? Alignment.centerLeft : Alignment.center,
-                        child: SvgPicture.asset(
-                          svgPath!,
-                          width: svgWidth, // Customizable SVG width
-                          height: svgHeight, // Customizable SVG height
-                          placeholderBuilder: (BuildContext context) => Container(
-                            padding: const EdgeInsets.all(4.0),
-                            child: const CircularProgressIndicator(),
-                          ),
+            child: LayoutBuilder(builder: (context, constraints) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (svgPath != null)
+                    Align(
+                      alignment: text != null
+                          ? Alignment.centerLeft
+                          : Alignment.center,
+                      child: SvgPicture.asset(
+                        svgPath!,
+                        width: svgWidth, // Customizable SVG width
+                        height: svgHeight, // Customizable SVG height
+                        placeholderBuilder: (BuildContext context) => Container(
+                          padding: const EdgeInsets.all(4.0),
+                          child: const CircularProgressIndicator(),
                         ),
                       ),
-                    if (icon != null)
-                      Align(
-                        alignment:
-                            text != null ? Alignment.centerLeft : Alignment.center,
-                        child: Icon(
-                          icon,
+                    ),
+                  if (icon != null)
+                    Align(
+                      alignment: text != null
+                          ? Alignment.centerLeft
+                          : Alignment.center,
+                      child: Icon(
+                        icon,
+                        color: textColor,
+                        size: svgWidth ?? 20,
+                      ),
+                    ),
+                  if (text != null)
+                    Container(
+                      width: constraints.maxWidth,
+                      alignment: Alignment.center,
+                      child: Text(
+                        text!,
+                        style: TextStyle(
                           color: textColor,
-                          size: svgWidth ?? 20,
+                          fontSize: fontSize, // Customizable font size
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
                         ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    if (text != null)
-                      Container(
-                        width: constraints.maxWidth,
-                        alignment: Alignment.center,
-                        child: Text(
-                          text!,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: fontSize, // Customizable font size
-                            fontFamily: 'Lexend',
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                  ],
-                );
-              }
-            ),
+                    ),
+                ],
+              );
+            }),
           ),
         ),
       ),

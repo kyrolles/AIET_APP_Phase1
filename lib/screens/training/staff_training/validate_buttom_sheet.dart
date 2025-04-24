@@ -32,16 +32,16 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   void _checkFileAvailability() {
     try {
       // Check if we can view the PDF (either via storage URL or base64)
-      final hasStorageUrl = widget.request.fileStorageUrl != null && 
+      final hasStorageUrl = widget.request.fileStorageUrl != null &&
           widget.request.fileStorageUrl!.isNotEmpty;
-      
-      final hasBase64 = widget.request.pdfBase64 != null && 
+
+      final hasBase64 = widget.request.pdfBase64 != null &&
           widget.request.pdfBase64!.isNotEmpty;
-      
+
       setState(() {
         _canViewPdf = hasStorageUrl || hasBase64;
       });
-      
+
       log('Can view PDF: $_canViewPdf');
       log('Has fileStorageUrl: $hasStorageUrl');
       log('Has pdfBase64: $hasBase64');
@@ -105,13 +105,15 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
       log('Opening PDF viewer');
       log('fileStorageUrl: ${widget.request.fileStorageUrl}');
       log('pdfBase64 length: ${widget.request.pdfBase64?.length ?? 0}');
-      
+
       // Check if at least one source is available
-      if ((widget.request.fileStorageUrl == null || widget.request.fileStorageUrl!.isEmpty) &&
-          (widget.request.pdfBase64 == null || widget.request.pdfBase64!.isEmpty)) {
+      if ((widget.request.fileStorageUrl == null ||
+              widget.request.fileStorageUrl!.isEmpty) &&
+          (widget.request.pdfBase64 == null ||
+              widget.request.pdfBase64!.isEmpty)) {
         throw Exception('No PDF data available');
       }
-      
+
       PDFViewer.open(
         context,
         pdfUrl: widget.request.fileStorageUrl,
@@ -227,6 +229,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                         svgHeight: 50,
                         svgWidth: 50,
                         height: 65,
+                        margin: const EdgeInsets.only(right: 8),
                         backgroundColor: const Color.fromRGBO(255, 118, 72, 1),
                       ),
                     ),
@@ -250,6 +253,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                         svgWidth: 50,
                         height: 65,
                         backgroundColor: kgreen,
+                        margin: const EdgeInsets.only(left: 8),
                       ),
                     )
                   ],
