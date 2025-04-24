@@ -2,10 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../components/kbutton.dart';
 import '../../components/my_app_bar.dart';
+import '../../components/excel_upload_widget.dart';
 import '../../constants.dart';
 import '../../services/results_service.dart';
+import '../../services/template_downloader.dart';
 import 'subject_results_dialog.dart';
 import 'results_management/semester_template_screen.dart';
 import 'subjects/department_subjects_screen.dart';
@@ -22,13 +25,16 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   final ResultsService _resultsService = ResultsService();
   String selectedDepartment = 'All';
   int selectedSemester = 1;
-  final List<String> departments = ['All', 'General', 'CE', 'ECE', 'ME', 'IE'];
+  final List<String> departments = ['All', 'General', 'CE', 'ECE', 'EME', 'IE'];
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String selectedAcademicYear = 'All';
   List<String> academicYears = ['All', 'GN', '1st', '2nd', '3rd', '4th'];
   Set<String> selectedStudentIds = {};
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isProcessingExcel = false;
+  String _processingMessage = '';
+  bool _canModifyResults = false; // Flag to indicate if user can modify results
 
   // For bulk operations
   bool _isBulkMode = false;
@@ -36,9 +42,21 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   final List<String> _bulkOperations = [
     'Select Operation',
     'Assign Subjects',
-    'Update Grades',
     'Reset Scores'
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    bool canModify = await _resultsService.canModifyResults();
+    setState(() {
+      _canModifyResults = canModify;
+    });
+  }
 
   @override
   void dispose() {
@@ -83,34 +101,50 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       String department) async {
     final subjects = await _resultsService.getDepartmentSubjects(department);
     return subjects.map((subject) {
+      // Ensure credits is always a numeric value, defaulting to 4
+      int credits = 4;
+      if (subject.containsKey("credits")) {
+        if (subject["credits"] is int) {
+          credits = subject["credits"];
+        } else if (subject["credits"] is num) {
+          credits = (subject["credits"] as num).toInt();
+        } else if (subject["credits"] is String) {
+          credits = int.tryParse(subject["credits"]) ?? 4;
+        }
+      }
+      
       return {
         "code": subject["code"],
         "name": subject["name"],
-        "credits": subject["credits"] ?? 4,
+        "credits": credits,
         "grade": "F",
         "points": 0.0,
         "scores": {
           "week5": 0.0,
           "week10": 0.0,
-          "coursework": subject["hasCoursework"] ? 0.0 : null,
-          "lab": subject["hasLab"] ? 0.0 : null,
+          "classwork": subject["hasCoursework"] ? 0.0 : null,
+          "labExam": subject["hasLab"] ? 0.0 : null,
+          "finalExam": 0.0,
         },
       };
     }).toList();
   }
 
   double _gradeToPoints(String grade) {
-    switch (grade) {
-      case 'A':
-        return 4.0;
-      case 'B':
-        return 3.0;
-      case 'C':
-        return 2.0;
-      case 'D':
-        return 1.0;
-      default:
-        return 0.0;
+    switch (grade.toUpperCase()) {
+      case 'A+': return 4.0;
+      case 'A': return 4.0;
+      case 'A-': return 3.7;
+      case 'B+': return 3.3;
+      case 'B': return 3.0;
+      case 'B-': return 2.7;
+      case 'C+': return 2.3;
+      case 'C': return 2.0;
+      case 'C-': return 1.7;
+      case 'D+': return 1.3;
+      case 'D': return 1.0;
+      case 'D-': return 0.7;
+      default: return 0.0;
     }
   }
 
@@ -119,8 +153,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     if (!context.mounted) return;
 
     try {
-      if (!await _resultsService.isUserAdmin()) {
-        throw Exception('Only admins can modify results');
+      if (!_canModifyResults) {
+        throw Exception('Only Admin and IT can modify results');
       }
 
       if (!context.mounted) return;
@@ -130,7 +164,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           subject: subject,
           onSave: (updatedSubject) async {
             try {
-              await _resultsService.updateSubjectResults(
+              await _resultsService.updateStudentSubjectResults(
                 userId: userId,
                 semesterId: selectedSemester.toString(),
                 subjectIndex: index,
@@ -169,8 +203,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     if (!context.mounted) return;
 
     try {
-      if (!await _resultsService.isUserAdmin()) {
-        throw Exception('Only admins can assign results');
+      if (!_canModifyResults) {
+        throw Exception('Only Admin and IT can assign results');
       }
 
       if (!context.mounted) return;
@@ -186,10 +220,16 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       final userData = userDoc.data()!;
 
       if (!context.mounted) return;
-      final currentSubjects = await _resultsService.getStudentSubjects(
+      // Convert Map<String, dynamic> to List<String> for subject codes
+      final currentSubjectsData = await _resultsService.getStudentSubjects(
         userId,
         selectedSemester.toString(),
       );
+      
+      // Extract subject codes from the data
+      final List<String> currentSubjectCodes = currentSubjectsData
+          .map((subject) => subject['code'] as String)
+          .toList();
 
       if (!context.mounted) return;
       final shouldContinue = await showDialog<bool>(
@@ -198,7 +238,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           userId: userId,
           department: userData['department'],
           semester: selectedSemester,
-          initiallySelectedSubjects: currentSubjects,
+          initiallySelectedSubjects: currentSubjectCodes,
         ),
       );
 
@@ -238,536 +278,275 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     }
   }
 
-  Future<void> _assignGradesForStudent(
-      BuildContext context, String userId) async {
-    if (!context.mounted) return;
-    try {
-      if (!await _resultsService.isUserAdmin()) {
-        throw Exception('Only admins can modify results');
-      }
-
-      if (!context.mounted) return;
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (!userDoc.exists) throw Exception('Student not found');
-      final userData = userDoc.data()!;
-
-      if (!context.mounted) return;
-      DocumentReference resultDoc = FirebaseFirestore.instance
-          .collection('results')
-          .doc(userId)
-          .collection('semesters')
-          .doc(selectedSemester.toString());
-
-      var results = await _resultsService.getSemesterResults(
-          userId, selectedSemester.toString());
-
-      if (!context.mounted) return;
-      if (results == null) {
-        final subjects = await _getDepartmentSubjects(userData['department']);
-
-        await resultDoc.set({
-          "semesterNumber": selectedSemester,
-          "department": userData['department'],
-          "lastUpdated": FieldValue.serverTimestamp(),
-          "subjects": subjects,
-        }, SetOptions(merge: true));
-
-        if (!context.mounted) return;
-        results = await _resultsService.getSemesterResults(
-            userId, selectedSemester.toString());
-      }
-
-      if (!context.mounted) return;
-      await _showGradesSheet(context, userId, userData, results);
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
-  }
-
-  Future<void> _showGradesSheet(
-    BuildContext context,
-    String userId,
-    Map<String, dynamic> userData,
-    Map<String, dynamic>? results,
-  ) async {
-    if (results == null || !results.containsKey('subjects')) {
-      if (!context.mounted) return;
+  // Show Excel upload dialog
+  Future<void> _showExcelUploadDialog(BuildContext context) async {
+    if (!_canModifyResults) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No subjects found for this student'),
+          content: Text('Only Admin and IT users can upload Excel files'),
+          backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    final List<dynamic> subjects = results['subjects'];
-
-    if (!context.mounted) return;
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        minChildSize: 0.5,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      "${userData['firstName']} ${userData['lastName']} - Semester $selectedSemester",
-                      style: kTextStyleBold,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: subjects.length,
-                  itemBuilder: (context, index) {
-                    final subject = subjects[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: kLightGrey, width: 1),
-                      ),
-                      elevation: 0,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        title: Text(
-                          subject['name'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Lexend',
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Code: ${subject['code']}'),
-                            Text(
-                                'Grade: ${subject['grade']} (${subject['points']})'),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: kBlue),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _showSubjectResultsDialog(
-                                    context, userId, subject, index);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _processBulkOperation() async {
-    if (selectedStudentIds.isEmpty) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select students first')),
-      );
-      return;
-    }
-
-    if (selectedDepartment == 'All') {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select a specific department first')),
-      );
-      return;
-    }
-
-    // Verify all selected students are from the same department
-    try {
-      final selectedStudents = await Future.wait(selectedStudentIds.map((id) =>
-          FirebaseFirestore.instance.collection('users').doc(id).get()));
-
-      if (!context.mounted) return;
-
-      final differentDepartments = selectedStudents
-          .where((doc) => doc.data()?['department'] != selectedDepartment)
-          .toList();
-
-      if (differentDepartments.isNotEmpty) {
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  'All selected students must be from the selected department')),
-        );
-        return;
-      }
-
-      // Perform the bulk operation based on type
-      switch (_bulkOperationType) {
-        case 'Assign Subjects':
-          await _bulkAssignSubjects();
-          break;
-        case 'Update Grades':
-          await _bulkUpdateGrades();
-          break;
-        case 'Reset Scores':
-          await _bulkResetScores();
-          break;
-        default:
-          if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please select an operation')),
-          );
-      }
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
-  }
-
-  Future<void> _bulkAssignSubjects() async {
-    final departmentSubjects = await _getDepartmentSubjects(selectedDepartment);
-
-    if (departmentSubjects.isEmpty) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('No subjects found for selected department')),
-      );
-      return;
-    }
-
-    if (!context.mounted) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Bulk Assign Subjects'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Department: $selectedDepartment'),
-            Text('Selected Students: ${selectedStudentIds.length}'),
-            Text('Available Subjects: ${departmentSubjects.length}'),
-            const SizedBox(height: 8),
-            const Text('This action will:'),
-            const Text('• Initialize results for selected semester'),
-            const Text('• Add all department subjects'),
-            const Text('• Set default grades (F)'),
-            const Text('• Initialize score structure'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kBlue,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () async {
-              try {
-                Navigator.pop(context);
-
-                await _resultsService.batchAssignResults(
-                  studentIds: selectedStudentIds.toList(),
-                  department: selectedDepartment,
-                  semester: selectedSemester,
-                  subjects: departmentSubjects,
-                );
-
-                if (!context.mounted) return;
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Subjects assigned successfully'),
-                    backgroundColor: kgreen,
-                  ),
-                );
-
-                this.setState(() {
-                  selectedStudentIds.clear();
-                  _isBulkMode = false;
-                });
-              } catch (e) {
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error assigning results: $e')),
-                );
-              }
-            },
-            child: const Text('Assign'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _bulkUpdateGrades() async {
-    // Show a dialog to select a grade to apply to all students
-    final grades = [
-      'A',
-      'A-',
-      'B+',
-      'B',
-      'B-',
-      'C+',
-      'C',
-      'C-',
-      'D+',
-      'D',
-      'D-',
-      'F'
-    ];
-    String selectedGrade = 'C';
-
-    if (!context.mounted) return;
+    PlatformFile? selectedFile;
 
     await showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Bulk Update Grades'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Selected Students: ${selectedStudentIds.length}'),
-              const SizedBox(height: 16),
-              const Text('Select grade to apply:'),
-              DropdownButton<String>(
-                value: selectedGrade,
-                items: grades.map((grade) {
-                  return DropdownMenuItem(
-                    value: grade,
-                    child: Text(grade),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedGrade = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                  'This will update the grade for all subjects for the selected students.'),
-            ],
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Upload Student Grades Excel Sheet'),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Upload an Excel sheet with student grades in the specified format:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Column A: Student ID\nColumn B: Course Name\nColumn C: Course Code\nColumn D: Week 5 Score\nColumn E: Week 10 Score\nColumn F: Coursework\nColumn G: Lab\nColumn H: Final Grade',
+                ),
+                const SizedBox(height: 16),
+                TextButton.icon(
+                  icon: const Icon(Icons.download_rounded),
+                  label: const Text('Download Template'),
+                  onPressed: () async {
+                    // Use TemplateDownloader from services
+                    final templateDownloader = TemplateDownloader();
+                    final success = await templateDownloader.generateAndSaveTemplate();
+                    
+                    if (!success && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to generate template'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                ExcelUploadWidget(
+                  height: 200,
+                  width: double.infinity,
+                  onFileSelected: (file) {
+                    selectedFile = file;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Semester: $selectedSemester',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kBlue,
-                foregroundColor: Colors.white,
-              ),
+            TextButton(
               onPressed: () async {
-                Navigator.pop(context);
-
-                try {
-                  final batch = FirebaseFirestore.instance.batch();
-
-                  for (final studentId in selectedStudentIds) {
-                    final resultRef = FirebaseFirestore.instance
-                        .collection('results')
-                        .doc(studentId)
-                        .collection('semesters')
-                        .doc(selectedSemester.toString());
-
-                    final resultDoc = await resultRef.get();
-                    if (resultDoc.exists) {
-                      final data = resultDoc.data() as Map<String, dynamic>;
-                      if (data.containsKey('subjects')) {
-                        final List<dynamic> subjects =
-                            List.from(data['subjects']);
-                        for (int i = 0; i < subjects.length; i++) {
-                          subjects[i]['grade'] = selectedGrade;
-                          subjects[i]['points'] = _gradeToPoints(selectedGrade);
-                        }
-
-                        batch.update(resultRef, {
-                          'subjects': subjects,
-                          'lastUpdated': FieldValue.serverTimestamp()
-                        });
-                      }
-                    }
-                  }
-
-                  await batch.commit();
-
-                  if (!context.mounted) return;
+                if (selectedFile != null) {
+                  Navigator.pop(dialogContext);
+                  await _processExcelFile(selectedFile!);
+                } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Grades updated successfully'),
-                      backgroundColor: kgreen,
+                      content: Text('Please select an Excel file first'),
+                      backgroundColor: Colors.red,
                     ),
-                  );
-                  this.setState(() {
-                    selectedStudentIds.clear();
-                    _isBulkMode = false;
-                  });
-                } catch (e) {
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error updating grades: $e')),
                   );
                 }
               },
-              child: const Text('Apply'),
+              child: const Text('Upload and Process'),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Future<void> _bulkResetScores() async {
-    if (!context.mounted) return;
+  // Process the uploaded Excel file
+  Future<void> _processExcelFile(PlatformFile file) async {
+    try {
+      setState(() {
+        _isProcessingExcel = true;
+        _processingMessage = 'Processing Excel file...';
+      });
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset All Scores'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Selected Students: ${selectedStudentIds.length}'),
-            const SizedBox(height: 8),
-            const Text('This action will:'),
-            const Text('• Reset all scores to 0'),
-            const Text('• Reset all grades to F'),
-            const Text('• Keep subject assignments intact'),
-            const SizedBox(height: 8),
-            const Text('This action cannot be undone.',
-                style:
-                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-          ],
+      // Process the Excel file and assign results to students
+      final successCount = await _resultsService.processAndAssignResultsFromExcel(
+        file,
+        selectedSemester,
+      );
+
+      // Force refresh the UI
+      setState(() {
+        _isProcessingExcel = false;
+        _processingMessage = '';
+      });
+
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Successfully processed grades for $successCount students'),
+          backgroundColor: kgreen,
+          duration: const Duration(seconds: 2),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+      );
+      
+      // Add a small delay to ensure Firebase updates are complete
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Trigger a rebuild of the entire screen to refresh data
+      if (mounted) {
+        setState(() {
+          // This empty setState forces a rebuild
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isProcessingExcel = false;
+        _processingMessage = '';
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error processing Excel file: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Show admin options FAB menu
+  void _showAdminOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Text(
+              'Admin Controls',
+              style: TextStyle(
+                fontFamily: 'Lexend',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-            onPressed: () async {
+          ),
+          const Divider(),
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: kbabyblue,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.upload_file, color: kBlue),
+            ),
+            title: const Text('Upload Excel Grade Sheet'),
+            subtitle: const Text('Batch import grades from Excel file'),
+            onTap: () {
               Navigator.pop(context);
-
-              try {
-                final batch = FirebaseFirestore.instance.batch();
-
-                for (final studentId in selectedStudentIds) {
-                  final resultRef = FirebaseFirestore.instance
-                      .collection('results')
-                      .doc(studentId)
-                      .collection('semesters')
-                      .doc(selectedSemester.toString());
-
-                  final resultDoc = await resultRef.get();
-                  if (resultDoc.exists) {
-                    final data = resultDoc.data() as Map<String, dynamic>;
-                    if (data.containsKey('subjects')) {
-                      final List<dynamic> subjects =
-                          List.from(data['subjects']);
-                      for (int i = 0; i < subjects.length; i++) {
-                        subjects[i]['grade'] = 'F';
-                        subjects[i]['points'] = 0.0;
-                        subjects[i]['scores'] = {
-                          'week5': 0.0,
-                          'week10': 0.0,
-                          'coursework':
-                              subjects[i]['scores']['coursework'] != null
-                                  ? 0.0
-                                  : null,
-                          'lab':
-                              subjects[i]['scores']['lab'] != null ? 0.0 : null,
-                        };
-                      }
-
-                      batch.update(resultRef, {
-                        'subjects': subjects,
-                        'lastUpdated': FieldValue.serverTimestamp()
-                      });
-                    }
-                  }
-                }
-
-                await batch.commit();
-
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Scores reset successfully'),
-                    backgroundColor: kgreen,
-                  ),
-                );
-                this.setState(() {
-                  selectedStudentIds.clear();
-                  _isBulkMode = false;
-                });
-              } catch (e) {
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error resetting scores: $e')),
-                );
-              }
+              _showExcelUploadDialog(context);
             },
-            child: const Text('Reset'),
+          ),
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: kOrange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.subject, color: kOrange),
+            ),
+            title: const Text('Manage Department Subjects'),
+            subtitle: const Text('Add, edit or remove course subjects'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DepartmentSubjectsScreen(
+                    department: selectedDepartment == 'All'
+                        ? 'General'
+                        : selectedDepartment,
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: kBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.assignment, color: kBlue),
+            ),
+            title: const Text('Manage Semester Templates'),
+            subtitle: const Text('Configure semester subject templates'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SemesterTemplateScreen(
+                    department: selectedDepartment == 'All'
+                        ? 'General'
+                        : selectedDepartment,
+                    semester: selectedSemester,
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: kgreen.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.import_export, color: kgreen),
+            ),
+            title: const Text('Bulk Operations'),
+            subtitle: const Text('Apply operations to multiple students'),
+            onTap: () {
+              Navigator.pop(context);
+              setState(() {
+                _isBulkMode = true;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Bulk mode activated. Select students to perform operations.'),
+                  backgroundColor: kBlue,
+                ),
+              );
+            },
           ),
         ],
       ),
     );
+  }
+
+  void _showSettingsMenu() {
+    _showAdminOptions();
   }
 
   @override
@@ -785,55 +564,74 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           ),
         ],
       ),
-      floatingActionButton: _isBulkMode
+      floatingActionButton: _isProcessingExcel
           ? FloatingActionButton.extended(
               backgroundColor: kBlue,
-              onPressed: () => _processBulkOperation(),
-              icon: const Icon(Icons.check, color: Colors.white),
-              label: const Text(
-                'Apply',
-                style: TextStyle(color: Colors.white, fontFamily: 'Lexend'),
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close, color: Colors.white),
+              label: Text(
+                _processingMessage,
+                style: const TextStyle(color: Colors.white, fontFamily: 'Lexend'),
               ),
             )
-          : null,
-      body: ReusableOffline(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildFilters(),
-            if (_isBulkMode) _buildBulkOperationBar(),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: getStudentsStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        'Error: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    );
-                  }
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: kBlue),
-                    );
-                  }
-
-                  final students = filterStudents(snapshot.data!.docs);
-
-                  if (students.isEmpty) {
-                    return _buildEmptyState();
-                  }
-
-                  return _buildStudentsList(students);
-                },
+          : _isBulkMode
+              ? FloatingActionButton.extended(
+                  backgroundColor: kBlue,
+                  onPressed: () => _processBulkOperation(),
+                  icon: const Icon(Icons.check, color: Colors.white),
+                  label: const Text(
+                    'Apply',
+                    style: TextStyle(color: Colors.white, fontFamily: 'Lexend'),
+                  ),
+                )
+              : null,
+      body: _isProcessingExcel
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(_processingMessage),
+                ],
               ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildFilters(),
+                if (_isBulkMode) _buildBulkOperationBar(),
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: getStudentsStream(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text(
+                            'Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: kBlue),
+                        );
+                      }
+
+                      final students = filterStudents(snapshot.data!.docs);
+
+                      if (students.isEmpty) {
+                        return _buildEmptyState();
+                      }
+
+                      return _buildStudentsList(students);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1239,196 +1037,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           tooltip: 'Assign Subjects',
           onPressed: () => assignResultsForStudent(context, studentId),
         ),
-        IconButton(
-          icon: const Icon(Icons.grade, color: kOrange, size: 20),
-          tooltip: 'Update Grades',
-          onPressed: () => _assignGradesForStudent(context, studentId),
-        ),
       ],
     );
-  }
-
-  void _showSettingsMenu() {
-    OfflineAwareBottomSheet.show(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      onlineContent: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: kbabyblue,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.library_books, color: kBlue),
-              ),
-              title: const Text(
-                'Manage Semester Template',
-                style: TextStyle(
-                    fontFamily: 'Lexend', fontWeight: FontWeight.w600),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SemesterTemplateScreen(
-                      department: selectedDepartment == 'All'
-                          ? 'General'
-                          : selectedDepartment,
-                      semester: selectedSemester,
-                    ),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: kOrange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.subject, color: kOrange),
-              ),
-              title: const Text(
-                'Manage Department Subjects',
-                style: TextStyle(
-                    fontFamily: 'Lexend', fontWeight: FontWeight.w600),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DepartmentSubjectsScreen(
-                      department: selectedDepartment == 'All'
-                          ? 'General'
-                          : selectedDepartment,
-                    ),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: kgreen.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.import_export, color: kgreen),
-              ),
-              title: const Text(
-                'Export/Import Results',
-                style: TextStyle(
-                    fontFamily: 'Lexend', fontWeight: FontWeight.w600),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                // Add export/import functionality
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-    // showModalBottomSheet(
-    //   context: context,
-    //   shape: const RoundedRectangleBorder(
-    //     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    //   ),
-    //   builder: (context) => Container(
-    //     padding: const EdgeInsets.all(16),
-    //     child: Column(
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: [
-    //         ListTile(
-    //           leading: Container(
-    //             padding: const EdgeInsets.all(8),
-    //             decoration: BoxDecoration(
-    //               color: kbabyblue,
-    //               borderRadius: BorderRadius.circular(8),
-    //             ),
-    //             child: const Icon(Icons.library_books, color: kBlue),
-    //           ),
-    //           title: const Text(
-    //             'Manage Semester Template',
-    //             style: TextStyle(
-    //                 fontFamily: 'Lexend', fontWeight: FontWeight.w600),
-    //           ),
-    //           onTap: () {
-    //             Navigator.pop(context);
-    //             Navigator.push(
-    //               context,
-    //               MaterialPageRoute(
-    //                 builder: (context) => SemesterTemplateScreen(
-    //                   department: selectedDepartment == 'All'
-    //                       ? 'General'
-    //                       : selectedDepartment,
-    //                   semester: selectedSemester,
-    //                 ),
-    //               ),
-    //             );
-    //           },
-    //         ),
-    //         ListTile(
-    //           leading: Container(
-    //             padding: const EdgeInsets.all(8),
-    //             decoration: BoxDecoration(
-    //               color: kOrange.withOpacity(0.1),
-    //               borderRadius: BorderRadius.circular(8),
-    //             ),
-    //             child: Icon(Icons.subject, color: kOrange),
-    //           ),
-    //           title: const Text(
-    //             'Manage Department Subjects',
-    //             style: TextStyle(
-    //                 fontFamily: 'Lexend', fontWeight: FontWeight.w600),
-    //           ),
-    //           onTap: () {
-    //             Navigator.pop(context);
-    //             Navigator.push(
-    //               context,
-    //               MaterialPageRoute(
-    //                 builder: (context) => DepartmentSubjectsScreen(
-    //                   department: selectedDepartment == 'All'
-    //                       ? 'General'
-    //                       : selectedDepartment,
-    //                 ),
-    //               ),
-    //             );
-    //           },
-    //         ),
-    //         ListTile(
-    //           leading: Container(
-    //             padding: const EdgeInsets.all(8),
-    //             decoration: BoxDecoration(
-    //               color: kgreen.withOpacity(0.1),
-    //               borderRadius: BorderRadius.circular(8),
-    //             ),
-    //             child: Icon(Icons.import_export, color: kgreen),
-    //           ),
-    //           title: const Text(
-    //             'Export/Import Results',
-    //             style: TextStyle(
-    //                 fontFamily: 'Lexend', fontWeight: FontWeight.w600),
-    //           ),
-    //           onTap: () {
-    //             Navigator.pop(context);
-    //             // Add export/import functionality
-    //           },
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 
   void _showDepartmentPicker() {
@@ -1593,8 +1203,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     );
   }
 
-  Future<void> _viewStudentResults(
-      String studentId, Map<String, dynamic> studentData) async {
+  Future<void> _viewStudentResults(String studentId, Map<String, dynamic> studentData) async {
+    // Force refresh from Firestore to get latest data
+    // Skip cache to ensure we get the latest data
     final results = await _resultsService.getSemesterResults(
       studentId,
       selectedSemester.toString(),
@@ -1865,7 +1476,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
             total + ((subject['credits'] as num?)?.toInt() ?? 0));
   }
 
-  Future<void> _executeBulkOperation() async {
+  Future<void> _processBulkOperation() async {
     if (selectedStudentIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -1886,7 +1497,304 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       return;
     }
 
-    // Implement bulk operations
-    // ...
+    // Show a progress indicator
+    setState(() {
+      _isProcessingExcel = true;
+      _processingMessage = 'Processing ${_bulkOperationType}...';
+    });
+
+    try {
+      if (_bulkOperationType == 'Assign Subjects') {
+        await _bulkAssignSubjects();
+      } else if (_bulkOperationType == 'Reset Scores') {
+        await _bulkResetScores();
+      }
+
+      // Hide progress indicator
+      setState(() {
+        _isProcessingExcel = false;
+        _processingMessage = '';
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_bulkOperationType} completed successfully'),
+          backgroundColor: kgreen,
+        ),
+      );
+    } catch (e) {
+      // Hide progress indicator
+      setState(() {
+        _isProcessingExcel = false;
+        _processingMessage = '';
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Bulk assign subjects to selected students
+  Future<void> _bulkAssignSubjects() async {
+    int successCount = 0;
+    int failCount = 0;
+    
+    // Get the students' department and subjects
+    final List<Map<String, dynamic>> studentsData = [];
+    
+    for (String studentId in selectedStudentIds) {
+      try {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(studentId)
+            .get();
+            
+        if (userDoc.exists) {
+          final userData = userDoc.data()!;
+          studentsData.add({
+            'id': studentId,
+            'department': userData['department'] ?? 'General',
+          });
+        }
+      } catch (e) {
+        debugPrint('Error getting student data: $e');
+        failCount++;
+      }
+    }
+    
+    // Show dialog to select subjects by department
+    final List<String> uniqueDepartments = studentsData
+      .map((data) => data['department'] as String)
+      .toSet()
+      .toList();
+      
+    // If there are multiple departments, we need to handle each separately
+    for (String department in uniqueDepartments) {
+      final studentsInDepartment = studentsData
+        .where((data) => data['department'] == department)
+        .toList();
+        
+      if (studentsInDepartment.isEmpty) continue;
+      
+      // Show dialog to select subjects for this department
+      if (!mounted) break;
+      
+      // Get existing subject codes for the first student to use as initial selection
+      List<String> initialSelectedSubjectCodes = [];
+      try {
+        final currentSubjectsData = await _resultsService.getStudentSubjects(
+          studentsInDepartment.first['id'],
+          selectedSemester.toString(),
+        );
+        
+        initialSelectedSubjectCodes = currentSubjectsData
+            .map((subject) => subject['code'] as String)
+            .toList();
+      } catch (e) {
+        debugPrint('Error getting initial subjects: $e');
+        // Continue with empty initial selection
+      }
+      
+      final bool? shouldContinue = await showDialog<bool>(
+        context: context,
+        builder: (context) => SubjectSelectionDialog(
+          userId: studentsInDepartment.first['id'],
+          department: department,
+          semester: selectedSemester,
+          initiallySelectedSubjects: initialSelectedSubjectCodes,
+        ),
+      );
+      
+      if (shouldContinue != true) continue;
+      
+      // Apply subjects to all students in this department
+      for (var studentData in studentsInDepartment) {
+        try {
+          // Get updated subject codes from the student we used for selection
+          final updatedSubjectsData = await _resultsService.getStudentSubjects(
+            studentsInDepartment.first['id'],
+            selectedSemester.toString(),
+          );
+          
+          // Get the department subjects in the proper format for other students
+          final subjects = await _getDepartmentSubjects(department);
+          
+          // Filter to only include the selected subjects
+          final List<String> selectedCodes = updatedSubjectsData
+              .map((subject) => subject['code'] as String)
+              .toList();
+              
+          final List<Map<String, dynamic>> selectedSubjects = subjects
+              .where((subject) => selectedCodes.contains(subject['code']))
+              .toList();
+          
+          // Update the student's semester with these subjects
+          DocumentReference resultDoc = FirebaseFirestore.instance
+              .collection('results')
+              .doc(studentData['id'])
+              .collection('semesters')
+              .doc(selectedSemester.toString());
+
+          await resultDoc.set({
+            "semesterNumber": selectedSemester,
+            "department": department,
+            "lastUpdated": FieldValue.serverTimestamp(),
+            "subjects": selectedSubjects,
+          }, SetOptions(merge: true));
+          
+          successCount++;
+        } catch (e) {
+          debugPrint('Error assigning subjects to student: $e');
+          failCount++;
+        }
+      }
+    }
+    
+    setState(() {
+      _processingMessage = 'Completed: $successCount successful, $failCount failed';
+    });
+  }
+  
+  // Bulk reset scores for all selected students
+  Future<void> _bulkResetScores() async {
+    int successCount = 0;
+    int failCount = 0;
+    
+    for (String studentId in selectedStudentIds) {
+      try {
+        // Get current student results
+        final results = await _resultsService.getSemesterResults(
+          studentId, 
+          selectedSemester.toString()
+        );
+        
+        if (results == null || (results['subjects'] as List?)?.isEmpty == true) {
+          continue; // Skip if no results exist
+        }
+        
+        // Reset scores for each subject
+        List<Map<String, dynamic>> subjects = 
+          List<Map<String, dynamic>>.from(results['subjects'] as List);
+        
+        for (int i = 0; i < subjects.length; i++) {
+          final subject = subjects[i];
+          
+          // Reset the scores while maintaining the structure
+          Map<String, dynamic> scores = Map<String, dynamic>.from(subject['scores'] as Map);
+          
+          // Reset scores to 0.0
+          if (scores.containsKey('week5')) scores['week5'] = 0.0;
+          if (scores.containsKey('week10')) scores['week10'] = 0.0;
+          if (scores.containsKey('classwork')) scores['classwork'] = 0.0;
+          if (scores.containsKey('coursework')) scores['coursework'] = 0.0;
+          if (scores.containsKey('labExam')) scores['labExam'] = 0.0;
+          if (scores.containsKey('lab')) scores['lab'] = 0.0;
+          if (scores.containsKey('finalExam')) scores['finalExam'] = 0.0;
+          
+          // Reset grade and points
+          subjects[i]['grade'] = 'F';
+          subjects[i]['points'] = 0.0;
+          subjects[i]['scores'] = scores;
+        }
+        
+        // Update the document with reset scores
+        await FirebaseFirestore.instance
+          .collection('results')
+          .doc(studentId)
+          .collection('semesters')
+          .doc(selectedSemester.toString())
+          .update({
+            'subjects': subjects,
+            'lastUpdated': FieldValue.serverTimestamp(),
+          });
+          
+        successCount++;
+      } catch (e) {
+        debugPrint('Error resetting scores: $e');
+        failCount++;
+      }
+    }
+    
+    setState(() {
+      _processingMessage = 'Completed: $successCount successful, $failCount failed';
+    });
+  }
+
+  // Method to show student results in a dialog
+  Future<void> _showStudentResults(BuildContext context, String userId) async {
+    try {
+      // Force refresh from Firestore to get the latest data
+      final results = await _resultsService.getSemesterResults(
+          userId, selectedSemester.toString());
+
+      if (results == null) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("No results found for this semester"),
+          ),
+        );
+        return;
+      }
+
+      final subjects = List<Map<String, dynamic>>.from(results['subjects'] ?? []);
+
+      if (!context.mounted) return;
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Semester Results'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: subjects.length,
+                itemBuilder: (context, index) {
+                  final subject = subjects[index];
+                  return ListTile(
+                    title: Text(subject['name'] ?? 'Unknown Subject'),
+                    subtitle: Text(
+                        'Code: ${subject['code']} | Grade: ${subject['grade']}'),
+                    trailing: _canModifyResults 
+                        ? IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _showSubjectResultsDialog(
+                                  context, userId, subject, index);
+                            },
+                          )
+                        : null,
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+        ),
+      );
+    }
   }
 }
+

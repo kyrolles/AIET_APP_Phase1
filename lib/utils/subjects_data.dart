@@ -53,8 +53,8 @@ class SubjectsData {
   static const Map<String, dynamic> _defaultScores = {
     "week5": 0.0,
     "week10": 0.0,
-    "coursework": 0.0,
-    "lab": 0.0,
+    "classwork": 0.0,
+    "labExam": 0.0,
   };
 
   // Semester 1 data

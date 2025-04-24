@@ -73,11 +73,18 @@ class _ResultPageState extends State<ResultPage> {
                   "credits": 4,  // default credit value; adjust as needed
                   "grade": subject["grade"],
                   "points": _gradeToPoints(subject["grade"]),
+                  "totalPoints": _calculateTotalPoints(subject),
                   "scores": {
                     "week5": (subject["scores"] as List)[0]["score"],
+                    "maxWeek5": 8.0,
                     "week10": (subject["scores"] as List)[1]["score"],
-                    "coursework": (subject["scores"] as List)[2]["score"],
-                    "lab": (subject["scores"] as List)[3]["score"],
+                    "maxWeek10": 12.0,
+                    "classwork": (subject["scores"] as List).length > 2 ? (subject["scores"] as List)[2]["score"] : 0.0,
+                    "maxClasswork": 10.0,
+                    "labExam": (subject["scores"] as List).length > 3 ? (subject["scores"] as List)[3]["score"] : 0.0,
+                    "maxLabExam": 10.0,
+                    "finalExam": 0.0, // Default to 0 since this is new in the format
+                    "maxFinalExam": 60.0,
                   }
                 }).toList(),
           });
@@ -91,13 +98,20 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   double _gradeToPoints(String grade) {
-    // Simple A=4, B=3, etc.
-    switch (grade) {
+    // Map to standard GPA points
+    switch (grade.toUpperCase()) {
+      case 'A+': return 4.0;
       case 'A': return 4.0;
+      case 'A-': return 3.7;
+      case 'B+': return 3.3;
       case 'B': return 3.0;
+      case 'B-': return 2.7;
+      case 'C+': return 2.3;
       case 'C': return 2.0;
+      case 'C-': return 1.7;
+      case 'D+': return 1.3;
       case 'D': return 1.0;
-      default:  return 0.0;
+      default: return 0.0;
     }
   }
 
@@ -458,10 +472,13 @@ class _ResultPageState extends State<ResultPage> {
                 "grade": s["grade"],
                 "color": getGradeColor(s["grade"]),
                 "scores": [
-                  {"label": "5th Week", "score": (s["scores"]["week5"] as num).toDouble()},
-                  {"label": "10th Week", "score": (s["scores"]["week10"] as num).toDouble()},
-                  {"label": "Course Work", "score": (s["scores"]["coursework"] as num).toDouble()},
-                  {"label": "Lab", "score": (s["scores"]["lab"] as num).toDouble()},
+                  {"label": "5th Week", "score": (s["scores"]["week5"] as num?)?.toDouble() ?? 0.0},
+                  {"label": "10th Week", "score": (s["scores"]["week10"] as num?)?.toDouble() ?? 0.0},
+                  {"label": "Classwork", "score": (s["scores"]["classwork"] as num?)?.toDouble() ?? 
+                                              (s["scores"]["coursework"] as num?)?.toDouble() ?? 0.0},
+                  {"label": "Lab Exam", "score": (s["scores"]["labExam"] as num?)?.toDouble() ?? 
+                                              (s["scores"]["lab"] as num?)?.toDouble() ?? 0.0},
+                  {"label": "Final Exam", "score": (s["scores"]["finalExam"] as num?)?.toDouble() ?? 0.0},
                 ],
               };
             }).toList();
@@ -501,19 +518,19 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   Color getGradeColor(String grade) {
-    switch (grade) {
-      case 'A':
-        return const Color(0xFFFF7D7D);
-      case 'B':
-        return const Color(0xFFFFDD29);
-      case 'C':
-        return const Color(0xFF978ECB);
-      case 'D':
-        return const Color(0xFF0ED290);
-      case 'F':
-        return const Color(0xFFED1C24);
-      default:
-        return Colors.grey; // Fallback color if needed
+    grade = grade.toUpperCase();
+    if (grade.startsWith('A')) {
+      return const Color(0xFFFF7D7D); // Red for A+, A, A-
+    } else if (grade.startsWith('B')) {
+      return const Color(0xFFFFDD29); // Yellow for B+, B, B-
+    } else if (grade.startsWith('C')) {
+      return const Color(0xFF978ECB); // Purple for C+, C, C-
+    } else if (grade.startsWith('D')) {
+      return const Color(0xFF0ED290); // Green for D+, D, D-
+    } else if (grade == 'F') {
+      return const Color(0xFFED1C24); // Bright Red for F
+    } else {
+      return Colors.grey; // Fallback color
     }
   }
 
@@ -729,16 +746,37 @@ class _ResultPageState extends State<ResultPage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: ListView(
-                      children: semesterResults[selectedSemester - 1].map((result) {
-                        return buildResultCard(
-                            result["label"],
-                            result["grade"],
-                            result["color"],
-                            result["scores"],
-                            result["smallTitle"] ?? "");
-                      }).toList(),
-                    ),
+                    child: semesterResults.isEmpty || 
+                           selectedSemester > semesterResults.length || 
+                           semesterResults[selectedSemester - 1].isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.school_outlined, size: 80, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No results available for Semester $selectedSemester',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView(
+                            children: semesterResults[selectedSemester - 1].map((result) {
+                              return buildResultCard(
+                                  result["label"],
+                                  result["grade"],
+                                  result["color"],
+                                  result["scores"],
+                                  result["smallTitle"] ?? "");
+                            }).toList(),
+                          ),
                   ),
                 ),
               ],
@@ -787,7 +825,7 @@ class _ResultPageState extends State<ResultPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(height: 10), // Add spacing above the divider
+                const SizedBox(height: 10),
 
                 // Adjusted Divider with reduced length on the right side
                 const Row(
@@ -798,62 +836,57 @@ class _ResultPageState extends State<ResultPage> {
                         color: kLightGrey,
                       ),
                     ),
-                    SizedBox(
-                        width:
-                            73), // Adjust this to control the shortening on the right
+                    SizedBox(width: 73),
                   ],
                 ),
 
-                const SizedBox(
-                    height: 5), // Add spacing below the divider if needed
+                const SizedBox(height: 5),
 
-                // Scores Row (horizontal layout)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(scores.length, (index) {
-                    List<Widget> scoreWidgets = [
-                      Column(
+                // Scores Row with scrollable horizontal layout for all scores
+                SizedBox(
+                  height: 60, // Fixed height for the score row
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: List.generate(scores.length, (index) {
+                      return Row(
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Text(
-                              "${scores[index]['score'].toStringAsFixed(2)}",
-                              style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.width *
-                                    0.04, // Scale font size with screen width
-                                fontWeight: FontWeight.bold,
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                child: Text(
+                                  "${scores[index]['score'].toStringAsFixed(1)}",
+                                  style: TextStyle(
+                                    fontSize: MediaQuery.of(context).size.width * 0.03,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                child: Text(
+                                  scores[index]['label'],
+                                  style: const TextStyle(
+                                      color: Colors.lightBlue, fontSize: 8),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (index < scores.length - 1)
+                            const SizedBox(
+                              width: 13,
+                              height: 30,
+                              child: VerticalDivider(
+                                color: kLightGrey,
+                                thickness: 2.5,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Text(
-                              scores[index]['label'],
-                              style: const TextStyle(
-                                  color: Colors.lightBlue, fontSize: 8),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
                         ],
-                      ),
-                    ];
-
-                    if (index < scores.length - 1) {
-                      scoreWidgets.add(const SizedBox(
-                        width: 13,
-                        height: 30,
-                        child: VerticalDivider(
-                          color: kLightGrey,
-                          thickness: 2.5,
-                        ),
-                      ));
-                    }
-
-                    return Row(children: scoreWidgets);
-                  }),
+                      );
+                    }),
+                  ),
                 ),
                 const SizedBox(height: 7),
               ],
@@ -861,13 +894,11 @@ class _ResultPageState extends State<ResultPage> {
           ),
         ),
         Positioned(
-          bottom: 8, // Align to the bottom of the card
+          bottom: 8,
           right: 0,
           child: Container(
-            height: MediaQuery.of(context).size.width *
-                0.18, // Scale height with screen width
-            width: MediaQuery.of(context).size.width *
-                0.18, // Scale width with screen width
+            height: MediaQuery.of(context).size.width * 0.18,
+            width: MediaQuery.of(context).size.width * 0.18,
             decoration: BoxDecoration(
               color: gradeColor,
               borderRadius: const BorderRadius.only(
@@ -878,8 +909,7 @@ class _ResultPageState extends State<ResultPage> {
               child: Text(
                 grade,
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width *
-                      0.1, // Scale font size with screen width
+                  fontSize: MediaQuery.of(context).size.width * 0.1,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -889,5 +919,20 @@ class _ResultPageState extends State<ResultPage> {
         ),
       ],
     );
+  }
+
+  // Helper method to calculate total points from scores
+  double _calculateTotalPoints(Map<String, dynamic> subject) {
+    double total = 0.0;
+    List<dynamic> scores = subject["scores"] as List;
+    
+    // Add up all available scores
+    for (var score in scores) {
+      if (score != null && score["score"] != null) {
+        total += (score["score"] as num).toDouble();
+      }
+    }
+    
+    return total;
   }
 }
