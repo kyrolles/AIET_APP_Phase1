@@ -24,13 +24,59 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart';
 import 'package:graduation_project/screens/attendance/attendance_router.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+
+// Define the background message handler (must be a top-level function)
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, like Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  // await Firebase.initializeApp(); // Uncomment if needed
+
+  print("Handling a background message: ${message.messageId}");
+  print('Message data: ${message.data}');
+  if (message.notification != null) {
+    print('Message also contained a notification: ${message.notification}');
+  }
+  // TODO: Handle the background message (e.g., show a local notification)
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
+  // Set the background messaging handler early on, as a named top-level function
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   // Request notification permission
-  await Permission.notification.request();
+  final PermissionStatus status = await Permission.notification.request();
+  if (kDebugMode) {
+    print('Notification permission status: $status');
+  }
+
+  // --- Foreground message handling ---
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (kDebugMode) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+    }
+
+    if (message.notification != null) {
+      if (kDebugMode) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+      // TODO: Display the foreground notification using flutter_local_notifications
+    }
+  });
+
+  // --- Handling notification tap ---
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    if (kDebugMode) {
+      print('Notification tapped! Message data: ${message.data}');
+    }
+    // TODO: Navigate to relevant screen based on message data
+  });
 
   // Check if the user is already logged in
   const storage = FlutterSecureStorage();
