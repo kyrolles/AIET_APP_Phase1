@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 
 // Data class to hold announcement details for posting
 class AnnouncementData {
@@ -25,9 +27,13 @@ class AnnouncementData {
 
 class AnnouncementRepository {
   final FirebaseFirestore _firestore;
+  final FirebaseMessaging _messaging;
 
-  AnnouncementRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+  AnnouncementRepository({
+    FirebaseFirestore? firestore,
+    FirebaseMessaging? messaging,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _messaging = messaging ?? FirebaseMessaging.instance;
 
   // Function to convert file to Base64 (moved from screen)
   Future<String?> _fileToBase64(File? file) async {
@@ -55,35 +61,36 @@ class AnnouncementRepository {
         'pdfFileName': pdfFileName,
       });
 
-      // *** Point to add notification trigger ***
-      // await _triggerNotification(authorName: data.authorName, title: data.title);
-      // print('Notification trigger called (placeholder)');
+      // Subscribe to the announcements topic (ensure users receive notifications)
+      await _subscribeToAnnouncementsTopic();
+      
+      if (kDebugMode) {
+        print('Announcement posted successfully');
+      }
 
     } catch (e) {
       // Re-throw the exception to be caught by the controller
-      print('Error in AnnouncementRepository.postAnnouncement: $e');
+      if (kDebugMode) {
+        print('Error in AnnouncementRepository.postAnnouncement: $e');
+      }
       throw Exception('Failed to post announcement: ${e.toString()}');
     }
   }
 
-  // Placeholder for the notification trigger function
-  // In a real implementation, this would call a Cloud Function or your backend API
-  // Future<void> _triggerNotification({required String authorName, required String title}) async {
-  //   try {
-  //     // Replace with your actual backend call (e.g., using http package or cloud_functions)
-  //     print('Simulating call to backend to trigger notification for: $authorName - $title');
-  //     // Example with hypothetical Cloud Function:
-  //     // final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('sendAnnouncementNotification');
-  //     // await callable.call(<String, dynamic>{
-  //     //   'authorName': authorName,
-  //     //   'title': title,
-  //     // });
-  //     await Future.delayed(const Duration(milliseconds: 100)); // Simulate network delay
-  //   } catch (e) {
-  //     print('Error triggering notification: $e');
-  //     // Decide how to handle notification trigger errors (e.g., log, ignore, retry?)
-  //   }
-  // }
+  // Subscribe the device to the 'announcements' topic to receive notifications
+  Future<void> _subscribeToAnnouncementsTopic() async {
+    try {
+      await _messaging.subscribeToTopic('announcements');
+      if (kDebugMode) {
+        print('Successfully subscribed to announcements topic');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error subscribing to announcements topic: $e');
+      }
+      // We don't throw here to avoid failing the announcement posting
+    }
+  }
 
   // Add other announcement-related methods if needed (fetch, delete, update)
 } 
