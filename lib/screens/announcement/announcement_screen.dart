@@ -1,291 +1,240 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart'; // For PDF file picking
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui'; // For ImageFilter
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
+import 'package:graduation_project/controllers/announcement_controller.dart'; // Import controller
+import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart'; // Add PDFView dependency
 import '../../components/my_app_bar.dart';
 
-class AnnouncementScreen extends StatefulWidget {
+// Convert to ConsumerStatefulWidget
+class AnnouncementScreen extends ConsumerStatefulWidget {
   const AnnouncementScreen({super.key});
 
   @override
-  AnnouncementScreenState createState() => AnnouncementScreenState();
+  ConsumerState<AnnouncementScreen> createState() => _AnnouncementScreenState();
 }
 
-class AnnouncementScreenState extends State<AnnouncementScreen> {
+// Convert to ConsumerState
+class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen> with TickerProviderStateMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  File? _image;
-  File? _pdfFile;
-  final ImagePicker _picker = ImagePicker();
 
-  // Helper function to format the timestamp
-  // ignore: unused_element
-  String _formatTimestamp(DateTime dateTime) {
-    final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
-    final period = dateTime.hour >= 12 ? 'PM' : 'AM';
-    final month = _getMonthName(dateTime.month);
-    return '$hour:${dateTime.minute.toString().padLeft(2, '0')} $period · $month ${dateTime.day}, ${dateTime.year}';
-  }
+  // Animation controller for image viewer blur effect
+  late AnimationController _blurController;
+  late Animation<double> _blurAnimation;
 
-  // Helper function to get the month name
-  String _getMonthName(int month) {
-    switch (month) {
-      case 1:
-        return 'Jan';
-      case 2:
-        return 'Feb';
-      case 3:
-        return 'Mar';
-      case 4:
-        return 'Apr';
-      case 5:
-        return 'May';
-      case 6:
-        return 'Jun';
-      case 7:
-        return 'Jul';
-      case 8:
-        return 'Aug';
-      case 9:
-        return 'Sep';
-      case 10:
-        return 'Oct';
-      case 11:
-        return 'Nov';
-      case 12:
-        return 'Dec';
-      default:
-        return '';
-    }
-  }
-
-  // Function to pick an image from the gallery
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
-  }
-
-  // Function to pick a PDF file
-  Future<void> _pickPDF() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'], // Allow only PDF files
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the animation controller
+    _blurController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
     );
-
-    if (result != null) {
-      setState(() {
-        _pdfFile = File(result.files.single.path!);
-      });
-    }
+    // Define the blur animation
+    _blurAnimation = Tween<double>(begin: 0, end: 10).animate(_blurController);
   }
 
-  // Function to convert file to Base64
-  Future<String?> _fileToBase64(File? file) async {
-    if (file == null) return null;
-    final bytes = await file.readAsBytes();
-    return base64Encode(bytes);
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _blurController.dispose(); // Dispose animation controller
+    super.dispose();
   }
 
-  Future<void> postAnnouncement() async {
-    if (_titleController.text.isEmpty || _descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a title and description')),
-      );
-      return;
-    }
-
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String email = user.email!;
-
-        // Check user role
-        QuerySnapshot userDocs = await FirebaseFirestore.instance
-            .collection('users')
-            .where('email', isEqualTo: email)
-            .get();
-
-        if (userDocs.docs.isNotEmpty) {
-          String role = userDocs.docs.first['role'];
-          String firstName = userDocs.docs.first['firstName'];
-          String lastName = userDocs.docs.first['lastName'];
-          String userName = '$firstName $lastName';
-
-          // Check if user has permission to post
-          bool hasPermission = role == 'Admin' ||
-              [
-                'IT',
-                'Professor',
-                'Assistant',
-                'Secretary',
-                'Training Unit',
-                'Student Affair'
-              ].contains(role);
-
-          if (hasPermission) {
-            // Continue with announcement posting...
-            DateTime now = DateTime.now();
-            String? imageBase64 = await _fileToBase64(_image);
-            String? pdfBase64 = await _fileToBase64(_pdfFile);
-            String? pdfFileName = _pdfFile?.path.split('/').last;
-
-            await FirebaseFirestore.instance.collection('announcements').add({
-              'title': _titleController.text.trim(),
-              'text': _descriptionController.text.trim(),
-              'timestamp': Timestamp.fromDate(now),
-              'author': userName,
-              'email': email,
-              'role': role, // Add role to announcement
-              'imageBase64': imageBase64,
-              'pdfBase64': pdfBase64,
-              'pdfFileName': pdfFileName,
-            });
-
-            _titleController.clear();
-            _descriptionController.clear();
-            setState(() {
-              _image = null;
-              _pdfFile = null;
-            });
-
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  backgroundColor: Colors.green,
-                  content: Text('Announcement posted successfully!'),
-                ),
-              );
-              Navigator.pop(context, true);
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content:
-                      Text('You do not have permission to post announcements')),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      print('Error posting announcement: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Error posting announcement: $e'),
-        ),
-      );
-    }
+  // Function to check if text is likely Arabic (keep if needed for text direction)
+  bool _isArabic(String text) {
+    if (text.isEmpty) return false; // Default to LTR if empty
+    // Basic check: Look for characters in the Arabic Unicode range
+    final arabicRegex = RegExp(r'[؀-ۿ]');
+    return arabicRegex.hasMatch(text);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch the controller state
+    final AnnouncementState state = ref.watch(announcementControllerProvider);
+    final AnnouncementController controller = ref.read(announcementControllerProvider.notifier);
+
+    // Listen for errors or success to show Snackbars and navigate
+    ref.listen<AnnouncementState>(announcementControllerProvider, (previous, next) {
+      // Show error message
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar(); // Remove previous snackbar if any
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(next.errorMessage!),
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction( // Optional: Allow dismissing the error
+              label: 'Dismiss',
+              onPressed: () => controller.clearError(),
+            ),
+          ),
+        );
+      }
+      // Show success message and navigate back
+      if (next.postSuccess && previous?.postSuccess == false) {
+         ScaffoldMessenger.of(context).removeCurrentSnackBar();
+         ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(
+             backgroundColor: Colors.green,
+             content: Text('Announcement posted successfully!'),
+             duration: Duration(seconds: 2),
+           ),
+         );
+         // Clear text fields after successful post
+         _titleController.clear();
+         _descriptionController.clear();
+         // Use WidgetsBinding to ensure build is complete before navigation
+         WidgetsBinding.instance.addPostFrameCallback((_) { 
+           if (mounted) {
+              Navigator.pop(context, true); // Navigate back, indicating success
+           }
+         });
+      }
+    });
+
+
     return Scaffold(
       appBar: MyAppBar(
         title: 'Create Announcement',
         actions: [
-          IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: postAnnouncement,
-          ),
+          // Show loading indicator or send icon
+          state.isLoading
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 16.0),
+                  child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0))),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.send),
+                  // Call controller's post method
+                  onPressed: () {
+                    // Ensure keyboard is dismissed
+                    FocusScope.of(context).unfocus(); 
+                    controller.postAnnouncement(
+                      title: _titleController.text,
+                      description: _descriptionController.text,
+                    );
+                  },
+                ),
         ],
         onpressed: () {
-          Navigator.pop(context);
+          if (!state.isLoading) { // Prevent popping while loading
+             Navigator.pop(context);
+          }
         },
       ),
-      body: ReusableOffline(
+      body: ReusableOffline( // Keep ReusableOffline wrapper if needed
         child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 20), // Add padding for scroll ends
           child: Column(
             children: [
-              // Title input field
+              // Title input field (unchanged structure)
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0), // Adjust padding
                 child: TextField(
                   controller: _titleController,
+                  enabled: !state.isLoading, // Disable when loading
                   textDirection: _isArabic(_titleController.text)
                       ? TextDirection.rtl
                       : TextDirection.ltr,
                   onChanged: (value) {
-                    setState(() {});
+                    setState(() {}); // Keep for text direction updates
                   },
                   decoration: InputDecoration(
+                    labelText: 'Title', // Use labelText
                     hintText: 'Enter announcement title',
                     hintTextDirection: _isArabic(_titleController.text)
                         ? TextDirection.rtl
                         : TextDirection.ltr,
                     border: const OutlineInputBorder(),
+                    filled: true, // Add fill color for better visuals
+                    fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Colors.grey.shade100,
                   ),
                 ),
               ),
-              // Description input field
+              // Description input field (unchanged structure)
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: TextField(
                   controller: _descriptionController,
+                  enabled: !state.isLoading, // Disable when loading
                   maxLines: 5,
                   textDirection: _isArabic(_descriptionController.text)
                       ? TextDirection.rtl
                       : TextDirection.ltr,
                   onChanged: (value) {
-                    setState(() {});
+                    setState(() {}); // Keep for text direction updates
                   },
                   decoration: InputDecoration(
+                    labelText: 'Description', // Use labelText
                     hintText: 'Write your announcement here...',
                     hintTextDirection: _isArabic(_descriptionController.text)
                         ? TextDirection.rtl
                         : TextDirection.ltr,
                     border: const OutlineInputBorder(),
+                    filled: true, // Add fill color
+                    fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Colors.grey.shade100,
                   ),
                 ),
               ),
-              // Image upload button
+              // File Attachment Section
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: _pickImage,
-                  child: const Text(
-                    'Upload Image',
-                    style: TextStyle(color: Colors.blue),
-                  ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, // Make buttons take full width
+                  children: [
+                    // Image Section
+                    if (state.image != null)
+                      _buildAttachmentPreview(
+                        context: context,
+                        file: state.image!,
+                        onRemove: state.isLoading ? null : () => controller.clearImage(),
+                        onTap: state.isLoading ? null : () => _viewImage(context, state.image!),
+                        icon: Icons.image,
+                      )
+                    else
+                      OutlinedButton.icon( // Use OutlinedButton for visual consistency
+                        onPressed: state.isLoading ? null : () => controller.pickImage(),
+                        icon: const Icon(Icons.image_outlined),
+                        label: const Text('Add Image'),
+                        style: OutlinedButton.styleFrom(
+                           minimumSize: const Size(double.infinity, 45), // Consistent height
+                           padding: const EdgeInsets.symmetric(vertical: 12), // Adjust padding
+                        ),
+                      ),
+
+                    const SizedBox(height: 10),
+
+                    // PDF Section
+                    if (state.pdfFile != null)
+                       _buildAttachmentPreview(
+                        context: context,
+                        file: state.pdfFile!,
+                        onRemove: state.isLoading ? null : () => controller.clearPdf(),
+                        onTap: state.isLoading ? null : () => _viewPdf(context, state.pdfFile!),
+                        icon: Icons.picture_as_pdf,
+                      )
+                    else
+                       OutlinedButton.icon( // Use OutlinedButton
+                        onPressed: state.isLoading ? null : () => controller.pickPDF(),
+                        icon: const Icon(Icons.attach_file),
+                        label: const Text('Add PDF'),
+                        style: OutlinedButton.styleFrom(
+                           minimumSize: const Size(double.infinity, 45), // Consistent height
+                           padding: const EdgeInsets.symmetric(vertical: 12), // Adjust padding
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              // PDF upload button
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: _pickPDF,
-                  child: const Text(
-                    'Upload PDF',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
-              ),
-              // Display the selected image
-              if (_image != null)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Image.file(
-                    _image!,
-                    height: 150,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              // Display the selected PDF file name
-              if (_pdfFile != null)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Selected PDF: ${_pdfFile!.path.split('/').last}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
+
+              const SizedBox(height: 20), // Add some spacing at the bottom
             ],
           ),
         ),
@@ -293,9 +242,195 @@ class AnnouncementScreenState extends State<AnnouncementScreen> {
     );
   }
 
-  // Helper function to check if the text is in Arabic
-  bool _isArabic(String text) {
-    final arabicRegex = RegExp(r'[\u0600-\u06FF]');
-    return arabicRegex.hasMatch(text);
+  // Helper widget to display attached file preview
+  Widget _buildAttachmentPreview({
+    required BuildContext context,
+    required File file,
+    required VoidCallback? onRemove,
+    required VoidCallback? onTap,
+    required IconData icon,
+  }) {
+    final String fileName = file.path.split(Platform.pathSeparator).last;
+    return Card(
+      elevation: 2, // Add slight elevation
+      margin: const EdgeInsets.symmetric(vertical: 6.0),
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).primaryColor),
+        title: Text(fileName, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14)),
+        onTap: onTap,
+        trailing: IconButton(
+          icon: const Icon(Icons.close, size: 20, color: Colors.redAccent), // Smaller, colored close icon
+          onPressed: onRemove,
+          tooltip: 'Remove',
+          splashRadius: 20, // Smaller splash radius
+        ),
+        dense: true, // Make tile more compact
+      ),
+    );
   }
+
+  // Show full-screen image dialog (adapted from UploadImage)
+  Future<void> _viewImage(BuildContext context, File imageFile) async {
+    // Read file bytes and encode on the fly
+    late final String imageBase64;
+    try {
+       final bytes = await imageFile.readAsBytes();
+       imageBase64 = base64Encode(bytes);
+    } catch (e) {
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error reading image file: $e')));
+       return;
+    }
+
+    _blurController.forward();
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside initially
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          child: AnimatedBuilder(
+            animation: _blurAnimation,
+            builder: (context, child) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Blurred background
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: _blurAnimation.value,
+                        sigmaY: _blurAnimation.value,
+                      ),
+                      child: Container(
+                         // Use GestureDetector on background to close
+                         child: GestureDetector(
+                            onTap: () {
+                              _blurController.reverse().then((_) {
+                                if(Navigator.canPop(context)) Navigator.of(context).pop();
+                              });
+                            },
+                            child: Container(color: Colors.black.withOpacity(0.6)),
+                         )
+                      ),
+                    ),
+                  ),
+                  // Interactive Image Viewer
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: InteractiveViewer(
+                      panEnabled: true,
+                      boundaryMargin: const EdgeInsets.all(20), // Add margin
+                      minScale: 0.8, // Allow zooming out slightly
+                      maxScale: 4.0,
+                      child: Center(
+                        child: Padding(
+                           padding: const EdgeInsets.all(8.0), // Padding around image
+                           child: Image.memory(
+                              base64Decode(imageBase64),
+                              fit: BoxFit.contain,
+                              // Add error builder for safety
+                              errorBuilder: (context, error, stackTrace) => 
+                                const Center(child: Text('Could not load image', style: TextStyle(color: Colors.white))), 
+                           ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Close button (optional, as background tap also closes)
+                  Positioned(
+                    top: 40,
+                    right: 20,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                      onPressed: () {
+                         _blurController.reverse().then((_) {
+                            if(Navigator.canPop(context)) Navigator.of(context).pop();
+                         });
+                      },
+                    ),
+                  )
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  // Navigate to view PDF using flutter_pdfview
+  void _viewPdf(BuildContext context, File pdfFile) {
+    if (!pdfFile.existsSync()) {
+       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error: PDF file not found')));
+       return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(pdfFile.path.split(Platform.pathSeparator).last), // Show filename in AppBar
+          ),
+          body: PDFView(
+            filePath: pdfFile.path,
+            onError: (error) {
+              print(error.toString());
+               WidgetsBinding.instance.addPostFrameCallback((_) { 
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error loading PDF: $error')));
+               });
+            },
+            onPageError: (page, error) {
+              print('$page: ${error.toString()}');
+               WidgetsBinding.instance.addPostFrameCallback((_) { 
+                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error on PDF page $page: $error')));
+               });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Remove these if they were defined locally and not imported
+// class ImageViewScreen extends StatelessWidget { ... }
+// class PdfViewScreen extends StatelessWidget { ... }
+
+// Keep the UploadImage and UploadPdf widgets if they are separate components used elsewhere,
+// otherwise, their functionality is now integrated or handled by the controller/preview.
+// Consider deleting upload_image.dart and upload_pdf.dart if they are no longer needed.
+
+// The widgets all_announcement_appear_on_one_screen.dart, announcement_item.dart,
+// and announcement_list.dart are likely for displaying announcements and are not
+// directly affected by this refactoring of the creation screen, unless they
+// need to be updated to use a new way of fetching announcements (e.g., via a provider).
+
+// Helper function to get the month name - Keep if needed elsewhere, maybe move to utils
+String _getMonthName(int month) {
+  switch (month) {
+    case 1: return 'Jan';
+    case 2: return 'Feb';
+    case 3: return 'Mar';
+    case 4: return 'Apr';
+    case 5: return 'May';
+    case 6: return 'Jun';
+    case 7: return 'Jul';
+    case 8: return 'Aug';
+    case 9: return 'Sep';
+    case 10: return 'Oct';
+    case 11: return 'Nov';
+    case 12: return 'Dec';
+    default: return '';
+  }
+}
+
+// Helper function to format the timestamp - Keep if needed elsewhere, maybe move to utils
+String _formatTimestamp(DateTime dateTime) {
+  final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
+  final hourString = hour == 0 ? '12' : hour.toString(); // Handle midnight/noon
+  final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+  final month = _getMonthName(dateTime.month);
+  return '$hourString:${dateTime.minute.toString().padLeft(2, '0')} $period · $month ${dateTime.day}, ${dateTime.year}';
 }
