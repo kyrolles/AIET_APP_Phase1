@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:graduation_project/screens/announcement/all_announcement_appear_on_one_screen.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/clinic/student_clinic/clinic_screen.dart';
@@ -27,6 +28,9 @@ import 'package:graduation_project/screens/attendance/attendance_router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Request notification permission
+  await Permission.notification.request();
 
   // Check if the user is already logged in
   const storage = FlutterSecureStorage();
