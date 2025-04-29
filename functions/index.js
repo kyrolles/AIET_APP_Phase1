@@ -158,4 +158,162 @@ exports.sendInvoiceNotification = functions.firestore
       console.error('Error sending invoice notification:', error);
       return { error: error.message };
     }
+  });
+
+/**
+ * Cloud Function that triggers when a training request document is updated
+ * and sends a notification to the student with the appropriate message
+ */
+exports.sendTrainingNotification = functions.firestore
+  .document('requests/{requestId}')
+  .onUpdate(async (change, context) => {
+    try {
+      const beforeData = change.before.data();
+      const afterData = change.after.data();
+      
+      // Enhanced logging
+      console.log('--------- TRAINING NOTIFICATION FUNCTION TRIGGERED ---------');
+      console.log('Request ID:', context.params.requestId);
+      console.log('Before data:', JSON.stringify(beforeData));
+      console.log('After data:', JSON.stringify(afterData));
+      console.log('Before status:', beforeData.status);
+      console.log('After status:', afterData.status);
+      console.log('Document type:', afterData.type);
+      
+      // Skip if not a training request - more detailed check
+      if (!afterData.type || afterData.type.toLowerCase() !== 'training') {
+        console.log('Not a training document - type:', afterData.type);
+        return null;
+      }
+      
+      // Check if status changed
+      if (!beforeData.status || !afterData.status) {
+        console.log('Status fields missing');
+        return null;
+      }
+      
+      const statusChanged = beforeData.status !== afterData.status;
+      const newStatusIsFinal = ['done', 'rejected'].includes(afterData.status.toLowerCase());
+      
+      console.log('Status changed:', statusChanged);
+      console.log('New status is final:', newStatusIsFinal);
+      
+      if (!statusChanged || !newStatusIsFinal) {
+        console.log('Status condition not met for notification');
+        return null;
+      }
+      
+      // Continue only if we have required fields
+      if (!afterData.student_id) {
+        console.log('Student ID missing in document');
+        return null;
+      }
+      
+      const studentId = afterData.student_id;
+      const trainingScore = afterData.training_score || 0;
+      const status = afterData.status;
+      
+      console.log('Processing for student ID:', studentId);
+      console.log('Training score:', trainingScore);
+      console.log('Status:', status);
+      
+      // Get user document with more robust error handling
+      let userDoc;
+      try {
+        const usersSnapshot = await admin.firestore()
+          .collection('users')
+          .where('id', '==', studentId)
+          .get();
+          
+        if (usersSnapshot.empty) {
+          console.log('No user found with ID:', studentId);
+          
+          // Try searching by email as fallback
+          if (afterData.email) {
+            console.log('Trying to find user by email:', afterData.email);
+            const userByEmailSnapshot = await admin.firestore()
+              .collection('users')
+              .where('email', '==', afterData.email)
+              .get();
+              
+            if (userByEmailSnapshot.empty) {
+              console.log('No user found with email either:', afterData.email);
+              return null;
+            }
+            
+            userDoc = userByEmailSnapshot.docs[0];
+          } else {
+            return null;
+          }
+        } else {
+          userDoc = usersSnapshot.docs[0];
+        }
+      } catch (error) {
+        console.error('Error fetching user document:', error);
+        return null;
+      }
+      
+      const userData = userDoc.data();
+      console.log('User data found:', JSON.stringify(userData));
+      
+      const fcmToken = userData.fcm_token;
+      
+      if (!fcmToken) {
+        console.log('No FCM token found for user:', studentId);
+        return null;
+      }
+      
+      console.log('Found FCM token:', fcmToken);
+      
+      // Create notification content with improved message
+      let title, body;
+      if (status.toLowerCase() === 'done') {
+        title = 'Training Request Approved';
+        body = `Congratulations! ${trainingScore} days have been added to your training record.`;
+      } else {
+        title = 'Training Request Rejected';
+        body = 'Your training request was not approved. Please check the details or contact administration.';
+      }
+      
+      // Add data to track notification in database
+      await admin.firestore().collection('notifications').add({
+        user_id: studentId,
+        user_uid: userData.uid || userData.user_uid,
+        title: title,
+        body: body,
+        type: 'training',
+        status: status,
+        request_id: context.params.requestId,
+        created_at: admin.firestore.FieldValue.serverTimestamp(),
+        read: false
+      });
+      
+      // Create and send notification with rich data
+      const message = {
+        notification: {
+          title: title,
+          body: body
+        },
+        data: {
+          type: 'training',
+          request_type: 'Training',
+          status: status,
+          score: trainingScore.toString(),
+          request_id: context.params.requestId,
+          timestamp: Date.now().toString(),
+          click_action: 'FLUTTER_NOTIFICATION_CLICK'
+        },
+        token: fcmToken
+      };
+      
+      console.log('Sending notification message:', JSON.stringify(message));
+      
+      // Send the message
+      const response = await admin.messaging().send(message);
+      console.log('Successfully sent training notification:', response);
+      return { success: true, messageId: response };
+    } catch (error) {
+      console.error('Error sending training notification:', error);
+      return { error: error.message };
+    }
   }); 

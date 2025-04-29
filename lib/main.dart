@@ -1,5 +1,6 @@
 import 'dart:io'; // Add for Platform check
 import 'dart:async'; // Add for StreamController and StreamSubscription
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:graduation_project/services/training_notification_service.dart';
 
 // Initialize FlutterLocalNotificationsPlugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = 
@@ -165,6 +167,11 @@ void main() async {
       }
     }
 
+    // Process training notifications with dedicated handler
+    if (message.data['type'] == 'training') {
+      TrainingNotificationService().processNotification(message.data);
+    }
+
     // Display the notification using flutter_local_notifications
     if (message.notification != null) {
       showLocalNotification(
@@ -182,8 +189,12 @@ void main() async {
       print('Notification tapped! Message data: ${message.data}');
     }
     
-    // Navigation will be handled in the app through a stream
-    if (message.data['type'] == 'invoice') {
+    // Process training notifications with dedicated handler for tap events
+    if (message.data['type'] == 'training') {
+      TrainingNotificationService().handleNotificationTap(message.data);
+      // Navigate to the student training screen
+      NotificationNavigationService.navigateTo('/studentTraining');
+    } else if (message.data['type'] == 'invoice') {
       // Navigate to the invoice screen to see approved requests
       NotificationNavigationService.navigateTo('/invoice');
     } else if (message.data['type'] == 'announcement') {
@@ -257,7 +268,21 @@ Future<void> _initializeLocalNotifications() async {
       
       // Extract payload to determine navigation
       final String payload = response.payload ?? '';
-      if (payload.contains('invoice')) {
+      if (payload.contains('training')) {
+        // Use dedicated handler for training notifications
+        if (response.payload != null) {
+          try {
+            final Map<String, dynamic> data = 
+                jsonDecode(response.payload!) as Map<String, dynamic>;
+            TrainingNotificationService().handleNotificationTap(data);
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error parsing notification payload: $e');
+            }
+          }
+        }
+        NotificationNavigationService.navigateTo('/studentTraining');
+      } else if (payload.contains('invoice')) {
         NotificationNavigationService.navigateTo('/invoice');
       } else if (payload.contains('announcement')) {
         NotificationNavigationService.navigateTo('/all_announcement');
@@ -491,6 +516,8 @@ class _MyAppState extends State<MyApp> {
                 Navigator.pushNamed(context, '/invoice');
               } else if (widget.initialMessage!.data['type'] == 'announcement') {
                 Navigator.pushNamed(context, '/all_announcement');
+              } else if (widget.initialMessage!.data['type'] == 'training') {
+                Navigator.pushNamed(context, '/studentTraining');
               }
             });
           }

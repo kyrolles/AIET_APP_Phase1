@@ -7,6 +7,7 @@ import 'package:graduation_project/components/pdf_view.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/services/training_notification_service.dart';
 
 class ValidateButtomSheet extends StatefulWidget {
   const ValidateButtomSheet({super.key, required this.request});
@@ -68,11 +69,32 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
       QuerySnapshot querySnapshot = await query.get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        await querySnapshot.docs.first.reference.update(newData);
-        log('Document updated successfully');
+        final docRef = querySnapshot.docs.first.reference;
+        final String documentId = docRef.id;
+        
+        // If the status is Done or Rejected, use the notification service
+        if (newData['status'] == 'Done' || newData['status'] == 'Rejected') {
+          await TrainingNotificationService().updateTrainingRequestStatus(
+            requestId: documentId,
+            status: newData['status'],
+            trainingScore: newData['training_score'] ?? 0,
+            comment: newData['comment'] ?? '',
+          );
+          log('Document updated using notification service');
+        } else {
+          // For other statuses, update normally
+          await docRef.update(newData);
+          log('Document updated normally');
+        }
       }
     } catch (e) {
       log('Error updating document: $e');
+      // Show error to user
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating request: $e')),
+        );
+      }
     }
   }
 
@@ -96,6 +118,24 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
         },
       ).then((_) {
         Navigator.pop(context);
+        
+        // Show a snackbar to confirm the status change
+        final String message = status == 'Done' 
+            ? 'Request approved. Student will be notified.' 
+            : status == 'Rejected'
+                ? 'Request rejected. Student will be notified.'
+                : 'Request status updated.';
+                
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: status == 'Done' 
+                ? kgreen 
+                : status == 'Rejected' 
+                    ? Colors.red 
+                    : Colors.blue,
+          ),
+        );
       });
     }
   }
