@@ -300,6 +300,7 @@ Future<void> _initializeLocalNotifications() async {
           channelName,
           description: channelDescription,
           importance: Importance.max,
+          enableLights: true
         ));
   }
 }

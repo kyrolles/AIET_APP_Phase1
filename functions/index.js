@@ -26,6 +26,12 @@ exports.sendAnnouncementNotification = functions.firestore
           title: 'New Announcement',
           body: `${authorName} has published a new announcement with the title ${title}`
         },
+        android: {
+          notification: {
+            icon: '@mipmap/launcher_icon',
+            color: '#000000'
+          }
+        },
         topic: 'announcements', // Send to all devices subscribed to the 'announcements' topic
       };
 
@@ -134,6 +140,12 @@ exports.sendInvoiceNotification = functions.firestore
           notification: {
             title: 'Request Approved',
             body: `Your ${requestType} request has been approved and is ready.`
+          },
+          android: {
+            notification: {
+              icon: '@mipmap/launcher_icon',
+              color: '#000000'
+            }
           },
           data: {
             type: 'invoice',
@@ -293,6 +305,12 @@ exports.sendTrainingNotification = functions.firestore
         notification: {
           title: title,
           body: body
+        },
+        android: {
+          notification: {
+            icon: '@mipmap/launcher_icon',
+            color: '#000000'
+          }
         },
         data: {
           type: 'training',
