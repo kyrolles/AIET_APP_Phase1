@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
+import 'dart:developer';
 import '../../../components/rpd_button.dart';
 import '../../../models/request_model.dart';
 
@@ -18,6 +19,13 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Log the initial state for debugging
+    log('ProofOfEnrollmentSheetScreen opened for request:');
+    log('Student ID: ${request.studentId}');
+    log('Student Name: ${request.studentName}');
+    log('Addressed To: ${request.addressedTo}');
+    log('Current Status: ${request.status}');
+    
     return SizedBox(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -109,19 +117,28 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 RejectPendinDoneButton(
-                  onpressed: rejectedFunctionality,
+                  onpressed: () {
+                    log('Rejected button pressed for request: ${request.studentId}');
+                    rejectedFunctionality();
+                  },
                   color: const Color(0XFFFF7648),
                   content: 'Rejected',
                 ),
                 const SizedBox(width: 3),
                 RejectPendinDoneButton(
-                  onpressed: pendingFunctionality,
+                  onpressed: () {
+                    log('Pending button pressed for request: ${request.studentId}');
+                    pendingFunctionality();
+                  },
                   color: const Color(0XFFFFDD29),
                   content: 'Pending',
                 ),
                 const SizedBox(width: 3),
                 RejectPendinDoneButton(
-                  onpressed: doneFunctionality,
+                  onpressed: () {
+                    log('Done button pressed for request: ${request.studentId}');
+                    doneFunctionality();
+                  },
                   color: const Color(0xFF34C759),
                   content: 'Done',
                 ),

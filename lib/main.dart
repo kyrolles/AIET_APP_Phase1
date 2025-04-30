@@ -1,4 +1,6 @@
 import 'dart:io'; // Add for Platform check
+import 'dart:async'; // Add for StreamController and StreamSubscription
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +23,7 @@ import 'package:graduation_project/screens/clinic/doctor_clinic/doctor_clinic_sc
 import 'package:graduation_project/screens/clinic/doctor_clinic/completed_appointments_screen.dart';
 import 'package:graduation_project/screens/clinic/doctor_clinic/pending_appointments_screen.dart';
 import 'screens/invoice/student_invoice/invoice_archive_screen.dart';
+import 'screens/invoice/student_invoice/invoice_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_user_screen.dart';
@@ -28,6 +31,9 @@ import 'package:graduation_project/screens/attendance/attendance_router.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:graduation_project/services/training_notification_service.dart';
 
 // Initialize FlutterLocalNotificationsPlugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = 
@@ -59,6 +65,7 @@ Future<void> showLocalNotification({
   required String title,
   required String body,
   String? payload,
+  Map<String, dynamic>? data,
 }) async {
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
     channelId,
@@ -78,16 +85,23 @@ Future<void> showLocalNotification({
     ),
   );
   
+  // Use the data map to construct a more specific payload if present
+  String notificationPayload = payload ?? '';
+  if (data != null && data['type'] != null) {
+    notificationPayload = data['type'];
+  }
+  
   await flutterLocalNotificationsPlugin.show(
     0, // Notification ID
     title,
     body,
     platformDetails,
-    payload: payload,
+    payload: notificationPayload,
   );
   
   if (kDebugMode) {
     print('Local notification displayed: $title - $body');
+    print('Notification payload: $notificationPayload');
   }
 }
 
@@ -153,12 +167,18 @@ void main() async {
       }
     }
 
+    // Process training notifications with dedicated handler
+    if (message.data['type'] == 'training') {
+      TrainingNotificationService().processNotification(message.data);
+    }
+
     // Display the notification using flutter_local_notifications
     if (message.notification != null) {
       showLocalNotification(
-        title: message.notification!.title ?? 'New Announcement',
-        body: message.notification!.body ?? 'Check out the new announcement!',
-        payload: 'announcement',
+        title: message.notification!.title ?? 'New Notification',
+        body: message.notification!.body ?? 'You have a new notification',
+        data: message.data,
+        payload: message.data['type'] ?? 'notification',
       );
     }
   });
@@ -168,8 +188,28 @@ void main() async {
     if (kDebugMode) {
       print('Notification tapped! Message data: ${message.data}');
     }
-    // TODO: Navigate to relevant screen based on message data
+    
+    // Process training notifications with dedicated handler for tap events
+    if (message.data['type'] == 'training') {
+      TrainingNotificationService().handleNotificationTap(message.data);
+      // Navigate to the student training screen
+      NotificationNavigationService.navigateTo('/studentTraining');
+    } else if (message.data['type'] == 'invoice') {
+      // Navigate to the invoice screen to see approved requests
+      NotificationNavigationService.navigateTo('/invoice');
+    } else if (message.data['type'] == 'announcement') {
+      NotificationNavigationService.navigateTo('/all_announcement');
+    }
   });
+
+  // Handle initial notification if app was terminated
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    if (kDebugMode) {
+      print('App opened from terminated state by notification: ${initialMessage.data}');
+    }
+    // We'll handle this in the MyApp widget to ensure navigation is possible
+  }
 
   // Check if the user is already logged in
   const storage = FlutterSecureStorage();
@@ -179,9 +219,26 @@ void main() async {
     ProviderScope(
       child: MyApp(
         isLoggedIn: token != null,
+        initialMessage: initialMessage,
       ),
     ),
   );
+}
+
+// Singleton service to handle notification navigation
+class NotificationNavigationService {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final StreamController<String> _navigationStreamController = StreamController<String>.broadcast();
+  
+  static Stream<String> get navigationStream => _navigationStreamController.stream;
+  
+  static void navigateTo(String route) {
+    _navigationStreamController.add(route);
+  }
+  
+  static void dispose() {
+    _navigationStreamController.close();
+  }
 }
 
 // Initialize local notifications
@@ -208,7 +265,28 @@ Future<void> _initializeLocalNotifications() async {
       if (kDebugMode) {
         print('Notification tapped: ${response.payload}');
       }
-      // TODO: Navigate to relevant screen based on payload
+      
+      // Extract payload to determine navigation
+      final String payload = response.payload ?? '';
+      if (payload.contains('training')) {
+        // Use dedicated handler for training notifications
+        if (response.payload != null) {
+          try {
+            final Map<String, dynamic> data = 
+                jsonDecode(response.payload!) as Map<String, dynamic>;
+            TrainingNotificationService().handleNotificationTap(data);
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error parsing notification payload: $e');
+            }
+          }
+        }
+        NotificationNavigationService.navigateTo('/studentTraining');
+      } else if (payload.contains('invoice')) {
+        NotificationNavigationService.navigateTo('/invoice');
+      } else if (payload.contains('announcement')) {
+        NotificationNavigationService.navigateTo('/all_announcement');
+      }
     },
   );
 
@@ -222,6 +300,7 @@ Future<void> _initializeLocalNotifications() async {
           channelName,
           description: channelDescription,
           importance: Importance.max,
+          enableLights: true
         ));
   }
 }
@@ -235,10 +314,117 @@ Future<void> _setupFCM() async {
       print('FCM Token: $fcmToken');
     }
     
+    // Save FCM token to user document if logged in
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null && fcmToken != null) {
+      try {
+        // First, find user by email
+        final userRef = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: currentUser.email)
+            .limit(1)
+            .get();
+        
+        if (userRef.docs.isNotEmpty) {
+          final userData = userRef.docs.first.data();
+          // Save token directly to the user document
+          await userRef.docs.first.reference.update({
+            'fcm_token': fcmToken,
+          });
+          
+          if (kDebugMode) {
+            print('FCM token saved to user document with ID: ${userRef.docs.first.id}');
+            print('User data: $userData');
+          }
+          
+          // For debugging - verify this is the correct user
+          if (userData.containsKey('id')) {
+            if (kDebugMode) {
+              print('User ID in Firestore: ${userData['id']}');
+            }
+          } else {
+            if (kDebugMode) {
+              print('Warning: User document does not have an id field');
+            }
+            // Add id field if missing
+            await userRef.docs.first.reference.update({
+              'id': userRef.docs.first.id
+            });
+            if (kDebugMode) {
+              print('Added id field to user document');
+            }
+          }
+          
+          // Also save to a separate collection for easier debugging
+          await FirebaseFirestore.instance
+              .collection('user_tokens')
+              .doc(userRef.docs.first.id)
+              .set({
+            'token': fcmToken,
+            'email': currentUser.email,
+            'user_id': userData['id'] ?? userRef.docs.first.id,
+            'updated_at': FieldValue.serverTimestamp()
+          });
+          
+          if (kDebugMode) {
+            print('FCM token also saved to user_tokens collection');
+          }
+        } else {
+          if (kDebugMode) {
+            print('No user document found for email: ${currentUser.email}');
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error saving FCM token to user document: $e');
+        }
+      }
+    }
+    
     // Listen for token refreshes
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
       if (kDebugMode) {
         print('FCM Token refreshed: $newToken');
+      }
+      
+      // Update the token in the user's document
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null && newToken != null) {
+        try {
+          FirebaseFirestore.instance
+              .collection('users')
+              .where('email', isEqualTo: currentUser.email)
+              .limit(1)
+              .get()
+              .then((snapshot) {
+                if (snapshot.docs.isNotEmpty) {
+                  final userData = snapshot.docs.first.data();
+                  // Update FCM token in user document
+                  snapshot.docs.first.reference.update({
+                    'fcm_token': newToken,
+                  });
+                  
+                  // Also update in user_tokens collection
+                  FirebaseFirestore.instance
+                      .collection('user_tokens')
+                      .doc(snapshot.docs.first.id)
+                      .set({
+                    'token': newToken,
+                    'email': currentUser.email,
+                    'user_id': userData['id'] ?? snapshot.docs.first.id,
+                    'updated_at': FieldValue.serverTimestamp()
+                  });
+                  
+                  if (kDebugMode) {
+                    print('FCM token updated in user document and user_tokens collection');
+                  }
+                }
+              });
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error updating FCM token in user document: $e');
+          }
+        }
       }
     });
     
@@ -266,14 +452,41 @@ Future<void> _setupFCM() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool isLoggedIn;
+  final RemoteMessage? initialMessage;
 
-  const MyApp({super.key, required this.isLoggedIn});
+  const MyApp({super.key, required this.isLoggedIn, this.initialMessage});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription<String> _navigationSubscription;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Listen to notification navigation events
+    _navigationSubscription = NotificationNavigationService.navigationStream.listen((route) {
+      if (mounted) {
+        Navigator.of(context).pushNamed(route);
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _navigationSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NotificationNavigationService.navigatorKey,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(
@@ -295,7 +508,23 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // home: SplashScreen(isUserLoggedIn: isLoggedIn),
-      home: const HomeScreen(),
+      home: Builder(
+        builder: (context) {
+          // Handle initial message after MaterialApp is built
+          if (widget.initialMessage != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (widget.initialMessage!.data['type'] == 'invoice') {
+                Navigator.pushNamed(context, '/invoice');
+              } else if (widget.initialMessage!.data['type'] == 'announcement') {
+                Navigator.pushNamed(context, '/all_announcement');
+              } else if (widget.initialMessage!.data['type'] == 'training') {
+                Navigator.pushNamed(context, '/studentTraining');
+              }
+            });
+          }
+          return const HomeScreen();
+        },
+      ),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
@@ -319,7 +548,6 @@ class MyApp extends StatelessWidget {
         '/all_announcement': (context) =>
             const AllAnnouncementAppearOnOneScreen(),
         '/clinicStudentScreen': (context) => const ClinicScreen(),
-
         '/clinicStudentScreen/newAppointmentScreen': (context) =>
             const NewAppointmentScreen(),
         // Add these routes to your routes map
@@ -328,6 +556,7 @@ class MyApp extends StatelessWidget {
             const CompletedAppointmentsScreen(),
         '/doctorClinicScreen/pendingAppointmentsScreen': (context) =>
             const PendingAppointmentsScreen(),
+        '/invoice': (context) => const InvoiceScreen(),
       },
     );
   }

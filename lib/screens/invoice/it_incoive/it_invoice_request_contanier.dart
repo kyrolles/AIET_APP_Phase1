@@ -13,8 +13,11 @@ Future<void> updateDocument({
   required String collectionPath,
   required Map<String, dynamic> searchCriteria,
   required Map<String, dynamic> newData,
+  bool isApproved = false,
 }) async {
   try {
+    log('Updating document: collectionPath=$collectionPath, criteria=$searchCriteria, newData=$newData');
+    
     //* Start with the collection reference
     Query query = FirebaseFirestore.instance.collection(collectionPath);
 
@@ -25,12 +28,54 @@ Future<void> updateDocument({
 
     //* Get the documents that match your criteria
     QuerySnapshot querySnapshot = await query.get();
-
-    //* Update the first matching document
-    if (querySnapshot.docs.isNotEmpty) {
-      await querySnapshot.docs.first.reference.update(newData);
+    
+    if (querySnapshot.docs.isEmpty) {
+      log('No documents found matching criteria');
+      return;
     }
-    log('Document updated successfully');
+
+    log('Found ${querySnapshot.docs.length} documents to update');
+    
+    // Get the document to update
+    final docRef = querySnapshot.docs.first.reference;
+    final docData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
+    
+    if (docData == null) {
+      log('Document data is null');
+      return;
+    }
+    
+    // For status changes from non-Done to Done, do a separate update 
+    // to ensure the cloud function triggers properly
+    if (newData.containsKey('status') && 
+        newData['status'] == 'Done' && 
+        docData['status'] != 'Done') {
+      
+      log('Updating status to Done - this should trigger notification');
+      
+      // First update everything except status
+      Map<String, dynamic> nonStatusUpdates = Map.from(newData);
+      nonStatusUpdates.remove('status');
+      
+      if (nonStatusUpdates.isNotEmpty) {
+        await docRef.update(nonStatusUpdates);
+        log('Updated non-status fields');
+      }
+      
+      // Ensure the document contains the type field for the cloud function
+      if (!docData.containsKey('type')) {
+        await docRef.update({'type': 'Tuition Fees'});
+        log('Added missing type field');
+      }
+      
+      // Then update status separately to ensure it triggers properly
+      await docRef.update({'status': 'Done'});
+      log('Updated status to Done');
+    } else {
+      // For other updates, just do them all at once
+      await docRef.update(newData);
+      log('Updated document with new data');
+    }
   } catch (e) {
     log('Error updating document: $e');
   }
@@ -150,17 +195,25 @@ class RequestContainer extends StatelessWidget {
       context: context,
       onlineContent: ProofOfEnrollmentSheetScreen(
         request: request,
-        doneFunctionality: () {
-          updateDocument(
-            collectionPath: 'requests',
-            searchCriteria: {
-              'student_id': request.studentId,
-              'addressed_to': request.addressedTo,
-            },
-            newData: {
-              'status': 'Done',
-            },
-          );
+        doneFunctionality: () async {
+          try {
+            log('Setting proof of enrollment request status to Done');
+            // Use the updateDocument function for consistency
+            await updateDocument(
+              collectionPath: 'requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+                'type': 'Proof of enrollment',
+              },
+              newData: {
+                'status': 'Done',
+              },
+            );
+            log('Successfully updated proof of enrollment status to Done');
+          } catch (e) {
+            log('Error updating status: $e');
+          }
           Navigator.pop(context);
         },
         rejectedFunctionality: () {
@@ -202,7 +255,24 @@ class RequestContainer extends StatelessWidget {
       ),
       onlineContent: TuitionFeesSheet(
         request: request,
-        doneFunctionality: () {},
+        doneFunctionality: () async {
+          try {
+            log('Setting tuition fees request status to Done');
+            await updateDocument(
+              collectionPath: 'requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'type': 'Tuition Fees',
+              },
+              newData: {
+                'status': 'Done',
+              },
+            );
+            log('Successfully updated tuition fees status to Done');
+          } catch (e) {
+            log('Error updating tuition fees status: $e');
+          }
+        },
       ),
     );
   }
