@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graduation_project/screens/announcement/all_announcement_appear_on_one_screen.dart';
 import 'dart:convert';
 import 'package:graduation_project/screens/drawer/app_drawer.dart';
 import '../components/activities_list_view.dart';
@@ -25,6 +26,8 @@ class HomeScreenState extends State<HomeScreen> {
   String userName = '';
   String? currentUserEmail;
   String? imageBase64; // Added missing variable declaration
+  String userDepartment = '';
+  String userYear = '';
 
   final storage = const FlutterSecureStorage();
 
@@ -54,6 +57,9 @@ class HomeScreenState extends State<HomeScreen> {
           setState(() {
             userName = '${userDoc['firstName']} ${userDoc['lastName']}'.trim();
             imageBase64 = userDoc['profileImage'] as String?; // Fixed casting
+
+            userDepartment = userDoc['department'] ?? '';
+            userYear = userDoc['academicYear'] ?? '';
           });
         }
       }
@@ -115,14 +121,24 @@ class HomeScreenState extends State<HomeScreen> {
               text: 'Announcements',
               textLink: 'View All',
               onTap: () {
-                Navigator.pushNamed(context, '/all_announcement');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AllAnnouncementAppearOnOneScreen(
+                      userYear: userYear,
+                      userDepartment: userDepartment,
+                    ),
+                  ),
+                );
               },
             ),
           ),
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: AnnouncementList(
               scrollDirection: Axis.vertical,
               showOnlyLast: true,
+              year: userYear,
+              department: userDepartment,
             ),
           ),
           // Schedule Section

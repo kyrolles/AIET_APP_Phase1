@@ -13,6 +13,8 @@ class AnnouncementData {
   final String authorRole;
   final File? imageFile;
   final File? pdfFile;
+  final List<String> departments;
+  final List<String> years;
 
   AnnouncementData({
     required this.title,
@@ -22,6 +24,8 @@ class AnnouncementData {
     required this.authorRole,
     this.imageFile,
     this.pdfFile,
+    required this.departments,
+    required this.years,
   });
 }
 
@@ -46,8 +50,36 @@ class AnnouncementRepository {
     try {
       final String? imageBase64 = await _fileToBase64(data.imageFile);
       final String? pdfBase64 = await _fileToBase64(data.pdfFile);
-      final String? pdfFileName = data.pdfFile?.path.split(Platform.pathSeparator).last;
+      final String? pdfFileName =
+          data.pdfFile?.path.split(Platform.pathSeparator).last;
       final DateTime now = DateTime.now();
+
+      // Create the composite targetAudience field
+      List<String> targetAudience = [];
+
+      // Add combinations of department and year
+      if (data.departments.isNotEmpty && data.years.isNotEmpty) {
+        for (String dept in data.departments) {
+          for (String yr in data.years) {
+            targetAudience.add('${dept}_$yr');
+          }
+        }
+      } else if (data.departments.isNotEmpty) {
+        // Only departments are provided
+        for (String dept in data.departments) {
+          targetAudience.add(dept);
+        }
+      } else if (data.years.isNotEmpty) {
+        // Only years are provided
+        for (String yr in data.years) {
+          targetAudience.add(yr);
+        }
+      } else {
+        targetAudience.add('global');
+      }
+
+      // Add global flag if both lists are empty
+      final bool isGlobal = data.departments.isEmpty && data.years.isEmpty;
 
       await _firestore.collection('announcements').add({
         'title': data.title.trim(),
@@ -55,21 +87,24 @@ class AnnouncementRepository {
         'timestamp': Timestamp.fromDate(now),
         'author': data.authorName,
         'email': data.authorEmail,
-        'role': data.authorRole, // Include role from data
+        'role': data.authorRole,
         'imageBase64': imageBase64,
         'pdfBase64': pdfBase64,
         'pdfFileName': pdfFileName,
+        'departments': data.departments,
+        'years': data.years,
+        'targetAudience': targetAudience, // Add the composite field
+        'isGlobal': isGlobal, // Add a simple flag for global announcements
       });
 
-      // Subscribe to the announcements topic (ensure users receive notifications)
+      // Subscribe to the announcements topic
       await _subscribeToAnnouncementsTopic();
-      
+
       if (kDebugMode) {
         print('Announcement posted successfully');
+        print('Target audience: $targetAudience');
       }
-
     } catch (e) {
-      // Re-throw the exception to be caught by the controller
       if (kDebugMode) {
         print('Error in AnnouncementRepository.postAnnouncement: $e');
       }
@@ -93,4 +128,4 @@ class AnnouncementRepository {
   }
 
   // Add other announcement-related methods if needed (fetch, delete, update)
-} 
+}

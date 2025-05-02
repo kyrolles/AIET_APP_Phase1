@@ -53,7 +53,8 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
 
   Future<void> pickImage() async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         state = state.copyWith(image: File(pickedFile.path), clearError: true);
       }
@@ -74,7 +75,8 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
       );
 
       if (result != null && result.files.single.path != null) {
-        state = state.copyWith(pdfFile: File(result.files.single.path!), clearError: true);
+        state = state.copyWith(
+            pdfFile: File(result.files.single.path!), clearError: true);
       }
     } catch (e) {
       state = state.copyWith(errorMessage: 'Failed to pick PDF: $e');
@@ -82,17 +84,38 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
   }
 
   void clearPdf() {
-     state = state.copyWith(clearPdf: true);
+    state = state.copyWith(clearPdf: true);
   }
 
   Future<void> postAnnouncement({
     required String title,
     required String description,
+    List<String> departments = const [],
+    List<String> years = const [],
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null, postSuccess: false, clearError: true);
+    state = state.copyWith(
+        isLoading: true,
+        errorMessage: null,
+        postSuccess: false,
+        clearError: true);
+
+    if (years.contains('General') && departments.isNotEmpty) {
+      state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'You cannot select a department with General.');
+      return;
+    }
+    // if (years.isEmpty && departments.isEmpty) {
+    //   state = state.copyWith(
+    //       isLoading: false,
+    //       errorMessage: 'Please select at least one department or one year.');
+    //   return;
+    // }
 
     if (title.isEmpty || description.isEmpty) {
-      state = state.copyWith(isLoading: false, errorMessage: 'Title and description cannot be empty.');
+      state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Title and description cannot be empty.');
       return;
     }
 
@@ -103,12 +126,11 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
         throw Exception('User not logged in or details not found.');
       }
 
-       // 2. Check permissions (Simplified - adapt based on actual roles)
+      // 2. Check permissions (Simplified - adapt based on actual roles)
       final bool hasPermission = _checkPermission(currentUser.role);
       if (!hasPermission) {
-         throw Exception('You do not have permission to post announcements.');
+        throw Exception('You do not have permission to post announcements.');
       }
-
 
       // 3. Prepare announcement data
       final AnnouncementData announcementData = AnnouncementData(
@@ -119,6 +141,8 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
         authorRole: currentUser.role,
         imageFile: state.image,
         pdfFile: state.pdfFile,
+        departments: departments,
+        years: years,
       );
 
       // 4. Call repository to post
@@ -131,34 +155,34 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
         clearImage: true, // Clear files after successful post
         clearPdf: true,
       );
-        // Reset success flag after a short delay or navigation
-        Future.delayed(const Duration(milliseconds: 100), () {
-           if (mounted) {
-              state = state.copyWith(postSuccess: false);
-           }
-        });
-
-
+      // Reset success flag after a short delay or navigation
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          state = state.copyWith(postSuccess: false);
+        }
+      });
     } catch (e) {
       // 6. Update state on error
-      state = state.copyWith(isLoading: false, errorMessage: 'Error posting announcement: ${e.toString()}', postSuccess: false);
+      state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Error posting announcement: ${e.toString()}',
+          postSuccess: false);
     }
   }
 
-   // Example permission check - adjust according to your actual roles
-   bool _checkPermission(String role) {
-      const List<String> allowedRoles = [
-          'Admin',
-          'IT',
-          'Professor',
-          'Assistant',
-          'Secretary',
-          'Training Unit',
-          'Student Affair'
-      ];
-       return allowedRoles.contains(role);
-   }
-
+  // Example permission check - adjust according to your actual roles
+  bool _checkPermission(String role) {
+    const List<String> allowedRoles = [
+      'Admin',
+      'IT',
+      'Professor',
+      'Assistant',
+      'Secretary',
+      'Training Unit',
+      'Student Affair'
+    ];
+    return allowedRoles.contains(role);
+  }
 
   // Method to clear the error message
   void clearError() {
@@ -174,11 +198,13 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
 // final announcementRepositoryProvider = Provider<AnnouncementRepository>((ref) => getIt<AnnouncementRepository>());
 
 // Example using placeholder providers if getIt isn't fully set up yet:
-final authRepositoryProvider = Provider<AuthRepository>((ref) => AuthRepository()); // Placeholder
-final announcementRepositoryProvider = Provider<AnnouncementRepository>((ref) => AnnouncementRepository()); // Placeholder
+final authRepositoryProvider =
+    Provider<AuthRepository>((ref) => AuthRepository()); // Placeholder
+final announcementRepositoryProvider = Provider<AnnouncementRepository>(
+    (ref) => AnnouncementRepository()); // Placeholder
 
-
-final announcementControllerProvider = StateNotifierProvider<AnnouncementController, AnnouncementState>((ref) {
+final announcementControllerProvider =
+    StateNotifierProvider<AnnouncementController, AnnouncementState>((ref) {
   final announcementRepository = ref.watch(announcementRepositoryProvider);
   final authRepository = ref.watch(authRepositoryProvider);
   return AnnouncementController(announcementRepository, authRepository);
@@ -197,4 +223,4 @@ final announcementIsLoadingProvider = Provider<bool>((ref) {
 // Helper provider for the error message
 final announcementErrorProvider = Provider<String?>((ref) {
   return ref.watch(announcementControllerProvider).errorMessage;
-}); 
+});
