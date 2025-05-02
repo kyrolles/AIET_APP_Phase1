@@ -36,13 +36,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/services/training_notification_service.dart';
 
 // Initialize FlutterLocalNotificationsPlugin
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 // Channel ID for Android notifications
 const String channelId = 'high_importance_channel';
 const String channelName = 'High Importance Notifications';
-const String channelDescription = 'This channel is used for important notifications.';
+const String channelDescription =
+    'This channel is used for important notifications.';
 
 // Define the background message handler (must be a top-level function)
 @pragma('vm:entry-point')
@@ -75,7 +76,7 @@ Future<void> showLocalNotification({
     priority: Priority.high,
     showWhen: true,
   );
-  
+
   const NotificationDetails platformDetails = NotificationDetails(
     android: androidDetails,
     iOS: DarwinNotificationDetails(
@@ -84,13 +85,13 @@ Future<void> showLocalNotification({
       presentSound: true,
     ),
   );
-  
+
   // Use the data map to construct a more specific payload if present
   String notificationPayload = payload ?? '';
   if (data != null && data['type'] != null) {
     notificationPayload = data['type'];
   }
-  
+
   await flutterLocalNotificationsPlugin.show(
     0, // Notification ID
     title,
@@ -98,7 +99,7 @@ Future<void> showLocalNotification({
     platformDetails,
     payload: notificationPayload,
   );
-  
+
   if (kDebugMode) {
     print('Local notification displayed: $title - $body');
     print('Notification payload: $notificationPayload');
@@ -126,9 +127,10 @@ void main() async {
       carPlay: false,
       criticalAlert: false,
     );
-    
+
     if (kDebugMode) {
-      print('User notification permission status: ${settings.authorizationStatus}');
+      print(
+          'User notification permission status: ${settings.authorizationStatus}');
       switch (settings.authorizationStatus) {
         case AuthorizationStatus.authorized:
           print('User granted permission: AUTHORIZED');
@@ -159,11 +161,12 @@ void main() async {
       print('📩 FOREGROUND MESSAGE RECEIVED:');
       print('  • Message ID: ${message.messageId}');
       print('  • Data: ${message.data}');
-      
+
       if (message.notification != null) {
         print('  • Notification Title: ${message.notification!.title}');
         print('  • Notification Body: ${message.notification!.body}');
-        print('  • Notification Android Channel ID: ${message.notification!.android?.channelId}');
+        print(
+            '  • Notification Android Channel ID: ${message.notification!.android?.channelId}');
       }
     }
 
@@ -188,7 +191,7 @@ void main() async {
     if (kDebugMode) {
       print('Notification tapped! Message data: ${message.data}');
     }
-    
+
     // Process training notifications with dedicated handler for tap events
     if (message.data['type'] == 'training') {
       TrainingNotificationService().handleNotificationTap(message.data);
@@ -206,7 +209,8 @@ void main() async {
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
     if (kDebugMode) {
-      print('App opened from terminated state by notification: ${initialMessage.data}');
+      print(
+          'App opened from terminated state by notification: ${initialMessage.data}');
     }
     // We'll handle this in the MyApp widget to ensure navigation is possible
   }
@@ -227,15 +231,18 @@ void main() async {
 
 // Singleton service to handle notification navigation
 class NotificationNavigationService {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  static final StreamController<String> _navigationStreamController = StreamController<String>.broadcast();
-  
-  static Stream<String> get navigationStream => _navigationStreamController.stream;
-  
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+  static final StreamController<String> _navigationStreamController =
+      StreamController<String>.broadcast();
+
+  static Stream<String> get navigationStream =>
+      _navigationStreamController.stream;
+
   static void navigateTo(String route) {
     _navigationStreamController.add(route);
   }
-  
+
   static void dispose() {
     _navigationStreamController.close();
   }
@@ -245,8 +252,8 @@ class NotificationNavigationService {
 Future<void> _initializeLocalNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/launcher_icon');
-      
-  final DarwinInitializationSettings initializationSettingsIOS = 
+
+  final DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(
     requestAlertPermission: false, // We'll handle permissions with FCM
     requestBadgePermission: false,
@@ -265,14 +272,14 @@ Future<void> _initializeLocalNotifications() async {
       if (kDebugMode) {
         print('Notification tapped: ${response.payload}');
       }
-      
+
       // Extract payload to determine navigation
       final String payload = response.payload ?? '';
       if (payload.contains('training')) {
         // Use dedicated handler for training notifications
         if (response.payload != null) {
           try {
-            final Map<String, dynamic> data = 
+            final Map<String, dynamic> data =
                 jsonDecode(response.payload!) as Map<String, dynamic>;
             TrainingNotificationService().handleNotificationTap(data);
           } catch (e) {
@@ -296,12 +303,10 @@ Future<void> _initializeLocalNotifications() async {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(const AndroidNotificationChannel(
-          channelId,
-          channelName,
-          description: channelDescription,
-          importance: Importance.max,
-          enableLights: true
-        ));
+            channelId, channelName,
+            description: channelDescription,
+            importance: Importance.max,
+            enableLights: true));
   }
 }
 
@@ -313,7 +318,7 @@ Future<void> _setupFCM() async {
     if (kDebugMode) {
       print('FCM Token: $fcmToken');
     }
-    
+
     // Save FCM token to user document if logged in
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null && fcmToken != null) {
@@ -324,19 +329,20 @@ Future<void> _setupFCM() async {
             .where('email', isEqualTo: currentUser.email)
             .limit(1)
             .get();
-        
+
         if (userRef.docs.isNotEmpty) {
           final userData = userRef.docs.first.data();
           // Save token directly to the user document
           await userRef.docs.first.reference.update({
             'fcm_token': fcmToken,
           });
-          
+
           if (kDebugMode) {
-            print('FCM token saved to user document with ID: ${userRef.docs.first.id}');
+            print(
+                'FCM token saved to user document with ID: ${userRef.docs.first.id}');
             print('User data: $userData');
           }
-          
+
           // For debugging - verify this is the correct user
           if (userData.containsKey('id')) {
             if (kDebugMode) {
@@ -347,14 +353,13 @@ Future<void> _setupFCM() async {
               print('Warning: User document does not have an id field');
             }
             // Add id field if missing
-            await userRef.docs.first.reference.update({
-              'id': userRef.docs.first.id
-            });
+            await userRef.docs.first.reference
+                .update({'id': userRef.docs.first.id});
             if (kDebugMode) {
               print('Added id field to user document');
             }
           }
-          
+
           // Also save to a separate collection for easier debugging
           await FirebaseFirestore.instance
               .collection('user_tokens')
@@ -365,7 +370,7 @@ Future<void> _setupFCM() async {
             'user_id': userData['id'] ?? userRef.docs.first.id,
             'updated_at': FieldValue.serverTimestamp()
           });
-          
+
           if (kDebugMode) {
             print('FCM token also saved to user_tokens collection');
           }
@@ -380,13 +385,13 @@ Future<void> _setupFCM() async {
         }
       }
     }
-    
+
     // Listen for token refreshes
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
       if (kDebugMode) {
         print('FCM Token refreshed: $newToken');
       }
-      
+
       // Update the token in the user's document
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null && newToken != null) {
@@ -397,29 +402,30 @@ Future<void> _setupFCM() async {
               .limit(1)
               .get()
               .then((snapshot) {
-                if (snapshot.docs.isNotEmpty) {
-                  final userData = snapshot.docs.first.data();
-                  // Update FCM token in user document
-                  snapshot.docs.first.reference.update({
-                    'fcm_token': newToken,
-                  });
-                  
-                  // Also update in user_tokens collection
-                  FirebaseFirestore.instance
-                      .collection('user_tokens')
-                      .doc(snapshot.docs.first.id)
-                      .set({
-                    'token': newToken,
-                    'email': currentUser.email,
-                    'user_id': userData['id'] ?? snapshot.docs.first.id,
-                    'updated_at': FieldValue.serverTimestamp()
-                  });
-                  
-                  if (kDebugMode) {
-                    print('FCM token updated in user document and user_tokens collection');
-                  }
-                }
+            if (snapshot.docs.isNotEmpty) {
+              final userData = snapshot.docs.first.data();
+              // Update FCM token in user document
+              snapshot.docs.first.reference.update({
+                'fcm_token': newToken,
               });
+
+              // Also update in user_tokens collection
+              FirebaseFirestore.instance
+                  .collection('user_tokens')
+                  .doc(snapshot.docs.first.id)
+                  .set({
+                'token': newToken,
+                'email': currentUser.email,
+                'user_id': userData['id'] ?? snapshot.docs.first.id,
+                'updated_at': FieldValue.serverTimestamp()
+              });
+
+              if (kDebugMode) {
+                print(
+                    'FCM token updated in user document and user_tokens collection');
+              }
+            }
+          });
         } catch (e) {
           if (kDebugMode) {
             print('Error updating FCM token in user document: $e');
@@ -427,16 +433,17 @@ Future<void> _setupFCM() async {
         }
       }
     });
-    
+
     // Subscribe to announcements topic
     await FirebaseMessaging.instance.subscribeToTopic('announcements');
     if (kDebugMode) {
       print('Successfully subscribed to announcements topic');
     }
-    
+
     // Request notification permissions on iOS (redundant but kept for backward compatibility)
     if (Platform.isIOS) {
-      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
@@ -464,19 +471,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late StreamSubscription<String> _navigationSubscription;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Listen to notification navigation events
-    _navigationSubscription = NotificationNavigationService.navigationStream.listen((route) {
+    _navigationSubscription =
+        NotificationNavigationService.navigationStream.listen((route) {
       if (mounted) {
         Navigator.of(context).pushNamed(route);
       }
     });
   }
-  
+
   @override
   void dispose() {
     _navigationSubscription.cancel();
@@ -515,7 +523,8 @@ class _MyAppState extends State<MyApp> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (widget.initialMessage!.data['type'] == 'invoice') {
                 Navigator.pushNamed(context, '/invoice');
-              } else if (widget.initialMessage!.data['type'] == 'announcement') {
+              } else if (widget.initialMessage!.data['type'] ==
+                  'announcement') {
                 Navigator.pushNamed(context, '/all_announcement');
               } else if (widget.initialMessage!.data['type'] == 'training') {
                 Navigator.pushNamed(context, '/studentTraining');
@@ -545,8 +554,8 @@ class _MyAppState extends State<MyApp> {
             const CreateAnnouncement(),
         '/it_invoice/archive': (context) => const ItArchiveScreen(),
         '/id': (context) => const QrcodeScreen(),
-        '/all_announcement': (context) =>
-            const AllAnnouncementAppearOnOneScreen(),
+        // '/all_announcement': (context) =>
+        //     const AllAnnouncementAppearOnOneScreen(),
         '/clinicStudentScreen': (context) => const ClinicScreen(),
         '/clinicStudentScreen/newAppointmentScreen': (context) =>
             const NewAppointmentScreen(),
