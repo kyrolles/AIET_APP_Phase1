@@ -123,68 +123,75 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
       ),
     );
   }
-  
+
   Future<void> _submitTuitionFeesRequest() async {
     if (_isLoading) return;
-    
+
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       // Get current user
       User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
         throw 'User not logged in';
       }
-      
+
       String? email = currentUser.email;
-      
+
       // Get user data from Firestore
       final QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
-          
+
       if (snapshot.docs.isEmpty) {
         throw 'User not found';
       }
-      
+
       // Check request limit
       int counter = 0;
       for (var i = 0; i < widget.requestsList.length; i++) {
         if (widget.requestsList[i].studentId == snapshot.docs.first['id'] &&
             widget.requestsList[i].type == 'Tuition Fees' &&
-            widget.requestsList[i].createdAt.toDate().year == DateTime.now().year) {
+            widget.requestsList[i].createdAt.toDate().year ==
+                DateTime.now().year) {
           counter++;
         }
       }
-      
+
       // The limit for Tuition Fees requests is 3
       if (counter >= 3) {
         throw 'You have reached the maximum number of requests';
       }
-      
+
       // No need to explicitly create a folder in Firebase Storage - it will be created automatically when files are uploaded
       // await _storageService.createStudentFolder(currentUser.uid);
-      
+
       // Add request to Firestore
       await FirebaseFirestore.instance.collection('requests').add({
         'addressed_to': '',
         'comment': '',
         'file_name': '',
         'pdfBase64': '',
-        'stamp': payInInstallments,
+        'pay_in_installments': payInInstallments,
         'status': 'No Status',
         'student_id': snapshot.docs.first['id'],
-        'student_name': '${snapshot.docs.first['firstName']} ${snapshot.docs.first['lastName']}'.trim(),
+        'student_name':
+            '${snapshot.docs.first['firstName']} ${snapshot.docs.first['lastName']}'
+                .trim(),
         'training_score': 0,
         'type': 'Tuition Fees',
         'year': snapshot.docs.first['academicYear'],
         'created_at': Timestamp.now(),
         'file_storage_url': '', // Will be populated by admin
+        'location': '',
+        'phone_number': '',
+        'document_language': '',
+        'stamp_type': '',
       });
-      
+
       _showCustomSnackBar('Request sent successfully');
       Navigator.pop(context);
     } catch (e) {

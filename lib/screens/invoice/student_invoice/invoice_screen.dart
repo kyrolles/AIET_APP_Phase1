@@ -194,6 +194,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       backgroundColor: const Color.fromRGBO(241, 196, 15, 1),
       onPressed: () {
         OfflineAwareBottomSheet.show(
+          isScrollControlled: true,
           context: context,
           onlineContent: const ProofOfEnrollment(),
         );

@@ -14,8 +14,14 @@ class Request {
   final String year;
   final Timestamp createdAt;
   final String? fileStorageUrl;
+  final String location;
+  final String phoneNumber;
+  final bool englishOrArabic;
 
   Request({
+    required this.phoneNumber,
+    required this.englishOrArabic,
+    required this.location,
     required this.addressedTo,
     required this.comment,
     required this.fileName,
@@ -33,10 +39,10 @@ class Request {
 
   factory Request.fromJson(dynamic json) {
     // Convert document snapshot to Map if needed
-    final Map<String, dynamic> data = json is DocumentSnapshot 
-        ? json.data() as Map<String, dynamic> 
+    final Map<String, dynamic> data = json is DocumentSnapshot
+        ? json.data() as Map<String, dynamic>
         : json as Map<String, dynamic>;
-    
+
     // Safe getter function to handle missing fields
     T? safeGet<T>(String key) {
       try {
@@ -46,7 +52,7 @@ class Request {
         return null;
       }
     }
-    
+
     return Request(
       addressedTo: safeGet<String>('addressed_to') ?? '',
       comment: safeGet<String>('comment') ?? '',
@@ -61,6 +67,9 @@ class Request {
       year: safeGet<String>('year') ?? '',
       createdAt: safeGet<Timestamp>('created_at') ?? Timestamp.now(),
       fileStorageUrl: safeGet<String>('file_storage_url') ?? '',
+      location: safeGet<String>('location') ?? '',
+      phoneNumber: safeGet<String>('phone_number') ?? '',
+      englishOrArabic: safeGet<bool>('english_or_arabic') ?? false,
     );
   }
 }

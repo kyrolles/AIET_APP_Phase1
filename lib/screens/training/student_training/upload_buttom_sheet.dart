@@ -107,9 +107,13 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         'status': 'No status',
         'addressed_to': '',
         'comment': '',
-        'stamp': false,
+        'pay_in_installments': false,
         'training_score': 0,
         'file_storage_url': '',
+        'location': '',
+        'phone_number': '',
+        'stamp_type': '',
+        'document_language': '',
       });
       Navigator.pop(context);
       _showCustomSnackBar('PDF uploaded successfully!');
