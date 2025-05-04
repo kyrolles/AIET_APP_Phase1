@@ -16,11 +16,13 @@ class Request {
   final String? fileStorageUrl;
   final String location;
   final String phoneNumber;
-  final bool englishOrArabic;
+  final String documentLanguage;
+  final String stampType;
 
   Request({
+    required this.stampType,
     required this.phoneNumber,
-    required this.englishOrArabic,
+    required this.documentLanguage,
     required this.location,
     required this.addressedTo,
     required this.comment,
@@ -58,7 +60,7 @@ class Request {
       comment: safeGet<String>('comment') ?? '',
       fileName: safeGet<String>('file_name') ?? '',
       pdfBase64: safeGet<String>('pdfBase64'),
-      stamp: safeGet<bool>('stamp') ?? false,
+      stamp: safeGet<bool>('pay_in_installments') ?? false,
       status: safeGet<String>('status') ?? 'No Status',
       studentId: safeGet<String>('student_id') ?? '',
       studentName: safeGet<String>('student_name') ?? '',
@@ -69,7 +71,8 @@ class Request {
       fileStorageUrl: safeGet<String>('file_storage_url') ?? '',
       location: safeGet<String>('location') ?? '',
       phoneNumber: safeGet<String>('phone_number') ?? '',
-      englishOrArabic: safeGet<bool>('english_or_arabic') ?? false,
+      documentLanguage: safeGet<String>('document_language') ?? '',
+      stampType: safeGet<String>('stamp_type') ?? '',
     );
   }
 }

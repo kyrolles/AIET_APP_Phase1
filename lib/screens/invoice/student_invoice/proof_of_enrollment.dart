@@ -130,13 +130,13 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     filled: true,
                     fillColor: Colors.grey[50],
                     labelText: 'Enter Your Name',
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: kPrimaryColor, fontWeight: FontWeight.w500),
                     hintText: selectedLanguage == DocumentLanguage.arabic
                         ? 'يرجى الكتابة باللغة العربية'
                         : 'Please type in English',
                     hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                    prefixIcon: Icon(Icons.person, color: kPrimaryColor),
+                    prefixIcon: const Icon(Icons.person, color: kPrimaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -147,7 +147,8 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: kPrimaryColor, width: 2),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -173,13 +174,14 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     filled: true,
                     fillColor: Colors.grey[50],
                     labelText: "Enter the target organization",
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: kPrimaryColor, fontWeight: FontWeight.w500),
                     hintText: selectedLanguage == DocumentLanguage.arabic
                         ? 'يرجى الكتابة باللغة العربية'
                         : 'Please type in English',
                     hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                    prefixIcon: Icon(Icons.business, color: kPrimaryColor),
+                    prefixIcon:
+                        const Icon(Icons.business, color: kPrimaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -190,7 +192,8 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: kPrimaryColor, width: 2),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -219,9 +222,10 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     filled: true,
                     fillColor: Colors.grey[50],
                     labelText: 'Enter Your Address',
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: kPrimaryColor, fontWeight: FontWeight.w500),
-                    prefixIcon: Icon(Icons.location_on, color: kPrimaryColor),
+                    prefixIcon:
+                        const Icon(Icons.location_on, color: kPrimaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -232,7 +236,8 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: kPrimaryColor, width: 2),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -262,9 +267,9 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     filled: true,
                     fillColor: Colors.grey[50],
                     labelText: 'Enter Your Phone Number',
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: kPrimaryColor, fontWeight: FontWeight.w500),
-                    prefixIcon: Icon(Icons.phone, color: kPrimaryColor),
+                    prefixIcon: const Icon(Icons.phone, color: kPrimaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -275,7 +280,8 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: kPrimaryColor, width: 2),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -299,11 +305,11 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.verified, color: kPrimaryColor),
-                          const SizedBox(width: 8),
-                          const Text(
+                          SizedBox(width: 8),
+                          Text(
                             'Stamp Type',
                             style: TextStyle(
                               fontSize: 16,
@@ -341,11 +347,11 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.language, color: kPrimaryColor),
-                          const SizedBox(width: 8),
-                          const Text(
+                          SizedBox(width: 8),
+                          Text(
                             'Document Language',
                             style: TextStyle(
                               fontSize: 16,
