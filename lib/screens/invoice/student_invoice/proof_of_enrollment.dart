@@ -446,6 +446,7 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                             'phone_number': phoneNumber,
                             'document_language': languageValue,
                             'stamp_type': stampTypeValue,
+                            'department': snapshot.docs.first['department']
                           });
 
                           ScaffoldMessenger.of(context).showSnackBar(

@@ -85,6 +85,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       final String lastName = userData!['lastName'] ?? '';
       final String studentName = '$firstName$lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
+      final String department = userData!['department'] ?? '';
       // Validate required fields
       if (studentId.isEmpty) {
         throw 'Student ID not found';
@@ -114,6 +115,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         'phone_number': '',
         'stamp_type': '',
         'document_language': '',
+        'department': department,
       });
       Navigator.pop(context);
       _showCustomSnackBar('PDF uploaded successfully!');

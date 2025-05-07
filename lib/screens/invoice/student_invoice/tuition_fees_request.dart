@@ -190,6 +190,7 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
         'phone_number': '',
         'document_language': '',
         'stamp_type': '',
+        'department': snapshot.docs.first['department']
       });
 
       _showCustomSnackBar('Request sent successfully');

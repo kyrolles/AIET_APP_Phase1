@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Request {
+  final String department;
   final String addressedTo;
   final String comment;
   final String fileName;
@@ -20,6 +21,7 @@ class Request {
   final String stampType;
 
   Request({
+    required this.department,
     required this.stampType,
     required this.phoneNumber,
     required this.documentLanguage,
@@ -57,6 +59,7 @@ class Request {
 
     return Request(
       addressedTo: safeGet<String>('addressed_to') ?? '',
+      department: safeGet<String>('department') ?? '',
       comment: safeGet<String>('comment') ?? '',
       fileName: safeGet<String>('file_name') ?? '',
       pdfBase64: safeGet<String>('pdfBase64'),
