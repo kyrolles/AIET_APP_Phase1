@@ -3,8 +3,10 @@ import 'dart:async'; // Add for StreamController and StreamSubscription
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/simple_bloc_observer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:graduation_project/screens/announcement/all_announcement_appear_on_one_screen.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
@@ -109,6 +111,9 @@ Future<void> showLocalNotification({
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  //adding bloc observer to observe cubits
+  Bloc.observer = SimpleBlocObserver();
 
   // Initialize flutter_local_notifications
   await _initializeLocalNotifications();
