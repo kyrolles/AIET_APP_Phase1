@@ -129,38 +129,41 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       // For backward compatibility, also save as base64
       final bytes = await _selectedFile!.readAsBytes();
       final base64String = base64Encode(bytes);
-      
+
       // First, find the specific document using precise criteria
-      final QuerySnapshot requestQuerySnapshot = await FirebaseFirestore.instance
+      final QuerySnapshot requestQuerySnapshot = await FirebaseFirestore
+          .instance
           .collection('requests')
           .where('student_id', isEqualTo: studentId)
           .where('type', isEqualTo: 'Tuition Fees')
           .where('created_at', isEqualTo: widget.request.createdAt)
           .get();
-          
+
       if (requestQuerySnapshot.docs.isEmpty) {
         throw 'Request document not found';
       }
-      
+
       // Reference to the document to update
-      final DocumentReference requestDocRef = requestQuerySnapshot.docs[0].reference;
-      final Map<String, dynamic> requestData = requestQuerySnapshot.docs[0].data() as Map<String, dynamic>;
-      
+      final DocumentReference requestDocRef =
+          requestQuerySnapshot.docs[0].reference;
+      final Map<String, dynamic> requestData =
+          requestQuerySnapshot.docs[0].data() as Map<String, dynamic>;
+
       log('Found request document to update: ${requestDocRef.id}');
       log('Current status: ${requestData['status']}');
-      
+
       // Update non-status fields first
       await requestDocRef.update({
         'file_name': fileName,
         'pdfBase64': base64String,
         'file_storage_url': downloadUrl,
       });
-      
+
       // Then update status separately to trigger the cloud function properly
       await requestDocRef.update({
         'status': 'Done',
       });
-      
+
       log('Document updated with Done status');
 
       Navigator.pop(context);
@@ -248,9 +251,9 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              widget.request.stamp
+              widget.request.payInInstallments
                   ? Checkbox(
-                      value: widget.request.stamp,
+                      value: widget.request.payInInstallments,
                       onChanged: null, // Disable interaction
                     )
                   : const Padding(

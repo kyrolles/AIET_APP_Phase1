@@ -48,13 +48,13 @@ class FloorContainer extends StatelessWidget {
                   borderRadius:
                       BorderRadius.circular(10), //* Optional: Rounded corners
                 ),
-                child: Column(
+                child: const Column(
                   //* the content in the container
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //* the lectures part
                     Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
+                      padding: EdgeInsets.only(top: 4.0),
                       child: Center(
                         child: Text(
                           'Lec',

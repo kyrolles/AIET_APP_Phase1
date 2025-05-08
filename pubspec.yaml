@@ -40,6 +40,7 @@ dependencies:
   firebase_storage: ^12.3.7
   flutter:
     sdk: flutter
+  flutter_bloc: ^9.1.1
   flutter_local_notifications: ^19.1.0
   flutter_offline: ^4.0.0
   flutter_pdfview: ^1.4.0
@@ -63,16 +64,10 @@ dependencies:
   webview_flutter: ^4.4.2
 
 dev_dependencies:
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
+  flutter_launcher_icons: "^0.14.3"
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.14.3"
 
 flutter_launcher_icons:
   android: "launcher_icon"

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
 import '../components/my_app_bar.dart';
 import '../components/service_item.dart';
 import 'invoice/student_invoice/invoice_screen.dart';
@@ -155,7 +157,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return const ItInvoiceScreen();
+                return BlocProvider(
+                  create: (context) => GetRequestsCubit(),
+                  child: const ItInvoiceScreen(),
+                );
               },
             ),
           );

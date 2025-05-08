@@ -17,7 +17,7 @@ Future<void> updateDocument({
 }) async {
   try {
     log('Updating document: collectionPath=$collectionPath, criteria=$searchCriteria, newData=$newData');
-    
+
     //* Start with the collection reference
     Query query = FirebaseFirestore.instance.collection(collectionPath);
 
@@ -28,46 +28,45 @@ Future<void> updateDocument({
 
     //* Get the documents that match your criteria
     QuerySnapshot querySnapshot = await query.get();
-    
+
     if (querySnapshot.docs.isEmpty) {
       log('No documents found matching criteria');
       return;
     }
 
     log('Found ${querySnapshot.docs.length} documents to update');
-    
+
     // Get the document to update
     final docRef = querySnapshot.docs.first.reference;
     final docData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
-    
+
     if (docData == null) {
       log('Document data is null');
       return;
     }
-    
-    // For status changes from non-Done to Done, do a separate update 
+
+    // For status changes from non-Done to Done, do a separate update
     // to ensure the cloud function triggers properly
-    if (newData.containsKey('status') && 
-        newData['status'] == 'Done' && 
+    if (newData.containsKey('status') &&
+        newData['status'] == 'Done' &&
         docData['status'] != 'Done') {
-      
       log('Updating status to Done - this should trigger notification');
-      
+
       // First update everything except status
       Map<String, dynamic> nonStatusUpdates = Map.from(newData);
       nonStatusUpdates.remove('status');
-      
+
       if (nonStatusUpdates.isNotEmpty) {
         await docRef.update(nonStatusUpdates);
         log('Updated non-status fields');
       }
-      
+
       // Ensure the document contains the type field for the cloud function
       if (!docData.containsKey('type')) {
         await docRef.update({'type': 'Tuition Fees'});
         log('Added missing type field');
       }
-      
+
       // Then update status separately to ensure it triggers properly
       await docRef.update({'status': 'Done'});
       log('Updated status to Done');
@@ -106,9 +105,14 @@ class RequestContainer extends StatelessWidget {
             Row(
               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  request.studentName,
-                  style: kTextStyleNormal,
+                SizedBox(
+                  width: 200,
+                  child: Text(
+                    request.studentName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: kTextStyleNormal,
+                  ),
                 ),
                 const SizedBox(width: 5),
                 Container(
