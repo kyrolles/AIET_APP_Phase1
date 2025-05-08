@@ -6,7 +6,7 @@ class Request {
   final String comment;
   final String fileName;
   String? pdfBase64;
-  final bool stamp;
+  final bool payInInstallments;
   final String status;
   final String studentId;
   final String studentName;
@@ -30,7 +30,7 @@ class Request {
     required this.comment,
     required this.fileName,
     this.pdfBase64,
-    required this.stamp,
+    required this.payInInstallments,
     required this.status,
     required this.studentId,
     required this.studentName,
@@ -63,7 +63,7 @@ class Request {
       comment: safeGet<String>('comment') ?? '',
       fileName: safeGet<String>('file_name') ?? '',
       pdfBase64: safeGet<String>('pdfBase64'),
-      stamp: safeGet<bool>('pay_in_installments') ?? false,
+      payInInstallments: safeGet<bool>('pay_in_installments') ?? false,
       status: safeGet<String>('status') ?? 'No Status',
       studentId: safeGet<String>('student_id') ?? '',
       studentName: safeGet<String>('student_name') ?? '',

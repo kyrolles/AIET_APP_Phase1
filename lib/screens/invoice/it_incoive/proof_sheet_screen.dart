@@ -25,94 +25,112 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
     log('Student Name: ${request.studentName}');
     log('Addressed To: ${request.addressedTo}');
     log('Current Status: ${request.status}');
-    
+
     return SizedBox(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          spacing: 20,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'اثبات القيد',
+                    'Proof of enrollment',
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Color(0XFF6C7072)),
                   ),
                 ]),
-            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Wrap(
                 children: [
+                  const Text(
+                    'Name : ',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 18),
+                  ),
                   Text(
                     request.studentName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
                     textAlign: TextAlign.right,
                     style: const TextStyle(fontSize: 18),
-                  ),
-                  const Text(
-                    '   : الاسم',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontSize: 18),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Wrap(
                 children: [
+                  const Text(
+                    'Organization : ',
+                    style: TextStyle(fontSize: 18),
+                  ),
                   Text(
                     request.addressedTo,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
                     style: const TextStyle(fontSize: 18),
                   ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                children: [
                   const Text(
-                    '   : الجهة الموجه إليها',
+                    'Address : ',
                     style: TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    request.location,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Wrap(
                 children: [
-                  request.stamp
-                      ? Checkbox(
-                          value: request.stamp,
-                          onChanged: null, // Disable interaction
-                        )
-                      : const Icon(
-                          Icons
-                              .cancel_presentation_outlined, // Use a cross icon
-                          color: kGrey, // Customize the color
-                          size: 24, // Adjust the size
-                        ),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'هل تريد ختم النسر ؟',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        '(!ملحوظة: سيأخذ الكثير من الوقت)',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  )
+                  const Text(
+                    'Phone Number : ',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    request.phoneNumber,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    style: const TextStyle(fontSize: 18),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                children: [
+                  const Text(
+                    '(Institute/Ministry) : ',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    request.stampType,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
