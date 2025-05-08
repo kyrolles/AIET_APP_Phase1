@@ -28,6 +28,7 @@ class _FilterWidgetState extends State<FilterWidget> {
         DropdownButton<String>(
           hint: const Text('Type'),
           value: selectedType,
+          dropdownColor: Colors.white, // Set dropdown menu color to white
           items: ['All', 'Proof of enrollment', 'Tuition Fees'].map((type) {
             return DropdownMenuItem(value: type, child: Text(type));
           }).toList(),
@@ -45,6 +46,7 @@ class _FilterWidgetState extends State<FilterWidget> {
         DropdownButton<String>(
           hint: const Text('Department'),
           value: selectedDepartment,
+          dropdownColor: Colors.white, // Set dropdown menu color to white
           items: ['All', 'CE', 'EME', 'ECE', 'IE'].map((department) {
             return DropdownMenuItem(value: department, child: Text(department));
           }).toList(),
@@ -62,6 +64,7 @@ class _FilterWidgetState extends State<FilterWidget> {
         DropdownButton<String>(
           hint: const Text('Year'),
           value: selectedYear,
+          dropdownColor: Colors.white, // Set dropdown menu color to white
           items: ['All', 'GN', '1st', '2nd', '3rd', '4th'].map((year) {
             return DropdownMenuItem(value: year, child: Text(year));
           }).toList(),
