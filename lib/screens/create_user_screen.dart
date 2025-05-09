@@ -277,7 +277,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Department',
+                          'Program',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w400),
                         ),
@@ -306,7 +306,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Department is required';
+                              return 'Program is required';
                             }
                             return null;
                           },

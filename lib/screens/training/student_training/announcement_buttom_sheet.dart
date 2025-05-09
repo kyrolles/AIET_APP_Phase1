@@ -15,7 +15,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.only(bottom: 16.0),
             child: Text(
-              'Department',
+              'Programs',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -62,7 +62,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildDepartmentButton({
     required BuildContext context,
     required String text,
@@ -74,7 +74,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
     return KButton(
       onPressed: () {
         Navigator.pushNamed(
-          context, 
+          context,
           '/departmentTraining',
           arguments: department,
         );

@@ -83,7 +83,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       final String studentId = userData!['id'] ?? '';
       final String firstName = userData!['firstName'] ?? '';
       final String lastName = userData!['lastName'] ?? '';
-      final String studentName = '$firstName$lastName'.trim();
+      final String studentName = '$firstName $lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
       final String department = userData!['department'] ?? '';
       // Validate required fields
