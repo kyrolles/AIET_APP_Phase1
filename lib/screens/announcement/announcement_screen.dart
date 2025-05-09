@@ -288,7 +288,7 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
               ),
               MultiSelectWidget(
                 options: const ['CE', 'ECE', 'EME', 'IE'],
-                title: 'Select Departments',
+                title: 'Select Programs',
                 onSelectionChanged: (selectedDepartments) {
                   setState(() {
                     _selectedDepartments = selectedDepartments;
