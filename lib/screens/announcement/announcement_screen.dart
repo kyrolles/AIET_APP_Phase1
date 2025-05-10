@@ -5,7 +5,6 @@ import 'dart:ui'; // For ImageFilter
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
 import 'package:graduation_project/components/kbutton.dart';
-import 'package:graduation_project/components/multiselect_widget.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/controllers/announcement_controller.dart'; // Import controller
 import 'package:graduation_project/screens/announcement/share_olnly_bottomsheet.dart';
@@ -26,6 +25,7 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
     with TickerProviderStateMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final FocusNode _descriptionFocusNode = FocusNode();
 
   List<String> _selectedYears = [];
   List<String> _selectedDepartments = [];
@@ -50,7 +50,8 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _blurController.dispose(); // Dispose animation controller
+    _blurController.dispose();
+    _descriptionFocusNode.dispose(); // Make sure to dispose the focus node
     super.dispose();
   }
 
@@ -129,6 +130,7 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                 )
               : IconButton(
                   icon: const Icon(Icons.send),
+                  color: kBlue,
                   // Call controller's post method
                   onPressed: () {
                     // Ensure keyboard is dismissed
@@ -152,62 +154,110 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
       body: ReusableOffline(
         // Keep ReusableOffline wrapper if needed
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.only(bottom: 20), // Add padding for scroll ends
           child: Column(
             children: [
               // Title input field (unchanged structure)
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                    16.0, 16.0, 16.0, 8.0), // Adjust padding
+                    16.0, 16, 16.0, 0), // Adjust padding
                 child: TextField(
                   controller: _titleController,
                   enabled: !state.isLoading, // Disable when loading
                   textDirection: _isArabic(_titleController.text)
                       ? TextDirection.rtl
                       : TextDirection.ltr,
+                  style: const TextStyle(
+                    fontSize: 20,
+                  ),
                   onChanged: (value) {
                     setState(() {}); // Keep for text direction updates
                   },
                   decoration: InputDecoration(
-                    labelText: 'Title', // Use labelText
+                    labelText: '  Title', // Use labelText
+                    labelStyle: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w400,
+                        color: kGrey),
                     hintText: 'Enter announcement title',
+                    hintStyle: const TextStyle(
+                      fontSize: 18,
+                      color: kGrey,
+                    ),
                     hintTextDirection: _isArabic(_titleController.text)
                         ? TextDirection.rtl
                         : TextDirection.ltr,
-                    border: const OutlineInputBorder(),
                     filled: true, // Add fill color for better visuals
                     fillColor:
                         Theme.of(context).inputDecorationTheme.fillColor ??
-                            Colors.grey.shade100,
+                            Colors.white,
+                    border: InputBorder.none, // Remove border
                   ),
                 ),
               ),
-              // Description input field (unchanged structure)
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: TextField(
-                  controller: _descriptionController,
-                  enabled: !state.isLoading, // Disable when loading
-                  maxLines: 5,
-                  textDirection: _isArabic(_descriptionController.text)
-                      ? TextDirection.rtl
-                      : TextDirection.ltr,
-                  onChanged: (value) {
-                    setState(() {}); // Keep for text direction updates
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Description', // Use labelText
-                    hintText: 'Write your announcement here...',
-                    hintTextDirection: _isArabic(_descriptionController.text)
-                        ? TextDirection.rtl
-                        : TextDirection.ltr,
-                    border: const OutlineInputBorder(),
-                    filled: true, // Add fill color
-                    fillColor:
-                        Theme.of(context).inputDecorationTheme.fillColor ??
-                            Colors.grey.shade100,
+              // Description input field with tap-to-focus capability
+              GestureDetector(
+                onTap: () {
+                  // Request focus when tapping anywhere in this area
+                  _descriptionFocusNode.requestFocus();
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(left: 16.0, right: 16, bottom: 8.0),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: 200,
+                      maxHeight: MediaQuery.of(context).size.height * 0.3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).inputDecorationTheme.fillColor ??
+                          Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: TextField(
+                        controller: _descriptionController,
+                        focusNode:
+                            _descriptionFocusNode, // Add this line to connect the focus node
+                        enabled: !state.isLoading,
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        textDirection: _isArabic(_descriptionController.text)
+                            ? TextDirection.rtl
+                            : TextDirection.ltr,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Description',
+                          alignLabelWithHint: true,
+                          hintText: 'Write your announcement here...',
+                          hintStyle: const TextStyle(
+                            fontSize: 18,
+                            color: kGrey,
+                          ),
+                          hintTextDirection:
+                              _isArabic(_descriptionController.text)
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
+                          border: InputBorder.none,
+                          labelStyle:
+                              const TextStyle(fontSize: 20, color: kGrey),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: const EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                        ),
+                        scrollPhysics: const NeverScrollableScrollPhysics(),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -244,94 +294,89 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                             : () => _viewPdf(context, state.pdfFile!),
                         icon: Icons.picture_as_pdf,
                       ),
-                    // Row of buttons
-                    Row(
-                      children: [
-                        // Add Image button
-                        Expanded(
-                          flex: 1,
-                          child: OutlinedButton(
-                            onPressed: state.isLoading
-                                ? null
-                                : () => controller.pickImage(),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.all(12),
-                              shape: const CircleBorder(),
-                            ),
-                            child: Icon(
-                              state.image == null
-                                  ? Icons.image_outlined
-                                  : Icons.edit,
-                              size: 30, // Bigger icon
-                              color: kBlue,
-                            ),
-                          ),
-                        ),
-
-                        // Add/Change PDF button - Icon only
-                        Expanded(
-                          flex: 1,
-                          child: OutlinedButton(
-                            onPressed: state.isLoading
-                                ? null
-                                : () => controller.pickPDF(),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.all(12),
-                              shape: const CircleBorder(),
-                            ),
-                            child: Icon(
-                              state.pdfFile == null
-                                  ? Icons.attach_file
-                                  : Icons.edit,
-                              size: 30, // Bigger icon
-                              color: kBlue,
-                            ),
-                          ),
-                        ),
-
-                        // Share Only To button - Icon only
-                        Expanded(
-                          flex: 2,
-                          child: KButton(
-                            text: 'Share Only To',
-                            fontSize: 16,
-                            borderColor: kBlue,
-                            textColor: kBlue,
-                            backgroundColor: Colors.white,
-                            borderWidth: 1,
-                            height: 45, // Match height with other buttons
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor:
-                                    const Color.fromRGBO(250, 250, 250, 1),
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(16)),
-                                ),
-                                builder: (context) => SharingOptionsBottomSheet(
-                                  initialSelectedYears: _selectedYears,
-                                  initialSelectedDepartments:
-                                      _selectedDepartments,
-                                  onApply: (years, departments) {
-                                    setState(() {
-                                      _selectedYears = years;
-                                      _selectedDepartments = departments;
-                                    });
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+      bottomSheet: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              // Add Image button
+              Expanded(
+                flex: 1,
+                child: OutlinedButton(
+                  onPressed:
+                      state.isLoading ? null : () => controller.pickImage(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(12),
+                    shape: const CircleBorder(),
+                  ),
+                  child: Icon(
+                    state.image == null ? Icons.image_outlined : Icons.edit,
+                    size: 30, // Bigger icon
+                    color: kBlue,
+                  ),
+                ),
+              ),
 
-              const SizedBox(height: 20), // Add some spacing at the bottom
+              // Add/Change PDF button - Icon only
+              Expanded(
+                flex: 1,
+                child: OutlinedButton(
+                  onPressed:
+                      state.isLoading ? null : () => controller.pickPDF(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(12),
+                    shape: const CircleBorder(),
+                  ),
+                  child: Icon(
+                    state.pdfFile == null ? Icons.attach_file : Icons.edit,
+                    size: 30, // Bigger icon
+                    color: kBlue,
+                  ),
+                ),
+              ),
+
+              // Share Only To button - Icon only
+              Expanded(
+                flex: 2,
+                child: KButton(
+                  text: 'Share Only To',
+                  fontSize: 16,
+                  borderColor: kBlue,
+                  textColor: kBlue,
+                  backgroundColor: Colors.white,
+                  borderWidth: 1,
+                  height: 45, // Match height with other buttons
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      builder: (context) => SharingOptionsBottomSheet(
+                        initialSelectedYears: _selectedYears,
+                        initialSelectedDepartments: _selectedDepartments,
+                        onApply: (years, departments) {
+                          setState(() {
+                            _selectedYears = years;
+                            _selectedDepartments = departments;
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
