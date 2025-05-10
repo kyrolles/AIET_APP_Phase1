@@ -99,7 +99,7 @@ class AnnouncementController extends StateNotifier<AnnouncementState> {
         postSuccess: false,
         clearError: true);
 
-    if (years.contains('General') && departments.isNotEmpty) {
+    if (years.contains('GN') && departments.isNotEmpty) {
       state = state.copyWith(
           isLoading: false,
           errorMessage: 'You cannot select a department with General.');
