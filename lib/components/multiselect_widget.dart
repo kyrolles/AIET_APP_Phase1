@@ -4,6 +4,7 @@ class MultiSelectWidget extends StatefulWidget {
   final List<String> options;
   final String title;
   final Function(List<String>) onSelectionChanged;
+  final List<String> initialSelection;
   final Color selectedColor;
   final Color unselectedColor;
   final Color borderColor;
@@ -13,9 +14,11 @@ class MultiSelectWidget extends StatefulWidget {
     required this.options,
     required this.title,
     required this.onSelectionChanged,
-    this.selectedColor = Colors.blue, // Default selected color
-    this.unselectedColor = Colors.grey, // Default unselected color
-    this.borderColor = Colors.black, // Default border color
+    this.initialSelection =
+        const [], // Add initialSelection parameter with empty default
+    this.selectedColor = Colors.blue,
+    this.unselectedColor = Colors.grey,
+    this.borderColor = Colors.black,
   });
 
   @override
@@ -23,7 +26,25 @@ class MultiSelectWidget extends StatefulWidget {
 }
 
 class _MultiSelectWidgetState extends State<MultiSelectWidget> {
-  final List<String> _selectedOptions = [];
+  late List<String> _selectedOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize selected options with the provided initialSelection
+    _selectedOptions = List.from(widget.initialSelection);
+  }
+
+  @override
+  void didUpdateWidget(MultiSelectWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update selected options if initialSelection changes from outside
+    if (widget.initialSelection != oldWidget.initialSelection) {
+      setState(() {
+        _selectedOptions = List.from(widget.initialSelection);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +69,16 @@ class _MultiSelectWidgetState extends State<MultiSelectWidget> {
                 label: Text(
                   option,
                   style: TextStyle(
-                    color: isSelected ? Colors.black : Colors.black87,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
+                      color: isSelected ? Colors.black : Colors.black87,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 18),
                 ),
                 selected: isSelected,
                 showCheckmark: false, // Remove checkmark
                 selectedColor: widget.selectedColor,
-                backgroundColor:
-                    Colors.grey[200], // Light grey background when not selected
+                backgroundColor: Colors
+                    .blueGrey[100], // Light grey background when not selected
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                   side: BorderSide(

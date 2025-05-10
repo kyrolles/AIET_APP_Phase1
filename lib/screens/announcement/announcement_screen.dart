@@ -4,8 +4,11 @@ import 'dart:ui'; // For ImageFilter
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
+import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/multiselect_widget.dart';
+import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/controllers/announcement_controller.dart'; // Import controller
+import 'package:graduation_project/screens/announcement/share_olnly_bottomsheet.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart'; // Add PDFView dependency
 import '../../components/my_app_bar.dart';
@@ -208,15 +211,14 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                   ),
                 ),
               ),
-              // File Attachment Section
+              // File Attachment Previews Section
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment
-                      .stretch, // Make buttons take full width
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Image Section
+                    // Image Preview (if selected)
                     if (state.image != null)
                       _buildAttachmentPreview(
                         context: context,
@@ -228,26 +230,8 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                             ? null
                             : () => _viewImage(context, state.image!),
                         icon: Icons.image,
-                      )
-                    else
-                      OutlinedButton.icon(
-                        // Use OutlinedButton for visual consistency
-                        onPressed: state.isLoading
-                            ? null
-                            : () => controller.pickImage(),
-                        icon: const Icon(Icons.image_outlined),
-                        label: const Text('Add Image'),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(
-                              double.infinity, 45), // Consistent height
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12), // Adjust padding
-                        ),
                       ),
-
-                    const SizedBox(height: 10),
-
-                    // PDF Section
+                    // PDF Preview (if selected)
                     if (state.pdfFile != null)
                       _buildAttachmentPreview(
                         context: context,
@@ -259,41 +243,92 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                             ? null
                             : () => _viewPdf(context, state.pdfFile!),
                         icon: Icons.picture_as_pdf,
-                      )
-                    else
-                      OutlinedButton.icon(
-                        // Use OutlinedButton
-                        onPressed:
-                            state.isLoading ? null : () => controller.pickPDF(),
-                        icon: const Icon(Icons.attach_file),
-                        label: const Text('Add PDF'),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(
-                              double.infinity, 45), // Consistent height
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12), // Adjust padding
-                        ),
                       ),
+                    // Row of buttons
+                    Row(
+                      children: [
+                        // Add Image button
+                        Expanded(
+                          flex: 1,
+                          child: OutlinedButton(
+                            onPressed: state.isLoading
+                                ? null
+                                : () => controller.pickImage(),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.all(12),
+                              shape: const CircleBorder(),
+                            ),
+                            child: Icon(
+                              state.image == null
+                                  ? Icons.image_outlined
+                                  : Icons.edit,
+                              size: 30, // Bigger icon
+                              color: kBlue,
+                            ),
+                          ),
+                        ),
+
+                        // Add/Change PDF button - Icon only
+                        Expanded(
+                          flex: 1,
+                          child: OutlinedButton(
+                            onPressed: state.isLoading
+                                ? null
+                                : () => controller.pickPDF(),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.all(12),
+                              shape: const CircleBorder(),
+                            ),
+                            child: Icon(
+                              state.pdfFile == null
+                                  ? Icons.attach_file
+                                  : Icons.edit,
+                              size: 30, // Bigger icon
+                              color: kBlue,
+                            ),
+                          ),
+                        ),
+
+                        // Share Only To button - Icon only
+                        Expanded(
+                          flex: 2,
+                          child: KButton(
+                            text: 'Share Only To',
+                            fontSize: 16,
+                            borderColor: kBlue,
+                            textColor: kBlue,
+                            backgroundColor: Colors.white,
+                            borderWidth: 1,
+                            height: 45, // Match height with other buttons
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor:
+                                    const Color.fromRGBO(250, 250, 250, 1),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16)),
+                                ),
+                                builder: (context) => SharingOptionsBottomSheet(
+                                  initialSelectedYears: _selectedYears,
+                                  initialSelectedDepartments:
+                                      _selectedDepartments,
+                                  onApply: (years, departments) {
+                                    setState(() {
+                                      _selectedYears = years;
+                                      _selectedDepartments = departments;
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ),
-              MultiSelectWidget(
-                options: const ['General', '1st', '2nd', '3rd', '4th'],
-                title: 'Select Years',
-                onSelectionChanged: (selectedYears) {
-                  setState(() {
-                    _selectedYears = selectedYears;
-                  });
-                },
-              ),
-              MultiSelectWidget(
-                options: const ['CE', 'ECE', 'EME', 'IE'],
-                title: 'Select Programs',
-                onSelectionChanged: (selectedDepartments) {
-                  setState(() {
-                    _selectedDepartments = selectedDepartments;
-                  });
-                },
               ),
 
               const SizedBox(height: 20), // Add some spacing at the bottom
@@ -313,23 +348,114 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
     required IconData icon,
   }) {
     final String fileName = file.path.split(Platform.pathSeparator).last;
-    return Card(
-      elevation: 2, // Add slight elevation
-      margin: const EdgeInsets.symmetric(vertical: 6.0),
-      child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
-        title: Text(fileName,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 14)),
-        onTap: onTap,
-        trailing: IconButton(
-          icon: const Icon(Icons.close,
-              size: 20, color: Colors.redAccent), // Smaller, colored close icon
-          onPressed: onRemove,
-          tooltip: 'Remove',
-          splashRadius: 20, // Smaller splash radius
+    final bool isImage = icon == Icons.image;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kBlue.withOpacity(0.3), width: 1),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                // File Type Visualization
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: isImage
+                        ? kPrimaryColor.withOpacity(0.1)
+                        : kBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: isImage && file.existsSync()
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            file,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              icon,
+                              size: 30,
+                              color: isImage ? kPrimaryColor : kBlue,
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          icon,
+                          size: 30,
+                          color: isImage ? kPrimaryColor : kBlue,
+                        ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // File Information
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        fileName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isImage
+                            ? 'Image file - Tap to view'
+                            : 'PDF document - Tap to open',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Remove Button
+                if (onRemove != null)
+                  Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(50),
+                    child: InkWell(
+                      onTap: onRemove,
+                      borderRadius: BorderRadius.circular(50),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.close,
+                          size: 24,
+                          color: Colors.red[400],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
-        dense: true, // Make tile more compact
       ),
     );
   }
