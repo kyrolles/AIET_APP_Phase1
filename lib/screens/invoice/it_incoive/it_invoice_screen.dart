@@ -27,7 +27,7 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: MyAppBar(
-          title: 'Invoice',
+          title: 'Student Affairs',
           onpressed: () {
             Navigator.pop(context);
           },

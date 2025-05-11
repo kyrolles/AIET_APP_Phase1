@@ -24,7 +24,7 @@ class InvoiceScreen extends StatefulWidget {
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
-      .collection('requests')
+      .collection('student_affairs_requests')
       .orderBy('created_at', descending: true)
       .snapshots();
 
@@ -66,7 +66,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Invoice',
+        title: 'Student Affairs',
         onpressed: () => Navigator.pop(context),
       ),
       body: StreamBuilder<QuerySnapshot>(

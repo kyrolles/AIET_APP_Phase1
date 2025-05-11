@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project/constants.dart';
 import 'dart:developer';
 import '../../../components/rpd_button.dart';
 import '../../../models/request_model.dart';
@@ -44,93 +43,14 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
                         color: Color(0XFF6C7072)),
                   ),
                 ]),
-            SizedBox(
-              width: double.infinity,
-              child: Wrap(
-                children: [
-                  const Text(
-                    'Name : ',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    request.studentName,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: Wrap(
-                children: [
-                  const Text(
-                    'Organization : ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    request.addressedTo,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: Wrap(
-                children: [
-                  const Text(
-                    'Address : ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    request.location,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: Wrap(
-                children: [
-                  const Text(
-                    'Phone Number : ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    request.phoneNumber,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: Wrap(
-                children: [
-                  const Text(
-                    '(Institute/Ministry) : ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    request.stampType,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
+            TextAndDataWidget(text: 'Name : ', data: request.studentName),
+            TextAndDataWidget(
+                text: 'Organization : ', data: request.addressedTo),
+            TextAndDataWidget(text: 'Address : ', data: request.location),
+            TextAndDataWidget(
+                text: 'Phone Number : ', data: request.phoneNumber),
+            TextAndDataWidget(
+                text: '(Institute/Ministry) : ', data: request.stampType),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -164,6 +84,38 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class TextAndDataWidget extends StatelessWidget {
+  const TextAndDataWidget({
+    super.key,
+    required this.text,
+    required this.data,
+  });
+
+  final String text;
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        children: [
+          Text(
+            text,
+            style: const TextStyle(fontSize: 18),
+          ),
+          Text(
+            data,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 3,
+            style: const TextStyle(fontSize: 18),
+          ),
+        ],
       ),
     );
   }

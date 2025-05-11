@@ -16,14 +16,14 @@ class GetRequestsCubit extends Cubit<GetRequestsState> {
     emit(GetRequestsLoading());
 
     try {
-      Query query = firestore.collection('requests');
+      Query query = firestore.collection('student_affairs_requests');
 
       if (type != null) {
         //if there is type, get requests of that type
         query = query.where('type', isEqualTo: type);
       } else {
         //if there is no type, get all requests except training
-        query = query.where('type', isNotEqualTo: 'Training');
+        // query = query.where('type', isNotEqualTo: 'Training');
       }
 
       if (department != null) {

@@ -16,7 +16,7 @@ class ItArchiveScreen extends StatefulWidget {
 
 class _ItArchiveScreenState extends State<ItArchiveScreen> {
   final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
-      .collection('requests')
+      .collection('student_affairs_requests')
       .orderBy('created_at', descending: true)
       .snapshots();
 
@@ -25,7 +25,7 @@ class _ItArchiveScreenState extends State<ItArchiveScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Invoice Archive',
+        title: 'Stuent Affairs Archive',
         onpressed: () {
           Navigator.pop(context);
         },

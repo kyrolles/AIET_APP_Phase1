@@ -11,8 +11,6 @@ import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/services/storage_service.dart';
 import 'package:path/path.dart' as path;
 
-import 'it_invoice_request_contanier.dart';
-
 class TuitionFeesSheet extends StatefulWidget {
   const TuitionFeesSheet({
     super.key,
@@ -133,7 +131,7 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       // First, find the specific document using precise criteria
       final QuerySnapshot requestQuerySnapshot = await FirebaseFirestore
           .instance
-          .collection('requests')
+          .collection('student_affairs_requests')
           .where('student_id', isEqualTo: studentId)
           .where('type', isEqualTo: 'Tuition Fees')
           .where('created_at', isEqualTo: widget.request.createdAt)

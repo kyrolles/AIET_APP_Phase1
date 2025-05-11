@@ -428,7 +428,7 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                           }
 
                           await FirebaseFirestore.instance
-                              .collection('requests')
+                              .collection('student_affairs_requests')
                               .add({
                             'addressed_to': addressedTo,
                             'comment': '',

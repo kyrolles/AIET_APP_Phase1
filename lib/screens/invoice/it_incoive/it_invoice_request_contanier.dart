@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import 'proof_sheet_screen.dart';
@@ -204,7 +206,7 @@ class RequestContainer extends StatelessWidget {
             log('Setting proof of enrollment request status to Done');
             // Use the updateDocument function for consistency
             await updateDocument(
-              collectionPath: 'requests',
+              collectionPath: 'student_affairs_requests',
               searchCriteria: {
                 'student_id': request.studentId,
                 'addressed_to': request.addressedTo,
@@ -215,14 +217,15 @@ class RequestContainer extends StatelessWidget {
               },
             );
             log('Successfully updated proof of enrollment status to Done');
+            BlocProvider.of<GetRequestsCubit>(context).getRequests();
           } catch (e) {
             log('Error updating status: $e');
           }
           Navigator.pop(context);
         },
-        rejectedFunctionality: () {
-          updateDocument(
-            collectionPath: 'requests',
+        rejectedFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
             searchCriteria: {
               'student_id': request.studentId,
               'addressed_to': request.addressedTo,
@@ -231,11 +234,12 @@ class RequestContainer extends StatelessWidget {
               'status': 'Rejected',
             },
           );
+          BlocProvider.of<GetRequestsCubit>(context).getRequests();
           Navigator.pop(context);
         },
-        pendingFunctionality: () {
-          updateDocument(
-            collectionPath: 'requests',
+        pendingFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
             searchCriteria: {
               'student_id': request.studentId,
               'addressed_to': request.addressedTo,
@@ -244,6 +248,7 @@ class RequestContainer extends StatelessWidget {
               'status': 'Pending',
             },
           );
+          BlocProvider.of<GetRequestsCubit>(context).getRequests();
           Navigator.pop(context);
         },
       ),
@@ -263,7 +268,7 @@ class RequestContainer extends StatelessWidget {
           try {
             log('Setting tuition fees request status to Done');
             await updateDocument(
-              collectionPath: 'requests',
+              collectionPath: 'student_affairs_requests',
               searchCriteria: {
                 'student_id': request.studentId,
                 'type': 'Tuition Fees',
