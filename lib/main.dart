@@ -36,6 +36,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/services/training_notification_service.dart';
+import 'package:graduation_project/services/auth_service.dart';
 
 // Initialize FlutterLocalNotificationsPlugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -220,14 +221,14 @@ void main() async {
     // We'll handle this in the MyApp widget to ensure navigation is possible
   }
 
-  // Check if the user is already logged in
-  const storage = FlutterSecureStorage();
-  String? token = await storage.read(key: 'token');
+  // Check if the user is already logged in using AuthService
+  final authService = AuthService();
+  bool isLoggedIn = await authService.isLoggedIn();
 
   runApp(
     ProviderScope(
       child: MyApp(
-        isLoggedIn: token != null,
+        isLoggedIn: isLoggedIn,
         initialMessage: initialMessage,
       ),
     ),
@@ -536,7 +537,7 @@ class _MyAppState extends State<MyApp> {
               }
             });
           }
-          return const HomeScreen();
+          return widget.isLoggedIn ? const HomeScreen() : const LoginScreen();
         },
       ),
       routes: {
