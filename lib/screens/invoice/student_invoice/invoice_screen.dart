@@ -190,7 +190,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   ServiceItem proofOfEnrollmentButton(BuildContext context) {
     return ServiceItem(
       title: 'Proof of enrollment',
-      imageUrl: 'assets/images/paragraph.png',
+      imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
       backgroundColor: const Color.fromRGBO(241, 196, 15, 1),
       onPressed: () {
         OfflineAwareBottomSheet.show(
