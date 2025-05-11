@@ -380,6 +380,9 @@ Future<void> _setupFCM() async {
           if (kDebugMode) {
             print('FCM token also saved to user_tokens collection');
           }
+          
+          // Subscribe user to specific topics based on department and year
+          await _subscribeToAnnouncementTopics(userData);
         } else {
           if (kDebugMode) {
             print('No user document found for email: ${currentUser.email}');
@@ -430,6 +433,9 @@ Future<void> _setupFCM() async {
                 print(
                     'FCM token updated in user document and user_tokens collection');
               }
+              
+              // Resubscribe user to topics on token refresh
+              _subscribeToAnnouncementTopics(userData);
             }
           });
         } catch (e) {
@@ -461,6 +467,53 @@ Future<void> _setupFCM() async {
   } catch (e) {
     if (kDebugMode) {
       print('Error setting up FCM: $e');
+    }
+  }
+}
+
+// Function to subscribe user to appropriate announcement topics based on their department and year
+Future<void> _subscribeToAnnouncementTopics(Map<String, dynamic> userData) async {
+  try {
+    // Extract department and year from user data
+    final String? department = userData['department'];
+    final String? year = userData['year'];
+    final List<String> topicsToSubscribe = [];
+    
+    // Subscribe to global announcements (already done in _setupFCM)
+    // topicsToSubscribe.add('announcements');
+    
+    // Subscribe to department-specific topic if available
+    if (department != null && department.isNotEmpty) {
+      final String deptTopic = 'announcement_${department.replaceAll(' ', '_')}';
+      topicsToSubscribe.add(deptTopic);
+      
+      // If year is available, also subscribe to department+year combination
+      if (year != null && year.isNotEmpty) {
+        final String deptYearTopic = 'announcement_${department.replaceAll(' ', '_')}_${year.replaceAll(' ', '_')}';
+        topicsToSubscribe.add(deptYearTopic);
+      }
+    }
+    
+    // Subscribe to year-specific topic if available
+    if (year != null && year.isNotEmpty) {
+      final String yearTopic = 'announcement_${year.replaceAll(' ', '_')}';
+      topicsToSubscribe.add(yearTopic);
+    }
+    
+    // Subscribe to all relevant topics
+    for (final topic in topicsToSubscribe) {
+      await FirebaseMessaging.instance.subscribeToTopic(topic);
+      if (kDebugMode) {
+        print('Subscribed to topic: $topic');
+      }
+    }
+    
+    if (kDebugMode) {
+      print('User subscribed to ${topicsToSubscribe.length} announcement topics');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error subscribing to announcement topics: $e');
     }
   }
 }
