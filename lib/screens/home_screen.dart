@@ -129,6 +129,7 @@ class HomeScreenState extends State<HomeScreen> {
                     builder: (context) => AllAnnouncementAppearOnOneScreen(
                       userYear: userYear,
                       userDepartment: userDepartment,
+                      userRole: userRule, // Pass the user role here
                     ),
                   ),
                 );
@@ -141,6 +142,7 @@ class HomeScreenState extends State<HomeScreen> {
               showOnlyLast: true,
               year: userYear,
               department: userDepartment,
+              userRole: userRule, // Pass the user role here
             ),
           ),
           // Schedule Section
