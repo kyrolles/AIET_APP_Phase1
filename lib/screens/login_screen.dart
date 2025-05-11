@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
 
   bool _isPasswordVisible = false;
   bool _hasError = false;
@@ -31,14 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _performLogin() async {
     if (_validateInputs()) {
       try {
-        UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
+        await _authService.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
-
-        // Save the user's token securely
-        await storage.write(key: 'token', value: userCredential.user?.uid);
 
         // Navigate to home screen
         Navigator.pushReplacement(

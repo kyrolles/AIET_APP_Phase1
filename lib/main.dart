@@ -36,6 +36,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/services/training_notification_service.dart';
+import 'package:graduation_project/services/auth_service.dart';
 
 // Initialize FlutterLocalNotificationsPlugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -220,14 +221,14 @@ void main() async {
     // We'll handle this in the MyApp widget to ensure navigation is possible
   }
 
-  // Check if the user is already logged in
-  const storage = FlutterSecureStorage();
-  String? token = await storage.read(key: 'token');
+  // Check if the user is already logged in using AuthService
+  final authService = AuthService();
+  bool isLoggedIn = await authService.isLoggedIn();
 
   runApp(
     ProviderScope(
       child: MyApp(
-        isLoggedIn: token != null,
+        isLoggedIn: isLoggedIn,
         initialMessage: initialMessage,
       ),
     ),
@@ -379,6 +380,9 @@ Future<void> _setupFCM() async {
           if (kDebugMode) {
             print('FCM token also saved to user_tokens collection');
           }
+          
+          // Subscribe user to specific topics based on department and year
+          await _subscribeToAnnouncementTopics(userData);
         } else {
           if (kDebugMode) {
             print('No user document found for email: ${currentUser.email}');
@@ -429,6 +433,9 @@ Future<void> _setupFCM() async {
                 print(
                     'FCM token updated in user document and user_tokens collection');
               }
+              
+              // Resubscribe user to topics on token refresh
+              _subscribeToAnnouncementTopics(userData);
             }
           });
         } catch (e) {
@@ -460,6 +467,53 @@ Future<void> _setupFCM() async {
   } catch (e) {
     if (kDebugMode) {
       print('Error setting up FCM: $e');
+    }
+  }
+}
+
+// Function to subscribe user to appropriate announcement topics based on their department and year
+Future<void> _subscribeToAnnouncementTopics(Map<String, dynamic> userData) async {
+  try {
+    // Extract department and year from user data
+    final String? department = userData['department'];
+    final String? year = userData['year'];
+    final List<String> topicsToSubscribe = [];
+    
+    // Subscribe to global announcements (already done in _setupFCM)
+    // topicsToSubscribe.add('announcements');
+    
+    // Subscribe to department-specific topic if available
+    if (department != null && department.isNotEmpty) {
+      final String deptTopic = 'announcement_${department.replaceAll(' ', '_')}';
+      topicsToSubscribe.add(deptTopic);
+      
+      // If year is available, also subscribe to department+year combination
+      if (year != null && year.isNotEmpty) {
+        final String deptYearTopic = 'announcement_${department.replaceAll(' ', '_')}_${year.replaceAll(' ', '_')}';
+        topicsToSubscribe.add(deptYearTopic);
+      }
+    }
+    
+    // Subscribe to year-specific topic if available
+    if (year != null && year.isNotEmpty) {
+      final String yearTopic = 'announcement_${year.replaceAll(' ', '_')}';
+      topicsToSubscribe.add(yearTopic);
+    }
+    
+    // Subscribe to all relevant topics
+    for (final topic in topicsToSubscribe) {
+      await FirebaseMessaging.instance.subscribeToTopic(topic);
+      if (kDebugMode) {
+        print('Subscribed to topic: $topic');
+      }
+    }
+    
+    if (kDebugMode) {
+      print('User subscribed to ${topicsToSubscribe.length} announcement topics');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error subscribing to announcement topics: $e');
     }
   }
 }
@@ -536,7 +590,7 @@ class _MyAppState extends State<MyApp> {
               }
             });
           }
-          return const HomeScreen();
+          return widget.isLoggedIn ? const HomeScreen() : const LoginScreen();
         },
       ),
       routes: {

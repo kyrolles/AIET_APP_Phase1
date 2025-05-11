@@ -14,14 +14,23 @@ exports.sendAnnouncementNotification = functions.firestore
       const announcementData = snapshot.data();
       const authorName = announcementData.author;
       const title = announcementData.title;
+      const targetAudience = announcementData.targetAudience || [];
+      const isGlobal = announcementData.isGlobal || false;
 
       if (!authorName || !title) {
         console.error('Missing required fields for notification');
         return null;
       }
 
-      // Create a notification message
-      const message = {
+      console.log('--------- ANNOUNCEMENT NOTIFICATION FUNCTION TRIGGERED ---------');
+      console.log('Announcement ID:', context.params.announcementId);
+      console.log('Title:', title);
+      console.log('Author:', authorName);
+      console.log('Target Audience:', targetAudience);
+      console.log('Is Global:', isGlobal);
+
+      // Create a notification message with basic information
+      const baseMessage = {
         notification: {
           title: 'New Announcement',
           body: `${authorName} has published a new announcement with the title ${title}`
@@ -32,13 +41,49 @@ exports.sendAnnouncementNotification = functions.firestore
             color: '#000000'
           }
         },
-        topic: 'announcements', // Send to all devices subscribed to the 'announcements' topic
+        data: {
+          type: 'announcement',
+          announcement_id: context.params.announcementId,
+          click_action: 'FLUTTER_NOTIFICATION_CLICK'
+        }
       };
 
-      // Send the message
-      const response = await admin.messaging().send(message);
-      console.log('Successfully sent notification:', response);
-      return { success: true, messageId: response };
+      const sendPromises = [];
+
+      // If it's a global announcement, send to everyone subscribed to 'announcements' topic
+      if (isGlobal) {
+        console.log('Sending global announcement notification');
+        const globalMessage = {
+          ...baseMessage,
+          topic: 'announcements'
+        };
+        sendPromises.push(admin.messaging().send(globalMessage));
+      }
+
+      // For each target audience (department or year or combination), send to specific topic
+      if (targetAudience && targetAudience.length > 0) {
+        console.log('Sending targeted notifications to:', targetAudience);
+        
+        for (const audience of targetAudience) {
+          // Create a valid FCM topic name (alphanumeric and underscores only)
+          const topicName = `announcement_${audience.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+          
+          console.log('Sending to topic:', topicName);
+          
+          const targetedMessage = {
+            ...baseMessage,
+            topic: topicName
+          };
+          
+          // Send targeted notification
+          sendPromises.push(admin.messaging().send(targetedMessage));
+        }
+      }
+
+      // Wait for all notifications to be sent
+      const responses = await Promise.all(sendPromises);
+      console.log('Successfully sent notifications:', responses);
+      return { success: true, messageIds: responses };
     } catch (error) {
       console.error('Error sending notification:', error);
       return { error: error.message };
