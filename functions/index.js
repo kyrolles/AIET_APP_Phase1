@@ -313,6 +313,13 @@ exports.sendTrainingNotification = functions.firestore
       const userData = userDoc.data();
       console.log('User data found:', JSON.stringify(userData));
       
+      // Debug user identifiers
+      console.log('User identifiers check:', {
+        id: userData.id,
+        uid: userData.uid,
+        user_uid: userData.user_uid
+      });
+
       const fcmToken = userData.fcm_token;
       
       if (!fcmToken) {
@@ -332,10 +339,9 @@ exports.sendTrainingNotification = functions.firestore
         body = 'Your training request was not approved. Please check the details or contact administration.';
       }
       
-      // Add data to track notification in database
-      await admin.firestore().collection('notifications').add({
+      // Add data to track notification in database - with proper field validation
+      const notificationData = {
         user_id: studentId,
-        user_uid: userData.uid || userData.user_uid,
         title: title,
         body: body,
         type: 'training',
@@ -343,7 +349,15 @@ exports.sendTrainingNotification = functions.firestore
         request_id: context.params.requestId,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         read: false
-      });
+      };
+      
+      // Only add user_uid field if we have a valid value
+      const userUid = userData.uid || userData.user_uid || userData.id;
+      if (userUid) {
+        notificationData.user_uid = userUid;
+      }
+      
+      await admin.firestore().collection('notifications').add(notificationData);
       
       // Create and send notification with rich data
       const message = {
