@@ -82,7 +82,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 // Safely get fields using utility
                 String docStudentId =
                     SafeDocumentSnapshot.getField(doc, 'student_id', '');
-                String docType = SafeDocumentSnapshot.getField(doc, 'type', '');
 
                 if (docStudentId == studentId) {
                   try {
