@@ -3,6 +3,7 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/it_archive.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
 import '../../../components/my_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,7 +75,14 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                 height: 62,
                 svgPath: 'assets/project_image/Pin.svg',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/it_invoice/archive');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const ItArchiveScreen();
+                      },
+                    ),
+                  );
                 },
               ),
             ),
@@ -85,7 +93,10 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
   List<Widget> showRequestsList(List<Request> requests) {
     List<Widget> listOfRequests = [];
     for (var i = 0; i < requests.length; i++) {
-      listOfRequests.add(RequestContainer(request: requests[i]));
+      if (requests[i].status == 'No Status' ||
+          requests[i].status == 'Pending') {
+        listOfRequests.add(RequestContainer(request: requests[i]));
+      }
     }
     return listOfRequests;
   }

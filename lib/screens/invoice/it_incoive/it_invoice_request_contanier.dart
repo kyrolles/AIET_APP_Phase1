@@ -196,6 +196,10 @@ class RequestContainer extends StatelessWidget {
   }
 
   Future<void> showModalBottomSheetForProofOfEnrollment(BuildContext context) {
+    // Get navigator reference while the widget is still active
+    final NavigatorState? navigator =
+        Navigator.of(context, rootNavigator: false);
+
     return OfflineAwareBottomSheet.show(
       backgroundColor: const Color(0XFFF1F1F2),
       context: context,
@@ -217,11 +221,13 @@ class RequestContainer extends StatelessWidget {
               },
             );
             log('Successfully updated proof of enrollment status to Done');
-            BlocProvider.of<GetRequestsCubit>(context).getRequests();
+            // BlocProvider.of<GetRequestsCubit>(context).getRequests();
           } catch (e) {
             log('Error updating status: $e');
           }
-          Navigator.pop(context);
+          if (navigator != null && navigator.mounted) {
+            navigator.pop();
+          }
         },
         rejectedFunctionality: () async {
           await updateDocument(
@@ -234,8 +240,10 @@ class RequestContainer extends StatelessWidget {
               'status': 'Rejected',
             },
           );
-          BlocProvider.of<GetRequestsCubit>(context).getRequests();
-          Navigator.pop(context);
+          // BlocProvider.of<GetRequestsCubit>(context).getRequests();
+          if (navigator != null && navigator.mounted) {
+            navigator.pop();
+          }
         },
         pendingFunctionality: () async {
           await updateDocument(
@@ -248,8 +256,10 @@ class RequestContainer extends StatelessWidget {
               'status': 'Pending',
             },
           );
-          BlocProvider.of<GetRequestsCubit>(context).getRequests();
-          Navigator.pop(context);
+          // BlocProvider.of<GetRequestsCubit>(context).getRequests();
+          if (navigator != null && navigator.mounted) {
+            navigator.pop();
+          }
         },
       ),
     );
