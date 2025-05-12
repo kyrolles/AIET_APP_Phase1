@@ -14,6 +14,8 @@ import '../../../components/my_app_bar.dart';
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
 import 'proof_of_enrollment.dart';
 import 'tuition_fees_request.dart';
+import 'grades_report_request.dart';
+import 'curriculum_content_request.dart';
 
 class InvoiceScreen extends StatefulWidget {
   const InvoiceScreen({super.key});
@@ -117,6 +119,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 ),
                 tuitionFeesButton(context, requestsList),
                 proofOfEnrollmentButton(context),
+                gradesReportButton(context),
+                curriculumContentButton(context),
               ],
             );
           }),
@@ -213,6 +217,36 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         OfflineAwareBottomSheet.show(
           context: context,
           onlineContent: TuitionFeesPreview(requestsList: requestsList),
+        );
+      },
+    );
+  }
+
+  ServiceItem gradesReportButton(BuildContext context) {
+    return ServiceItem(
+      title: 'Grades Report',
+      imageUrl: 'assets/images/image 29 (2).png', // Update with correct image
+      backgroundColor: const Color.fromRGBO(46, 204, 113, 1),
+      onPressed: () {
+        OfflineAwareBottomSheet.show(
+          isScrollControlled: true,
+          context: context,
+          onlineContent: const GradesReportRequest(),
+        );
+      },
+    );
+  }
+
+  ServiceItem curriculumContentButton(BuildContext context) {
+    return ServiceItem(
+      title: 'Curriculum Content',
+      imageUrl: 'assets/images/image 29 (2).png', // Update with correct image
+      backgroundColor: const Color.fromRGBO(155, 89, 182, 1),
+      onPressed: () {
+        OfflineAwareBottomSheet.show(
+          isScrollControlled: true,
+          context: context,
+          onlineContent: const CurriculumContentRequest(),
         );
       },
     );

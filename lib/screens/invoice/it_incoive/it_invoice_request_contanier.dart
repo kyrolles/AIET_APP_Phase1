@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
+import 'curriculum_content_sheet_screen.dart';
+import 'grades_report_sheet_screen.dart';
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
 
@@ -94,9 +96,20 @@ class RequestContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        request.type == 'Tuition Fees'
-            ? showModalBottomSheetForTuitionFees(context)
-            : showModalBottomSheetForProofOfEnrollment(context);
+        switch (request.type) {
+          case 'Tuition Fees':
+            showModalBottomSheetForTuitionFees(context);
+            break;
+          case 'Proof of enrollment':
+            showModalBottomSheetForProofOfEnrollment(context);
+            break;
+          case 'Grades Report':
+            showModalBottomSheetForGradesReport(context);
+            break;
+          case 'Curriculum Content':
+            showModalBottomSheetForCurriculumContent(context);
+            break;
+        }
       },
       child: Container(
         margin: const EdgeInsets.all(8.0),
@@ -285,6 +298,142 @@ class RequestContainer extends StatelessWidget {
         request: request,
         doneFunctionality: () {
           onStatusChanged(); // This will trigger the UI refresh
+        },
+      ),
+    );
+  }
+
+  Future<void> showModalBottomSheetForGradesReport(BuildContext context) {
+    final NavigatorState navigator =
+        Navigator.of(context, rootNavigator: false);
+
+    return OfflineAwareBottomSheet.show(
+      backgroundColor: const Color(0XFFF1F1F2),
+      context: context,
+      onlineContent: GradesReportSheetScreen(
+        request: request,
+        doneFunctionality: () async {
+          try {
+            await updateDocument(
+              collectionPath: 'student_affairs_requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+                'type': 'Grades Report',
+              },
+              newData: {
+                'status': 'Done',
+              },
+            );
+            onStatusChanged();
+          } catch (e) {
+            log('Error updating status: $e');
+          }
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        rejectedFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Grades Report',
+            },
+            newData: {
+              'status': 'Rejected',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        pendingFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Grades Report',
+            },
+            newData: {
+              'status': 'Pending',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> showModalBottomSheetForCurriculumContent(BuildContext context) {
+    final NavigatorState navigator =
+        Navigator.of(context, rootNavigator: false);
+
+    return OfflineAwareBottomSheet.show(
+      backgroundColor: const Color(0XFFF1F1F2),
+      context: context,
+      onlineContent: CurriculumContentSheetScreen(
+        request: request,
+        doneFunctionality: () async {
+          try {
+            await updateDocument(
+              collectionPath: 'student_affairs_requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+                'type': 'Curriculum Content',
+              },
+              newData: {
+                'status': 'Done',
+              },
+            );
+            onStatusChanged();
+          } catch (e) {
+            log('Error updating status: $e');
+          }
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        rejectedFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Curriculum Content',
+            },
+            newData: {
+              'status': 'Rejected',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        pendingFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Curriculum Content',
+            },
+            newData: {
+              'status': 'Pending',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
         },
       ),
     );

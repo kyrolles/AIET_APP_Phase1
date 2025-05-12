@@ -39,7 +39,12 @@ class GetRequestsCubit extends Cubit<GetRequestsState> {
       final querySnapshot = await query.get();
       final requests = querySnapshot.docs
           .map((doc) => Request.fromJson(doc))
-          .where((request) => statusList.contains(request.status))
+          .where((request) =>
+              statusList.contains(request.status) &&
+              (request.type == 'Proof of enrollment' ||
+                  request.type == 'Grades Report' ||
+                  request.type == 'Curriculum Content' ||
+                  request.type == 'Tuition Fees'))
           .toList();
 
       emit(GetRequestsLoaded(requests));
