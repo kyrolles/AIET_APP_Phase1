@@ -11,39 +11,37 @@ class GetRequestsCubit extends Cubit<GetRequestsState> {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future<void> getRequests(
-      {String? year, String? department, String? type}) async {
+  Future<void> getRequests({
+    String? year,
+    String? department,
+    String? type,
+    required List<String> statusList,
+  }) async {
     emit(GetRequestsLoading());
 
     try {
-      Query query = firestore.collection('student_affairs_requests');
+      Query query = firestore
+          .collection('student_affairs_requests')
+          .orderBy('created_at', descending: true);
 
       if (type != null) {
-        //if there is type, get requests of that type
         query = query.where('type', isEqualTo: type);
-      } else {
-        //if there is no type, get all requests except training
-        // query = query.where('type', isNotEqualTo: 'Training');
       }
 
       if (department != null) {
-        //if there is department, get requests of that department
         query = query.where('department', isEqualTo: department);
       }
 
       if (year != null) {
-        //if there is year, get requests of that year
         query = query.where('year', isEqualTo: year);
       }
-      //getting the documents
-      final querySnapshot = await query.get();
 
-      //transfrom each document to request
+      final querySnapshot = await query.get();
       final requests = querySnapshot.docs
-          .map((request) => Request.fromJson(request))
+          .map((doc) => Request.fromJson(doc))
+          .where((request) => statusList.contains(request.status))
           .toList();
 
-      //emiting the requests loaded state with the requests
       emit(GetRequestsLoaded(requests));
     } catch (e) {
       emit(GetRequestsError(e.toString()));

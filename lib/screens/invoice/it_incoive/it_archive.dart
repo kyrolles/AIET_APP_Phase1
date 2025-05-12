@@ -1,72 +1,56 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
-import 'package:graduation_project/models/request_model.dart';
-import 'package:graduation_project/utils/safe_json_extractor.dart';
-import 'dart:developer';
 import '../../../components/my_app_bar.dart';
+import 'get_requests_cubit/get_requests_cubit.dart';
 
-class ItArchiveScreen extends StatefulWidget {
+class ItArchiveScreen extends StatelessWidget {
   const ItArchiveScreen({super.key});
 
-  @override
-  State<ItArchiveScreen> createState() => _ItArchiveScreenState();
-}
-
-class _ItArchiveScreenState extends State<ItArchiveScreen> {
-  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
-      .collection('student_affairs_requests')
-      .orderBy('created_at', descending: true)
-      .snapshots();
-
-  List<Request> requestsList = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Stuent Affairs Archive',
+        title: 'Student Affairs Archive',
         onpressed: () {
           Navigator.pop(context);
         },
       ),
-      body: StreamBuilder<QuerySnapshot>(
-          stream: _requestsStream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              requestsList = [];
-              for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                DocumentSnapshot doc = snapshot.data!.docs[i];
-
-                // Safely get fields using utility
-                String docType = SafeDocumentSnapshot.getField(doc, 'type', '');
-                String docStatus =
-                    SafeDocumentSnapshot.getField(doc, 'status', '');
-
-                if ((docType == 'Proof of enrollment' ||
-                        docType == 'Tuition Fees') &&
-                    (docStatus == 'Done' || docStatus == 'Rejected')) {
-                  try {
-                    requestsList.add(Request.fromJson(doc));
-                  } catch (e) {
-                    log('Error parsing request: $e');
-                  }
-                }
-              }
+      body: BlocProvider(
+        create: (context) =>
+            GetRequestsCubit()..getRequests(statusList: ['Done', 'Rejected']),
+        child: BlocBuilder<GetRequestsCubit, GetRequestsState>(
+          builder: (context, state) {
+            if (state is GetRequestsLoading) {
+              return const Center(child: CircularProgressIndicator());
             }
-            return ListContainer(
-              title: 'Requests',
-              listOfWidgets: archiveRequestsList(),
-            );
-          }),
-    );
-  }
 
-  List<RequestContainer> archiveRequestsList() {
-    List<RequestContainer> archiveRequests = [];
-    for (var i = 0; i < requestsList.length; i++) {
-      archiveRequests.add(RequestContainer(request: requestsList[i]));
-    }
-    return archiveRequests;
+            if (state is GetRequestsError) {
+              return Center(child: Text('Error: ${state.message}'));
+            }
+
+            if (state is GetRequestsLoaded) {
+              return ListContainer(
+                title: 'Requests',
+                listOfWidgets: state.requests
+                    .map((request) => RequestContainer(
+                          request: request,
+                          onStatusChanged: () {
+                            // Refresh the requests list
+                            context
+                                .read<GetRequestsCubit>()
+                                .getRequests(statusList: ['Done', 'Rejected']);
+                          },
+                        ))
+                    .toList(),
+              );
+            }
+
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
   }
 }

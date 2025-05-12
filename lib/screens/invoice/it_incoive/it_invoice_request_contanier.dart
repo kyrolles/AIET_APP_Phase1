@@ -2,9 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graduation_project/models/request_model.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import 'proof_sheet_screen.dart';
@@ -83,8 +81,14 @@ Future<void> updateDocument({
 }
 
 class RequestContainer extends StatelessWidget {
-  const RequestContainer({super.key, required this.request});
+  const RequestContainer({
+    super.key,
+    required this.request,
+    required this.onStatusChanged, // Add this line
+  });
+
   final Request request;
+  final VoidCallback onStatusChanged; // Add this line
 
   @override
   Widget build(BuildContext context) {
@@ -220,6 +224,7 @@ class RequestContainer extends StatelessWidget {
                 'status': 'Done',
               },
             );
+            onStatusChanged(); // Add this line
             log('Successfully updated proof of enrollment status to Done');
             // BlocProvider.of<GetRequestsCubit>(context).getRequests();
           } catch (e) {
@@ -240,6 +245,7 @@ class RequestContainer extends StatelessWidget {
               'status': 'Rejected',
             },
           );
+          onStatusChanged(); // Add this line
           // BlocProvider.of<GetRequestsCubit>(context).getRequests();
           if (navigator != null && navigator.mounted) {
             navigator.pop();
@@ -256,6 +262,7 @@ class RequestContainer extends StatelessWidget {
               'status': 'Pending',
             },
           );
+          onStatusChanged(); // Add this line
           // BlocProvider.of<GetRequestsCubit>(context).getRequests();
           if (navigator != null && navigator.mounted) {
             navigator.pop();
@@ -287,6 +294,7 @@ class RequestContainer extends StatelessWidget {
                 'status': 'Done',
               },
             );
+            onStatusChanged(); // Add this line
             log('Successfully updated tuition fees status to Done');
           } catch (e) {
             log('Error updating tuition fees status: $e');

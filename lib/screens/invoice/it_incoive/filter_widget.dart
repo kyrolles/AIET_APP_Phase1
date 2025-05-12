@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
 class FilterWidget extends StatefulWidget {
-  final Function(String? dapertment, String? year, String? type)
+  final Function(String? department, String? year, String? type)
       onFilterChanged;
+  final List<String> statusList; // Add this
 
-  const FilterWidget({super.key, required this.onFilterChanged});
+  const FilterWidget({
+    super.key,
+    required this.onFilterChanged,
+    required this.statusList, // Add this
+  });
 
   @override
   State<FilterWidget> createState() => _FilterWidgetState();
@@ -17,6 +22,14 @@ class _FilterWidgetState extends State<FilterWidget> {
 
   String? filterValue(String? value) {
     return value == 'All' ? null : value;
+  }
+
+  void applyFilters() {
+    widget.onFilterChanged(
+      filterValue(selectedDepartment),
+      filterValue(selectedYear),
+      filterValue(selectedType),
+    );
   }
 
   @override
@@ -36,11 +49,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             setState(() {
               selectedType = value;
             });
-            widget.onFilterChanged(
-              filterValue(selectedDepartment),
-              filterValue(selectedYear),
-              filterValue(selectedType),
-            );
+            applyFilters();
           },
         ),
         DropdownButton<String>(
@@ -54,11 +63,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             setState(() {
               selectedDepartment = value;
             });
-            widget.onFilterChanged(
-              filterValue(selectedDepartment),
-              filterValue(selectedYear),
-              filterValue(selectedType),
-            );
+            applyFilters();
           },
         ),
         DropdownButton<String>(
@@ -72,11 +77,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             setState(() {
               selectedYear = value;
             });
-            widget.onFilterChanged(
-              filterValue(selectedDepartment),
-              filterValue(selectedYear),
-              filterValue(selectedType),
-            );
+            applyFilters();
           },
         ),
         const Spacer(),
