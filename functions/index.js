@@ -341,6 +341,17 @@ exports.sendInvoiceNotification = functions.firestore
               await userDoc.ref.update({
                 fcm_token: admin.firestore.FieldValue.delete()
               });
+              
+              // Add to failed notifications collection for tracking and analysis
+              await admin.firestore().collection('failed_notifications').add({
+                user_id: studentId,
+                error_code: fcmError.code,
+                error_message: fcmError.message,
+                token: fcmToken,
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                request_type: requestType,
+                request_id: context.params.requestId
+              });
             } catch (removeTokenError) {
               console.error('Error removing invalid token:', removeTokenError);
             }

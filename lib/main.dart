@@ -36,6 +36,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:graduation_project/services/training_notification_service.dart';
+import 'package:graduation_project/services/notification_service.dart';
 import 'package:graduation_project/services/auth_service.dart';
 
 // Initialize FlutterLocalNotificationsPlugin
@@ -121,6 +122,10 @@ void main() async {
 
   // Set the background messaging handler early on, as a named top-level function
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize the notification service for robust FCM token management
+  final notificationService = NotificationService();
+  await notificationService.initialize();
 
   // Request notification permission with more detailed settings and logging
   try {
