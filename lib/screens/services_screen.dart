@@ -134,7 +134,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
       ServiceItem(
-        title: 'Invoices',
+        title: 'Student Affairs',
         imageUrl: 'assets/project_image/invoice.png',
         backgroundColor: const Color(0xFF8AC9FE),
         onPressed: () {
@@ -149,7 +149,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         },
       ),
       ServiceItem(
-        title: 'IT-Invoices',
+        title: 'Staff Student Affairs',
         imageUrl: 'assets/project_image/invoice.png',
         backgroundColor: const Color(0xFF8AC9FE),
         onPressed: () {
@@ -254,7 +254,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         children: [
           const SizedBox(height: 18),
           ...serviceItems
-              .where((item) => item.title != 'IT-Invoices' || isStaff)
+              .where((item) => item.title != 'Staff Student Affairs' || isStaff)
               .map((item) => ServiceItem(
                     title: item.title,
                     imageUrl: item.imageUrl,

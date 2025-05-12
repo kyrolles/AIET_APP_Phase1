@@ -95,7 +95,7 @@ exports.sendAnnouncementNotification = functions.firestore
  * and sends a notification to the student when their invoice request is approved
  */
 exports.sendInvoiceNotification = functions.firestore
-  .document('requests/{requestId}')
+  .document('student_affairs_requests/{requestId}')
   .onUpdate(async (change, context) => {
     try {
       const beforeData = change.before.data();
@@ -222,7 +222,7 @@ exports.sendInvoiceNotification = functions.firestore
  * and sends a notification to the student with the appropriate message
  */
 exports.sendTrainingNotification = functions.firestore
-  .document('requests/{requestId}')
+  .document('student_affairs_requests/{requestId}')
   .onUpdate(async (change, context) => {
     try {
       const beforeData = change.before.data();
