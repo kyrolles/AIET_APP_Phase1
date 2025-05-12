@@ -43,7 +43,7 @@ class GetRequestsCubit extends Cubit<GetRequestsState> {
               statusList.contains(request.status) &&
               (request.type == 'Proof of enrollment' ||
                   request.type == 'Grades Report' ||
-                  request.type == 'Curriculum Content' ||
+                  request.type == 'Academic Content' ||
                   request.type == 'Tuition Fees'))
           .toList();
 
