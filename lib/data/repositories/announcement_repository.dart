@@ -78,6 +78,11 @@ class AnnouncementRepository {
         targetAudience.add('global');
       }
 
+      // Clean up targetAudience to make valid FCM topics
+      targetAudience = targetAudience.map((audience) => 
+        audience.replaceAll(' ', '_')
+      ).toList();
+
       // Add global flag if both lists are empty
       final bool isGlobal = data.departments.isEmpty && data.years.isEmpty;
 

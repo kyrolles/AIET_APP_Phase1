@@ -7,6 +7,7 @@ class AnnouncementList extends StatefulWidget {
   final bool showOnlyLast; // New parameter to control display mode
   final String year;
   final String department;
+  final String userRole; // Added parameter
 
   const AnnouncementList({
     super.key,
@@ -14,6 +15,7 @@ class AnnouncementList extends StatefulWidget {
     this.showOnlyLast = false, // Default to showing all announcements
     required this.year,
     required this.department,
+    required this.userRole, // Added
   });
 
   @override
@@ -25,33 +27,39 @@ class _AnnouncementListState extends State<AnnouncementList> {
   Widget build(BuildContext context) {
     Query query = FirebaseFirestore.instance.collection('announcements');
 
-    if (widget.department.isNotEmpty && widget.year.isNotEmpty) {
-      // Both department and year are provided
-      // We need to show announcements that:
-      // 1. Match the specific department_year combination, OR
-      // 2. Match just the department, OR
-      // 3. Match just the year, OR
-      // 4. Are global announcements
-      final String compositeKey = '${widget.department}_${widget.year}';
-
-      query = query.where(Filter.or(
-          Filter('targetAudience', arrayContains: compositeKey),
-          Filter('targetAudience', arrayContains: widget.department),
-          Filter('targetAudience', arrayContains: widget.year),
-          Filter('isGlobal', isEqualTo: true)));
-    } else if (widget.department.isNotEmpty) {
-      // Only department is provided
-      query = query.where(Filter.or(
-          Filter('targetAudience', arrayContains: widget.department),
-          Filter('isGlobal', isEqualTo: true)));
-    } else if (widget.year.isNotEmpty) {
-      // Only year is provided
-      query = query.where(Filter.or(
-          Filter('targetAudience', arrayContains: widget.year),
-          Filter('isGlobal', isEqualTo: true)));
+    // If user is Admin or IT, skip the targeting filters
+    if (widget.userRole == 'Admin' || widget.userRole == 'IT') {
+      // No targeting filters for Admin or IT
     } else {
-      // Neither is provided, show global announcements only
-      query = query.where('isGlobal', isEqualTo: true);
+      // Normal filtering logic for other users
+      if (widget.department.isNotEmpty && widget.year.isNotEmpty) {
+        // Both department and year are provided
+        // We need to show announcements that:
+        // 1. Match the specific department_year combination, OR
+        // 2. Match just the department, OR
+        // 3. Match just the year, OR
+        // 4. Are global announcements
+        final String compositeKey = '${widget.department}_${widget.year}';
+
+        query = query.where(Filter.or(
+            Filter('targetAudience', arrayContains: compositeKey),
+            Filter('targetAudience', arrayContains: widget.department),
+            Filter('targetAudience', arrayContains: widget.year),
+            Filter('isGlobal', isEqualTo: true)));
+      } else if (widget.department.isNotEmpty) {
+        // Only department is provided
+        query = query.where(Filter.or(
+            Filter('targetAudience', arrayContains: widget.department),
+            Filter('isGlobal', isEqualTo: true)));
+      } else if (widget.year.isNotEmpty) {
+        // Only year is provided
+        query = query.where(Filter.or(
+            Filter('targetAudience', arrayContains: widget.year),
+            Filter('isGlobal', isEqualTo: true)));
+      } else {
+        // Neither is provided, show global announcements only
+        query = query.where('isGlobal', isEqualTo: true);
+      }
     }
 
     return StreamBuilder(
