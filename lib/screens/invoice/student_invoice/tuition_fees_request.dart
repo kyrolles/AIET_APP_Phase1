@@ -170,7 +170,9 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
       // await _storageService.createStudentFolder(currentUser.uid);
 
       // Add request to Firestore
-      await FirebaseFirestore.instance.collection('requests').add({
+      await FirebaseFirestore.instance
+          .collection('student_affairs_requests')
+          .add({
         'addressed_to': '',
         'comment': '',
         'file_name': '',

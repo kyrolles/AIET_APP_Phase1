@@ -1,23 +1,24 @@
-import 'package:flutter/material.dart';
 import 'dart:developer';
+
+import 'package:flutter/material.dart';
 import '../../../components/rpd_button.dart';
 import '../../../models/request_model.dart';
 import 'textAndDataWidget.dart';
 
-class ProofOfEnrollmentSheetScreen extends StatelessWidget {
-  const ProofOfEnrollmentSheetScreen(
-      {super.key,
-      required this.doneFunctionality,
-      required this.rejectedFunctionality,
-      required this.pendingFunctionality,
-      required this.request});
+class CurriculumContentSheetScreen extends StatelessWidget {
+  const CurriculumContentSheetScreen({
+    super.key,
+    required this.doneFunctionality,
+    required this.rejectedFunctionality,
+    required this.pendingFunctionality,
+    required this.request,
+  });
 
   final Function() doneFunctionality;
   final Function() rejectedFunctionality;
   final Function() pendingFunctionality;
   final Request request;
 
-  @override
   Widget build(BuildContext context) {
     // Log the initial state for debugging
     log('ProofOfEnrollmentSheetScreen opened for request:');
@@ -37,7 +38,7 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'Proof of enrollment',
+                    'Academic Content',
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,

@@ -95,7 +95,7 @@ exports.sendAnnouncementNotification = functions.firestore
  * and sends a notification to the student when their invoice request is approved
  */
 exports.sendInvoiceNotification = functions.firestore
-  .document('requests/{requestId}')
+  .document('student_affairs_requests/{requestId}')
   .onUpdate(async (change, context) => {
     try {
       const beforeData = change.before.data();
@@ -110,14 +110,22 @@ exports.sendInvoiceNotification = functions.firestore
       console.log('After status:', afterData.status);
       console.log('Document type:', afterData.type);
       
-      // Check if this is a request related to invoices
+      // Check if this is a request related to invoices or other student affairs documents
       if (!afterData.type) {
         console.log('Type field is missing in the document');
         return null;
       }
       
-      if (afterData.type !== 'Proof of enrollment' && afterData.type !== 'Tuition Fees') {
-        console.log('Not an invoice document - type:', afterData.type);
+      // Add the new types to the list of valid document types
+      const validDocumentTypes = [
+        'Proof of enrollment', 
+        'Tuition Fees',
+        'Grades Report',
+        'Academic Content'
+      ];
+      
+      if (!validDocumentTypes.includes(afterData.type)) {
+        console.log('Not a supported document type:', afterData.type);
         return null;
       }
       
@@ -132,50 +140,143 @@ exports.sendInvoiceNotification = functions.firestore
         
         const studentId = afterData.student_id;
         const requestType = afterData.type;
+        const studentName = afterData.student_name || '';
         
         console.log('Student ID:', studentId);
+        console.log('Student Name:', studentName);
         console.log('Request type:', requestType);
         
-        // Get the student's FCM token from the users collection
-        const usersSnapshot = await admin.firestore()
-          .collection('users')
-          .where('id', '==', studentId)
-          .get();
+        // Create notification content
+        const title = 'Request Approved';
+        const body = `Your ${requestType} request has been approved and is ready.`;
         
-        console.log('User documents found:', usersSnapshot.size);
+        // Store notification in Firestore even before attempting to send
+        const notificationData = {
+          user_id: studentId,
+          title: title,
+          body: body,
+          type: 'invoice',
+          request_type: requestType,
+          request_id: context.params.requestId,
+          created_at: admin.firestore.FieldValue.serverTimestamp(),
+          read: false
+        };
         
-        if (usersSnapshot.empty) {
-          console.log('No user found with ID:', studentId);
-          
-          // Try searching by email as fallback
-          if (afterData.email) {
-            console.log('Trying to find user by email:', afterData.email);
-            const userByEmailSnapshot = await admin.firestore()
-              .collection('users')
-              .where('email', '==', afterData.email)
-              .get();
-              
-            if (userByEmailSnapshot.empty) {
-              console.log('No user found with email either:', afterData.email);
-              return null;
-            }
-            
-            const user = userByEmailSnapshot.docs[0].data();
-            console.log('User found by email:', user.id || user.email);
-          } else {
-            return null;
-          }
+        // Add the notification to Firestore
+        try {
+          await admin.firestore().collection('notifications').add(notificationData);
+          console.log('Notification stored in database for user:', studentId);
+        } catch (storeError) {
+          console.error('Error storing notification in database:', storeError);
         }
         
-        const user = usersSnapshot.docs[0].data();
-        console.log('User data:', JSON.stringify(user));
+        // Get the student's FCM token from the users collection
+        let userDoc = null;
+        let fcmToken = null;
         
-        const fcmToken = user.fcm_token;
+        try {
+          console.log('Searching for user with ID:', studentId);
+          
+          // Try finding user by id field
+          const usersSnapshot = await admin.firestore()
+            .collection('users')
+            .where('id', '==', studentId)
+            .get();
+          
+          console.log('User documents found by ID:', usersSnapshot.size);
+          
+          if (!usersSnapshot.empty) {
+            userDoc = usersSnapshot.docs[0];
+            const userData = userDoc.data();
+            fcmToken = userData.fcm_token;
+            console.log('Found user by ID with FCM token:', fcmToken ? 'Yes' : 'No');
+          } else {
+            // Try searching by uid field
+            console.log('No user found with ID field, trying uid field...');
+            const usersByUidSnapshot = await admin.firestore()
+              .collection('users')
+              .where('uid', '==', studentId)
+              .get();
+              
+            if (!usersByUidSnapshot.empty) {
+              userDoc = usersByUidSnapshot.docs[0];
+              const userData = userDoc.data();
+              fcmToken = userData.fcm_token;
+              console.log('Found user by uid with FCM token:', fcmToken ? 'Yes' : 'No');
+            } else if (afterData.email) {
+              // Try searching by email as fallback
+              console.log('Trying to find user by email if available');
+              const userByEmailSnapshot = await admin.firestore()
+                .collection('users')
+                .where('email', '==', afterData.email)
+                .get();
+                
+              if (!userByEmailSnapshot.empty) {
+                userDoc = userByEmailSnapshot.docs[0];
+                const userData = userDoc.data();
+                fcmToken = userData.fcm_token;
+                console.log('Found user by email with FCM token:', fcmToken ? 'Yes' : 'No');
+              }
+            }
+          }
+          
+          // Check for token in alternative fields if not found
+          if (userDoc && !fcmToken) {
+            const userData = userDoc.data();
+            fcmToken = userData.fcmToken || userData.token;
+            console.log('Checked alternative token fields:', fcmToken ? 'Found token' : 'No token');
+          }
+          
+          // Still no token? Check if there's a devices collection
+          if (!fcmToken) {
+            console.log('No FCM token found in user document, checking devices collection...');
+            try {
+              const userId = userDoc ? userDoc.id : studentId;
+              const devicesSnapshot = await admin.firestore()
+                .collection('devices')
+                .where('userId', '==', userId)
+                .orderBy('lastActive', 'desc')
+                .limit(1)
+                .get();
+              
+              if (!devicesSnapshot.empty) {
+                const deviceData = devicesSnapshot.docs[0].data();
+                fcmToken = deviceData.token;
+                console.log('Found token in devices collection:', fcmToken ? 'Yes' : 'No');
+              }
+            } catch (err) {
+              console.log('Error checking devices collection:', err);
+            }
+          }
+        } catch (userLookupError) {
+          console.error('Error during user lookup:', userLookupError);
+        }
         
-        // If no FCM token, exit
+        // If no FCM token, log and return
         if (!fcmToken) {
-          console.log('No FCM token found for user:', studentId);
-          return null;
+          console.log('No valid FCM token found for user:', studentId);
+          
+          // Update the notification to indicate delivery failure
+          try {
+            const notificationsSnapshot = await admin.firestore()
+              .collection('notifications')
+              .where('user_id', '==', studentId)
+              .where('request_id', '==', context.params.requestId)
+              .orderBy('created_at', 'desc')
+              .limit(1)
+              .get();
+            
+            if (!notificationsSnapshot.empty) {
+              await notificationsSnapshot.docs[0].ref.update({
+                delivery_failed: true,
+                delivery_error: 'No FCM token found'
+              });
+            }
+          } catch (updateError) {
+            console.error('Error updating notification with delivery status:', updateError);
+          }
+          
+          return { success: false, error: 'No FCM token available for user' };
         }
         
         console.log('Found FCM token:', fcmToken);
@@ -183,8 +284,8 @@ exports.sendInvoiceNotification = functions.firestore
         // Create a notification message
         const message = {
           notification: {
-            title: 'Request Approved',
-            body: `Your ${requestType} request has been approved and is ready.`
+            title: title,
+            body: body
           },
           android: {
             notification: {
@@ -195,24 +296,95 @@ exports.sendInvoiceNotification = functions.firestore
           data: {
             type: 'invoice',
             request_type: requestType,
-            click_action: 'FLUTTER_NOTIFICATION_CLICK'
+            request_id: context.params.requestId,
+            click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            timestamp: Date.now().toString()
           },
           token: fcmToken
         };
         
         console.log('Sending notification:', JSON.stringify(message));
         
-        // Send the message
-        const response = await admin.messaging().send(message);
-        console.log('Successfully sent invoice notification:', response);
-        return { success: true, messageId: response };
+        // Send the message with error handling
+        try {
+          const response = await admin.messaging().send(message);
+          console.log('Successfully sent invoice notification:', response);
+          
+          // Update the notification to indicate successful delivery
+          try {
+            // Simplified query - just find by request_id without sorting
+            const notificationsSnapshot = await admin.firestore()
+              .collection('notifications')
+              .where('request_id', '==', context.params.requestId)
+              .limit(1)
+              .get();
+            
+            if (!notificationsSnapshot.empty) {
+              await notificationsSnapshot.docs[0].ref.update({
+                delivery_success: true,
+                message_id: response
+              });
+            }
+          } catch (updateError) {
+            console.error('Error updating notification with delivery status:', updateError);
+          }
+          
+          return { success: true, messageId: response };
+        } catch (fcmError) {
+          console.error('Error sending invoice notification:', fcmError);
+          
+          // Handle invalid token error
+          if (fcmError.code === 'messaging/registration-token-not-registered' && userDoc) {
+            try {
+              // Remove the invalid token from the user document
+              console.log('Removing invalid FCM token from user document');
+              await userDoc.ref.update({
+                fcm_token: admin.firestore.FieldValue.delete()
+              });
+              
+              // Add to failed notifications collection for tracking and analysis
+              await admin.firestore().collection('failed_notifications').add({
+                user_id: studentId,
+                error_code: fcmError.code,
+                error_message: fcmError.message,
+                token: fcmToken,
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                request_type: requestType,
+                request_id: context.params.requestId
+              });
+            } catch (removeTokenError) {
+              console.error('Error removing invalid token:', removeTokenError);
+            }
+          }
+          
+          // Update the notification to indicate delivery failure
+          try {
+            // Simplified query - find by request_id without sorting
+            const notificationsSnapshot = await admin.firestore()
+              .collection('notifications')
+              .where('request_id', '==', context.params.requestId)
+              .limit(1)
+              .get();
+            
+            if (!notificationsSnapshot.empty) {
+              await notificationsSnapshot.docs[0].ref.update({
+                delivery_failed: true,
+                delivery_error: fcmError.message
+              });
+            }
+          } catch (updateError) {
+            console.error('Error updating notification with delivery status:', updateError);
+          }
+          
+          return { error: fcmError.message };
+        }
       } else {
         console.log('Status condition not met:', beforeData.status, '->', afterData.status);
       }
       
       return null;
     } catch (error) {
-      console.error('Error sending invoice notification:', error);
+      console.error('Error in invoice notification function:', error);
       return { error: error.message };
     }
   });
@@ -222,264 +394,258 @@ exports.sendInvoiceNotification = functions.firestore
  * and sends a notification to the student with the appropriate message
  */
 exports.sendTrainingNotification = functions.firestore
-  .document('requests/{requestId}')
-  .onUpdate(async (change, context) => {
-    try {
-      const beforeData = change.before.data();
-      const afterData = change.after.data();
-      
-      // Enhanced logging
-      console.log('--------- TRAINING NOTIFICATION FUNCTION TRIGGERED ---------');
-      console.log('Request ID:', context.params.requestId);
-      console.log('Before data:', JSON.stringify(beforeData));
-      console.log('After data:', JSON.stringify(afterData));
-      console.log('Before status:', beforeData.status);
-      console.log('After status:', afterData.status);
-      console.log('Document type:', afterData.type);
-      
-      // Skip if not a training request - more detailed check
-      if (!afterData.type || afterData.type.toLowerCase() !== 'training') {
-        console.log('Not a training document - type:', afterData.type);
-        return null;
-      }
-      
-      // Check if status changed
-      if (!beforeData.status || !afterData.status) {
-        console.log('Status fields missing');
-        return null;
-      }
-      
-      const statusChanged = beforeData.status !== afterData.status;
-      const newStatusIsFinal = ['done', 'rejected'].includes(afterData.status.toLowerCase());
-      
-      console.log('Status changed:', statusChanged);
-      console.log('New status is final:', newStatusIsFinal);
-      
-      if (!statusChanged || !newStatusIsFinal) {
-        console.log('Status condition not met for notification');
-        return null;
-      }
-      
-      // Continue only if we have required fields
-      if (!afterData.student_id) {
-        console.log('Student ID missing in document');
-        return null;
-      }
-      
-      const studentId = afterData.student_id;
-      const trainingScore = afterData.training_score || 0;
-      const status = afterData.status;
-      
-      console.log('Processing for student ID:', studentId);
-      console.log('Training score:', trainingScore);
-      console.log('Status:', status);
-      
-      // Get user document with more robust error handling
-      let userDoc;
+  .document('student_affairs_requests/{requestId}')
+  .onUpdate((change, context) => {
+    const beforeData = change.before.data();
+    const afterData = change.after.data();
+    
+    // Quick check - if not a training document, exit early without processing
+    if (!afterData.type || afterData.type.toLowerCase() !== 'training') {
+      console.log('Not a training request document, exiting early');
+      return null;
+    }
+    
+    // Continue only if status changed to 'done' or 'rejected'
+    if (!beforeData.status || !afterData.status || 
+        beforeData.status === afterData.status ||
+        !['done', 'rejected'].includes(afterData.status.toLowerCase())) {
+      console.log('Status condition not met for training notification');
+      return null;
+    }
+    
+    // Now proceed with the full function
+    return (async () => {
       try {
-        console.log('Looking for user with ID:', studentId);
+        // Enhanced logging
+        console.log('--------- TRAINING NOTIFICATION FUNCTION TRIGGERED ---------');
+        console.log('Request ID:', context.params.requestId);
+        console.log('Before data:', JSON.stringify(beforeData));
+        console.log('After data:', JSON.stringify(afterData));
+        console.log('Before status:', beforeData.status);
+        console.log('After status:', afterData.status);
+        console.log('Document type:', afterData.type);
         
-        // First, check for user by exact ID match
-        const usersSnapshot = await admin.firestore()
-          .collection('users')
-          .where('id', '==', studentId)
-          .get();
+        // Continue only if we have required fields
+        if (!afterData.student_id) {
+          console.log('Student ID missing in document');
+          return null;
+        }
+        
+        const studentId = afterData.student_id;
+        const trainingScore = afterData.training_score || 0;
+        const status = afterData.status;
+        
+        console.log('Processing for student ID:', studentId);
+        console.log('Training score:', trainingScore);
+        console.log('Status:', status);
+        
+        // Get user document with more robust error handling
+        let userDoc;
+        try {
+          console.log('Looking for user with ID:', studentId);
           
-        if (usersSnapshot.empty) {
-          console.log('No user found with ID field match. Trying uid field...');
-          
-          // Try searching by uid field
-          const usersByUidSnapshot = await admin.firestore()
+          // First, check for user by exact ID match
+          const usersSnapshot = await admin.firestore()
             .collection('users')
-            .where('uid', '==', studentId)
+            .where('id', '==', studentId)
             .get();
             
-          if (usersByUidSnapshot.empty) {
-            console.log('No user found with uid field match either');
+          if (usersSnapshot.empty) {
+            console.log('No user found with ID field match. Trying uid field...');
             
-            // Try searching by email as last resort
-            if (afterData.email) {
-              console.log('Trying to find user by email:', afterData.email);
-              const userByEmailSnapshot = await admin.firestore()
-                .collection('users')
-                .where('email', '==', afterData.email)
-                .get();
+            // Try searching by uid field
+            const usersByUidSnapshot = await admin.firestore()
+              .collection('users')
+              .where('uid', '==', studentId)
+              .get();
+              
+            if (usersByUidSnapshot.empty) {
+              console.log('No user found with uid field match either');
+              
+              // Try searching by email as last resort
+              if (afterData.email) {
+                console.log('Trying to find user by email:', afterData.email);
+                const userByEmailSnapshot = await admin.firestore()
+                  .collection('users')
+                  .where('email', '==', afterData.email)
+                  .get();
+                  
+                if (userByEmailSnapshot.empty) {
+                  console.log('No user found with email either:', afterData.email);
+                  return null;
+                }
                 
-              if (userByEmailSnapshot.empty) {
-                console.log('No user found with email either:', afterData.email);
+                userDoc = userByEmailSnapshot.docs[0];
+                console.log('User found by email search');
+              } else {
+                console.log('No email available for fallback search');
                 return null;
               }
-              
-              userDoc = userByEmailSnapshot.docs[0];
-              console.log('User found by email search');
             } else {
-              console.log('No email available for fallback search');
-              return null;
+              userDoc = usersByUidSnapshot.docs[0];
+              console.log('User found by uid field search');
             }
           } else {
-            userDoc = usersByUidSnapshot.docs[0];
-            console.log('User found by uid field search');
+            userDoc = usersSnapshot.docs[0];
+            console.log('User found by id field search');
           }
-        } else {
-          userDoc = usersSnapshot.docs[0];
-          console.log('User found by id field search');
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+          return null;
         }
-      } catch (error) {
-        console.error('Error fetching user document:', error);
-        return null;
-      }
-      
-      const userData = userDoc.data();
-      console.log('User data found:', JSON.stringify(userData));
-      
-      // Debug user identifiers with more details
-      console.log('User identifiers check:', {
-        id: userData.id,
-        uid: userData.uid,
-        user_uid: userData.user_uid,
-        email: userData.email,
-        docId: userDoc.id  // Document ID itself might be useful
-      });
+        
+        const userData = userDoc.data();
+        console.log('User data found:', JSON.stringify(userData));
+        
+        // Debug user identifiers with more details
+        console.log('User identifiers check:', {
+          id: userData.id,
+          uid: userData.uid,
+          user_uid: userData.user_uid,
+          email: userData.email,
+          docId: userDoc.id  // Document ID itself might be useful
+        });
 
-      // Get FCM token with more robust logic
-      let fcmToken = userData.fcm_token;
-      
-      // If no fcm_token in user document, check if it has a different field name
-      if (!fcmToken) {
-        console.log('No fcm_token found, checking alternative field names');
-        fcmToken = userData.fcmToken || userData.token;
+        // Get FCM token with more robust logic
+        let fcmToken = userData.fcm_token;
         
-        if (fcmToken) {
-          console.log('Found token in alternative field');
-        }
-      }
-      
-      if (!fcmToken) {
-        console.log('No FCM token found for user:', studentId);
-        
-        // Check for any recent device tokens linked to this user
-        try {
-          console.log('Checking for devices collection for tokens...');
-          const devicesSnapshot = await admin.firestore()
-            .collection('devices')
-            .where('userId', '==', userDoc.id)
-            .orderBy('lastActive', 'desc')
-            .limit(1)
-            .get();
-            
-          if (!devicesSnapshot.empty) {
-            const deviceData = devicesSnapshot.docs[0].data();
-            fcmToken = deviceData.token;
-            console.log('Found token in devices collection:', fcmToken ? 'Yes' : 'No');
+        // If no fcm_token in user document, check if it has a different field name
+        if (!fcmToken) {
+          console.log('No fcm_token found, checking alternative field names');
+          fcmToken = userData.fcmToken || userData.token;
+          
+          if (fcmToken) {
+            console.log('Found token in alternative field');
           }
-        } catch (err) {
-          console.log('Error checking devices collection:', err);
         }
         
         if (!fcmToken) {
-          console.log('No valid token found in any location. Cannot send notification.');
+          console.log('No FCM token found for user:', studentId);
           
-          // Still store the notification even if we can't send it
-          // Add specific flag to indicate notification couldn't be delivered
-          const notificationData = {
-            user_id: studentId,
-            title: title,
-            body: body,
-            type: 'training',
-            status: status,
-            request_id: context.params.requestId,
-            created_at: admin.firestore.FieldValue.serverTimestamp(),
-            read: false,
-            delivery_failed: true,
-            reason: 'No FCM token available'
-          };
-          
-          const userUid = userData.uid || userData.user_uid || userData.id || userDoc.id;
-          if (userUid) {
-            notificationData.user_uid = userUid;
+          // Check for any recent device tokens linked to this user
+          try {
+            console.log('Checking for devices collection for tokens...');
+            const devicesSnapshot = await admin.firestore()
+              .collection('devices')
+              .where('userId', '==', userDoc.id)
+              .orderBy('lastActive', 'desc')
+              .limit(1)
+              .get();
+              
+            if (!devicesSnapshot.empty) {
+              const deviceData = devicesSnapshot.docs[0].data();
+              fcmToken = deviceData.token;
+              console.log('Found token in devices collection:', fcmToken ? 'Yes' : 'No');
+            }
+          } catch (err) {
+            console.log('Error checking devices collection:', err);
           }
           
-          await admin.firestore().collection('notifications').add(notificationData);
-          return { success: false, error: 'No FCM token available' };
+          if (!fcmToken) {
+            console.log('No valid token found in any location. Cannot send notification.');
+            
+            // Still store the notification even if we can't send it
+            // Add specific flag to indicate notification couldn't be delivered
+            const notificationData = {
+              user_id: studentId,
+              title: title,
+              body: body,
+              type: 'training',
+              status: status,
+              request_id: context.params.requestId,
+              created_at: admin.firestore.FieldValue.serverTimestamp(),
+              read: false,
+              delivery_failed: true,
+              reason: 'No FCM token available'
+            };
+            
+            const userUid = userData.uid || userData.user_uid || userData.id || userDoc.id;
+            if (userUid) {
+              notificationData.user_uid = userUid;
+            }
+            
+            await admin.firestore().collection('notifications').add(notificationData);
+            return { success: false, error: 'No FCM token available' };
+          }
         }
-      }
-      
-      console.log('Using FCM token:', fcmToken);
-      
-      // Create notification content with improved message
-      let title, body;
-      if (status.toLowerCase() === 'done') {
-        title = 'Training Request Approved';
-        body = `Congratulations! ${trainingScore} days have been added to your training record.`;
-      } else {
-        title = 'Training Request Rejected';
-        body = 'Your training request was not approved. Please check the details or contact training unit.';
-      }
-      
-      // Add data to track notification in database - with proper field validation
-      const notificationData = {
-        user_id: studentId,
-        title: title,
-        body: body,
-        type: 'training',
-        status: status,
-        request_id: context.params.requestId,
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
-        read: false
-      };
-      
-      // Store multiple user identifiers to ensure proper association
-      // Document ID is the most reliable identifier
-      notificationData.docId = userDoc.id;
-      
-      // Store userID fields based on availability
-      const userUid = userData.uid || userData.user_uid || userData.id;
-      if (userUid) {
-        notificationData.user_uid = userUid;
-      }
-      
-      // Store email for additional linking capability
-      if (userData.email) {
-        notificationData.user_email = userData.email;
-      }
-      
-      // Log notification data for debugging
-      console.log('Storing notification with data:', notificationData);
-      
-      await admin.firestore().collection('notifications').add(notificationData);
-      
-      // Create and send notification with rich data
-      const message = {
-        notification: {
+        
+        console.log('Using FCM token:', fcmToken);
+        
+        // Create notification content with improved message
+        let title, body;
+        if (status.toLowerCase() === 'done') {
+          title = 'Training Request Approved';
+          body = `Congratulations! ${trainingScore} days have been added to your training record.`;
+        } else {
+          title = 'Training Request Rejected';
+          body = 'Your training request was not approved. Please check the details or contact training unit.';
+        }
+        
+        // Add data to track notification in database - with proper field validation
+        const notificationData = {
+          user_id: studentId,
           title: title,
-          body: body
-        },
-        android: {
-          notification: {
-            icon: '@mipmap/launcher_icon',
-            color: '#000000'
-          }
-        },
-        data: {
+          body: body,
           type: 'training',
-          request_type: 'Training',
           status: status,
-          score: trainingScore.toString(),
           request_id: context.params.requestId,
-          timestamp: Date.now().toString(),
-          click_action: 'FLUTTER_NOTIFICATION_CLICK'
-        },
-        token: fcmToken
-      };
-      
-      console.log('Sending notification message:', JSON.stringify(message));
-      
-      // Send the message
-      const response = await admin.messaging().send(message);
-      console.log('Successfully sent training notification:', response);
-      return { success: true, messageId: response };
-    } catch (error) {
-      console.error('Error sending training notification:', error);
-      return { error: error.message };
-    }
+          created_at: admin.firestore.FieldValue.serverTimestamp(),
+          read: false
+        };
+        
+        // Store multiple user identifiers to ensure proper association
+        // Document ID is the most reliable identifier
+        notificationData.docId = userDoc.id;
+        
+        // Store userID fields based on availability
+        const userUid = userData.uid || userData.user_uid || userData.id;
+        if (userUid) {
+          notificationData.user_uid = userUid;
+        }
+        
+        // Store email for additional linking capability
+        if (userData.email) {
+          notificationData.user_email = userData.email;
+        }
+        
+        // Log notification data for debugging
+        console.log('Storing notification with data:', notificationData);
+        
+        await admin.firestore().collection('notifications').add(notificationData);
+        
+        // Create and send notification with rich data
+        const message = {
+          notification: {
+            title: title,
+            body: body
+          },
+          android: {
+            notification: {
+              icon: '@mipmap/launcher_icon',
+              color: '#000000'
+            }
+          },
+          data: {
+            type: 'training',
+            request_type: 'Training',
+            status: status,
+            score: trainingScore.toString(),
+            request_id: context.params.requestId,
+            timestamp: Date.now().toString(),
+            click_action: 'FLUTTER_NOTIFICATION_CLICK'
+          },
+          token: fcmToken
+        };
+        
+        console.log('Sending notification message:', JSON.stringify(message));
+        
+        // Send the message
+        const response = await admin.messaging().send(message);
+        console.log('Successfully sent training notification:', response);
+        return { success: true, messageId: response };
+      } catch (error) {
+        console.error('Error sending training notification:', error);
+        return { error: error.message };
+      }
+    })();
   }); 

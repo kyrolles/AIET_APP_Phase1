@@ -3,6 +3,7 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
+import 'package:graduation_project/screens/invoice/it_incoive/it_archive.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
 import '../../../components/my_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,33 +18,51 @@ class ItInvoiceScreen extends StatefulWidget {
 }
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
+  final List<String> statusList = ['No Status', 'Pending'];
+  String? currentDepartment;
+  String? currentYear;
+  String? currentType;
+
+  void _refreshRequests() {
+    BlocProvider.of<GetRequestsCubit>(context).getRequests(
+      department: currentDepartment,
+      year: currentYear,
+      type: currentType,
+      statusList: statusList,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<GetRequestsCubit>(context).getRequests();
+    _refreshRequests();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: MyAppBar(
-          title: 'Invoice',
-          onpressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        body: Column(
-          children: [
-            FilterWidget(
-              onFilterChanged: (department, year, type) {
-                BlocProvider.of<GetRequestsCubit>(context).getRequests(
-                  department: department,
-                  year: year,
-                  type: type,
-                );
-              },
-            ),
-            BlocBuilder<GetRequestsCubit, GetRequestsState>(
+      appBar: MyAppBar(
+        title: 'Student Affairs',
+        onpressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      body: Column(
+        children: [
+          FilterWidget(
+            statusList: statusList,
+            initialDepartment: currentDepartment,
+            initialYear: currentYear,
+            initialType: currentType,
+            onFilterChanged: (department, year, type) {
+              currentDepartment = department;
+              currentYear = year;
+              currentType = type;
+              _refreshRequests();
+            },
+          ),
+          Expanded(
+            child: BlocBuilder<GetRequestsCubit, GetRequestsState>(
               builder: (context, state) {
                 if (state is GetRequestsLoading) {
                   return const Center(
@@ -51,42 +70,52 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                   );
                 }
                 if (state is GetRequestsLoaded) {
-                  return ListContainer(
-                    title: 'Requests',
-                    listOfWidgets: showRequestsList(state.requests),
-                  );
+                  return state.requests.isEmpty
+                      ? const Center(child: Text('No requests found'))
+                      : ListContainer(
+                          title: 'Requests',
+                          listOfWidgets: showRequestsList(state.requests),
+                        );
                 }
                 if (state is GetRequestsError) {
                   return Center(
                     child: Text('Error: ${state.message}'),
                   );
-                } else {
-                  return const Center(
-                      child: Text('Use filters to load documents.'));
                 }
+                return const SizedBox();
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: KButton(
-                backgroundColor: Colors.black38,
-                text: 'Archive',
-                height: 62,
-                svgPath: 'assets/project_image/Pin.svg',
-                onPressed: () {
-                  Navigator.pushNamed(context, '/it_invoice/archive');
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: KButton(
+              backgroundColor: Colors.black38,
+              text: 'Archive',
+              height: 62,
+              svgPath: 'assets/project_image/Pin.svg',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ItArchiveScreen(),
+                  ),
+                );
+              },
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   List<Widget> showRequestsList(List<Request> requests) {
-    List<Widget> listOfRequests = [];
-    for (var i = 0; i < requests.length; i++) {
-      listOfRequests.add(RequestContainer(request: requests[i]));
-    }
-    return listOfRequests;
+    return requests
+        .map((request) => RequestContainer(
+              request: request,
+              onStatusChanged: () {
+                _refreshRequests();
+              },
+            ))
+        .toList();
   }
 }

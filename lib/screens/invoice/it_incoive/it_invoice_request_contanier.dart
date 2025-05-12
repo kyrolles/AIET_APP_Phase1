@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/tuition_fees_upload.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
+import 'curriculum_content_sheet_screen.dart';
+import 'grades_report_sheet_screen.dart';
 import 'proof_sheet_screen.dart';
 import '../../../constants.dart';
 
@@ -81,16 +83,33 @@ Future<void> updateDocument({
 }
 
 class RequestContainer extends StatelessWidget {
-  const RequestContainer({super.key, required this.request});
+  const RequestContainer({
+    super.key,
+    required this.request,
+    required this.onStatusChanged, // Add this line
+  });
+
   final Request request;
+  final VoidCallback onStatusChanged; // Add this line
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        request.type == 'Tuition Fees'
-            ? showModalBottomSheetForTuitionFees(context)
-            : showModalBottomSheetForProofOfEnrollment(context);
+        switch (request.type) {
+          case 'Tuition Fees':
+            showModalBottomSheetForTuitionFees(context);
+            break;
+          case 'Proof of enrollment':
+            showModalBottomSheetForProofOfEnrollment(context);
+            break;
+          case 'Grades Report':
+            showModalBottomSheetForGradesReport(context);
+            break;
+          case 'Academic Content':
+            showModalBottomSheetForCurriculumContent(context);
+            break;
+        }
       },
       child: Container(
         margin: const EdgeInsets.all(8.0),
@@ -194,6 +213,10 @@ class RequestContainer extends StatelessWidget {
   }
 
   Future<void> showModalBottomSheetForProofOfEnrollment(BuildContext context) {
+    // Get navigator reference while the widget is still active
+    final NavigatorState navigator =
+        Navigator.of(context, rootNavigator: false);
+
     return OfflineAwareBottomSheet.show(
       backgroundColor: const Color(0XFFF1F1F2),
       context: context,
@@ -204,7 +227,7 @@ class RequestContainer extends StatelessWidget {
             log('Setting proof of enrollment request status to Done');
             // Use the updateDocument function for consistency
             await updateDocument(
-              collectionPath: 'requests',
+              collectionPath: 'student_affairs_requests',
               searchCriteria: {
                 'student_id': request.studentId,
                 'addressed_to': request.addressedTo,
@@ -214,15 +237,19 @@ class RequestContainer extends StatelessWidget {
                 'status': 'Done',
               },
             );
+            onStatusChanged(); // Add this line
             log('Successfully updated proof of enrollment status to Done');
+            // BlocProvider.of<GetRequestsCubit>(context).getRequests();
           } catch (e) {
             log('Error updating status: $e');
           }
-          Navigator.pop(context);
+          if (navigator.mounted) {
+            navigator.pop();
+          }
         },
-        rejectedFunctionality: () {
-          updateDocument(
-            collectionPath: 'requests',
+        rejectedFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
             searchCriteria: {
               'student_id': request.studentId,
               'addressed_to': request.addressedTo,
@@ -231,11 +258,15 @@ class RequestContainer extends StatelessWidget {
               'status': 'Rejected',
             },
           );
-          Navigator.pop(context);
+          onStatusChanged(); // Add this line
+          // BlocProvider.of<GetRequestsCubit>(context).getRequests();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
         },
-        pendingFunctionality: () {
-          updateDocument(
-            collectionPath: 'requests',
+        pendingFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
             searchCriteria: {
               'student_id': request.studentId,
               'addressed_to': request.addressedTo,
@@ -244,13 +275,19 @@ class RequestContainer extends StatelessWidget {
               'status': 'Pending',
             },
           );
-          Navigator.pop(context);
+          onStatusChanged(); // Add this line
+          // BlocProvider.of<GetRequestsCubit>(context).getRequests();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
         },
       ),
     );
   }
 
   Future<dynamic> showModalBottomSheetForTuitionFees(BuildContext context) {
+    Navigator.of(context, rootNavigator: false);
+
     return OfflineAwareBottomSheet.show(
       context: context,
       isScrollControlled: true,
@@ -259,22 +296,143 @@ class RequestContainer extends StatelessWidget {
       ),
       onlineContent: TuitionFeesSheet(
         request: request,
+        doneFunctionality: () {
+          onStatusChanged(); // This will trigger the UI refresh
+        },
+      ),
+    );
+  }
+
+  Future<void> showModalBottomSheetForGradesReport(BuildContext context) {
+    final NavigatorState navigator =
+        Navigator.of(context, rootNavigator: false);
+
+    return OfflineAwareBottomSheet.show(
+      backgroundColor: const Color(0XFFF1F1F2),
+      context: context,
+      onlineContent: GradesReportSheetScreen(
+        request: request,
         doneFunctionality: () async {
           try {
-            log('Setting tuition fees request status to Done');
             await updateDocument(
-              collectionPath: 'requests',
+              collectionPath: 'student_affairs_requests',
               searchCriteria: {
                 'student_id': request.studentId,
-                'type': 'Tuition Fees',
+                'addressed_to': request.addressedTo,
+                'type': 'Grades Report',
               },
               newData: {
                 'status': 'Done',
               },
             );
-            log('Successfully updated tuition fees status to Done');
+            onStatusChanged();
           } catch (e) {
-            log('Error updating tuition fees status: $e');
+            log('Error updating status: $e');
+          }
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        rejectedFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Grades Report',
+            },
+            newData: {
+              'status': 'Rejected',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        pendingFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Grades Report',
+            },
+            newData: {
+              'status': 'Pending',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> showModalBottomSheetForCurriculumContent(BuildContext context) {
+    final NavigatorState navigator =
+        Navigator.of(context, rootNavigator: false);
+
+    return OfflineAwareBottomSheet.show(
+      backgroundColor: const Color(0XFFF1F1F2),
+      context: context,
+      onlineContent: CurriculumContentSheetScreen(
+        request: request,
+        doneFunctionality: () async {
+          try {
+            await updateDocument(
+              collectionPath: 'student_affairs_requests',
+              searchCriteria: {
+                'student_id': request.studentId,
+                'addressed_to': request.addressedTo,
+                'type': 'Academic Content',
+              },
+              newData: {
+                'status': 'Done',
+              },
+            );
+            onStatusChanged();
+          } catch (e) {
+            log('Error updating status: $e');
+          }
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        rejectedFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Academic Content',
+            },
+            newData: {
+              'status': 'Rejected',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
+          }
+        },
+        pendingFunctionality: () async {
+          await updateDocument(
+            collectionPath: 'student_affairs_requests',
+            searchCriteria: {
+              'student_id': request.studentId,
+              'addressed_to': request.addressedTo,
+              'type': 'Academic Content',
+            },
+            newData: {
+              'status': 'Pending',
+            },
+          );
+          onStatusChanged();
+          if (navigator.mounted) {
+            navigator.pop();
           }
         },
       ),
