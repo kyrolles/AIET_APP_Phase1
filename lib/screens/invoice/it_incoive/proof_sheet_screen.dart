@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer';
 import '../../../components/rpd_button.dart';
 import '../../../models/request_model.dart';
+import 'textAndDataWidget.dart';
 
 class ProofOfEnrollmentSheetScreen extends StatelessWidget {
   const ProofOfEnrollmentSheetScreen(
@@ -84,38 +85,6 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
             )
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TextAndDataWidget extends StatelessWidget {
-  const TextAndDataWidget({
-    super.key,
-    required this.text,
-    required this.data,
-  });
-
-  final String text;
-  final String data;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Wrap(
-        children: [
-          Text(
-            text,
-            style: const TextStyle(fontSize: 18),
-          ),
-          Text(
-            data,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 3,
-            style: const TextStyle(fontSize: 18),
-          ),
-        ],
       ),
     );
   }
