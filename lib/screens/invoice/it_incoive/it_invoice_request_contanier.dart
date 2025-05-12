@@ -201,7 +201,7 @@ class RequestContainer extends StatelessWidget {
 
   Future<void> showModalBottomSheetForProofOfEnrollment(BuildContext context) {
     // Get navigator reference while the widget is still active
-    final NavigatorState? navigator =
+    final NavigatorState navigator =
         Navigator.of(context, rootNavigator: false);
 
     return OfflineAwareBottomSheet.show(
@@ -230,7 +230,7 @@ class RequestContainer extends StatelessWidget {
           } catch (e) {
             log('Error updating status: $e');
           }
-          if (navigator != null && navigator.mounted) {
+          if (navigator.mounted) {
             navigator.pop();
           }
         },
@@ -247,7 +247,7 @@ class RequestContainer extends StatelessWidget {
           );
           onStatusChanged(); // Add this line
           // BlocProvider.of<GetRequestsCubit>(context).getRequests();
-          if (navigator != null && navigator.mounted) {
+          if (navigator.mounted) {
             navigator.pop();
           }
         },
@@ -264,7 +264,7 @@ class RequestContainer extends StatelessWidget {
           );
           onStatusChanged(); // Add this line
           // BlocProvider.of<GetRequestsCubit>(context).getRequests();
-          if (navigator != null && navigator.mounted) {
+          if (navigator.mounted) {
             navigator.pop();
           }
         },
@@ -273,6 +273,8 @@ class RequestContainer extends StatelessWidget {
   }
 
   Future<dynamic> showModalBottomSheetForTuitionFees(BuildContext context) {
+    Navigator.of(context, rootNavigator: false);
+
     return OfflineAwareBottomSheet.show(
       context: context,
       isScrollControlled: true,
@@ -281,24 +283,8 @@ class RequestContainer extends StatelessWidget {
       ),
       onlineContent: TuitionFeesSheet(
         request: request,
-        doneFunctionality: () async {
-          try {
-            log('Setting tuition fees request status to Done');
-            await updateDocument(
-              collectionPath: 'student_affairs_requests',
-              searchCriteria: {
-                'student_id': request.studentId,
-                'type': 'Tuition Fees',
-              },
-              newData: {
-                'status': 'Done',
-              },
-            );
-            onStatusChanged(); // Add this line
-            log('Successfully updated tuition fees status to Done');
-          } catch (e) {
-            log('Error updating tuition fees status: $e');
-          }
+        doneFunctionality: () {
+          onStatusChanged(); // This will trigger the UI refresh
         },
       ),
     );

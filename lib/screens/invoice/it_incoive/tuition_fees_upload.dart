@@ -17,7 +17,7 @@ class TuitionFeesSheet extends StatefulWidget {
     required this.doneFunctionality,
     required this.request,
   });
-  final Function() doneFunctionality;
+  final VoidCallback doneFunctionality; // Change to VoidCallback
   final Request request;
 
   @override
@@ -163,6 +163,9 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
       });
 
       log('Document updated with Done status');
+
+      // Call the doneFunctionality callback before closing the sheet
+      widget.doneFunctionality();
 
       Navigator.pop(context);
       _showCustomSnackBar('PDF uploaded successfully!');
