@@ -106,7 +106,7 @@ class RequestContainer extends StatelessWidget {
           case 'Grades Report':
             showModalBottomSheetForGradesReport(context);
             break;
-          case 'Curriculum Content':
+          case 'Academic Content':
             showModalBottomSheetForCurriculumContent(context);
             break;
         }
@@ -387,7 +387,7 @@ class RequestContainer extends StatelessWidget {
               searchCriteria: {
                 'student_id': request.studentId,
                 'addressed_to': request.addressedTo,
-                'type': 'Curriculum Content',
+                'type': 'Academic Content',
               },
               newData: {
                 'status': 'Done',
@@ -407,7 +407,7 @@ class RequestContainer extends StatelessWidget {
             searchCriteria: {
               'student_id': request.studentId,
               'addressed_to': request.addressedTo,
-              'type': 'Curriculum Content',
+              'type': 'Academic Content',
             },
             newData: {
               'status': 'Rejected',
@@ -424,7 +424,7 @@ class RequestContainer extends StatelessWidget {
             searchCriteria: {
               'student_id': request.studentId,
               'addressed_to': request.addressedTo,
-              'type': 'Curriculum Content',
+              'type': 'Academic Content',
             },
             newData: {
               'status': 'Pending',
