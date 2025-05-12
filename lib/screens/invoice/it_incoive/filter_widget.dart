@@ -61,7 +61,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             'Proof of enrollment',
             'Tuition Fees',
             'Grades Report', // Add this
-            'Curriculum Content' // Add this
+            'Academic Content' // Add this
           ].map((type) {
             return DropdownMenuItem(value: type, child: Text(type));
           }).toList(),

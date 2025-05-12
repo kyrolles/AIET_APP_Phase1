@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:graduation_project/constants.dart';
 import '../../../components/rpd_button.dart';
 import '../../../models/request_model.dart';
 import 'textAndDataWidget.dart';
@@ -39,7 +38,7 @@ class CurriculumContentSheetScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'Curriculum Content',
+                    'Academic Content',
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,

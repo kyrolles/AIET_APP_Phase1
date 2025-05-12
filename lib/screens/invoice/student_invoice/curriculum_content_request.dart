@@ -105,7 +105,7 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
                       Icon(Icons.description, color: Colors.white, size: 24),
                       SizedBox(width: 10),
                       Text(
-                        'Curriculum Content',
+                        'Academic Content',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -438,7 +438,7 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
                             'student_id': snapshot.docs.first['id'],
                             'student_name': studentName,
                             'training_score': 0,
-                            'type': 'Curriculum Content',
+                            'type': 'Academic Content',
                             'year': snapshot.docs.first['academicYear'],
                             'created_at': Timestamp.now(),
                             'location': location,
