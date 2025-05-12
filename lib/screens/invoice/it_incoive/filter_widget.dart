@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 class FilterWidget extends StatefulWidget {
   final Function(String? department, String? year, String? type)
       onFilterChanged;
-  final List<String> statusList; // Add this
+  final List<String> statusList;
+  final String? initialDepartment;
+  final String? initialYear;
+  final String? initialType;
 
   const FilterWidget({
     super.key,
     required this.onFilterChanged,
-    required this.statusList, // Add this
+    required this.statusList,
+    this.initialDepartment,
+    this.initialYear,
+    this.initialType,
   });
 
   @override
@@ -16,9 +22,17 @@ class FilterWidget extends StatefulWidget {
 }
 
 class _FilterWidgetState extends State<FilterWidget> {
-  String? selectedType = 'All';
-  String? selectedYear = 'All';
-  String? selectedDepartment = 'All';
+  String? selectedType;
+  String? selectedYear;
+  String? selectedDepartment;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedType = widget.initialType ?? 'All';
+    selectedYear = widget.initialYear ?? 'All';
+    selectedDepartment = widget.initialDepartment ?? 'All';
+  }
 
   String? filterValue(String? value) {
     return value == 'All' ? null : value;

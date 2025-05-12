@@ -19,12 +19,23 @@ class ItInvoiceScreen extends StatefulWidget {
 
 class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
   final List<String> statusList = ['No Status', 'Pending'];
+  String? currentDepartment;
+  String? currentYear;
+  String? currentType;
+
+  void _refreshRequests() {
+    BlocProvider.of<GetRequestsCubit>(context).getRequests(
+      department: currentDepartment,
+      year: currentYear,
+      type: currentType,
+      statusList: statusList,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<GetRequestsCubit>(context)
-        .getRequests(statusList: statusList);
+    _refreshRequests();
   }
 
   @override
@@ -39,14 +50,15 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
       body: Column(
         children: [
           FilterWidget(
-            statusList: statusList, // Add this
+            statusList: statusList,
+            initialDepartment: currentDepartment,
+            initialYear: currentYear,
+            initialType: currentType,
             onFilterChanged: (department, year, type) {
-              BlocProvider.of<GetRequestsCubit>(context).getRequests(
-                department: department,
-                year: year,
-                type: type,
-                statusList: statusList, // Add this
-              );
+              currentDepartment = department;
+              currentYear = year;
+              currentType = type;
+              _refreshRequests();
             },
           ),
           Expanded(
@@ -101,8 +113,7 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
         .map((request) => RequestContainer(
               request: request,
               onStatusChanged: () {
-                BlocProvider.of<GetRequestsCubit>(context)
-                    .getRequests(statusList: statusList);
+                _refreshRequests();
               },
             ))
         .toList();
