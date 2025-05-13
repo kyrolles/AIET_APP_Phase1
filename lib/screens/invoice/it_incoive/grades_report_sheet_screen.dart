@@ -1,16 +1,19 @@
-import 'package:flutter/material.dart';
 import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:graduation_project/constants.dart';
 import '../../../components/rpd_button.dart';
 import '../../../models/request_model.dart';
 import 'textAndDataWidget.dart';
 
-class ProofOfEnrollmentSheetScreen extends StatelessWidget {
-  const ProofOfEnrollmentSheetScreen(
-      {super.key,
-      required this.doneFunctionality,
-      required this.rejectedFunctionality,
-      required this.pendingFunctionality,
-      required this.request});
+class GradesReportSheetScreen extends StatelessWidget {
+  const GradesReportSheetScreen({
+    super.key,
+    required this.doneFunctionality,
+    required this.rejectedFunctionality,
+    required this.pendingFunctionality,
+    required this.request,
+  });
 
   final Function() doneFunctionality;
   final Function() rejectedFunctionality;
@@ -37,7 +40,7 @@ class ProofOfEnrollmentSheetScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'Proof of enrollment',
+                    'Grades Report',
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,

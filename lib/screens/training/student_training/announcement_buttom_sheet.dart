@@ -9,13 +9,14 @@ class AnnouncementButtomSheet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        spacing: 8,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Padding(
             padding: EdgeInsets.only(bottom: 16.0),
             child: Text(
-              'Department',
+              'Programs',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -24,71 +25,87 @@ class AnnouncementButtomSheet extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 8),
-          _buildDepartmentButton(
-            context: context,
+          KButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/departmentTraining',
+                arguments: 'Computer',
+              );
+            },
             text: 'CE',
-            department: 'Computer',
-            imagePath: 'assets/project_image/CE.jpeg',
+            fontSize: 36,
+            height: 70,
             textColor: Colors.black,
+            borderWidth: 1,
+            borderColor: Colors.black,
+            backgroundImage: const DecorationImage(
+              image: AssetImage('assets/project_image/CE.jpeg'),
+              fit: BoxFit.cover,
+              opacity: 0.5,
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildDepartmentButton(
-            context: context,
+          KButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/departmentTraining',
+                arguments: 'Mechatronics',
+              );
+            },
             text: 'EME',
-            department: 'Mechatronics',
-            imagePath: 'assets/project_image/EME.png',
+            fontSize: 36,
+            height: 70,
             textColor: Colors.white,
+            borderWidth: 1,
+            borderColor: Colors.black,
+            backgroundImage: const DecorationImage(
+              image: AssetImage('assets/project_image/EME.png'),
+              fit: BoxFit.cover,
+              opacity: 0.8,
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildDepartmentButton(
-            context: context,
+          KButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/departmentTraining',
+                arguments: 'Communication & Electronics',
+              );
+            },
             text: 'ECE',
-            department: 'Communication & Electronics',
-            imagePath: 'assets/project_image/ECE.jpeg',
+            fontSize: 36,
+            height: 70,
             textColor: Colors.black,
-            opacity: 0.5,
+            borderWidth: 1,
+            borderColor: Colors.black,
+            backgroundImage: const DecorationImage(
+              image: AssetImage('assets/project_image/ECE.jpeg'),
+              fit: BoxFit.cover,
+              opacity: 0.5,
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildDepartmentButton(
-            context: context,
+          KButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/departmentTraining',
+                arguments: 'Industrial',
+              );
+            },
             text: 'IE',
-            department: 'Industrial',
-            imagePath: 'assets/project_image/IE.jpeg',
+            fontSize: 36,
+            height: 70,
             textColor: Colors.white,
-            opacity: 0.8,
+            borderWidth: 1,
+            borderColor: Colors.black,
+            backgroundImage: const DecorationImage(
+              image: AssetImage('assets/project_image/IE.jpeg'),
+              fit: BoxFit.cover,
+              opacity: 0.8,
+            ),
           ),
         ],
-      ),
-    );
-  }
-  
-  Widget _buildDepartmentButton({
-    required BuildContext context,
-    required String text,
-    required String department,
-    required String imagePath,
-    required Color textColor,
-    double opacity = 1.0,
-  }) {
-    return KButton(
-      onPressed: () {
-        Navigator.pushNamed(
-          context, 
-          '/departmentTraining',
-          arguments: department,
-        );
-      },
-      text: text,
-      fontSize: 36,
-      height: 70,
-      textColor: textColor,
-      borderWidth: 1,
-      borderColor: Colors.black,
-      backgroundImage: DecorationImage(
-        image: AssetImage(imagePath),
-        fit: BoxFit.cover,
-        opacity: opacity,
       ),
     );
   }

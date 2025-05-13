@@ -107,7 +107,7 @@ class AppDrawer extends StatelessWidget {
                         ),
                         ListTile(
                           title: const Text(
-                            "Departments",
+                            "Programs",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
@@ -118,7 +118,7 @@ class AppDrawer extends StatelessWidget {
                                     const AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/department.asp?R=3',
-                                  title: 'Departments',
+                                  title: 'Programs',
                                 ),
                               ),
                             );

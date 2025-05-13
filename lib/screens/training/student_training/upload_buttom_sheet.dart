@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
@@ -15,7 +15,7 @@ class UploadButtomSheet extends StatefulWidget {
 }
 
 class _UploadButtomSheetState extends State<UploadButtomSheet> {
-  String? pdfBase64;
+  File? pdfFile;
   bool _isLoading = false;
   String? fileName;
   Map<String, dynamic>? userData;
@@ -63,6 +63,28 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
     }
   }
 
+  Future<String> _uploadFileToStorage(File file, String studentId) async {
+    try {
+      // Generate a unique file path in Firebase Storage
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final String storagePath = 'training_pdfs/$studentId/$timestamp-${path.basename(file.path)}';
+      
+      // Create a reference to the file location in Firebase Storage
+      final storageRef = FirebaseStorage.instance.ref().child(storagePath);
+      
+      // Upload the file
+      final uploadTask = storageRef.putFile(file);
+      
+      // Wait for the upload to complete and get the download URL
+      final TaskSnapshot taskSnapshot = await uploadTask;
+      final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      
+      return downloadUrl;
+    } catch (e) {
+      throw 'Failed to upload file: $e';
+    }
+  }
+
   Future<void> _saveAnnouncement() async {
     if (_isLoading) return;
     setState(() {
@@ -70,7 +92,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
     });
     try {
       // Validate inputs
-      if (pdfBase64 == null || pdfBase64!.isEmpty) {
+      if (pdfFile == null) {
         throw 'Please upload a PDF file';
       }
       if (fileName == null || fileName!.isEmpty) {
@@ -83,7 +105,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       final String studentId = userData!['id'] ?? '';
       final String firstName = userData!['firstName'] ?? '';
       final String lastName = userData!['lastName'] ?? '';
-      final String studentName = '$firstName$lastName'.trim();
+      final String studentName = '$firstName $lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
       final String department = userData!['department'] ?? '';
       // Validate required fields
@@ -96,10 +118,13 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       if (academicYear.isEmpty) {
         throw 'Academic year not found';
       }
+      
+      // Upload file to Firebase Storage and get download URL
+      final String downloadUrl = await _uploadFileToStorage(pdfFile!, studentId);
+      
       // Save to Firestore
       await FirebaseFirestore.instance.collection('requests').add({
         'file_name': fileName,
-        'pdfBase64': pdfBase64,
         'student_id': studentId,
         'student_name': studentName,
         'type': 'Training',
@@ -110,7 +135,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         'comment': '',
         'pay_in_installments': false,
         'training_score': 0,
-        'file_storage_url': '',
+        'file_storage_url': downloadUrl,
         'location': '',
         'phone_number': '',
         'stamp_type': '',
@@ -168,18 +193,12 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
                       // Get file name from path
                       setState(() {
                         fileName = path.basename(file.path!);
+                        pdfFile = File(file.path!);
                       });
-                      final bytes = await File(file.path!).readAsBytes();
-                      final base64String = base64Encode(bytes);
-                      setState(() {
-                        pdfBase64 = base64String;
-                      });
-                      // Show filename in a snackbar
                       _showCustomSnackBar('Selected file: $fileName');
                     }
                   } catch (e) {
-                    _showCustomSnackBar('Error encoding PDF: $e',
-                        isError: true);
+                    _showCustomSnackBar('Error selecting PDF: $e', isError: true);
                   }
                 },
               ),

@@ -8,16 +8,16 @@ enum DocumentLanguage { arabic, english }
 
 enum StampType { institute, ministry }
 
-class ProofOfEnrollment extends StatefulWidget {
-  const ProofOfEnrollment({
+class CurriculumContentRequest extends StatefulWidget {
+  const CurriculumContentRequest({
     super.key,
   });
 
   @override
-  State<ProofOfEnrollment> createState() => _ProofOfEnrollmentState();
+  State<CurriculumContentRequest> createState() => _CurriculumContentRequest();
 }
 
-class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
+class _CurriculumContentRequest extends State<CurriculumContentRequest> {
   StampType selectedStampType =
       StampType.institute; // Default to institute stamp
   late String studentName;
@@ -105,7 +105,7 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                       Icon(Icons.description, color: Colors.white, size: 24),
                       SizedBox(width: 10),
                       Text(
-                        'Proof Of Enrollment',
+                        'Academic Content',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -438,7 +438,7 @@ class _ProofOfEnrollmentState extends State<ProofOfEnrollment> {
                             'student_id': snapshot.docs.first['id'],
                             'student_name': studentName,
                             'training_score': 0,
-                            'type': 'Proof of enrollment',
+                            'type': 'Academic Content',
                             'year': snapshot.docs.first['academicYear'],
                             'created_at': Timestamp.now(),
                             'location': location,

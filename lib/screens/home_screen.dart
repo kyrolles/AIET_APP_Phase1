@@ -8,6 +8,7 @@ import 'package:graduation_project/screens/announcement/all_announcement_appear_
 import 'dart:convert';
 import 'package:graduation_project/screens/drawer/app_drawer.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
+import 'package:graduation_project/services/notification_service.dart';
 import '../components/activities_list_view.dart';
 import '../components/schedule/home_schedule_view.dart';
 import '../components/text_link.dart';
@@ -73,6 +74,10 @@ class HomeScreenState extends State<HomeScreen> {
 
   Future<void> _logout() async {
     try {
+      // Clean up FCM token
+      final notificationService = NotificationService();
+      await notificationService.cleanupOnLogout();
+      
       // Clear the saved token
       await storage.delete(key: 'token');
 
@@ -129,6 +134,7 @@ class HomeScreenState extends State<HomeScreen> {
                     builder: (context) => AllAnnouncementAppearOnOneScreen(
                       userYear: userYear,
                       userDepartment: userDepartment,
+                      userRole: userRule, // Pass the user role here
                     ),
                   ),
                 );
@@ -141,6 +147,7 @@ class HomeScreenState extends State<HomeScreen> {
               showOnlyLast: true,
               year: userYear,
               department: userDepartment,
+              userRole: userRule, // Pass the user role here
             ),
           ),
           // Schedule Section

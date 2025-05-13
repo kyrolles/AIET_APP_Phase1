@@ -1,22 +1,49 @@
 import 'package:flutter/material.dart';
 
 class FilterWidget extends StatefulWidget {
-  final Function(String? dapertment, String? year, String? type)
+  final Function(String? department, String? year, String? type)
       onFilterChanged;
+  final List<String> statusList;
+  final String? initialDepartment;
+  final String? initialYear;
+  final String? initialType;
 
-  const FilterWidget({super.key, required this.onFilterChanged});
+  const FilterWidget({
+    super.key,
+    required this.onFilterChanged,
+    required this.statusList,
+    this.initialDepartment,
+    this.initialYear,
+    this.initialType,
+  });
 
   @override
   State<FilterWidget> createState() => _FilterWidgetState();
 }
 
 class _FilterWidgetState extends State<FilterWidget> {
-  String? selectedType = 'All';
-  String? selectedYear = 'All';
-  String? selectedDepartment = 'All';
+  String? selectedType;
+  String? selectedYear;
+  String? selectedDepartment;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedType = widget.initialType ?? 'All';
+    selectedYear = widget.initialYear ?? 'All';
+    selectedDepartment = widget.initialDepartment ?? 'All';
+  }
 
   String? filterValue(String? value) {
     return value == 'All' ? null : value;
+  }
+
+  void applyFilters() {
+    widget.onFilterChanged(
+      filterValue(selectedDepartment),
+      filterValue(selectedYear),
+      filterValue(selectedType),
+    );
   }
 
   @override
@@ -29,18 +56,20 @@ class _FilterWidgetState extends State<FilterWidget> {
           hint: const Text('Type'),
           value: selectedType,
           dropdownColor: Colors.white, // Set dropdown menu color to white
-          items: ['All', 'Proof of enrollment', 'Tuition Fees'].map((type) {
+          items: [
+            'All',
+            'Proof of enrollment',
+            'Tuition Fees',
+            'Grades Report', // Add this
+            'Academic Content' // Add this
+          ].map((type) {
             return DropdownMenuItem(value: type, child: Text(type));
           }).toList(),
           onChanged: (value) {
             setState(() {
               selectedType = value;
             });
-            widget.onFilterChanged(
-              filterValue(selectedDepartment),
-              filterValue(selectedYear),
-              filterValue(selectedType),
-            );
+            applyFilters();
           },
         ),
         DropdownButton<String>(
@@ -54,11 +83,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             setState(() {
               selectedDepartment = value;
             });
-            widget.onFilterChanged(
-              filterValue(selectedDepartment),
-              filterValue(selectedYear),
-              filterValue(selectedType),
-            );
+            applyFilters();
           },
         ),
         DropdownButton<String>(
@@ -72,11 +97,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             setState(() {
               selectedYear = value;
             });
-            widget.onFilterChanged(
-              filterValue(selectedDepartment),
-              filterValue(selectedYear),
-              filterValue(selectedType),
-            );
+            applyFilters();
           },
         ),
         const Spacer(),

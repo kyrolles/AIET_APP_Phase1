@@ -14,6 +14,8 @@ import '../../../components/my_app_bar.dart';
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
 import 'proof_of_enrollment.dart';
 import 'tuition_fees_request.dart';
+import 'grades_report_request.dart';
+import 'curriculum_content_request.dart';
 
 class InvoiceScreen extends StatefulWidget {
   const InvoiceScreen({super.key});
@@ -24,7 +26,7 @@ class InvoiceScreen extends StatefulWidget {
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
-      .collection('requests')
+      .collection('student_affairs_requests')
       .orderBy('created_at', descending: true)
       .snapshots();
 
@@ -66,7 +68,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Invoice',
+        title: 'Student Affairs',
         onpressed: () => Navigator.pop(context),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -80,11 +82,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 // Safely get fields using utility
                 String docStudentId =
                     SafeDocumentSnapshot.getField(doc, 'student_id', '');
-                String docType = SafeDocumentSnapshot.getField(doc, 'type', '');
 
-                if (docStudentId == studentId &&
-                    (docType == 'Proof of enrollment' ||
-                        docType == 'Tuition Fees')) {
+                if (docStudentId == studentId) {
                   try {
                     requestsList.add(Request.fromJson(doc));
                   } catch (e) {
@@ -117,6 +116,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 ),
                 tuitionFeesButton(context, requestsList),
                 proofOfEnrollmentButton(context),
+                gradesReportButton(context),
+                curriculumContentButton(context),
               ],
             );
           }),
@@ -164,7 +165,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             pdfBase64: request.pdfBase64,
           ),
         );
-      } else if (request.type == 'Proof of enrollment') {
+      } else {
         requestsWidgets.add(StudentContainer(
           onTap: (BuildContext context) {},
           name: request.studentName,
@@ -178,7 +179,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       : kGreyLight,
           id: request.studentId,
           year: request.year,
-          title: "Proof of enrollment, To: ${request.addressedTo}",
+          title: "${request.type}, To: ${request.addressedTo}",
           image: 'assets/project_image/pdf.png',
           pdfBase64: request.pdfBase64,
         ));
@@ -190,7 +191,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   ServiceItem proofOfEnrollmentButton(BuildContext context) {
     return ServiceItem(
       title: 'Proof of enrollment',
-      imageUrl: 'assets/images/paragraph.png',
+      imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
       backgroundColor: const Color.fromRGBO(241, 196, 15, 1),
       onPressed: () {
         OfflineAwareBottomSheet.show(
@@ -217,51 +218,34 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       },
     );
   }
-}
 
-// Widget statusTile({
-//   required String imagePath,
-//   required String label,
-//   required String status,
-//   required Color statusColor,
-// }) {
-//   return Container(
-//     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-//     margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-//     decoration: BoxDecoration(
-//       color: Colors.white,
-//       borderRadius: BorderRadius.circular(10),
-//     ),
-//     child: Row(
-//       children: [
-//         CircleAvatar(
-//           backgroundColor: Colors.grey[200],
-//           child: Image.asset(
-//             imagePath,
-//             width: 24,
-//             height: 24,
-//           ),
-//         ),
-//         const SizedBox(width: 15),
-//         Expanded(
-//           child: Text(
-//             label,
-//             style: const TextStyle(fontSize: 16),
-//           ),
-//         ),
-//         Text(
-//           status,
-//           style: TextStyle(
-//             color: statusColor,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//         const SizedBox(width: 10),
-//         CircleAvatar(
-//           radius: 8,
-//           backgroundColor: statusColor,
-//         ),
-//       ],
-//     ),
-//   );
-// }
+  ServiceItem gradesReportButton(BuildContext context) {
+    return ServiceItem(
+      title: 'Grades Report',
+      imageUrl: 'assets/images/image 29 (2).png', // Update with correct image
+      backgroundColor: const Color.fromRGBO(46, 204, 113, 1),
+      onPressed: () {
+        OfflineAwareBottomSheet.show(
+          isScrollControlled: true,
+          context: context,
+          onlineContent: const GradesReportRequest(),
+        );
+      },
+    );
+  }
+
+  ServiceItem curriculumContentButton(BuildContext context) {
+    return ServiceItem(
+      title: 'Academic Content',
+      imageUrl: 'assets/images/image 29 (2).png', // Update with correct image
+      backgroundColor: const Color.fromRGBO(155, 89, 182, 1),
+      onPressed: () {
+        OfflineAwareBottomSheet.show(
+          isScrollControlled: true,
+          context: context,
+          onlineContent: const CurriculumContentRequest(),
+        );
+      },
+    );
+  }
+}

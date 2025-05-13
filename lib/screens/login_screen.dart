@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:graduation_project/services/auth_service.dart';
+import 'package:graduation_project/services/notification_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,10 +17,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
+  final NotificationService _notificationService = NotificationService();
 
   bool _isPasswordVisible = false;
   bool _hasError = false;
+  bool _isLoading = false;
 
   bool _validateInputs() {
     bool isValid = _formKey.currentState?.validate() ?? false;
@@ -30,15 +34,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _performLogin() async {
     if (_validateInputs()) {
+      setState(() {
+        _isLoading = true;
+      });
+      
       try {
-        UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
+        await _authService.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
-
-        // Save the user's token securely
-        await storage.write(key: 'token', value: userCredential.user?.uid);
+        
+        // Refresh and save FCM token after successful login
+        await _notificationService.refreshAndSaveToken();
 
         // Navigate to home screen
         Navigator.pushReplacement(
@@ -48,9 +55,18 @@ class _LoginScreenState extends State<LoginScreen> {
       } on FirebaseAuthException catch (e) {
         setState(() {
           _hasError = true;
+          _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.message ?? 'Login failed')),
+        );
+      } catch (e) {
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: $e')),
         );
       }
     }
@@ -162,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _performLogin,
+        onPressed: _isLoading ? null : _performLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF0074CE),
           shape: RoundedRectangleBorder(
@@ -170,14 +186,23 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           padding: const EdgeInsets.symmetric(vertical: 20),
         ),
-        child: const Text(
-          'Login',
-          style: TextStyle(
-            fontSize: 18,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: _isLoading 
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : const Text(
+              'Login',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
       ),
     );
   }

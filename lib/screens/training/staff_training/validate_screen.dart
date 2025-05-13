@@ -6,6 +6,7 @@ import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:graduation_project/screens/training/staff_training/filter_bottom_sheet.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
 
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
@@ -18,12 +19,27 @@ class ValidateScreen extends StatefulWidget {
 }
 
 class _ValidateScreenState extends State<ValidateScreen> {
-  final Stream<QuerySnapshot> _requestsStream = FirebaseFirestore.instance
-      .collection('requests')
-      .where('type', isEqualTo: 'Training')
-      .where('status', whereIn: ['No status', 'Pending'])
-      .orderBy('created_at', descending: true)
-      .snapshots();
+  String? selectedYear;
+  late Stream<QuerySnapshot> _requestsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRequestsStream();
+  }
+
+  void _updateRequestsStream() {
+    Query query = FirebaseFirestore.instance
+        .collection('requests')
+        .where('type', isEqualTo: 'Training')
+        .where('status', whereIn: ['No status', 'Pending']);
+
+    if (selectedYear != null) {
+      query = query.where('year', isEqualTo: selectedYear);
+    }
+
+    _requestsStream = query.orderBy('created_at', descending: true).snapshots();
+  }
 
   List<Request> requestsList = [];
 
@@ -63,6 +79,26 @@ class _ValidateScreenState extends State<ValidateScreen> {
       appBar: MyAppBar(
         title: 'Validate',
         onpressed: () => Navigator.pop(context),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              OfflineAwareBottomSheet.show(
+                context: context,
+                onlineContent: FilterBottomSheet(
+                  onYearSelected: (year) {
+                    setState(() {
+                      selectedYear = year;
+                      _updateRequestsStream();
+                    });
+                  },
+                  currentYear: selectedYear,
+                ),
+                backgroundColor: const Color.fromRGBO(250, 250, 250, 0.93),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
