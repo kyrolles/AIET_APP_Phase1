@@ -2,7 +2,7 @@ name: graduation_project
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -40,6 +40,8 @@ dependencies:
   firebase_storage: ^12.3.7
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_local_notifications: ^19.1.0
   flutter_offline: ^4.0.0
@@ -50,7 +52,7 @@ dependencies:
   flutterfire_cli: ^1.0.1-dev.4
   google_nav_bar: ^5.0.6
   image_picker: ^1.1.2
-  intl: ^0.18.0
+  # intl: ^0.18.0
   mobile_scanner: ^3.5.5
   open_file: ^3.5.10
   path_provider: ^2.1.5
@@ -79,7 +81,6 @@ flutter_launcher_icons:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
