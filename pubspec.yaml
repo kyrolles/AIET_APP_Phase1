@@ -49,7 +49,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   flutter_secure_storage: ^9.2.2
   flutter_svg: ^2.0.10+1
-  flutterfire_cli: ^1.0.1-dev.4
+  # flutterfire_cli: ^1.0.1-dev.4
   google_nav_bar: ^5.0.6
   image_picker: ^1.1.2
   # intl: ^0.18.0
@@ -81,6 +81,8 @@ flutter_launcher_icons:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

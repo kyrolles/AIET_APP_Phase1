@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:graduation_project/language_clases/language_constants.dart';
 import 'package:graduation_project/screens/drawer/academic_webview_screen.dart';
 import '../admin/schedule_management_screen.dart';
+import 'package:graduation_project/language_clases/language.dart';
+import 'package:graduation_project/language_clases/language_constants.dart';
+import 'package:graduation_project/main.dart';
 
 class AppDrawer extends StatelessWidget {
   final Function() onLogout;
@@ -139,6 +143,7 @@ class AppDrawer extends StatelessWidget {
                             );
                           },
                         ),
+
                         // Add more links here if needed
                       ],
                     ),
@@ -555,6 +560,63 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
 
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25.0),
+                    child: ExpansionTile(
+                      leading: const Icon(
+                        Icons.settings,
+                        size: 30,
+                      ),
+                      title: const Text(
+                        "Settings",
+                        style: kTextStyleBold,
+                      ),
+                      iconColor: kBlue,
+                      children: [
+                        DropdownButton<Language>(
+                          underline: const SizedBox(),
+                          hint: Row(
+                            children: [
+                              const Icon(
+                                Icons.language,
+                                size: 30,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(translation(context).changeLanguage),
+                            ],
+                          ),
+                          onChanged: (Language? language) async {
+                            if (language != null) {
+                              Locale _locale =
+                                  await setLocale(language.languageCode);
+                              MyApp.setLocale(context, _locale);
+                            }
+                          },
+                          items: Language.languageList()
+                              .map<DropdownMenuItem<Language>>(
+                                (e) => DropdownMenuItem<Language>(
+                                  value: e,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Text(
+                                        e.flag,
+                                        style: const TextStyle(fontSize: 30),
+                                      ),
+                                      Text(e.name)
+                                    ],
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+
+                        // Add more links here if needed
+                      ],
+                    ),
+                  ),
+                  // Add some space between sections
                   // About section
                   // const Padding(
                   //   padding: EdgeInsets.only(left: 25.0),
