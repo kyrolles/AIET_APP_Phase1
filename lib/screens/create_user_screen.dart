@@ -6,6 +6,7 @@ import '../components/my_app_bar.dart';
 import 'package:uuid/uuid.dart';
 import '../services/results_service.dart';
 import '../services/schedule_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({super.key});
@@ -335,9 +336,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Academic Year',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         const SizedBox(height: 8),
@@ -394,7 +395,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       ),
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Create Account'),
+                          : Text(AppLocalizations.of(context)?.createAccount ??
+                              'Create Account'),
                     ),
                   ),
 
@@ -432,18 +434,38 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     required String label,
     required String hintText,
   }) {
+    final localizations = AppLocalizations.of(context);
+
+    String localizedLabel = label;
+    String localizedHint = hintText;
+
+    // Map common field labels to their localized versions
+    if (label == 'Email') {
+      localizedLabel = localizations?.email ?? 'Email';
+      localizedHint = localizations?.emailHint ?? 'Enter your email';
+    } else if (label == 'First name' || label == 'Last name') {
+      localizedLabel = localizations?.name ?? 'Name';
+      localizedHint = localizations?.nameHint ?? 'Enter your name';
+    } else if (label == 'Phone') {
+      localizedLabel = localizations?.phoneNumber ?? 'Phone Number';
+      localizedHint =
+          localizations?.phoneNumberHint ?? 'Enter your phone number';
+    } else if (label == 'Date of Birth') {
+      localizedLabel = localizations?.dateOfBirth ?? 'Date of Birth';
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          localizedLabel,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: hintText,
+            hintText: localizedHint,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
@@ -451,13 +473,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'This field is required';
+              return localizations?.requiredField ?? 'This field is required';
             }
             // Add email format validation
             if (label == 'Email') {
               final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
               if (!emailRegExp.hasMatch(value)) {
-                return 'Please enter a valid email address';
+                return localizations?.invalidEmail ??
+                    'Please enter a valid email address';
               }
             }
             return null;
@@ -470,19 +493,20 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   Widget _buildPasswordField({
     required TextEditingController controller,
   }) {
+    final localizations = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Password',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        Text(
+          localizations?.password ?? 'Password',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: !isPasswordVisible,
           decoration: InputDecoration(
-            hintText: 'enter Password',
+            hintText: localizations?.passwordHint ?? 'Enter Password',
             suffixIcon: IconButton(
               icon: Icon(
                   isPasswordVisible ? Icons.visibility : Icons.visibility_off),
@@ -499,10 +523,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Password is required';
+              return localizations?.requiredField ?? 'Password is required';
             }
             if (value.length < 15) {
-              return 'Password must be at least 15 characters';
+              return localizations?.invalidPassword ??
+                  'Password must be at least 15 characters';
             }
             return null;
           },
@@ -514,12 +539,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   Widget _buildDateField({
     required TextEditingController controller,
   }) {
+    final localizations = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Birth Date',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        Text(
+          localizations?.dateOfBirth ?? 'Birth Date',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
         TextFormField(

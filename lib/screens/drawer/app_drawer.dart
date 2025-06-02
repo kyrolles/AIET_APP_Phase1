@@ -6,6 +6,7 @@ import '../admin/schedule_management_screen.dart';
 import 'package:graduation_project/language_clases/language.dart';
 import 'package:graduation_project/language_clases/language_constants.dart';
 import 'package:graduation_project/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppDrawer extends StatelessWidget {
   final Function() onLogout;
@@ -370,8 +371,7 @@ class AppDrawer extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                  // About AIET section code...
+                  ), // About AIET section code...
                   Padding(
                     padding: const EdgeInsets.only(left: 25.0),
                     child: ExpansionTile(
@@ -379,8 +379,8 @@ class AppDrawer extends StatelessWidget {
                         Icons.info_outline,
                         size: 30,
                       ),
-                      title: const Text(
-                        "About AIET",
+                      title: Text(
+                        AppLocalizations.of(context)?.aboutUs ?? "About AIET",
                         style: kTextStyleBold,
                       ),
                       iconColor: kBlue,
@@ -567,8 +567,8 @@ class AppDrawer extends StatelessWidget {
                         Icons.settings,
                         size: 30,
                       ),
-                      title: const Text(
-                        "Settings",
+                      title: Text(
+                        AppLocalizations.of(context)?.settings ?? "Settings",
                         style: kTextStyleBold,
                       ),
                       iconColor: kBlue,

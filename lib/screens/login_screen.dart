@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graduation_project/services/auth_service.dart';
 import 'package:graduation_project/services/notification_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,13 +38,13 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = true;
       });
-      
+
       try {
         await _authService.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
-        
+
         // Refresh and save FCM token after successful login
         await _notificationService.refreshAndSaveToken();
 
@@ -117,7 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _emailController,
       cursorColor: Colors.blue,
       decoration: InputDecoration(
-        labelText: 'Email',
+        labelText: AppLocalizations.of(context)!.email,
+        hintText: AppLocalizations.of(context)!.emailHint,
         border: _inputBorder(),
         enabledBorder: _inputBorder(color: Colors.black),
         focusedBorder: _inputBorder(color: Colors.blue, width: 2.0),
@@ -127,9 +129,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter your email';
+          return AppLocalizations.of(context)!.fieldRequired;
         } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-          return 'Please enter a valid email';
+          return AppLocalizations.of(context)!.invalidEmail;
         }
         return null;
       },
@@ -138,12 +140,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildPasswordField() {
+    final localizations = AppLocalizations.of(context);
     return TextFormField(
       controller: _passwordController,
       obscureText: !_isPasswordVisible,
       cursorColor: Colors.blue,
       decoration: InputDecoration(
-        labelText: 'Password',
+        labelText: localizations?.password ?? 'Password',
+        hintText: localizations?.passwordHint ?? 'Enter your password',
         border: _inputBorder(),
         enabledBorder: _inputBorder(color: Colors.black),
         focusedBorder: _inputBorder(color: Colors.blue, width: 2.0),
@@ -164,9 +168,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter your password';
+          return localizations?.requiredField ?? 'Required field';
         } else if (value.length < 6) {
-          return 'Password must be at least 6 characters';
+          return localizations?.invalidPassword ??
+              'Password must be at least 6 characters';
         }
         return null;
       },
@@ -175,6 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginButton() {
+    final localizations = AppLocalizations.of(context);
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -186,23 +192,23 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           padding: const EdgeInsets.symmetric(vertical: 20),
         ),
-        child: _isLoading 
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
+        child: _isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                localizations?.login ?? 'Login',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            )
-          : const Text(
-              'Login',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
       ),
     );
   }

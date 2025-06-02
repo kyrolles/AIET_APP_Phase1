@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:graduation_project/screens/drawer/app_drawer.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
 import 'package:graduation_project/services/notification_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../components/activities_list_view.dart';
 import '../components/schedule/home_schedule_view.dart';
 import '../components/text_link.dart';
@@ -77,7 +78,7 @@ class HomeScreenState extends State<HomeScreen> {
       // Clean up FCM token
       final notificationService = NotificationService();
       await notificationService.cleanupOnLogout();
-      
+
       // Clear the saved token
       await storage.delete(key: 'token');
 
@@ -194,7 +195,9 @@ class HomeScreenState extends State<HomeScreen> {
         children: [
           const Spacer(),
           Text(
-            userName.isNotEmpty ? 'Hi, ${userName.split(' ')[0]}!' : 'Hi!',
+            userName.isNotEmpty
+                ? '${AppLocalizations.of(context)?.welcome ?? "Hi"}, ${userName.split(' ')[0]}!'
+                : AppLocalizations.of(context)?.welcome ?? 'Hi!',
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 27),
           ),
           const SizedBox(width: 8),
