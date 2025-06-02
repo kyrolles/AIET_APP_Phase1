@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import '../constants.dart';
+import '../../constants.dart';
 
 class BuildingSelection extends StatelessWidget {
   final void Function(int)? onTabChange;
