@@ -19,6 +19,7 @@ class CurriculumContentSheetScreen extends StatelessWidget {
   final Function() pendingFunctionality;
   final Request request;
 
+  @override
   Widget build(BuildContext context) {
     // Log the initial state for debugging
     log('ProofOfEnrollmentSheetScreen opened for request:');
@@ -27,13 +28,27 @@ class CurriculumContentSheetScreen extends StatelessWidget {
     log('Addressed To: ${request.addressedTo}');
     log('Current Status: ${request.status}');
 
-    return SizedBox(
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 24.0,
+        ),
         child: Column(
-          spacing: 20,
+          spacing: 10,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
             const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -45,6 +60,7 @@ class CurriculumContentSheetScreen extends StatelessWidget {
                         color: Color(0XFF6C7072)),
                   ),
                 ]),
+            const SizedBox(height: 16),
             TextAndDataWidget(text: 'Name : ', data: request.studentName),
             TextAndDataWidget(
                 text: 'Organization : ', data: request.addressedTo),
@@ -52,7 +68,18 @@ class CurriculumContentSheetScreen extends StatelessWidget {
             TextAndDataWidget(
                 text: 'Phone Number : ', data: request.phoneNumber),
             TextAndDataWidget(
-                text: '(Institute/Ministry) : ', data: request.stampType),
+                text: 'Language : ', data: request.documentLanguage),
+            TextAndDataWidget(
+                text: 'Date Oof birth : ', data: request.birthDate),
+            TextAndDataWidget(
+                text: 'Location of birth : ', data: request.loctionOfBirth),
+            TextAndDataWidget(text: 'Year : ', data: request.year),
+            TextAndDataWidget(text: 'Department : ', data: request.department),
+            TextAndDataWidget(text: 'The Cause : ', data: request.theCause),
+            TextAndDataWidget(
+                text: 'Date : ',
+                data:
+                    '${request.createdAt.toDate().year}-${request.createdAt.toDate().month}-${request.createdAt.toDate().day}'),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
