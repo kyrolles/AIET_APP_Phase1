@@ -20,9 +20,11 @@ class Request {
   final String documentLanguage;
   final String stampType;
   final String loctionOfBirth;
+  final String birthDate;
   final String theCause;
 
   Request({
+    required this.birthDate,
     required this.loctionOfBirth,
     required this.theCause,
     required this.department,
@@ -64,6 +66,7 @@ class Request {
     return Request(
       addressedTo: safeGet<String>('addressed_to') ?? '',
       loctionOfBirth: safeGet<String>('location_of_birth') ?? '',
+      birthDate: safeGet<String>('birth_date') ?? '',
       theCause: safeGet<String>('the_cause') ?? '',
       department: safeGet<String>('department') ?? '',
       comment: safeGet<String>('comment') ?? '',
