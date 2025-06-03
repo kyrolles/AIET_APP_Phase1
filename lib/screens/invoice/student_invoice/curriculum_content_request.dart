@@ -26,6 +26,8 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
   late String phoneNumber;
   DocumentLanguage selectedLanguage =
       DocumentLanguage.arabic; // Default to Arabic
+  late String locationOfBirth;
+  late String theCause;
 
   GlobalKey<FormState> formKey = GlobalKey();
 
@@ -292,6 +294,96 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Location of Birth TextField
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Field is required';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    locationOfBirth = value;
+                  },
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    labelText: 'Enter Your Location of Birth',
+                    labelStyle: const TextStyle(
+                        color: kPrimaryColor, fontWeight: FontWeight.w500),
+                    prefixIcon:
+                        const Icon(Icons.location_city, color: kPrimaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // The Cause TextField
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Field is required';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    theCause = value;
+                  },
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    labelText: 'Enter The Cause',
+                    labelStyle: const TextStyle(
+                        color: kPrimaryColor, fontWeight: FontWeight.w500),
+                    prefixIcon:
+                        const Icon(Icons.description, color: kPrimaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: kPrimaryColor, width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
                 // Stamp Type Selection with enhanced design
                 Container(
                   width: double.infinity,
@@ -430,14 +522,10 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
                               .collection('student_affairs_requests')
                               .add({
                             'addressed_to': addressedTo,
-                            'comment': '',
-                            'file_name': '',
-                            'pdfBase64': '',
                             'pay_in_installments': false,
                             'status': 'No Status',
                             'student_id': snapshot.docs.first['id'],
                             'student_name': studentName,
-                            'training_score': 0,
                             'type': 'Academic Content',
                             'year': snapshot.docs.first['academicYear'],
                             'created_at': Timestamp.now(),
@@ -445,7 +533,10 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
                             'phone_number': phoneNumber,
                             'document_language': languageValue,
                             'stamp_type': stampTypeValue,
-                            'department': snapshot.docs.first['department']
+                            'department': snapshot.docs.first['department'],
+                            'birth_date': snapshot.docs.first['birthDate'],
+                            'the_cause': theCause,
+                            'location_of_birth': locationOfBirth,
                           });
 
                           ScaffoldMessenger.of(context).showSnackBar(
