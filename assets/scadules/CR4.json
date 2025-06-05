@@ -1,0 +1,175 @@
+{
+  "CR4": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME412",
+      "subject_name": "Refrigeration & Air Conditioning Tut",
+      "teacher": ["Eng. Tasneem Mohamed El Rouby"],
+      "group": ["4M1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-EME412",
+      "subject_name": "Refrigeration & Air Conditioning Tut",
+      "teacher": ["Eng. Tasneem Mohamed El Rouby"],
+      "group": ["4M3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-ECE442",
+      "subject_name": "VLSI Fabrication & Design Tut",
+      "teacher": ["Eng. Sherin Ahmed Younis"],
+      "group": ["4E2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-CE212",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Asmaa AbdelRehim"],
+      "group": ["2M1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["1E2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-EM442",
+      "subject_name": "Industrial Safety Tut",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-IE332",
+      "subject_name": "Project Management Tut",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-ECE322",
+      "subject_name": "Micro - Processor System Tut",
+      "teacher": ["Eng. Rana Mohamed Abdel El Ghany"],
+      "group": ["3E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-ECE322",
+      "subject_name": "Micro - Processor System Tut",
+      "teacher": ["Eng. Rana Mohamed Abdel El Ghany"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ECE224",
+      "subject_name": "Integrated Circuit Devices Tut",
+      "teacher": ["Eng. Hoda Mohamed Farid"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["2E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ME142",
+      "subject_name": "Design of machine element Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ME142",
+      "subject_name": "Design of machine element Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Eng. Nourhan Amin", "Dr. Omnia Gawdat"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-IED071",
+      "subject_name": "Engineering Drawing & Projection Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-ECE442",
+      "subject_name": "VLSI Fabrication & Design Tut",
+      "teacher": ["Eng. Sherin Ahmed Younis"],
+      "group": ["4E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-ECE442",
+      "subject_name": "VLSI Fabrication & Design Tut",
+      "teacher": ["Eng. Sherin Ahmed Younis"],
+      "group": ["4E1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-ECE322",
+      "subject_name": "Micro - Processor System Tut",
+      "teacher": ["Eng. Rana Mohamed Abdel El Ghany"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CE312",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Mohamed Zein EL Abdeen"],
+      "group": ["3E2"]
+    }
+  ]
+}

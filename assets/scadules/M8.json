@@ -1,0 +1,166 @@
+{
+  "M8": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME312",
+      "subject_name": "Fluid Mechanics",
+      "teachers": ["Dr Asmaa Attya", "Prof. Dr Wageeh El Askary"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME312",
+      "subject_name": "Fluid Mechanics",
+      "teachers": ["Dr Asmaa Attya", "Prof. Dr Wageeh El Askary"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME314",
+      "subject_name": "Heat Transfer",
+      "teachers": ["Dr Asmaa Attya Ibrahim"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE224",
+      "subject_name": "Integrated Circuit Devices",
+      "teachers": ["Dr. Mohamed El Ameer Ismael"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE222",
+      "subject_name": "Analog Integrated Circuit",
+      "teachers": ["Dr. Mohamed El Ameer Ismael"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME252",
+      "subject_name": "Mechanical Engineering",
+      "teachers": ["Dr. Hassan Ahmed El Shobashy"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME252",
+      "subject_name": "Mechanical Engineering",
+      "teachers": ["Dr. Hassan Ahmed El Shobashy"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE224",
+      "subject_name": "Integrated Circuit Devices",
+      "teachers": ["Dr. Mohamed El Ameer Ismael"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE112",
+      "subject_name": "Logic Design",
+      "teachers": ["Dr. Rasha Said El Khamy"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "L-CE402",
+      "subject_name": "Computer Graphics",
+      "teachers": ["Dr. Amira Gamal Mohamed"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "L-EM322",
+      "subject_name": "Introduction to Marketing",
+      "teachers": ["Dr. Hadeer Ragab abdelMonem"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE112",
+      "subject_name": "Logic Design",
+      "teachers": ["Dr. Reda El Shishtawy Mohamed"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE112",
+      "subject_name": "Logic Design",
+      "teachers": ["Dr. Reda El Shishtawy Mohamed"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME142",
+      "subject_name": "Design of machine element",
+      "teachers": ["Dr. Kassem Kadry Kassem"],
+      "groups": ["1I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE314",
+      "subject_name": "Computer Architecture",
+      "teachers": ["Dr. Eman Shawky"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE314",
+      "subject_name": "Computer Architecture",
+      "teachers": ["Dr. Eman Shawky"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE302",
+      "subject_name": "Formal Language",
+      "teachers": ["Dr. Eman Shawky"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "L-CE302",
+      "subject_name": "Formal Language",
+      "teachers": ["Dr. Eman Shawky"],
+      "groups": ["3C1"]
+    }
+  ]
+}

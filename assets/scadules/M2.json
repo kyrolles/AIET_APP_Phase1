@@ -1,0 +1,130 @@
+{
+  "M2": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM442",
+      "subject_name": "Engineering Management",
+      "teachers": ["Dr. Hany Mohamed Arnaoot"],
+      "groups": ["4I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CED072",
+      "subject_name": "Computer and Programming II",
+      "teachers": ["Dr. Asmaa Mohamed Aly"],
+      "groups": ["0GNC1", "0GNC2", "0GNC3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CED072",
+      "subject_name": "Computer and Programming II",
+      "teachers": ["Dr. Asmaa Mohamed Aly"],
+      "groups": ["0GNC4", "0GNC5", "0GNC6"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MED017",
+      "subject_name": "Engineering Mechanics II",
+      "teachers": ["Dr. Yousra Hamdy Farid"],
+      "groups": ["0GNC1", "0GNC2", "0GNC3"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MED017",
+      "subject_name": "Engineering Mechanics II",
+      "teachers": ["Dr. Yousra Hamdy Farid"],
+      "groups": ["0GNC4", "0GNC5", "0GNC6"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM442",
+      "subject_name": "Engineering Management",
+      "teachers": ["Dr. Hany Mohamed Arnaoot"],
+      "groups": ["4I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE482",
+      "subject_name": "Digital Control",
+      "teachers": ["Dr. Amira Salah Eldin EL Batouty"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": "Odd",
+      "subject": "L-EM322",
+      "subject_name": "Introduction to Marketing",
+      "teachers": ["Dr. Hadeer Ragab AbdelMoneim"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-PHY012",
+      "subject_name": "Physics 2",
+      "teachers": ["Dr. Amel Saleh Soliman"],
+      "groups": ["0G1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": "Even",
+      "subject": "L-EM222",
+      "subject_name": "Fundamentals of Marketing",
+      "teachers": ["Dr. Amna Saeed Mohamed"],
+      "groups": ["2I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE322",
+      "subject_name": "Operating System",
+      "teachers": ["Dr. Soha Ahmed"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE322",
+      "subject_name": "Operating System",
+      "teachers": ["Dr. Soha Ahmed"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME412",
+      "subject_name": "Refrigeration & Air Conditioning",
+      "teachers": ["Dr. Amr Nassr Eldin AbdelGaber"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME412",
+      "subject_name": "Refrigeration & Air Conditioning",
+      "teachers": ["Dr. Amr Nassr Eldin AbdelGaber"],
+      "groups": ["4M1", "4M2"]
+    }
+  ]
+}

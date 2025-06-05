@@ -1,0 +1,13 @@
+{
+  "B-4-06": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IE332",
+      "subject_name": "Engineering Measurements Lab",
+      "teacher": ["Eng. Dina mokhtar", "Dr. Marwa"],
+      "group": ["3I1"]
+    }
+  ]
+}

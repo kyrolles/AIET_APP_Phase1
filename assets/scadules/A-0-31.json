@@ -1,0 +1,67 @@
+{
+  "A-0-31": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-PMD022",
+      "subject_name": "Engineering Physics II, Lab",
+      "teacher": ["Eng. Shimaa Helal", "Eng Yara Gamal"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-PMD022",
+      "subject_name": "Engineering Physics II, Lab",
+      "teacher": ["Eng. Shimaa Helal", "Eng Yara Gamal"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-PMD022",
+      "subject_name": "Engineering Physics II, Lab",
+      "teacher": ["Eng. Ahmed Reda", "Eng Nada Ehab"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-PMD022",
+      "subject_name": "Engineering Physics II, Lab",
+      "teacher": ["Eng. Ahmed Reda", "Eng Nada Ehab"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-PMD022",
+      "subject_name": "Engineering Physics II, Lab",
+      "teacher": ["Eng. Ahmed Reda", "Eng. Mayar Moustafa", "Eng Nada Ehab"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-PMD022",
+      "subject_name": "Engineering Physics II, Lab",
+      "teacher": ["Eng. Ahmed Reda", "Eng. Mayar Moustafa", "Eng Nada Ehab"],
+      "group": ["0GNC6"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-PHY012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Eng. Ahmed Reda", "Eng Yara Gamal", "Eng M Ayoub"],
+      "group": ["0G1"]
+    }
+  ]
+}

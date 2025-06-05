@@ -1,0 +1,31 @@
+{
+  "CR12": [
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CE304",
+      "subject_name": "Information Technology Tut",
+      "teacher": ["Eng Menna Allah Ibraheem"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-ECE352",
+      "subject_name": "Digital Communication Tut",
+      "teacher": ["Eng Somaya"],
+      "group": ["3E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-ECE352",
+      "subject_name": "Digital Communication Tut",
+      "teacher": ["Eng Somaya"],
+      "group": ["3E4"]
+    }
+  ]
+}

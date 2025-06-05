@@ -1,0 +1,148 @@
+{
+  "A-0-19": [
+    {
+      "day": "Saturday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102",
+      "teacher": ["Eng. Shimaa Helal Elsayed"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102",
+      "teacher": ["Eng. Noha Nabil El Zahar"],
+      "group": ["1M1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B_CE002",
+      "subject_name": "Computer Programing Lab",
+      "teacher": ["Eng. Noha", "Dr Asmaa Aly", "Eng Mazen"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-IE302",
+      "subject_name": "Management Information Sys Lab",
+      "teacher": ["Eng Ayman M Kamil"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-CE102",
+      "subject_name": "Introduction to information technology Lab",
+      "teacher": ["Eng Mazen"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-ECE454",
+      "subject_name": "Image Processing Lab",
+      "teacher": ["Eng Mazen"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-CE302",
+      "subject_name": "Formal Language Lab",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-CE406",
+      "subject_name": "Expert System Application Lab",
+      "teacher": ["Eng Menna Allah Ibraheem"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-EM222",
+      "subject_name": "Analog Integrated Circuit Lab",
+      "teacher": ["Eng. Ibraheem Abd Fattah Mohamed"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-CE406",
+      "subject_name": "Expert System Application Lab",
+      "teacher": ["Eng Menna Allah Ibraheem"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-CE402",
+      "subject_name": "Computer Graphics Lab",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["4E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-CE402",
+      "subject_name": "Computer Graphics Lab",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-ECE354",
+      "subject_name": "Digital Filtering Lab",
+      "teacher": ["Eng Hams"],
+      "group": ["3E3", "3E4", "3E1", "3E2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-EM222",
+      "subject_name": "Analog Integrated Circuit Lab",
+      "teacher": ["Eng. Ibraheem Abd Fattah Mohamed"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-CE414",
+      "subject_name": "Computer Network Lab",
+      "teacher": ["Eng Menna Allah Ibraheem"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-CE402",
+      "subject_name": "Computer Graphics Lab",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["4C1"]
+    }
+  ]
+}

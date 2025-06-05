@@ -1,0 +1,202 @@
+{
+  "M10": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE354",
+      "subject_name": "Digital Filtering",
+      "teachers": ["Dr. M Adel Hassan"],
+      "groups": ["3E1", "3E2", "3E3", "3E4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-ECE354",
+      "subject_name": "Digital Filtering",
+      "teachers": ["Dr. M Adel Hassan"],
+      "groups": ["3E1", "3E2", "3E3", "3E4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-ECE354",
+      "subject_name": "Digital Filtering Tut",
+      "teachers": ["Dr. M Adel Hassan"],
+      "groups": ["3E1", "3E2", "3E3", "3E4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Reda El Shishtawy Mohamed"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Saturday",
+      "period": "4",
+      "week_type": ["Odd","Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Reda El Shishtawy Mohamed"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME312",
+      "subject_name": "Fluid Mechanics",
+      "teachers": ["Dr. Asmaa Attya", "Prof. Dr. Wageeh El Askary"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-CE304",
+      "subject_name": "Information Technology",
+      "teachers": ["Dr. Amr Hassan Yassein"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "L-EME314",
+      "subject_name": "Heat Transfer",
+      "teachers": ["Dr. Asmaa Attya Ibrahim"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE454",
+      "subject_name": "Image Processing",
+      "teachers": ["Dr. Amr Hassan Yassein"],
+      "groups": ["4C1", "4C2"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Mohamed Ibrahim El Bouraidy"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Mohamed Ibrahim El Bouraidy"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE304",
+      "subject_name": "Information Technology",
+      "teachers": ["Dr. Amr Hassan Yassein"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE454",
+      "subject_name": "Image Processing",
+      "teachers": ["Dr. Amr Hassan Yassein"],
+      "groups": ["4C1", "4C2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "L-ECE322",
+      "subject_name": "Optical Electronics",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "L-ECE322",
+      "subject_name": "Optical Electronics",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE322",
+      "subject_name": "Optical Electronics",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME222",
+      "subject_name": "Analog Integrated Circuit",
+      "teachers": ["Dr. Mohamed El Ameer Ismael"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE442",
+      "subject_name": "VLSI Fabrication & Design",
+      "teachers": ["Dr. Amr Hassan Yassein"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE442",
+      "subject_name": "VLSI Fabrication & Design",
+      "teachers": ["Dr. Amr Hassan Yassein"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE132",
+      "subject_name": "Electric Circuit 2",
+      "teachers": ["Dr. Ahmed Keshk"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME222",
+      "subject_name": "Analog Integrated Circuit",
+      "teachers": ["Dr. Amna Saeed Mohamed"],
+      "groups": ["2I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE452",
+      "subject_name": "Optical Information Processing",
+      "teachers": ["Dr. Amira Gamal Mohamed"],
+      "groups": ["4E1", "4E2", "4E3"]
+    }
+  ]
+}

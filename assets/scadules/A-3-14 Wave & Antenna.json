@@ -1,0 +1,22 @@
+{
+  "A-3-14": [
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-ECE362",
+      "subject_name": "Introduction to Microwaves Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng. Fayrouz"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-ECE362",
+      "subject_name": "Introduction to Microwaves Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng Mennallah Abd El-satar"],
+      "group": ["3E1"]
+    }
+  ]
+}

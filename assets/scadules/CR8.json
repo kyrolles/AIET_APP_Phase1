@@ -1,0 +1,112 @@
+{
+  "CR8": [
+    {
+      "day": "Saturday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Eng Somaya"],
+      "group": ["2M3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-ECE134",
+      "subject_name": "Fundamentals of Electrical Engineering Tut",
+      "teacher": ["Dr. Marwa Samara Mohamed"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-ECE132",
+      "subject_name": "Electric Circuit 2 Tut",
+      "teacher": ["Dr. Marwa Samara Mohamed"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MED017",
+      "subject_name": "Engineering Mechanics II, Tut",
+      "teacher": ["Eng. Omar AbdelAziz Keshk"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MED017",
+      "subject_name": "Engineering Mechanics II, Tut",
+      "teacher": ["Eng. Omar AbdelAziz Keshk"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD022",
+      "subject_name": "Engineering Physics II, Tut",
+      "teacher": ["Eng Yara Gamal"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME314",
+      "subject_name": "Heat Transfer Tut",
+      "teacher": ["Eng Yara Gamal"],
+      "group": ["3M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME302",
+      "subject_name": "Engineering Vibrations Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PHY012",
+      "subject_name": "Physics 2 Tut",
+      "teacher": ["Dr. Amel Saleh Soliman"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-ECE454",
+      "subject_name": "Image Processing Tut",
+      "teacher": ["Eng Mazen"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CED072",
+      "subject_name": "Computer and Programming II, Tut",
+      "teacher": ["Eng Mazen"],
+      "group": ["0GNC6"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-EM222",
+      "subject_name": "Analog Integrated Circuit Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E1"]
+    }
+  ]
+}

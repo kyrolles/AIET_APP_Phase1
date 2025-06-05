@@ -1,0 +1,76 @@
+{
+  "CR11": [
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME312",
+      "subject_name": "Engineering Mechanics II, Tut",
+      "teacher": ["Eng. Mohamed Ahmed El. Saadany"],
+      "group": ["3M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD012",
+      "subject_name": "Engineering Math II, Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD012",
+      "subject_name": "Engineering Math II, Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-EME342",
+      "subject_name": "Power Electronics Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-CIE202",
+      "subject_name": "Civil Engineering Tut",
+      "teacher": ["Eng. Mayar Moustafa"],
+      "group": ["2E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-CIE202",
+      "subject_name": "Civil Engineering Tut",
+      "teacher": ["Eng. Mayar Moustafa"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-EME342",
+      "subject_name": "Power Electronics Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["3M4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-EME302",
+      "subject_name": "Engineering Vibrations Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["3M2"]
+    }
+  ]
+}

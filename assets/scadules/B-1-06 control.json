@@ -1,0 +1,31 @@
+{
+  "B-1-06": [
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-ECE382",
+      "subject_name": "Controle System Thoery & Design Lab",
+      "teacher": ["Eng. Hossam Abou Kil AbdElAzim"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-ECE482",
+      "subject_name": "Digital Control Lab",
+      "teacher": ["Eng. Hossam Abou Kil AbdElAzim"],
+      "group": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-ECE482",
+      "subject_name": "Digital Control Lab",
+      "teacher": ["Eng. Mohamed Zein EL Abdeen"],
+      "group": ["4M1", "4M2", "4M3", "4M4"]
+    }
+  ]
+}
