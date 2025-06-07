@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import '../../constants.dart';
 
 class BuildingSelection extends StatelessWidget {
@@ -8,32 +7,58 @@ class BuildingSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GNav(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-      iconSize: 24,
-      color: Colors.grey[400], // unselected icon color
-      activeColor: kOrange, // selected icon and text color
-      tabActiveBorder: Border.all(color: Colors.white),
-      tabBackgroundColor: Colors.grey.shade100,
-      mainAxisAlignment: MainAxisAlignment.center,
-      tabBorderRadius: 20,
-      onTabChange: (value) => onTabChange!(value),
-      tabs: [
-        //* the button of the building A
-        GButton(
-          icon: Icons.apartment,
-          text: 'A',
-          textStyle: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 20, color: kOrange),
+    return Container(
+      width: 180, // Slightly smaller width for better centering
+      height: 45, // Slightly smaller height for app bar
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white),
+      ),
+      child: TabBar(
+        padding: const EdgeInsets.all(3),
+        onTap: (value) => onTabChange!(value),
+        indicator: BoxDecoration(
+          color: kPrimaryColor,
+          borderRadius: BorderRadius.circular(16),
         ),
-        //* the button of the building B
-        GButton(
-          icon: Icons.apartment,
-          text: 'B',
-          textStyle: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 20, color: kOrange),
-        )
-      ],
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.grey[600],
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 15, // Slightly smaller font
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          fontSize: 15,
+        ),
+        dividerHeight: 0,
+        tabs: const [
+          //* the button of the building A
+          Tab(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.apartment, size: 18), // Slightly smaller icon
+                SizedBox(width: 6),
+                Text('A'),
+              ],
+            ),
+          ),
+          //* the button of the building B
+          Tab(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.apartment, size: 18),
+                SizedBox(width: 6),
+                Text('B'),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

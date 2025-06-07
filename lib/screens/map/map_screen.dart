@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'map_building_b.dart';
 import 'map_building_a.dart';
-import 'map_building_selection.dart';
-import '../../components/my_app_bar.dart';
-import '../../components/search_bar.dart';
+import 'map_app_bar.dart';
+import 'map_date_timeline.dart';
 import '../../constants.dart';
 
 class MapScreen extends StatefulWidget {
@@ -13,8 +12,27 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   int _selectedindex = 0;
+  DateTime _selectedDate = DateTime.now();
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        navigateBottomBar(_tabController.index);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
 //this method will update our selected index
 //when the user taps on the bottom bar
@@ -29,35 +47,36 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(
-        title: 'Map',
-        onpressed: () => Navigator.pop(context),
-        actions: [
-          BuildingSelection(
-            onTabChange: (index) => navigateBottomBar(index),
-          ),
-        ],
-      ),
-      //////////////////////////////////////////////////////////////////////////
-      body: SafeArea(
-        child: ListView(
-          children: [
-            const SizedBox(
-              height: 35,
-            ),
-            const MySearchBar(),
-            const Padding(
-              padding: EdgeInsets.all(14.0),
-              child: Text(
-                'Floor',
-                style: kTextStyleNormal,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: MapAppBar(
+          onTabChange: (index) => navigateBottomBar(index),
+        ),
+        //////////////////////////////////////////////////////////////////////////
+        body: SafeArea(
+          child: ListView(
+            children: [
+              MapDateTimeline(
+                selectedDate: _selectedDate,
+                onDateChange: (selectedDate) {
+                  setState(() {
+                    _selectedDate = selectedDate;
+                  });
+                },
               ),
-            ),
-            Center(
-              child: _widgetOptions.elementAt(_selectedindex),
-            )
-          ],
+              const Padding(
+                padding: EdgeInsets.all(14.0),
+                child: Text(
+                  'Floor',
+                  style: kTextStyleNormal,
+                ),
+              ),
+              Center(
+                child: _widgetOptions.elementAt(_selectedindex),
+              )
+            ],
+          ),
         ),
       ),
     );
