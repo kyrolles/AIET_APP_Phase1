@@ -91,6 +91,7 @@ flutter:
     - assets/images/
     - assets/project_image/
     - assets/app_icon/
+    - assets/scadules/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

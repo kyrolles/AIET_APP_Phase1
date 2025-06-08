@@ -27,9 +27,9 @@ class BuildingA extends StatelessWidget {
             {'name': 'DH', 'isEmpty': kGreyLight},
           ],
           labs: [
-            {'name': 'B1', 'isEmpty': kGreyLight},
-            {'name': 'B2', 'isEmpty': kOrange},
-            {'name': 'B3', 'isEmpty': kGreyLight},
+            {'name': 'B17', 'isEmpty': kGreyLight},
+            {'name': 'B19', 'isEmpty': kOrange},
+            {'name': 'B20', 'isEmpty': kGreyLight},
             {'name': 'B23', 'isEmpty': kOrange},
             {'name': 'B24', 'isEmpty': kOrange},
             {'name': 'B31', 'isEmpty': kGreyLight},
@@ -56,7 +56,7 @@ class BuildingA extends StatelessWidget {
         ),
         // Floor 4
         FloorContainer(
-          floor: '4',
+          floor: '3',
           lectures: [
             {'name': 'M4', 'isEmpty': kOrange},
             {'name': 'M5', 'isEmpty': kGreyLight},
