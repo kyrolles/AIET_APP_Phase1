@@ -1,18 +1,104 @@
 import 'package:flutter/material.dart';
-import '../../constants.dart';
-import 'time_coursedetails_component.dart'; // Import ClassSchedule component
+import 'dart:async';
+import 'services/map_schedule_service.dart';
+import 'utils/time_utils.dart';
+import 'widgets/room_header_widget.dart';
+import 'widgets/schedule_header_widget.dart';
+import 'widgets/schedule_content_widget.dart';
 
-class RoomDetailsBottomSheet extends StatelessWidget {
+class RoomDetailsBottomSheet extends StatefulWidget {
   final String roomName;
   final bool isEmpty;
   final String roomType; // "Lecture", "Section", or "Lab"
+  final DateTime selectedDate;
 
   const RoomDetailsBottomSheet({
     super.key,
     required this.roomName,
     required this.roomType,
     required this.isEmpty,
+    required this.selectedDate,
   });
+
+  @override
+  State<RoomDetailsBottomSheet> createState() => _RoomDetailsBottomSheetState();
+}
+
+class _RoomDetailsBottomSheetState extends State<RoomDetailsBottomSheet> {
+  final MapScheduleService _scheduleService = MapScheduleService();
+  List<Map<String, dynamic>> _daySchedule = [];
+  bool _isLoading = true;
+  String? _error;
+  int _currentPeriod = 0;
+  Timer? _periodTimer;
+  DateTime _lastUpdateTime = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRoomSchedule();
+    _startPeriodTimer();
+  }
+
+  @override
+  void dispose() {
+    _periodTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startPeriodTimer() {
+    // Update current period every minute to handle real-time changes
+    _periodTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      final now = DateTime.now();
+      final newCurrentPeriod = MapScheduleService.getCurrentPeriod(now);
+
+      // Only update if period changed or if it's been more than 5 minutes since last update
+      if (newCurrentPeriod != _currentPeriod ||
+          now.difference(_lastUpdateTime).inMinutes >= 5) {
+        setState(() {
+          _currentPeriod = newCurrentPeriod;
+          _lastUpdateTime = now;
+        });
+      }
+    });
+  }
+
+  Future<void> _loadRoomSchedule() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      // Get current period for highlighting
+      _currentPeriod = MapScheduleService.getCurrentPeriod(DateTime.now());
+
+      print(
+          'Loading schedule for room: ${widget.roomName} on date: ${widget.selectedDate}');
+
+      final schedule = await _scheduleService.getRoomScheduleForDate(
+        widget.roomName,
+        widget.selectedDate,
+      );
+
+      print(
+          'Loaded ${schedule.length} schedule entries for ${widget.roomName}');
+      if (schedule.isNotEmpty) {
+        print('First entry: ${schedule.first}');
+      }
+
+      setState(() {
+        _daySchedule = schedule;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading room schedule: $e');
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,96 +126,27 @@ class RoomDetailsBottomSheet extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Room header
-          Row(
-            children: [
-              // Room icon
-              Container(
-                height: 50,
-                width: 59,
-                decoration: BoxDecoration(
-                  color: isEmpty ? kGreyLight : kOrange,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Text(
-                    roomName,
-                    style: const TextStyle(
-                      fontFamily: 'Lexend',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-
-              // Room details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "$roomType Room: $roomName",
-                      style: const TextStyle(
-                        fontFamily: 'Lexend',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    Text(
-                      isEmpty ? "Available" : "Occupied",
-                      style: TextStyle(
-                        fontFamily: 'Lexend',
-                        fontSize: 14,
-                        color: isEmpty ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          RoomHeaderWidget(
+            roomName: widget.roomName,
+            roomType: widget.roomType,
+            isEmpty: widget.isEmpty,
           ),
           const SizedBox(height: 20),
 
-          // Today's schedule - REPLACED WITH CLASSSCHEDULE COMPONENT
-          const Text(
-            "Today's Schedule:",
-            style: TextStyle(
-              fontFamily: 'Lexend',
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+          // Schedule header
+          ScheduleHeaderWidget(
+            statusText: TimeUtils.getCurrentPeriodStatus(
+                widget.selectedDate, _currentPeriod),
           ),
           const SizedBox(height: 16),
 
-          // Using ClassSchedule component instead of ScheduleItem
-          Column(
-            children: const [
-              ClassSchedule(
-                period: "P1",
-                courseName: "Data Structures",
-                instructor: "Dr. Sara Ahmed",
-              ),
-              SizedBox(height: 16),
-              ClassSchedule(
-                period: "P2",
-                courseName: "Introduction to CS",
-                instructor: "Dr. Ahmed Hassan",
-              ),
-              SizedBox(height: 16),
-              ClassSchedule(
-                period: "P3",
-                courseName: "Algorithms",
-                instructor: "Dr. Mohamed Ali",
-              ),
-              SizedBox(height: 16),
-              ClassSchedule(
-                period: "P4",
-                courseName: "Software Engineering",
-                instructor: "Dr. Layla Ibrahim",
-              ),
-            ],
+          // Schedule content
+          ScheduleContentWidget(
+            isLoading: _isLoading,
+            error: _error,
+            daySchedule: _daySchedule,
+            currentPeriod: _currentPeriod,
+            selectedDate: widget.selectedDate,
           ),
         ],
       ),

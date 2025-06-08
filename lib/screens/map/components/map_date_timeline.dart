@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
-import 'package:graduation_project/constants.dart';
+import '../../../constants.dart';
 
 class MapDateTimeline extends StatelessWidget {
   final DateTime selectedDate;

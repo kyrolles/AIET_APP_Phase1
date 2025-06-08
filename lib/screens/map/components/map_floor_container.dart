@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'map_lec_container.dart';
-import 'room_details_bottom_sheet.dart'; // Import the new component
-import '../../constants.dart';
+import '../room_details_bottom_sheet.dart'; // Import the new component
+import '../../../constants.dart';
 
 class FloorContainer extends StatelessWidget {
   const FloorContainer({
     super.key,
     required this.floor,
+    required this.selectedDate,
     this.lectures = const [], // Default to empty list
     this.sections = const [], // Default to empty list
     this.labs = const [], // Default to empty list
   });
 
   final String floor;
+  final DateTime selectedDate;
   final List<Map<String, dynamic>>
       lectures; // List of lecture rooms with their status
   final List<Map<String, dynamic>>
@@ -207,6 +209,7 @@ class FloorContainer extends StatelessWidget {
         roomName: roomName,
         isEmpty: isEmpty,
         roomType: roomType,
+        selectedDate: selectedDate,
       ),
     );
   }

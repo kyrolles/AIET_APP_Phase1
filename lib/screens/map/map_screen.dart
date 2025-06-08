@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'map_building_b.dart';
 import 'map_building_a.dart';
-import 'map_app_bar.dart';
-import 'map_date_timeline.dart';
+import 'components/map_app_bar.dart';
+import 'components/map_date_timeline.dart';
 import '../../constants.dart';
 
 class MapScreen extends StatefulWidget {
@@ -42,8 +42,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     });
   }
 
-//Building pages to display
-  final List<Widget> _widgetOptions = const [BuildingA(), BuildingB()];
+  //Building pages to display
+  List<Widget> get _widgetOptions => [
+        BuildingA(selectedDate: _selectedDate),
+        BuildingB(selectedDate: _selectedDate)
+      ];
 
   @override
   Widget build(BuildContext context) {
