@@ -103,12 +103,19 @@ class HomeScheduleView extends ConsumerWidget {
     final allSessionsForClass = scheduleState.getFilteredSessions();
     if (allSessionsForClass.isEmpty) {
       return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: kGrey.withOpacity(0.3)),
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.circular(16),
+        //   border: Border.all(color: kGrey.withOpacity(0.3)),
+        // ),
+        // margin: const EdgeInsets.only(bottom: 16),
+        // padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: kShadow,
         ),
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(vertical: 12.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
             _buildScheduleHeader(weekType, scheduleState, context, ref),
@@ -192,11 +199,12 @@ class HomeScheduleView extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'My Schedule - ${_getCurrentDayName()}',
+                    _getCurrentDayName(),
                     style: const TextStyle(
                       fontFamily: 'Lexend',
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(height: 4),
