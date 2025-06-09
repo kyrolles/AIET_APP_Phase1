@@ -102,51 +102,83 @@ class _RoomDetailsBottomSheetState extends State<RoomDetailsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenHeight = MediaQuery.of(context).size.height;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
+    // Calculate available height (70% of screen height, adjusted for keyboard)
+    final maxHeight = (screenHeight * 0.8) - keyboardHeight;
+    final minHeight = screenHeight * 0.3;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      constraints: BoxConstraints(
+        maxHeight: maxHeight,
+        minHeight: minHeight,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle indicator
-          Center(
-            child: Container(
-              width: 40,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
-              ),
+          // Fixed header section (handle + room info)
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle indicator
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Room header
+                RoomHeaderWidget(
+                  roomName: widget.roomName,
+                  roomType: widget.roomType,
+                  isEmpty: widget.isEmpty,
+                ),
+                const SizedBox(height: 20),
+
+                // Schedule header
+                ScheduleHeaderWidget(
+                  statusText: TimeUtils.getCurrentPeriodStatus(
+                      widget.selectedDate, _currentPeriod),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
 
-          // Room header
-          RoomHeaderWidget(
-            roomName: widget.roomName,
-            roomType: widget.roomType,
-            isEmpty: widget.isEmpty,
-          ),
-          const SizedBox(height: 20),
-
-          // Schedule header
-          ScheduleHeaderWidget(
-            statusText: TimeUtils.getCurrentPeriodStatus(
-                widget.selectedDate, _currentPeriod),
-          ),
-          const SizedBox(height: 16),
-
-          // Schedule content
-          ScheduleContentWidget(
-            isLoading: _isLoading,
-            error: _error,
-            daySchedule: _daySchedule,
-            currentPeriod: _currentPeriod,
-            selectedDate: widget.selectedDate,
+          // Scrollable content section
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    // Schedule content
+                    ScheduleContentWidget(
+                      isLoading: _isLoading,
+                      error: _error,
+                      daySchedule: _daySchedule,
+                      currentPeriod: _currentPeriod,
+                      selectedDate: widget.selectedDate,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

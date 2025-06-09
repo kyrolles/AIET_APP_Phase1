@@ -205,6 +205,9 @@ class FloorContainer extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      enableDrag: true,
+      isDismissible: true,
       builder: (context) => RoomDetailsBottomSheet(
         roomName: roomName,
         isEmpty: isEmpty,
