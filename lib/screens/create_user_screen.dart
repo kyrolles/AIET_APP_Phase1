@@ -394,7 +394,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       ),
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Create Account'),
+                          : const Text(
+                              'Create Account',
+                              style: TextStyle(color: Colors.white),
+                            ),
                     ),
                   ),
 

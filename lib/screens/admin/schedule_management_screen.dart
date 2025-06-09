@@ -38,7 +38,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
     if (state.isLoading) {
       return const LoadingIndicator(message: 'Loading schedule data...');
     }
-    
+
     return Column(
       children: [
         _buildStatusMessages(state),
@@ -49,7 +49,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ],
     );
   }
-  
+
   Widget _buildStatusMessages(AdminScheduleState state) {
     return Column(
       children: [
@@ -57,7 +57,8 @@ class ScheduleManagementScreen extends ConsumerWidget {
           Container(
             width: double.infinity,
             color: Colors.red.shade100,
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Text(
               state.errorMessage!,
               style: TextStyle(color: Colors.red.shade900),
@@ -67,14 +68,14 @@ class ScheduleManagementScreen extends ConsumerWidget {
           Container(
             width: double.infinity,
             color: Colors.green.shade100,
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Text(
               state.successMessage!,
               style: TextStyle(color: Colors.green.shade900),
             ),
           ),
-        if (state.isSaving)
-          const LinearProgressIndicator(),
+        if (state.isSaving) const LinearProgressIndicator(),
       ],
     );
   }
@@ -90,13 +91,15 @@ class ScheduleManagementScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Semester selector
-          const Text('Select Semester', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Select Semester',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _buildSemesterSelector(state, controller),
           const SizedBox(height: 16),
-          
+
           // Class selector
-          const Text('Select Class', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Select Class',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           DropdownButtonFormField<ClassIdentifier>(
             decoration: const InputDecoration(
@@ -107,7 +110,8 @@ class ScheduleManagementScreen extends ConsumerWidget {
             items: state.classIdentifiers.map((classId) {
               return DropdownMenuItem(
                 value: classId,
-                child: Text('${classId.year}${classId.department.name}${classId.section}'),
+                child: Text(
+                    '${classId.year}${classId.department.name}${classId.section}'),
               );
             }).toList(),
             onChanged: (value) {
@@ -117,32 +121,41 @@ class ScheduleManagementScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 16),
-          
+
           // Week type selector
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Week Type:', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(width: 16),
-              ChoiceChip(
-                label: const Text('ODD'),
-                selected: state.selectedWeekType == WeekType.ODD,
-                onSelected: (_) {
-                  if (state.selectedWeekType != WeekType.ODD) {
-                    controller.toggleWeekType();
-                  }
-                },
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Week Type:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Row(
+                    spacing: 12.0,
+                    children: [
+                      ChoiceChip(
+                        label: const Text('ODD'),
+                        selected: state.selectedWeekType == WeekType.ODD,
+                        onSelected: (_) {
+                          if (state.selectedWeekType != WeekType.ODD) {
+                            controller.toggleWeekType();
+                          }
+                        },
+                      ),
+                      ChoiceChip(
+                        label: const Text('EVEN'),
+                        selected: state.selectedWeekType == WeekType.EVEN,
+                        onSelected: (_) {
+                          if (state.selectedWeekType != WeekType.EVEN) {
+                            controller.toggleWeekType();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              ChoiceChip(
-                label: const Text('EVEN'),
-                selected: state.selectedWeekType == WeekType.EVEN,
-                onSelected: (_) {
-                  if (state.selectedWeekType != WeekType.EVEN) {
-                    controller.toggleWeekType();
-                  }
-                },
-              ),
-              const Spacer(),
               ElevatedButton.icon(
                 icon: const Icon(Icons.add),
                 label: const Text('Bulk Add'),
@@ -154,7 +167,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   // Build the semester selector dropdown with management buttons
   Widget _buildSemesterSelector(
     AdminScheduleState state,
@@ -192,40 +205,40 @@ class ScheduleManagementScreen extends ConsumerWidget {
         ],
       );
     }
-    
+
     // Sort semesters: active first, then by descending semester number
     final sortedSemesters = List<Semester>.from(state.availableSemesters)
       ..sort((a, b) {
         // Active semester first
         if (a.isActive && !b.isActive) return -1;
         if (!a.isActive && b.isActive) return 1;
-        
+
         // Then by academic year (descending)
         final yearA = a.academicYear ?? "";
         final yearB = b.academicYear ?? "";
         final yearCompare = yearB.compareTo(yearA);
         if (yearCompare != 0) return yearCompare;
-        
+
         // Then by semester number (descending)
         final semA = a.semesterNumber ?? 0;
         final semB = b.semesterNumber ?? 0;
         return semB.compareTo(semA);
       });
-    
+
     // Make sure there's a valid selection
     final selectedId = state.selectedSemesterId ?? '';
     final isValidSelection = sortedSemesters.any((sem) => sem.id == selectedId);
-    
+
     if (!isValidSelection && sortedSemesters.isNotEmpty) {
       // Schedule the selection for after the build
       Future.microtask(() {
         controller.selectSemester(sortedSemesters.first.id ?? '');
       });
     }
-    
+
     // Get the currently selected semester object
     final selectedSemester = state.selectedSemester;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -242,7 +255,11 @@ class ScheduleManagementScreen extends ConsumerWidget {
                   child: ButtonTheme(
                     alignedDropdown: true,
                     child: DropdownButton<String>(
-                      value: isValidSelection ? selectedId : (sortedSemesters.isNotEmpty ? sortedSemesters.first.id : null),
+                      value: isValidSelection
+                          ? selectedId
+                          : (sortedSemesters.isNotEmpty
+                              ? sortedSemesters.first.id
+                              : null),
                       isExpanded: true,
                       isDense: true,
                       items: sortedSemesters.map((semester) {
@@ -258,14 +275,16 @@ class ScheduleManagementScreen extends ConsumerWidget {
                               ),
                               if (semester.isActive)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: Colors.green,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Text(
                                     'Active',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12),
                                   ),
                                 ),
                             ],
@@ -285,11 +304,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
             const SizedBox(width: 8),
             // Set active button
             ElevatedButton(
-              onPressed: state.selectedSemesterId == null || 
-                        state.selectedSemester?.isActive == true ? 
-                        null : () {
-                          controller.setActiveSemester(state.selectedSemesterId!);
-                        },
+              onPressed: state.selectedSemesterId == null ||
+                      state.selectedSemester?.isActive == true
+                  ? null
+                  : () {
+                      controller.setActiveSemester(state.selectedSemesterId!);
+                    },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.green,
@@ -298,7 +318,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
             ),
           ],
         ),
-        
+
         // Show semester details if one is selected
         if (selectedSemester != null) ...[
           const SizedBox(height: 8),
@@ -347,7 +367,8 @@ class ScheduleManagementScreen extends ConsumerWidget {
                     ),
                     // Session count badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade100,
                         borderRadius: BorderRadius.circular(12),
@@ -372,7 +393,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                         icon: const Icon(Icons.edit, size: 16),
                         label: const Text('Edit'),
                         onPressed: () => _showEditSemesterDialog(
-                          ctx, 
+                          ctx,
                           controller,
                           selectedSemester,
                         ),
@@ -385,7 +406,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                         icon: const Icon(Icons.content_copy, size: 16),
                         label: const Text('Clone'),
                         onPressed: () => _showCloneSemesterDialog(
-                          ctx, 
+                          ctx,
                           controller,
                           selectedSemester,
                         ),
@@ -397,11 +418,13 @@ class ScheduleManagementScreen extends ConsumerWidget {
                       TextButton.icon(
                         icon: const Icon(Icons.delete, size: 16),
                         label: const Text('Delete'),
-                        onPressed: selectedSemester.isActive ? null : () => _showDeleteSemesterDialog(
-                          ctx, 
-                          controller,
-                          selectedSemester,
-                        ),
+                        onPressed: selectedSemester.isActive
+                            ? null
+                            : () => _showDeleteSemesterDialog(
+                                  ctx,
+                                  controller,
+                                  selectedSemester,
+                                ),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.red,
                           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -415,7 +438,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
             ),
           ),
         ],
-        
+
         // Create new semester button
         const SizedBox(height: 8),
         Builder(
@@ -432,7 +455,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ],
     );
   }
-  
+
   // Show dialog to create a new semester
   void _showCreateSemesterDialog(
     BuildContext context,
@@ -450,7 +473,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
             academicYear: academicYear,
             isActive: isActive,
           );
-          
+
           if (success && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -458,7 +481,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   // Show dialog to edit a semester
   void _showEditSemesterDialog(
     BuildContext context,
@@ -477,11 +500,11 @@ class ScheduleManagementScreen extends ConsumerWidget {
         onSave: (name, semesterNumber, academicYear, _) async {
           final success = await controller.updateSemesterDetails(
             semester.id!,
-            name: name, 
+            name: name,
             semesterNumber: semesterNumber,
             academicYear: academicYear,
           );
-          
+
           if (success && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -489,7 +512,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   // Show dialog to clone a semester
   void _showCloneSemesterDialog(
     BuildContext context,
@@ -498,7 +521,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
   ) {
     final now = DateTime.now();
     final defaultAcademicYear = '${now.year}-${now.year + 1}';
-    
+
     showDialog(
       context: context,
       builder: (context) => SemesterDialog(
@@ -515,7 +538,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
             newAcademicYear: academicYear,
             makeActive: makeActive,
           );
-          
+
           if (success && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -523,7 +546,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   // Show dialog to confirm semester deletion
   void _showDeleteSemesterDialog(
     BuildContext context,
@@ -534,11 +557,9 @@ class ScheduleManagementScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Semester?'),
-        content: Text(
-          'Are you sure you want to delete "${semester.name}"?\n\n'
-          'This will permanently delete all ${semester.sessions.length} sessions associated with this semester.\n\n'
-          'This action cannot be undone.'
-        ),
+        content: Text('Are you sure you want to delete "${semester.name}"?\n\n'
+            'This will permanently delete all ${semester.sessions.length} sessions associated with this semester.\n\n'
+            'This action cannot be undone.'),
         actions: [
           TextButton(
             child: const Text('Cancel'),
@@ -566,7 +587,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
   ) {
     // Get sessions grouped by day
     final sessionsByDay = state.sessionsByDay;
-    
+
     if (sessionsByDay.isEmpty) {
       return Center(
         child: Column(
@@ -575,7 +596,8 @@ class ScheduleManagementScreen extends ConsumerWidget {
             const Text('No schedule data found'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => _showAddSessionDialog(context, state, controller),
+              onPressed: () =>
+                  _showAddSessionDialog(context, state, controller),
               child: const Text('Add First Session'),
             ),
           ],
@@ -588,12 +610,12 @@ class ScheduleManagementScreen extends ConsumerWidget {
       itemBuilder: (context, index) {
         final day = DayOfWeek.values[index];
         final daySessions = sessionsByDay[day] ?? [];
-        
+
         return _buildDayCard(context, day, daySessions, state, controller);
       },
     );
   }
-  
+
   Widget _buildDayCard(
     BuildContext context,
     DayOfWeek day,
@@ -610,11 +632,18 @@ class ScheduleManagementScreen extends ConsumerWidget {
         },
         title: Row(
           children: [
-            Text(day.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(width: 8),
-            Chip(
-              label: Text('${sessions.length} sessions'),
-              backgroundColor: sessions.isEmpty ? Colors.grey.shade200 : Colors.blue.shade100,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(day.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Chip(
+                  label: Text('${sessions.length} sessions'),
+                  backgroundColor: sessions.isEmpty
+                      ? Colors.grey.shade200
+                      : Colors.blue.shade100,
+                ),
+              ],
             ),
             const Spacer(),
             IconButton(
@@ -657,7 +686,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildSessionTile(
     BuildContext context,
     ClassSession session,
@@ -665,7 +694,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
   ) {
     // Format for special session types
     final bool isDayOff = session.courseName.toUpperCase() == 'DAY OFF';
-    
+
     return ListTile(
       title: Text(
         session.courseName,
@@ -677,8 +706,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (session.courseCode.isNotEmpty)
-            Text(session.courseCode),
+          if (session.courseCode.isNotEmpty) Text(session.courseCode),
           Text(
             'Period ${session.periodNumber} • ${session.instructor.isNotEmpty ? session.instructor : 'No instructor'} • ${session.location.isNotEmpty ? session.location : 'No location'}',
           ),
@@ -692,8 +720,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
                   padding: EdgeInsets.zero,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-              if (session.isLab && session.isTutorial)
-                const SizedBox(width: 4),
+              if (session.isLab && session.isTutorial) const SizedBox(width: 4),
               if (session.isTutorial)
                 Chip(
                   label: const Text('Tutorial'),
@@ -800,8 +827,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Delete Session?'),
         content: Text(
-          'Are you sure you want to delete "${session.courseName}" on ${session.day.name}, period ${session.periodNumber}?'
-        ),
+            'Are you sure you want to delete "${session.courseName}" on ${session.day.name}, period ${session.periodNumber}?'),
         actions: [
           TextButton(
             child: const Text('Cancel'),
@@ -829,9 +855,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Add Day Off'),
-        content: Text(
-          'Add DAY OFF for ${day.name}?'
-        ),
+        content: Text('Add DAY OFF for ${day.name}?'),
         actions: [
           TextButton(
             child: const Text('Cancel'),
@@ -848,7 +872,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   void _showBulkAddDialog(
     BuildContext context,
     AdminScheduleState state,
@@ -860,7 +884,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
       );
       return;
     }
-    
+
     showDialog(
       context: context,
       builder: (context) => BulkAddSessionDialog(
@@ -908,9 +932,12 @@ class _SessionDialogState extends State<SessionDialog> {
   @override
   void initState() {
     super.initState();
-    _courseNameController = TextEditingController(text: widget.session.courseName);
-    _courseCodeController = TextEditingController(text: widget.session.courseCode);
-    _instructorController = TextEditingController(text: widget.session.instructor);
+    _courseNameController =
+        TextEditingController(text: widget.session.courseName);
+    _courseCodeController =
+        TextEditingController(text: widget.session.courseCode);
+    _instructorController =
+        TextEditingController(text: widget.session.instructor);
     _locationController = TextEditingController(text: widget.session.location);
     _selectedDay = widget.session.day;
     _selectedPeriod = widget.session.periodNumber;
@@ -1020,7 +1047,8 @@ class _SessionDialogState extends State<SessionDialog> {
               const SizedBox(height: 16),
               SwitchListTile(
                 title: const Text('Is Lab Class'),
-                subtitle: const Text('Laboratory sessions typically held in lab rooms'),
+                subtitle: const Text(
+                    'Laboratory sessions typically held in lab rooms'),
                 value: _isLab,
                 onChanged: (value) {
                   setState(() {
@@ -1033,7 +1061,8 @@ class _SessionDialogState extends State<SessionDialog> {
               ),
               SwitchListTile(
                 title: const Text('Is Tutorial'),
-                subtitle: const Text('Tutorial sessions for practical exercises'),
+                subtitle:
+                    const Text('Tutorial sessions for practical exercises'),
                 value: _isTutorial,
                 onChanged: (value) {
                   setState(() {
@@ -1103,7 +1132,7 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
   final _courseCodeController = TextEditingController();
   final _instructorController = TextEditingController();
   final _locationController = TextEditingController();
-  
+
   final List<DayOfWeek> _selectedDays = [];
   final List<int> _selectedPeriods = [];
   bool _isLab = false;
@@ -1167,8 +1196,8 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              
-              const Text('Select Days:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Select Days:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               Wrap(
                 spacing: 8,
                 children: DayOfWeek.values.map((day) {
@@ -1187,9 +1216,9 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
                   );
                 }).toList(),
               ),
-              
               const SizedBox(height: 12),
-              const Text('Select Periods:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Select Periods:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               Wrap(
                 spacing: 8,
                 children: List.generate(5, (index) {
@@ -1209,7 +1238,6 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
                   );
                 }),
               ),
-              
               const SizedBox(height: 12),
               SwitchListTile(
                 title: const Text('Is Lab Class'),
@@ -1237,7 +1265,6 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
                   });
                 },
               ),
-              
               const SizedBox(height: 12),
               Text(
                 'This will create ${_selectedDays.length * _selectedPeriods.length} sessions',
@@ -1258,20 +1285,22 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
             if (_formKey.currentState?.validate() ?? false) {
               if (_selectedDays.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please select at least one day')),
+                  const SnackBar(
+                      content: Text('Please select at least one day')),
                 );
                 return;
               }
-              
+
               if (_selectedPeriods.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please select at least one period')),
+                  const SnackBar(
+                      content: Text('Please select at least one period')),
                 );
                 return;
               }
-              
+
               final List<ClassSession> sessions = [];
-              
+
               for (final day in _selectedDays) {
                 for (final period in _selectedPeriods) {
                   sessions.add(ClassSession(
@@ -1289,7 +1318,7 @@ class _BulkAddSessionDialogState extends State<BulkAddSessionDialog> {
                   ));
                 }
               }
-              
+
               widget.onAdd(sessions);
             }
           },
@@ -1309,7 +1338,9 @@ class SemesterDialog extends StatefulWidget {
   final bool isCreating;
   final bool isEditing;
   final bool isCloning;
-  final Function(String name, int semesterNumber, String academicYear, bool isActive) onSave;
+  final Function(
+          String name, int semesterNumber, String academicYear, bool isActive)
+      onSave;
 
   const SemesterDialog({
     Key? key,
@@ -1339,7 +1370,8 @@ class _SemesterDialogState extends State<SemesterDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName ?? '');
-    _academicYearController = TextEditingController(text: widget.initialAcademicYear ?? _getCurrentAcademicYear());
+    _academicYearController = TextEditingController(
+        text: widget.initialAcademicYear ?? _getCurrentAcademicYear());
     _semesterNumber = widget.initialSemesterNumber ?? 1;
     _isActive = widget.isActive;
   }
@@ -1394,13 +1426,13 @@ class _SemesterDialogState extends State<SemesterDialog> {
                   if (value == null || value.isEmpty) {
                     return 'Academic year is required';
                   }
-                  
+
                   // Validate format (optional)
                   final yearPattern = RegExp(r'^\d{4}-\d{4}$');
                   if (!yearPattern.hasMatch(value)) {
                     return 'Format should be YYYY-YYYY';
                   }
-                  
+
                   return null;
                 },
               ),
@@ -1413,7 +1445,13 @@ class _SemesterDialogState extends State<SemesterDialog> {
                 value: _semesterNumber,
                 items: List.generate(4, (index) {
                   final number = index + 1;
-                  final suffix = number == 1 ? 'st' : number == 2 ? 'nd' : number == 3 ? 'rd' : 'th';
+                  final suffix = number == 1
+                      ? 'st'
+                      : number == 2
+                          ? 'nd'
+                          : number == 3
+                              ? 'rd'
+                              : 'th';
                   return DropdownMenuItem(
                     value: number,
                     child: Text('$number$suffix Semester'),
@@ -1431,7 +1469,8 @@ class _SemesterDialogState extends State<SemesterDialog> {
                 const SizedBox(height: 16),
                 SwitchListTile(
                   title: const Text('Set as Active Semester'),
-                  subtitle: const Text('This will deactivate any currently active semester'),
+                  subtitle: const Text(
+                      'This will deactivate any currently active semester'),
                   value: _isActive,
                   onChanged: (value) {
                     setState(() {
@@ -1460,9 +1499,11 @@ class _SemesterDialogState extends State<SemesterDialog> {
               );
             }
           },
-          child: Text(widget.isEditing ? 'Update' : (widget.isCloning ? 'Clone' : 'Create')),
+          child: Text(widget.isEditing
+              ? 'Update'
+              : (widget.isCloning ? 'Clone' : 'Create')),
         ),
       ],
     );
   }
-} 
+}
