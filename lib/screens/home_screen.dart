@@ -77,7 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
       // Clean up FCM token
       final notificationService = NotificationService();
       await notificationService.cleanupOnLogout();
-      
+
       // Clear the saved token
       await storage.delete(key: 'token');
 
@@ -152,12 +152,14 @@ class HomeScreenState extends State<HomeScreen> {
           ),
           // Schedule Section
           SliverToBoxAdapter(
-            child: TextLink(
-              text: 'My Schedule',
-              textLink: 'View All',
-              onTap: () {
-                // Navigate to full schedule view if needed
-              },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextLink(
+                text: 'My Schedule',
+                onTap: () {
+                  // Navigate to full schedule view if needed
+                },
+              ),
             ),
           ),
           const SliverToBoxAdapter(

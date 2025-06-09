@@ -36,12 +36,14 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
   Future<void> _loadSubjects() async {
     setState(() => isLoading = true);
     try {
-      availableSubjects = await _resultsService.getDepartmentSubjects(widget.department);
+      availableSubjects =
+          await _resultsService.getDepartmentSubjects(widget.department);
       // Filter subjects by semester availability
       availableSubjects = availableSubjects
-          .where((s) => (s['availableForSemesters'] as List).contains(widget.semester))
+          .where((s) =>
+              (s['availableForSemesters'] as List).contains(widget.semester))
           .toList();
-      
+
       // Sort subjects: mandatory first, then electives
       availableSubjects.sort((a, b) {
         final aElective = a['isElective'] ?? false;
@@ -65,7 +67,7 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
       elevation: 0,
       backgroundColor: Colors.transparent,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.rectangle,
@@ -88,7 +90,14 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
                       style: kTextStyleBold,
                     ),
                     Text(
-                      'Department: ${widget.department} | Semester: ${widget.semester}',
+                      'Department: ${widget.department}',
+                      style: const TextStyle(
+                        color: kGrey,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Semester: ${widget.semester}',
                       style: const TextStyle(
                         color: kGrey,
                         fontSize: 14,
@@ -105,7 +114,7 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
             ),
             const Divider(),
             const SizedBox(height: 16),
-            
+
             // Filter & Counter section
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -113,8 +122,8 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
                 color: kbabyblue,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Available Subjects: ${availableSubjects.length}',
@@ -136,111 +145,129 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Subjects List
             SizedBox(
               height: 400,
               child: isLoading
-                ? const Center(child: CircularProgressIndicator(color: kBlue))
-                : availableSubjects.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No subjects available for this semester',
-                        style: TextStyle(color: kGrey),
-                      ),
-                    )
-                  : ListView.separated(
-                      itemCount: availableSubjects.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final subject = availableSubjects[index];
-                        final bool isElective = subject['isElective'] ?? false;
-                        final bool isSelected = selectedSubjectCodes.contains(subject['code']);
-                        
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? kBlue : Colors.transparent,
-                              width: isSelected ? 1 : 0,
-                            ),
+                  ? const Center(child: CircularProgressIndicator(color: kBlue))
+                  : availableSubjects.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No subjects available for this semester',
+                            style: TextStyle(color: kGrey),
                           ),
-                          child: CheckboxListTile(
-                            title: Text(
-                              subject['name'],
-                              style: const TextStyle(
-                                fontFamily: 'Lexend',
-                                fontWeight: FontWeight.w600,
+                        )
+                      : ListView.separated(
+                          itemCount: availableSubjects.length,
+                          separatorBuilder: (context, index) =>
+                              const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final subject = availableSubjects[index];
+                            final bool isElective =
+                                subject['isElective'] ?? false;
+                            final bool isSelected =
+                                selectedSubjectCodes.contains(subject['code']);
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color:
+                                      isSelected ? kBlue : Colors.transparent,
+                                  width: isSelected ? 1 : 0,
+                                ),
                               ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Code: ${subject['code']}'),
-                                Row(
+                              child: CheckboxListTile(
+                                title: Text(
+                                  subject['name'],
+                                  style: const TextStyle(
+                                    fontFamily: 'Lexend',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: isElective ? kOrange.withOpacity(0.2) : kgreen.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        isElective ? 'Elective' : 'Mandatory',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: isElective ? kOrange : kgreen,
-                                        ),
-                                      ),
-                                    ),
-                                    if (subject['credits'] != null) ...[
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: kGrey.withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          '${subject['credits']} Credits',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: kGrey,
+                                    Text('Code: ${subject['code']}'),
+                                    Column(
+                                      spacing: 4,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: isElective
+                                                ? kOrange.withOpacity(0.2)
+                                                : kgreen.withOpacity(0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            isElective
+                                                ? 'Elective'
+                                                : 'Mandatory',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color:
+                                                  isElective ? kOrange : kgreen,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        if (subject['credits'] != null)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: kGrey.withOpacity(0.2),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              '${subject['credits']} Credits',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: kGrey,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
                                   ],
                                 ),
-                              ],
-                            ),
-                            value: isSelected,
-                            onChanged: isElective
-                                ? (bool? value) {
-                                    setState(() {
-                                      if (value ?? false) {
-                                        selectedSubjectCodes.add(subject['code']);
-                                      } else {
-                                        selectedSubjectCodes.remove(subject['code']);
+                                value: isSelected,
+                                onChanged: isElective
+                                    ? (bool? value) {
+                                        setState(() {
+                                          if (value ?? false) {
+                                            selectedSubjectCodes
+                                                .add(subject['code']);
+                                          } else {
+                                            selectedSubjectCodes
+                                                .remove(subject['code']);
+                                          }
+                                        });
                                       }
-                                    });
-                                  }
-                                : null,
-                            activeColor: kBlue,
-                            checkColor: Colors.white,
-                            tileColor: isSelected ? kbabyblue.withOpacity(0.3) : Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                                    : null,
+                                activeColor: kBlue,
+                                checkColor: Colors.white,
+                                tileColor: isSelected
+                                    ? kbabyblue.withOpacity(0.3)
+                                    : Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Action Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -260,7 +287,8 @@ class _SubjectSelectionDialogState extends State<SubjectSelectionDialog> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                   ),
                   onPressed: () async {
                     await _resultsService.updateStudentSubjects(

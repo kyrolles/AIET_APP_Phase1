@@ -198,12 +198,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
       //     );
       //   },
       // ),
-      ServiceItem(
-        title: 'E-Payment',
-        imageUrl: 'assets/project_image/e-wallet.png',
-        backgroundColor: const Color(0xFFFFBCAB),
-        onPressed: () {},
-      ),
+      // ServiceItem(
+      //   title: 'E-Payment',
+      //   imageUrl: 'assets/project_image/e-wallet.png',
+      //   backgroundColor: const Color(0xFFFFBCAB),
+      //   onPressed: () {},
+      // ),
       if (isStaff)
         ServiceItem(
           title: 'Announcements',
