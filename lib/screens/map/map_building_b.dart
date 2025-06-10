@@ -6,10 +6,12 @@ import 'services/room_mapping_service.dart';
 
 class BuildingB extends StatefulWidget {
   final DateTime selectedDate;
+  final String? highlightedRoom; // Add this
 
   const BuildingB({
     super.key,
     required this.selectedDate,
+    this.highlightedRoom, // Add this
   });
 
   @override
@@ -98,7 +100,12 @@ class _BuildingBState extends State<BuildingB> {
   }
 
   Color _getRoomColor(String roomName) {
-    if (isLoading) return kGreyLight; // Show grey while loading
+    if (isLoading) return kGreyLight;
+
+    if (widget.highlightedRoom == roomName) {
+      return Colors.yellow;
+    }
+
     return roomOccupancyStatus[roomName] == true ? kOrange : kGreyLight;
   }
 
