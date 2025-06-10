@@ -1,0 +1,40 @@
+{
+  "B-2-05": [
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-EME452",
+      "subject_name": "Design of Microprocessor Lab",
+      "teacher": ["Eng Tasneem Mohamed", "Eng Asmaa AbdelRehim"],
+      "group": ["4M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-EME452",
+      "subject_name": "Design of Microprocessor Lab",
+      "teacher": ["Eng Tasneem Mohamed", "Eng Asmaa AbdelRehim"],
+      "group": ["4M3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-EME452",
+      "subject_name": "Design of Microprocessor Lab",
+      "teacher": ["Eng Tasneem Mohamed", "Eng Mayar Moustafa"],
+      "group": ["4M4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-EME452",
+      "subject_name": "Design of Microprocessor Lab",
+      "teacher": ["Eng Tasneem Mohamed", "Eng Mayar Moustafa"],
+      "group": ["4M1"]
+    }
+  ]
+}

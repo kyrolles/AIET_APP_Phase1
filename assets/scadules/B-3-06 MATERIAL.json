@@ -1,0 +1,58 @@
+{
+  "B-3-06": [
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-ME252",
+      "subject_name": "Mechanical Engineering Lab",
+      "teacher": ["Eng. O keshk", "Dr EL Shobashy"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-ME252",
+      "subject_name": "Mechanical Engineering Lab",
+      "teacher": ["Eng saadany", "Dr EL Shobashy"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-ME252",
+      "subject_name": "Mechanical Engineering Lab",
+      "teacher": ["Eng. O keshk", "Eng saadany"],
+      "group": ["2E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-EME262",
+      "subject_name": "Engineering Material Lab",
+      "teacher": ["Dr Hadeer Ragab", "Eng. shimaa El Haddad"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-EME262",
+      "subject_name": "Engineering Material Lab",
+      "teacher": ["Dr Hadeer Ragab", "Eng. shimaa El Haddad"],
+      "group": ["2M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-EME262",
+      "subject_name": "Engineering Material Lab",
+      "teacher": ["Dr Hadeer Ragab", "Eng. shimaa El Haddad"],
+      "group": ["2M3"]
+    }
+  ]
+}

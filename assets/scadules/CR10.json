@@ -1,0 +1,67 @@
+{
+  "CR10": [
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ECE224",
+      "subject_name": "Integrated Circuit Devices Tut",
+      "teacher": ["Eng. Hoda Mohamed Farid"],
+      "group": ["2E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["1E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["2M1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MED017",
+      "subject_name": "Engineering Mechanics II, Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ME002",
+      "subject_name": "Mechanics 2 Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-CED072",
+      "subject_name": "Computer and Programming II, Tut",
+      "teacher": ["Eng Mazen"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ECE224",
+      "subject_name": "Integrated Circuit Devices Tut",
+      "teacher": ["Eng. Hoda Mohamed Farid"],
+      "group": ["2E3"]
+    }
+  ]
+}

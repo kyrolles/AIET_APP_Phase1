@@ -1,0 +1,166 @@
+{
+  "M6": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT132",
+      "subject_name": "Math 4",
+      "teachers": ["Dr. Somaya Ahmed Mohamed"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT132",
+      "subject_name": "Math 4",
+      "teachers": ["Dr. Somaya Ahmed Mohamed"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM222",
+      "subject_name": "Fundamentals of Marketing",
+      "teachers": ["Dr. Amr Fathy El Gendy"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": ["Dr. Omnia AbdelMageed Gawdat"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-E232",
+      "subject_name": "Production & Inventory Cont.",
+      "teachers": ["Dr. Omnia AbdelMageed Gawdat"],
+      "groups": ["2I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE142",
+      "subject_name": "Basic Electronics",
+      "teachers": ["Dr. Ahmed Keshk"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": ["Dr. Amna Saeed Mohamed"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": ["Dr. Amna Saeed Mohamed"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "L-EME314",
+      "subject_name": "Heat Transfer",
+      "teachers": ["Dr. Asmaa Attya Ibrahim"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME314",
+      "subject_name": "Heat Transfer",
+      "teachers": ["Dr. Asmaa Attya Ibrahim", "Prof. Dr. Wageeh El Askary"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME314",
+      "subject_name": "Heat Transfer",
+      "teachers": ["Dr. Asmaa Attya Ibrahim"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE212",
+      "subject_name": "Digital System Design",
+      "teachers": ["Dr. Fatma Ahmed Aly"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE212",
+      "subject_name": "Digital System Design",
+      "teachers": ["Dr. Fatma Ahmed Aly"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "L-IE352",
+      "subject_name": "Human Factors Engineering Lec",
+      "teachers": ["Dr. Soha"],
+      "groups": ["3I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "EM412",
+      "subject_name": "Decision Analysis",
+      "teachers": ["Dr. Soha"],
+      "groups": ["4I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-IE352",
+      "subject_name": "Human Factors Engineering Tut",
+      "teachers": ["Dr. Soha"],
+      "groups": ["3I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-EM412",
+      "subject_name": "Decision Analysis Tut",
+      "teachers": ["Dr. Soha"],
+      "groups": ["4I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE212",
+      "subject_name": "Digital System Design",
+      "teachers": ["Dr. Fatma Ahmed Aly"],
+      "groups": ["2E1", "2E2", "2E3"]
+    }
+  ]
+}

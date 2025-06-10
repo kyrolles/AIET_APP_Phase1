@@ -1,0 +1,58 @@
+{
+  "A-3-18": [
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-EME132",
+      "subject_name": "Electric Energy Sources Lab",
+      "teacher": ["Eng. walaa", "Eng. Gehad Khaled Hamza"],
+      "group": ["1M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-EME132",
+      "subject_name": "Electric Energy Sources Lab",
+      "teacher": ["Eng. Gehad Khaled Hamza", "Eng Yara Gamal"],
+      "group": ["1E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-EME132",
+      "subject_name": "Electric Energy Sources Lab",
+      "teacher": ["Eng. Gehad Khaled Hamza", "Eng Yara Gamal"],
+      "group": ["1M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-EME132",
+      "subject_name": "Electric Energy Sources Lab",
+      "teacher": ["Eng. walaa", "Eng Yara Gamal", "Eng Nora"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-EME132",
+      "subject_name": "Electric Energy Sources Lab",
+      "teacher": ["Eng. walaa", "Eng. Gehad Khaled Hamza"],
+      "group": ["1E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-EME132",
+      "subject_name": "Electric Energy Sources Lab",
+      "teacher": ["Eng. walaa", "Eng. Gehad Khaled Hamza"],
+      "group": ["1E2"]
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "CR3": [
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CIE202",
+      "subject_name": "Civil Engineering Tut",
+      "teacher": ["Eng. Omar AbdelAziz Keshk"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-IED071",
+      "subject_name": "Engineering Drawing & Projection Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-IE364",
+      "subject_name": "Facility Planning & Design Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-IED071",
+      "subject_name": "Engineering Drawing & Projection Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CE112",
+      "subject_name": "Logic design Tut",
+      "teacher": ["Eng. Mennallah Abd El-satar"],
+      "group": ["1M1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-IE332",
+      "subject_name": "Project Management Tut",
+      "teacher": ["Eng. Yara Gamal"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Caroulin Kamil Ishak"],
+      "group": ["1E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-CE312",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-CE402",
+      "subject_name": "Computer Graphics Tut",
+      "teacher": ["Eng. Ayman M Kamal"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-EME314",
+      "subject_name": "Heat Transfer Tut",
+      "teacher": ["Eng. Omar AbdelAziz Keshk"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-CIE202",
+      "subject_name": "Civil Engineering Tut",
+      "teacher": ["Eng. Omar AbdelAziz Keshk"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-IED071",
+      "subject_name": "Engineering Drawing & Projection Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-IED071",
+      "subject_name": "Engineering Drawing & Projection Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-CE312",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-EME262",
+      "subject_name": "Engineering Material Tut",
+      "teacher": ["Eng. Mayar Moustafa"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-EM222",
+      "subject_name": "Quality Control Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-EME262",
+      "subject_name": "Engineering Material Tut",
+      "teacher": ["Eng. Mayar Moustafa"],
+      "group": ["2M3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-CED072",
+      "subject_name": "Computer and Programming II, Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-CED072",
+      "subject_name": "Computer and Programming II, Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CED072",
+      "subject_name": "Computer and Programming II, Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-CE112",
+      "subject_name": "Logic design Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-CE112",
+      "subject_name": "Logic design Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["1M2"]
+    }
+  ]
+}

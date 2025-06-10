@@ -1,0 +1,211 @@
+{
+  "CR2": [
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Caroulin Kamil Ishak"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-ECE132",
+      "subject_name": "Electric Circuit 2 Tut",
+      "teacher": ["Dr. Nehal Ahmed Mabrook"],
+      "group": ["1M1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-ECE132",
+      "subject_name": "Electric Circuit 2 Tut",
+      "teacher": ["Dr. Nehal Ahmed Mabrook"],
+      "group": ["1M2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-ECE412",
+      "subject_name": "Communication Theory Tut",
+      "teacher": ["Eng. Hossam Abou Kil AbdelAzim"],
+      "group": ["4E2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-ECE412",
+      "subject_name": "Communication Theory Tut",
+      "teacher": ["Eng. Hossam Abou Kil AbdelAzim"],
+      "group": ["4E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-ECE382",
+      "subject_name": "Controle System Theory & Design Tut",
+      "teacher": ["Eng. Hossam Abou Kil AbdelAzim"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-ECE142",
+      "subject_name": "Basic Electronics Tut",
+      "teacher": ["Dr. Amira Salah Eldin EL Baiouy"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-CE102",
+      "subject_name": "Introduction to information technology Tut",
+      "teacher": ["Dr. Nehal Ahmed Mabrook"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME312",
+      "subject_name": "Fluid Mechanics Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["3M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-EM382",
+      "subject_name": "T-EM382 Tut",
+      "teacher": ["Eng. Mayar Moustafa"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-ECE362",
+      "subject_name": "Electromagnetic fields Tut",
+      "teacher": ["Eng. Tarek Ahmed AbdelShahid"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-ECE352",
+      "subject_name": "Digital Communication Tut",
+      "teacher": ["Eng. Somaya"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-ECE352",
+      "subject_name": "Digital Communication Tut",
+      "teacher": ["Eng. Somaya"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME342",
+      "subject_name": "Automatic Control Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-ME252",
+      "subject_name": "Industrial Accounting Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["2E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-CE406",
+      "subject_name": "Expert System Application Tut",
+      "teacher": ["Eng. Menna Allah Ibraheem"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-EME312",
+      "subject_name": "Fluid Mechanics Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-CE406",
+      "subject_name": "Expert System Application Tut",
+      "teacher": ["Eng. Menna Allah Ibraheem"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CE402",
+      "subject_name": "Computer Graphics Tut",
+      "teacher": ["Eng. Ayman M Kamal"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-LAN002",
+      "subject_name": "English Tut",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-CE312",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-EM222",
+      "subject_name": "Quality Control Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-CE402",
+      "subject_name": "Computer Graphics Tut",
+      "teacher": ["Eng. Ayman M Kamal"],
+      "group": ["4E2"]
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "CR7": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME454",
+      "subject_name": "Introduction to Robotics Tut",
+      "teacher": ["Eng M Ayoub"],
+      "group": ["4M3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-EME454",
+      "subject_name": "Introduction to Robotics Tut",
+      "teacher": ["Eng M Ayoub"],
+      "group": ["4M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT012",
+      "subject_name": "Math 2 Tut",
+      "teacher": ["Eng M Ayoub"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-ECE132",
+      "subject_name": "Electric Circuit 2 Tut",
+      "teacher": ["Eng Mennallah Abd EL satar"],
+      "group": ["1E3"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-CE112",
+      "subject_name": "Logic design Tut",
+      "teacher": ["Eng Mennallah Abd EL satar"],
+      "group": ["1E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-CE002",
+      "subject_name": "Computer Programing Tut",
+      "teacher": ["Eng Mazen"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-CE112",
+      "subject_name": "Logic design Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["1E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-CE302",
+      "subject_name": "T-CE302 Tut",
+      "teacher": ["Eng. Amal Yosry Zakzouk"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-ME252",
+      "subject_name": "Mechanical Engineering Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-CED072",
+      "subject_name": "Computer and Programming II, Tut",
+      "teacher": ["Eng Mazen"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Dr. Amna Saeed Mohamed"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MED017",
+      "subject_name": "Engineering Mechanics II, Tut",
+      "teacher": ["Eng. Nada Ehab Salah"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-EME452",
+      "subject_name": "T-EME452 Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["4M4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-EME452",
+      "subject_name": "T-EME452 Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["4M3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-EME232",
+      "subject_name": "Electrical Power Engineering Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["2M1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-CE232",
+      "subject_name": "Database System Tut",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT252",
+      "subject_name": "Probability and statistic Tut",
+      "teacher": ["Eng. Nourhan Amin"],
+      "group": ["2E1"]
+    }
+  ]
+}
