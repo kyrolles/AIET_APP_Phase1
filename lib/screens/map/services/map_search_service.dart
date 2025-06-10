@@ -1,23 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'map_schedule_service.dart';
+import 'room_mapping_service.dart';
 
 class MapSearchService {
   static Map<String, dynamic> _allSchedulesCache = {};
   static bool _isInitialized = false;
 
-  // Initialize and cache all schedule data
   static Future<void> initialize() async {
-    print('🚀 MapSearchService.initialize() called');
-
-    if (_isInitialized) {
-      print('🚀 Already initialized, skipping...');
-      return;
-    }
+    if (_isInitialized) return;
 
     try {
-      print('🚀 Loading AssetManifest.json...');
-      // Get all schedule file names from your assets/scadules folder
       final manifestContent = await rootBundle.loadString('AssetManifest.json');
       final Map<String, dynamic> manifestMap = json.decode(manifestContent);
 
@@ -26,46 +19,25 @@ class MapSearchService {
               key.startsWith('assets/scadules/') && key.endsWith('.json'))
           .toList();
 
-      print('🚀 Found ${scheduleFiles.length} schedule files: $scheduleFiles');
-
-      if (scheduleFiles.isEmpty) {
-        print('❌ No schedule files found! Check your assets/scadules/ folder');
-        return;
-      }
+      if (scheduleFiles.isEmpty) return;
 
       for (final filePath in scheduleFiles) {
         try {
-          print('🚀 Loading file: $filePath');
           final jsonString = await rootBundle.loadString(filePath);
           final scheduleData = json.decode(jsonString);
-
-          // Extract file name from path
           final fileName = filePath.split('/').last.replaceAll('.json', '');
           _allSchedulesCache[fileName] = scheduleData;
-
-          print(
-              '✅ Loaded schedule file: $fileName with ${scheduleData.keys.length} rooms');
         } catch (e) {
-          print('❌ Error loading schedule file $filePath: $e');
+          // Silent fail for individual files
         }
       }
 
       _isInitialized = true;
-      print(
-          '🚀 MapSearchService initialized with ${_allSchedulesCache.length} room schedules');
-
-      // Print sample data to verify structure
-      if (_allSchedulesCache.isNotEmpty) {
-        final firstKey = _allSchedulesCache.keys.first;
-        final firstSchedule = _allSchedulesCache[firstKey];
-        print('📋 Sample data from $firstKey: ${firstSchedule?.keys}');
-      }
     } catch (e) {
-      print('❌ Error initializing MapSearchService: $e');
+      // Silent fail for initialization
     }
   }
 
-  // Main search function
   static Future<List<SearchResult>> search({
     required String query,
     DateTime? searchDate,
@@ -79,56 +51,138 @@ class MapSearchService {
     final weekType = _getWeekType(targetDate);
     final dayName = _getDayName(targetDate);
 
-    print(
-        'Searching for: "$query" on $dayName, Week: $weekType, Period: $currentPeriod');
-
     final List<SearchResult> results = [];
 
-    // Search through all cached schedules
-    for (final entry in _allSchedulesCache.entries) {
-      final fileName = entry.key;
-      final scheduleData = entry.value as Map<String, dynamic>;
+    // Search through rooms using RoomMappingService
+    for (final displayRoomName in RoomMappingService.getAllRooms()) {
+      final scheduleId = RoomMappingService.getScheduleId(displayRoomName);
 
-      // Each file contains one or more rooms
-      for (final roomName in scheduleData.keys) {
-        final sessions = scheduleData[roomName] as List<dynamic>;
+      // Check if room name matches the query
+      if (_roomNameMatches(displayRoomName, normalizedQuery)) {
+        // Add room name match result
+        final roomResult = _createRoomSearchResult(displayRoomName, scheduleId,
+            targetDate, currentPeriod, weekType, dayName);
+        if (roomResult != null) {
+          results.add(roomResult);
+        }
+      }
 
-        for (final sessionData in sessions) {
-          final session = sessionData as Map<String, dynamic>;
+      // Check schedule data if available
+      if (RoomMappingService.hasScheduleData(displayRoomName) &&
+          _allSchedulesCache.containsKey(scheduleId)) {
+        final scheduleData =
+            _allSchedulesCache[scheduleId] as Map<String, dynamic>;
 
-          // Check if session matches the target day and week type
-          if (!_isSessionRelevant(session, dayName, weekType)) continue;
+        for (final roomDataKey in scheduleData.keys) {
+          final sessions = scheduleData[roomDataKey] as List<dynamic>;
 
-          // Check for matches in this session
-          final matches = _findMatches(session, normalizedQuery);
-          if (matches.isNotEmpty) {
-            results.add(SearchResult(
-              roomName: roomName,
-              session: session,
-              matches: matches,
-              relevanceScore:
-                  _calculateRelevanceScore(matches, session, currentPeriod),
-              isCurrentPeriod:
-                  session['period'].toString() == currentPeriod.toString(),
-            ));
+          for (final sessionData in sessions) {
+            final session = sessionData as Map<String, dynamic>;
+
+            if (!_isSessionRelevant(session, dayName, weekType)) continue;
+
+            final matches = _findMatches(session, normalizedQuery);
+            if (matches.isNotEmpty) {
+              results.add(SearchResult(
+                roomName:
+                    displayRoomName, // Use display name instead of schedule ID
+                session: session,
+                matches: matches,
+                relevanceScore:
+                    _calculateRelevanceScore(matches, session, currentPeriod),
+                isCurrentPeriod:
+                    session['period'].toString() == currentPeriod.toString(),
+              ));
+            }
           }
         }
       }
     }
 
-    print('Found ${results.length} search results');
-
-    // Sort by relevance (current period first, then by score)
-    results.sort((a, b) {
+    // Remove duplicates and sort
+    final uniqueResults = _removeDuplicateResults(results);
+    uniqueResults.sort((a, b) {
       if (a.isCurrentPeriod && !b.isCurrentPeriod) return -1;
       if (!a.isCurrentPeriod && b.isCurrentPeriod) return 1;
       return b.relevanceScore.compareTo(a.relevanceScore);
     });
 
-    return results;
+    return uniqueResults;
   }
 
-  // Check if session is relevant for the target day and week
+  // Check if room name matches query
+  static bool _roomNameMatches(String roomName, String query) {
+    return roomName.toLowerCase().contains(query);
+  }
+
+  // Create a search result for room name matches
+  static SearchResult? _createRoomSearchResult(
+    String displayRoomName,
+    String scheduleId,
+    DateTime targetDate,
+    int currentPeriod,
+    String weekType,
+    String dayName,
+  ) {
+    // Try to find current session for this room
+    if (RoomMappingService.hasScheduleData(displayRoomName) &&
+        _allSchedulesCache.containsKey(scheduleId)) {
+      final scheduleData =
+          _allSchedulesCache[scheduleId] as Map<String, dynamic>;
+
+      for (final roomDataKey in scheduleData.keys) {
+        final sessions = scheduleData[roomDataKey] as List<dynamic>;
+
+        for (final sessionData in sessions) {
+          final session = sessionData as Map<String, dynamic>;
+
+          if (_isSessionRelevant(session, dayName, weekType) &&
+              session['period'].toString() == currentPeriod.toString()) {
+            return SearchResult(
+              roomName: displayRoomName,
+              session: session,
+              matches: ['Room: $displayRoomName'],
+              relevanceScore: 8.0, // High score for room name matches
+              isCurrentPeriod: true,
+            );
+          }
+        }
+      }
+    }
+
+    // Return basic room result if no current session found
+    return SearchResult(
+      roomName: displayRoomName,
+      session: {
+        'period': currentPeriod,
+        'day': dayName,
+        'subject': '',
+        'subject_name': '',
+        'teacher': [],
+        'group': [],
+      },
+      matches: ['Room: $displayRoomName'],
+      relevanceScore: 6.0,
+      isCurrentPeriod: false,
+    );
+  }
+
+  // Remove duplicate results (same room, same period)
+  static List<SearchResult> _removeDuplicateResults(
+      List<SearchResult> results) {
+    final Map<String, SearchResult> uniqueMap = {};
+
+    for (final result in results) {
+      final key = '${result.roomName}_${result.period}';
+      if (!uniqueMap.containsKey(key) ||
+          result.relevanceScore > uniqueMap[key]!.relevanceScore) {
+        uniqueMap[key] = result;
+      }
+    }
+
+    return uniqueMap.values.toList();
+  }
+
   static bool _isSessionRelevant(
       Map<String, dynamic> session, String dayName, String weekType) {
     final sessionDay = session['day']?.toString() ?? '';
@@ -152,7 +206,6 @@ class MapSearchService {
     return true;
   }
 
-  // Find all matches in a session
   static List<String> _findMatches(Map<String, dynamic> session, String query) {
     final List<String> matches = [];
 
@@ -190,13 +243,12 @@ class MapSearchService {
       }
     }
 
-    // Check subject code
+    // Check subjects
     final subject = session['subject']?.toString() ?? '';
     if (subject.toLowerCase().contains(query)) {
       matches.add('Subject: $subject');
     }
 
-    // Check subject name
     final subjectName = session['subject_name']?.toString() ?? '';
     if (subjectName.toLowerCase().contains(query)) {
       matches.add('Subject: $subjectName');
@@ -205,32 +257,24 @@ class MapSearchService {
     return matches;
   }
 
-  // Smart name matching for teachers - improved for full names
   static bool _nameMatches(String fullName, String query) {
     final normalizedName = fullName.toLowerCase();
     final normalizedQuery = query.toLowerCase();
 
-    // Direct substring match - this should catch most cases
     if (normalizedName.contains(normalizedQuery)) return true;
 
-    // Remove common titles for cleaner comparison
     final cleanedName = _removeCommonTitles(normalizedName);
     final cleanedQuery = _removeCommonTitles(normalizedQuery);
 
-    // Check cleaned versions
     if (cleanedName.contains(cleanedQuery)) return true;
 
-    // Split into words for flexible matching
     final nameWords = cleanedName.split(RegExp(r'[\s.]+'));
     final queryWords = cleanedQuery.split(RegExp(r'[\s.]+'));
 
-    // For longer queries (full names), use flexible matching
     if (queryWords.length >= 2) {
       int matchedWords = 0;
-
       for (final queryWord in queryWords) {
         if (queryWord.length >= 2) {
-          // Check if this query word appears in any name word
           bool foundInName = false;
           for (final nameWord in nameWords) {
             if (nameWord.contains(queryWord)) {
@@ -241,16 +285,9 @@ class MapSearchService {
           if (foundInName) matchedWords++;
         }
       }
-
-      // If we found most of the query words, it's a match
-      // For "dr reda el shistawy" -> we need at least 3 out of 4 words
       double matchRatio = matchedWords / queryWords.length;
-      if (matchRatio >= 0.6) {
-        // 60% of words must match
-        return true;
-      }
+      if (matchRatio >= 0.6) return true;
     } else {
-      // Single word matching - keep the existing logic
       final queryWord = queryWords.first;
       if (queryWord.length >= 2) {
         for (final nameWord in nameWords) {
@@ -264,7 +301,6 @@ class MapSearchService {
     return false;
   }
 
-  // Improved title removal to handle more cases
   static String _removeCommonTitles(String name) {
     final titles = [
       'dr',
@@ -287,46 +323,35 @@ class MapSearchService {
     ];
 
     String cleaned = name.trim();
-
-    // Remove titles from the beginning with better regex
     for (final title in titles) {
-      // Handle "Dr." "Dr " "DR." "dr" etc.
       cleaned = cleaned.replaceFirst(
         RegExp('^$title\\.?\\s+', caseSensitive: false),
         '',
       );
     }
-
     return cleaned.trim();
   }
 
-  // Calculate relevance score
   static double _calculateRelevanceScore(
       List<String> matches, Map<String, dynamic> session, int currentPeriod) {
     double score = 0.0;
     final sessionPeriod = int.tryParse(session['period'].toString()) ?? 0;
 
-    // Boost score for current period
     if (sessionPeriod == currentPeriod) score += 10.0;
-
-    // Boost for next period
     if (sessionPeriod == currentPeriod + 1) score += 5.0;
 
-    // Score based on match types
     for (final match in matches) {
+      if (match.startsWith('Room:')) score += 8.0;
       if (match.startsWith('Teacher:')) score += 5.0;
       if (match.startsWith('Group:')) score += 4.0;
       if (match.startsWith('Subject:')) score += 3.0;
     }
 
-    // Boost for multiple matches
     score += matches.length * 0.5;
-
     return score;
   }
 
   static String _getWeekType(DateTime date) {
-    // Simple implementation - you can adjust based on your academic calendar
     final weekNumber =
         ((date.difference(DateTime(date.year, 9, 1)).inDays) / 7).floor();
     return weekNumber % 2 == 0 ? 'Even' : 'Odd';
@@ -346,7 +371,7 @@ class MapSearchService {
   }
 }
 
-// Search result model
+// Rest of SearchResult class stays the same...
 class SearchResult {
   final String roomName;
   final Map<String, dynamic> session;
