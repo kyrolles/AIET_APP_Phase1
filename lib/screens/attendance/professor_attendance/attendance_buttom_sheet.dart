@@ -63,8 +63,6 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   void initState() {
     super.initState();
     _loadSubjects();
-    // Remove this line - we'll use onChanged instead
-    // _subjectCodeController.addListener(_onSearchChanged);
   }
 
   
@@ -93,7 +91,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0, -200), // Position above the text field
+          offset: Offset(0, -200), 
           child: Material(
             elevation: 4,
             borderRadius: BorderRadius.circular(4),
@@ -161,7 +159,6 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
     }
   }
 
-  // Keep the existing _onSearchChanged method as is:
   void _onSearchChanged(String query) {
     setState(() {
       if (query.length >= 2) {
@@ -369,7 +366,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     
                     
                     DocumentReference docRef = await FirebaseFirestore.instance.collection('attendance').add({
-                      'subjectName': _selectedSubjectName, // Use subject name instead of code
+                      'subjectName': _selectedSubjectName, 
                       'period': selectedPeriod,
                       'studentsList': [],
                       'status': widget.defaultStatus,
@@ -385,7 +382,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => AttendanceArchive(
-                            subjectName: _selectedSubjectName, // Use subject name here too
+                            subjectName: _selectedSubjectName, 
                             period: selectedPeriod,
                             existingDocId: docRef.id,
                           ),
