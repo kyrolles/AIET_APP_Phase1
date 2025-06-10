@@ -11,7 +11,7 @@ class CurrentAttendanceItem extends StatelessWidget {
     required this.total,
     required this.ontapOnReview,
     required this.ontapOnSend,
-    this.onDelete,  // Add this parameter
+    this.onDelete,  
   });
 
   final String subject;
@@ -21,7 +21,7 @@ class CurrentAttendanceItem extends StatelessWidget {
   final int total;
   final Function() ontapOnReview;
   final Function() ontapOnSend;
-  final Function()? onDelete;  // Add this field
+  final Function()? onDelete;  
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class CurrentAttendanceItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(subject, style: kTextStyleBold),
-                      // Convert the close icon to a button that calls onDelete
+                      
                       InkWell(
                         onTap: onDelete,
                         child: const Icon(Icons.close, color: kGrey),
