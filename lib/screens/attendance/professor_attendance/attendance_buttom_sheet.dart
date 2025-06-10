@@ -234,6 +234,14 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     return;
                   }
 
+                  if (_selectedSubjectName.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Please select a subject from the dropdown')),
+                    );
+                    return;
+                  }
+
                   if (selectedPeriod == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please select a period')),
@@ -265,7 +273,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     
                     
                     DocumentReference docRef = await FirebaseFirestore.instance.collection('attendance').add({
-                      'subjectName': subjectCode,
+                      'subjectName': _selectedSubjectName, // Use subject name instead of code
                       'period': selectedPeriod,
                       'studentsList': [],
                       'status': widget.defaultStatus,
@@ -281,7 +289,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => AttendanceArchive(
-                            subjectName: subjectCode,
+                            subjectName: _selectedSubjectName, // Use subject name here too
                             period: selectedPeriod,
                             existingDocId: docRef.id,
                           ),
