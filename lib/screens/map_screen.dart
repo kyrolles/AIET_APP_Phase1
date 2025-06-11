@@ -5,6 +5,7 @@ import '../components/map_building_selection.dart';
 import '../components/my_app_bar.dart';
 import '../components/search_bar.dart';
 import '../constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -26,12 +27,12 @@ class _MapScreenState extends State<MapScreen> {
 
 //Building pages to display
   final List<Widget> _widgetOptions = const [BuildingA(), BuildingB()];
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Map',
+        title: localizations?.map ?? 'Map',
         onpressed: () => Navigator.pop(context),
         actions: [
           BuildingSelection(

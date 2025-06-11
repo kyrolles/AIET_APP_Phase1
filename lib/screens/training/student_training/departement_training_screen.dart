@@ -4,6 +4,7 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // import 'dart:convert';
 
 class DepartementTrainingScreen extends StatelessWidget {
@@ -26,13 +27,14 @@ class DepartementTrainingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     // Get department from navigation arguments
     final String department =
         ModalRoute.of(context)!.settings.arguments as String? ?? 'Computer';
 
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Training Announcement',
+        title: localizations?.trainingAnnouncement ?? 'Training Announcement',
         onpressed: () => Navigator.pop(context),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -56,7 +58,10 @@ class DepartementTrainingScreen extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             print(
                 'No data available. HasData: ${snapshot.hasData}, IsEmpty: ${snapshot.data?.docs.isEmpty}');
-            return const Center(child: Text('No announcements available'));
+            return Center(
+              child: Text(localizations?.noAnnouncementsAvailable ??
+                  'No announcements available'),
+            );
           }
 
           print('Number of documents: ${snapshot.data!.docs.length}');
@@ -73,7 +78,9 @@ class DepartementTrainingScreen extends StatelessWidget {
                       child: AnnouncementCard(
                         imageBase64: data['logo']
                             as String?, // Pass base64 string directly
-                        title: data['companyName'] ?? 'Unknown Company',
+                        title: data['companyName'] ??
+                            (localizations?.unknownCompany ??
+                                'Unknown Company'),
                         onPressed: () {
                           Navigator.pushNamed(context, '/trainingDetails',
                               arguments: doc.id);
@@ -97,23 +104,25 @@ class DepartementTrainingScreen extends StatelessWidget {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Text(
-                                      'Confirm Deletion',
-                                      style: TextStyle(
+                                    Text(
+                                      localizations?.confirmDeletion ??
+                                          'Confirm Deletion',
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 20),
                                     KButton(
-                                      text: 'Delete',
+                                      text: localizations?.delete ?? 'Delete',
                                       textColor: Colors.red,
                                       backgroundColor: Colors.transparent,
                                       borderWidth: 2,
                                       borderColor: Colors.red,
                                       onPressed: () {
                                         FirebaseFirestore.instance
-                                            .collection('training_announcements')
+                                            .collection(
+                                                'training_announcements')
                                             .doc(doc.id)
                                             .delete();
                                         Navigator.pop(context);
@@ -121,7 +130,7 @@ class DepartementTrainingScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 10),
                                     KButton(
-                                      text: 'Cancel',
+                                      text: localizations?.cancel ?? 'Cancel',
                                       backgroundColor: Colors.grey.shade200,
                                       textColor: Colors.black,
                                       onPressed: () {

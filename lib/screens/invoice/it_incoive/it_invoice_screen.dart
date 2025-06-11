@@ -7,6 +7,7 @@ import 'package:graduation_project/screens/invoice/it_incoive/it_archive.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
 import '../../../components/my_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'filter_widget.dart';
 
@@ -40,9 +41,11 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Student Affairs',
+        title: localizations?.studentAffairs ?? 'Student Affairs',
         onpressed: () {
           Navigator.pop(context);
         },
@@ -90,7 +93,7 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
             padding: const EdgeInsets.all(8.0),
             child: KButton(
               backgroundColor: Colors.black38,
-              text: 'Archive',
+              text: localizations?.archive ?? 'Archive',
               height: 62,
               svgPath: 'assets/project_image/Pin.svg',
               onPressed: () {

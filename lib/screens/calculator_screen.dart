@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/my_app_bar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GPACalculatorScreen extends StatefulWidget {
   const GPACalculatorScreen({super.key});
@@ -80,9 +81,10 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: MyAppBar(
-        title: 'GPA Calculator',
+        title: localizations?.gpaCalculator ?? 'GPA Calculator',
         onpressed: () => Navigator.pop(context),
       ),
       body: Padding(
@@ -101,12 +103,12 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
                       const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                   child: Column(
                     children: [
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Your GPA: ',
-                            style: TextStyle(
+                            localizations?.yourGPA ?? 'Your GPA: ',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.blueAccent,
@@ -116,8 +118,8 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
                           //   width: 40,
                           // ),
                           Text(
-                            'Total Credits: ',
-                            style: TextStyle(
+                            localizations?.totalCredits ?? 'Total Credits: ',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.blueAccent,
@@ -168,12 +170,14 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
                               controller: _creditsControllers[index],
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
-                                labelText: 'Credits ${index + 1}',
+                                labelText:
+                                    '${localizations?.credits ?? 'Credits'} ${index + 1}',
                                 border: const OutlineInputBorder(),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Enter credits';
+                                  return localizations?.enterCredits ??
+                                      'Enter credits';
                                 }
                                 return null;
                               },
@@ -198,7 +202,8 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
                                 });
                               },
                               decoration: InputDecoration(
-                                labelText: 'Grade ${index + 1}',
+                                labelText:
+                                    '${localizations?.grade ?? 'Grade'} ${index + 1}',
                                 border: const OutlineInputBorder(),
                               ),
                             ),
@@ -227,9 +232,9 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
                       Icons.add,
                       color: Colors.blueAccent,
                     ),
-                    label: const Text(
-                      'Add Course',
-                      style: TextStyle(
+                    label: Text(
+                      localizations?.addCourse ?? 'Add Course',
+                      style: const TextStyle(
                         color: Colors.blueAccent,
                       ),
                     ),
@@ -250,9 +255,9 @@ class GPACalculatorScreenState extends State<GPACalculatorScreen> {
                       Icons.calculate,
                       color: Colors.blueAccent,
                     ),
-                    label: const Text(
-                      'Calculate GPA',
-                      style: TextStyle(
+                    label: Text(
+                      '${localizations?.calculate ?? 'Calculate'} GPA',
+                      style: const TextStyle(
                         color: Colors.blueAccent,
                       ),
                     ),

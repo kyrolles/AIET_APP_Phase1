@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../components/my_app_bar.dart';
 
@@ -76,12 +77,13 @@ class TrianingDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     final String announcementId =
         ModalRoute.of(context)!.settings.arguments as String;
 
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Training Details',
+        title: localizations?.trainingDetails ?? 'Training Details',
         onpressed: () => Navigator.pop(context),
       ),
       body: StreamBuilder<DocumentSnapshot>(

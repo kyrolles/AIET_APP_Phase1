@@ -8,6 +8,7 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/training/staff_training/filter_bottom_sheet.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
 
@@ -75,9 +76,11 @@ class _ValidateScreenState extends State<ValidateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Validate',
+        title: localizations?.validate ?? 'Validate',
         onpressed: () => Navigator.pop(context),
         actions: [
           IconButton(
@@ -111,9 +114,9 @@ class _ValidateScreenState extends State<ValidateScreen> {
                   requestsList.add(Request.fromJson(snapshot.data!.docs[i]));
                 }
                 return ListContainer(
-                  title: 'Requests',
+                  title: localizations?.requests ?? 'Requests',
                   listOfWidgets: studentreques,
-                  emptyMessage: 'No Requests',
+                  emptyMessage: localizations?.noRequests ?? 'No Requests',
                 );
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
@@ -126,7 +129,7 @@ class _ValidateScreenState extends State<ValidateScreen> {
             padding: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
             child: KButton(
               backgroundColor: Colors.black26,
-              text: 'Archive',
+              text: localizations?.archive ?? 'Archive',
               height: 62,
               svgPath: 'assets/project_image/Pin.svg',
               onPressed: () {

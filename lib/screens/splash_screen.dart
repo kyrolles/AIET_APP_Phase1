@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:graduation_project/screens/home_screen.dart';
 // import 'package:graduation_project/screens/home_screen.dart';
 import 'package:graduation_project/screens/login_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, required this.isUserLoggedIn});

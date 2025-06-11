@@ -6,6 +6,7 @@ import 'package:graduation_project/components/student_container.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/training/staff_training/validate_buttom_sheet.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
 
@@ -25,12 +26,13 @@ class _ArchiveValidateScreenState extends State<ArchiveValidateScreen> {
       .snapshots();
 
   List<Request> requestsList = [];
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Archive',
+        title: localizations?.archive ?? 'Archive',
         onpressed: () => Navigator.pop(context),
       ),
       body: Column(
@@ -44,9 +46,9 @@ class _ArchiveValidateScreenState extends State<ArchiveValidateScreen> {
                   requestsList.add(Request.fromJson(snapshot.data!.docs[i]));
                 }
                 return ListContainer(
-                  title: 'Requests',
+                  title: localizations?.requests ?? 'Requests',
                   listOfWidgets: archiveRequestsList(),
-                  emptyMessage: 'No Requests',
+                  emptyMessage: localizations?.noRequests ?? 'No Requests',
                 );
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));

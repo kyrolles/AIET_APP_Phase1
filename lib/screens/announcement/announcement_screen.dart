@@ -11,6 +11,7 @@ import 'package:graduation_project/screens/announcement/share_olnly_bottomsheet.
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart'; // Add PDFView dependency
 import '../../components/my_app_bar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // Convert to ConsumerStatefulWidget
 class AnnouncementScreen extends ConsumerStatefulWidget {
@@ -66,6 +67,7 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
   @override
   Widget build(BuildContext context) {
     // Watch the controller state
+    final localizations = AppLocalizations.of(context);
     final AnnouncementState state = ref.watch(announcementControllerProvider);
     final AnnouncementController controller =
         ref.read(announcementControllerProvider.notifier);
@@ -95,10 +97,11 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
       if (next.postSuccess && previous?.postSuccess == false) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             backgroundColor: Colors.green,
-            content: Text('Announcement posted successfully!'),
-            duration: Duration(seconds: 2),
+            content: Text(localizations?.announcementPosted ??
+                'Announcement posted successfully!'),
+            duration: const Duration(seconds: 2),
           ),
         );
         // Clear text fields after successful post
@@ -112,10 +115,9 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
         });
       }
     });
-
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Create Announcement',
+        title: localizations?.createAnnouncement ?? 'Create Announcement',
         actions: [
           // Show loading indicator or send icon
           state.isLoading
@@ -173,12 +175,14 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                     setState(() {}); // Keep for text direction updates
                   },
                   decoration: InputDecoration(
-                    labelText: '  Title', // Use labelText
+                    labelText:
+                        '  ${localizations?.title ?? 'Title'}', // Use labelText
                     labelStyle: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w400,
                         color: kGrey),
-                    hintText: 'Enter announcement title',
+                    hintText: localizations?.enterAnnouncementTitle ??
+                        'Enter announcement title',
                     hintStyle: const TextStyle(
                       fontSize: 18,
                       color: kGrey,
@@ -233,9 +237,11 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                           height: 1.5,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Description',
+                          labelText:
+                              localizations?.description ?? 'Description',
                           alignLabelWithHint: true,
-                          hintText: 'Write your announcement here...',
+                          hintText: localizations?.writeAnnouncementHere ??
+                              'Write your announcement here...',
                           hintStyle: const TextStyle(
                             fontSize: 18,
                             color: kGrey,
@@ -341,13 +347,11 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
                     color: kBlue,
                   ),
                 ),
-              ),
-
-              // Share Only To button - Icon only
+              ), // Share Only To button - Icon only
               Expanded(
                 flex: 2,
                 child: KButton(
-                  text: 'Share Only To',
+                  text: localizations?.shareOnlyTo ?? 'Share Only To',
                   fontSize: 16,
                   borderColor: kBlue,
                   textColor: kBlue,

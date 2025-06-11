@@ -10,6 +10,7 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/screens/invoice/student_invoice/tuition_fees_download.dart';
 import 'package:graduation_project/utils/safe_json_extractor.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../components/my_app_bar.dart';
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
 import 'proof_of_enrollment.dart';
@@ -66,9 +67,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Student Affairs',
+        title: localizations?.studentAffairs ?? 'Student Affairs',
         onpressed: () => Navigator.pop(context),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -92,45 +94,46 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 }
               }
             }
+            final localizations = AppLocalizations.of(context);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ListContainer(
-                  title: 'Status',
-                  listOfWidgets: showRequestsList(),
+                  title: localizations?.status ?? 'Status',
+                  listOfWidgets: showRequestsList(localizations),
                 ),
                 const Divider(
                     color: kLightGrey, indent: 10, endIndent: 10, height: 10),
                 const SizedBox(
                   height: 8,
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0),
                   child: Text(
-                    'Ask for',
-                    style: TextStyle(
+                    localizations?.askFor ?? 'Ask for',
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                tuitionFeesButton(context, requestsList),
-                proofOfEnrollmentButton(context),
-                gradesReportButton(context),
-                curriculumContentButton(context),
+                tuitionFeesButton(context, requestsList, localizations),
+                proofOfEnrollmentButton(context, localizations),
+                gradesReportButton(context, localizations),
+                curriculumContentButton(context, localizations),
               ],
             );
           }),
     );
   }
 
-  List<Widget> showRequestsList() {
+  List<Widget> showRequestsList([AppLocalizations? localizations]) {
     if (requestsList.isEmpty) {
       return [
-        const Center(
+        Center(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('No requests found'),
+            padding: const EdgeInsets.all(16.0),
+            child: Text(localizations?.noRequestsFound ?? 'No requests found'),
           ),
         )
       ];
@@ -159,7 +162,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             id: request.studentId,
             year: request.year,
             title: request.fileName.isEmpty
-                ? 'Tuition Fees Request'
+                ? localizations?.tuitionFeesRequest ?? 'Tuition Fees Request'
                 : request.fileName,
             image: 'assets/project_image/pdf.png',
             pdfBase64: request.pdfBase64,
@@ -188,9 +191,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     return requestsWidgets;
   }
 
-  ServiceItem proofOfEnrollmentButton(BuildContext context) {
+  ServiceItem proofOfEnrollmentButton(BuildContext context,
+      [AppLocalizations? localizations]) {
     return ServiceItem(
-      title: 'Proof of enrollment',
+      title: localizations?.proofOfEnrollment ?? 'Proof of enrollment',
       imageUrl: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
       backgroundColor: const Color.fromRGBO(241, 196, 15, 1),
       onPressed: () {
@@ -204,9 +208,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   ServiceItem tuitionFeesButton(
-      BuildContext context, List<Request> requestsList) {
+      BuildContext context, List<Request> requestsList,
+      [AppLocalizations? localizations]) {
     return ServiceItem(
-      title: 'Tuition fees',
+      title: localizations?.tuitionFees ?? 'Tuition fees',
       imageUrl: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
       backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
       onPressed: () {
@@ -219,9 +224,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  ServiceItem gradesReportButton(BuildContext context) {
+  ServiceItem gradesReportButton(BuildContext context,
+      [AppLocalizations? localizations]) {
     return ServiceItem(
-      title: 'Grades Report',
+      title: localizations?.gradesReport ?? 'Grades Report',
       imageUrl: 'assets/images/image 29 (2).png', // Update with correct image
       backgroundColor: const Color.fromRGBO(46, 204, 113, 1),
       onPressed: () {
@@ -234,9 +240,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  ServiceItem curriculumContentButton(BuildContext context) {
+  ServiceItem curriculumContentButton(BuildContext context,
+      [AppLocalizations? localizations]) {
     return ServiceItem(
-      title: 'Academic Content',
+      title: localizations?.academicContent ?? 'Academic Content',
       imageUrl: 'assets/images/image 29 (2).png', // Update with correct image
       backgroundColor: const Color.fromRGBO(155, 89, 182, 1),
       onPressed: () {

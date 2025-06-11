@@ -4,15 +4,18 @@ import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/screens/invoice/it_incoive/it_invoice_request_contanier.dart';
 import '../../../components/my_app_bar.dart';
 import 'get_requests_cubit/get_requests_cubit.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ItArchiveScreen extends StatelessWidget {
   const ItArchiveScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Student Affairs Archive',
+        title:
+            localizations?.studentAffairsArchive ?? 'Student Affairs Archive',
         onpressed: () {
           Navigator.pop(context);
         },
@@ -32,7 +35,7 @@ class ItArchiveScreen extends StatelessWidget {
 
             if (state is GetRequestsLoaded) {
               return ListContainer(
-                title: 'Requests',
+                title: localizations?.requests ?? 'Requests',
                 listOfWidgets: state.requests
                     .map((request) => RequestContainer(
                           request: request,

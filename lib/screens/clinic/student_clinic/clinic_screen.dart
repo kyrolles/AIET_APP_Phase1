@@ -6,15 +6,16 @@ import 'package:graduation_project/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ClinicScreen extends StatelessWidget {
   const ClinicScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Clinic',
+        title: localizations?.clinic ?? 'Clinic',
         onpressed: () {
           Navigator.pop(context);
         },
@@ -102,6 +103,7 @@ class _ClinicBodyState extends State<ClinicBody> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView(
@@ -114,23 +116,23 @@ class _ClinicBodyState extends State<ClinicBody> {
             ),
             child: Stack(
               children: [
-                const Positioned(
+                Positioned(
                   top: 30,
                   left: 25,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Book your',
-                        style: TextStyle(
+                        localizations?.bookYour ?? 'Book your',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'appointments',
-                        style: TextStyle(
+                        localizations?.appointments ?? 'appointments',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -162,13 +164,13 @@ class _ClinicBodyState extends State<ClinicBody> {
                 fetchUserAppointments();
               });
             },
-            text: 'New Appointment',
+            text: localizations?.newAppointment ?? 'New Appointment',
             backgroundColor: const Color(0xFF39A0FF),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Your Appointments',
-            style: TextStyle(
+          Text(
+            localizations?.yourAppointments ?? 'Your Appointments',
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
@@ -177,10 +179,11 @@ class _ClinicBodyState extends State<ClinicBody> {
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : appointments.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No appointment has been booked',
-                        style: TextStyle(color: kGrey),
+                        localizations?.noAppointments ??
+                            'No appointment has been booked',
+                        style: const TextStyle(color: kGrey),
                       ),
                     )
                   : ListView.builder(
@@ -214,16 +217,18 @@ class _ClinicBodyState extends State<ClinicBody> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Time',
-                                      style: TextStyle(
+                                    Text(
+                                      localizations?.time ?? 'Time',
+                                      style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
                                       ),
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      appointment['time'] ?? 'Not specified',
+                                      appointment['time'] ??
+                                          localizations?.notSpecified ??
+                                          'Not specified',
                                       style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 18,
@@ -245,9 +250,9 @@ class _ClinicBodyState extends State<ClinicBody> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Date',
-                                        style: TextStyle(
+                                      Text(
+                                        localizations?.date ?? 'Date',
+                                        style: const TextStyle(
                                           color: Colors.black54,
                                           fontSize: 16,
                                         ),
@@ -286,17 +291,17 @@ class _ClinicBodyState extends State<ClinicBody> {
                                         ],
                                       ),
                                       const SizedBox(height: 16),
-                                      const Row(
+                                      Row(
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.medical_services_outlined,
                                             size: 18,
                                             color: Colors.grey,
                                           ),
-                                          SizedBox(width: 8),
+                                          const SizedBox(width: 8),
                                           Text(
-                                            'Room 2-168',
-                                            style: TextStyle(
+                                            '${localizations?.room ?? 'Room'} 2-168',
+                                            style: const TextStyle(
                                               fontSize: 16,
                                             ),
                                           ),
@@ -325,7 +330,8 @@ class _ClinicBodyState extends State<ClinicBody> {
                                             ),
                                             child: Text(
                                               getStatusText(
-                                                  appointment['status']),
+                                                  appointment['status'],
+                                                  localizations),
                                               style: TextStyle(
                                                 color: appointment['status'] ==
                                                         'cancelled'
@@ -348,9 +354,11 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                   context: context,
                                                   builder: (context) =>
                                                       AlertDialog(
-                                                    title: const Text(
+                                                    title: Text(localizations
+                                                            ?.cancelAppointment ??
                                                         'Cancel Appointment'),
-                                                    content: const Text(
+                                                    content: Text(localizations
+                                                            ?.confirmCancelAppointment ??
                                                         'Are you sure you want to cancel this appointment?'),
                                                     actions: [
                                                       TextButton(
@@ -358,7 +366,9 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                           Navigator.pop(
                                                               context);
                                                         },
-                                                        child: const Text('No'),
+                                                        child: Text(
+                                                            localizations?.no ??
+                                                                'No'),
                                                       ),
                                                       TextButton(
                                                         onPressed: () async {
@@ -376,8 +386,10 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                           });
                                                           fetchUserAppointments();
                                                         },
-                                                        child:
-                                                            const Text('Yes'),
+                                                        child: Text(
+                                                            localizations
+                                                                    ?.yes ??
+                                                                'Yes'),
                                                       ),
                                                     ],
                                                   ),
@@ -391,9 +403,10 @@ class _ClinicBodyState extends State<ClinicBody> {
                                                     MaterialTapTargetSize
                                                         .shrinkWrap,
                                               ),
-                                              child: const Text(
-                                                'Cancel',
-                                                style: TextStyle(
+                                              child: Text(
+                                                localizations?.cancel ??
+                                                    'Cancel',
+                                                style: const TextStyle(
                                                   color: Colors.red,
                                                   fontSize: 14,
                                                 ),
@@ -427,9 +440,21 @@ class _ClinicBodyState extends State<ClinicBody> {
     }
   }
 
-  String getStatusText(String? status) {
-    if (status == null) return 'Pending';
-    if (status == 'completed') return 'Approved';
-    return status.toString()[0].toUpperCase() + status.toString().substring(1);
+  String getStatusText(String? status, AppLocalizations? localizations) {
+    if (status == null) return localizations?.pending ?? 'Pending';
+    if (status == 'completed') return localizations?.approved ?? 'Approved';
+
+    // Capitalize first letter and return localized version if available
+    String capitalizedStatus =
+        status.toString()[0].toUpperCase() + status.toString().substring(1);
+
+    switch (status) {
+      case 'pending':
+        return localizations?.pending ?? capitalizedStatus;
+      case 'cancelled':
+        return localizations?.cancelled ?? capitalizedStatus;
+      default:
+        return capitalizedStatus;
+    }
   }
 }
