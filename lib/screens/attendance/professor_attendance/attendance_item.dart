@@ -37,7 +37,7 @@ class CurrentAttendanceItem extends StatelessWidget {
                 color: const Color(0xFFEB8991),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Center(child: Text(period, style: kTextStyleBold)),
+              child: Center(child: Text('P$period', style: kTextStyleBold)), 
             ),
             Text(startTime, style: kTextStyleNormal),
             Text(

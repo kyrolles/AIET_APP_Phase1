@@ -39,6 +39,8 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   List<MapEntry<String, String>> _filteredSubjects = [];
   bool _showDropdown = false;
   String _selectedSubjectName = '';
+  OverlayEntry? _overlayEntry;
+  final LayerLink _layerLink = LayerLink();
 
   
   final List<Period> periods = [
@@ -61,7 +63,6 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   void initState() {
     super.initState();
     _loadSubjects();
-    _subjectCodeController.addListener(_onSearchChanged);
   }
 
   
@@ -79,20 +80,111 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
     }
   }
 
-  void _onSearchChanged() {
-    final String query = _subjectCodeController.text.toUpperCase();
-    if (query.length >= 2) {
-      setState(() {
-        _filteredSubjects = _allSubjects.entries
-            .where((entry) => entry.key.startsWith(query))
-            .toList();
-        _showDropdown = true;
-      });
-    } else {
-      setState(() {
-        _showDropdown = false;
-      });
+  void _showSubjectDropdown() {
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
     }
+    
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: MediaQuery.of(context).size.width - 32,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0, -200), 
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                itemCount: _filteredSubjects.length,
+                itemBuilder: (context, index) {
+                  final entry = _filteredSubjects[index];
+                  return ListTile(
+                    dense: true,
+                    title: Row(
+                      children: [
+                        Text(
+                          entry.key,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            entry.value,
+                            style: const TextStyle(color: Colors.grey),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _subjectCodeController.text = entry.key;
+                        _selectedSubjectName = entry.value;
+                        _showDropdown = false;
+                      });
+                      _hideSubjectDropdown();
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _hideSubjectDropdown() {
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
+      _overlayEntry = null;
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      if (query.length >= 2) {
+        _filteredSubjects = _allSubjects.entries
+            .where((entry) => entry.key.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+        if (_filteredSubjects.isNotEmpty && !_showDropdown) {
+          _showDropdown = true;
+          _showSubjectDropdown();
+        } else if (_filteredSubjects.isEmpty && _showDropdown) {
+          _showDropdown = false;
+          _hideSubjectDropdown();
+        }
+      } else {
+        _filteredSubjects = [];
+        _showDropdown = false;
+        _hideSubjectDropdown();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _hideSubjectDropdown();
+    _subjectCodeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,36 +214,37 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextField(
-                    controller: _subjectCodeController,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: 'Enter the subject code',
-                      labelStyle: TextStyle(color: kGrey),
+                  CompositedTransformTarget(
+                    link: _layerLink,
+                    child: TextField(
+                      controller: _subjectCodeController,
+                      onChanged: _onSearchChanged,
+                      decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        labelText: 'Enter the subject code',
+                        labelStyle: TextStyle(color: kGrey),
+                      ),
                     ),
                   ),
                   if (_showDropdown && _filteredSubjects.isNotEmpty)
-                    Container(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2), // Using withOpacity
-                            spreadRadius: 1,
-                            blurRadius: 2,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: SingleChildScrollView(
+                    Transform.translate(
+                      offset: Offset(0, MediaQuery.of(context).viewInsets.bottom > 0 ? -MediaQuery.of(context).viewInsets.bottom - 50 : 0),
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 2,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
                         child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: _filteredSubjects.length,
                           itemBuilder: (context, index) {
                             final entry = _filteredSubjects[index];
@@ -234,6 +327,14 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     return;
                   }
 
+                  if (_selectedSubjectName.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Please select a subject from the dropdown')),
+                    );
+                    return;
+                  }
+
                   if (selectedPeriod == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please select a period')),
@@ -265,7 +366,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     
                     
                     DocumentReference docRef = await FirebaseFirestore.instance.collection('attendance').add({
-                      'subjectName': subjectCode,
+                      'subjectName': _selectedSubjectName, 
                       'period': selectedPeriod,
                       'studentsList': [],
                       'status': widget.defaultStatus,
@@ -281,7 +382,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => AttendanceArchive(
-                            subjectName: subjectCode,
+                            subjectName: _selectedSubjectName, 
                             period: selectedPeriod,
                             existingDocId: docRef.id,
                           ),
@@ -306,12 +407,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
     );
   }
 
-  @override
-  void dispose() {
-    _subjectCodeController.removeListener(_onSearchChanged);
-    _subjectCodeController.dispose();
-    super.dispose();
-  }
+ 
 }
 
 class PeriodButton extends StatelessWidget {
