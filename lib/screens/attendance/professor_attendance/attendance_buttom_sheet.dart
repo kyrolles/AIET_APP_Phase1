@@ -35,19 +35,26 @@ class AttendanceButtomSheet extends StatefulWidget {
 
 class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   final TextEditingController _subjectCodeController = TextEditingController();
+  final TextEditingController _classNumberController = TextEditingController();
   Map<String, String> _allSubjects = {};
+  List<String> _allClasses = [];
   List<MapEntry<String, String>> _filteredSubjects = [];
+  List<String> _filteredClasses = [];
   bool _showDropdown = false;
+  bool _showClassDropdown = false;
   String _selectedSubjectName = '';
+  String _selectedClassName = '';
   OverlayEntry? _overlayEntry;
+  OverlayEntry? _classOverlayEntry;
   final LayerLink _layerLink = LayerLink();
+  final LayerLink _classLayerLink = LayerLink();
 
   
   final List<Period> periods = [
-    Period(number: '1', timeRange: '9:00-10:30', isSelected: false, color: Colors.blue),
-    Period(number: '2', timeRange: '10:40-12:10', isSelected: false, color: Colors.green),
-    Period(number: '3', timeRange: '12:20-1:50', isSelected: false, color: Colors.orange),
-    Period(number: '4', timeRange: '2:00-3:30', isSelected: false, color: Colors.red),
+    Period(number: '1', timeRange: '9:00-10:30', isSelected: false, color: const Color(0xFFEB8991)),
+    Period(number: '2', timeRange: '10:40-12:10', isSelected: false, color: const Color(0xFF978ECB)),
+    Period(number: '3', timeRange: '12:20-1:50', isSelected: false, color: const Color(0xFF0ED290)),
+    Period(number: '4', timeRange: '2:00-3:30', isSelected: false, color: const Color(0xFFFFDD29)),
   ];
 
   
@@ -63,6 +70,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   void initState() {
     super.initState();
     _loadSubjects();
+    _loadClasses();
   }
 
   
@@ -165,10 +173,16 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
         _filteredSubjects = _allSubjects.entries
             .where((entry) => entry.key.toLowerCase().contains(query.toLowerCase()))
             .toList();
-        if (_filteredSubjects.isNotEmpty && !_showDropdown) {
-          _showDropdown = true;
-          _showSubjectDropdown();
-        } else if (_filteredSubjects.isEmpty && _showDropdown) {
+        if (_filteredSubjects.isNotEmpty) {
+          bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+          _showDropdown = !keyboardVisible; // Only show normal dropdown when keyboard is hidden
+          
+          if (keyboardVisible) {
+            _showSubjectDropdown(); // Show overlay when keyboard is visible
+          } else {
+            _hideSubjectDropdown(); // Hide overlay when keyboard is hidden
+          }
+        } else {
           _showDropdown = false;
           _hideSubjectDropdown();
         }
@@ -178,12 +192,129 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
         _hideSubjectDropdown();
       }
     });
+}
+
+  // Add this method after _loadSubjects() method (around line 88)
+  Future<void> _loadClasses() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/attendance/all_classes.json');
+      final List<dynamic> jsonData = json.decode(jsonString);
+      setState(() {
+        _allClasses = List<String>.from(jsonData);
+      });
+      debugPrint('Loaded ${_allClasses.length} classes');
+    } catch (e) {
+      debugPrint('Error loading classes: $e');
+    }
   }
+  
+  // Add this method after _showSubjectDropdown() method (around line 150)
+  void _displayClassDropdown() {
+    if (_classOverlayEntry != null) {
+      _classOverlayEntry!.remove();
+    }
+    
+    _classOverlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: MediaQuery.of(context).size.width - 32,
+        child: CompositedTransformFollower(
+          link: _classLayerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0, -200),
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                itemCount: _filteredClasses.length,
+                itemBuilder: (context, index) {
+                  final className = _filteredClasses[index];
+                  return ListTile(
+                    dense: true,
+                    title: Text(
+                      className,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _classNumberController.text = className;
+                        _selectedClassName = className;
+                        _showClassDropdown = false;
+                      });
+                      _hideClassDropdown();
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    // Add this line to insert the overlay entry
+    Overlay.of(context).insert(_classOverlayEntry!);
+  }
+  
+  // Add this method after _hideSubjectDropdown() method (around line 180)
+  void _hideClassDropdown() {
+    if (_classOverlayEntry != null) {
+      _classOverlayEntry!.remove();
+      _classOverlayEntry = null;
+    }
+  }
+  
+  // Add this method after _onSearchChanged() method (around line 200)
+  void _onClassSearchChanged(String query) {
+      setState(() {
+        if (query.length >= 2) {
+          _filteredClasses = _allClasses
+              .where((className) => className.toLowerCase().contains(query.toLowerCase()))
+              .toList();
+          
+          if (_filteredClasses.isNotEmpty) {
+            bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+            _showClassDropdown = !keyboardVisible; // Only show normal dropdown when keyboard is hidden
+            
+            if (keyboardVisible) {
+              _displayClassDropdown(); // Show overlay when keyboard is visible
+            } else {
+              _hideClassDropdown(); // Hide overlay when keyboard is hidden
+            }
+          } else {
+            _showClassDropdown = false;
+            _hideClassDropdown();
+          }
+        } else {
+          _filteredClasses = [];
+          _showClassDropdown = false;
+          _hideClassDropdown();
+        }
+      });
+  }
+
+ 
 
   @override
   void dispose() {
     _hideSubjectDropdown();
+    _hideClassDropdown();
     _subjectCodeController.dispose();
+    _classNumberController.dispose();
     super.dispose();
   }
 
@@ -210,72 +341,149 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                 ),
               ),
               const SizedBox(height: 20),
+              const Text('Class Number'),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // For class number TextField, update the CompositedTransformTarget:
+                  CompositedTransformTarget(
+                    link: _classLayerLink,
+                    child: Focus(
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus) {
+                          setState(() {
+                            _showClassDropdown = false;
+                            _hideClassDropdown();
+                          });
+                        }
+                      },
+                      child: TextField(
+                        controller: _classNumberController,
+                        onChanged: _onClassSearchChanged,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'example 4C2',
+                          labelStyle: TextStyle(color: kGrey),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_showClassDropdown && _filteredClasses.isNotEmpty && MediaQuery.of(context).viewInsets.bottom == 0)
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ListView.builder(
+                        itemCount: _filteredClasses.length,
+                        itemBuilder: (context, index) {
+                          final className = _filteredClasses[index];
+                          return ListTile(
+                            dense: true,
+                            title: Text(
+                              className,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _classNumberController.text = className;
+                                _selectedClassName = className;
+                                _showClassDropdown = false;
+                              });
+                              _hideClassDropdown();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
               const Text('Subject Code'),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // For subject code TextField, update the CompositedTransformTarget:
                   CompositedTransformTarget(
                     link: _layerLink,
-                    child: TextField(
-                      controller: _subjectCodeController,
-                      onChanged: _onSearchChanged,
-                      decoration: const InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'Enter the subject code',
-                        labelStyle: TextStyle(color: kGrey),
+                    child: Focus(
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus) {
+                          setState(() {
+                            _showDropdown = false;
+                            _hideSubjectDropdown();
+                          });
+                        }
+                      },
+                      child: TextField(
+                        controller: _subjectCodeController,
+                        onChanged: _onSearchChanged,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Enter the subject code',
+                          labelStyle: TextStyle(color: kGrey),
+                        ),
                       ),
                     ),
                   ),
-                  if (_showDropdown && _filteredSubjects.isNotEmpty)
-                    Transform.translate(
-                      offset: Offset(0, MediaQuery.of(context).viewInsets.bottom > 0 ? -MediaQuery.of(context).viewInsets.bottom - 50 : 0),
-                      child: Container(
-                        height: MediaQuery.of(context).size.height * 0.3,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 2,
-                              offset: const Offset(0, 2),
+                  if (_showDropdown && _filteredSubjects.isNotEmpty && MediaQuery.of(context).viewInsets.bottom == 0)
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ListView.builder(
+                        itemCount: _filteredSubjects.length,
+                        itemBuilder: (context, index) {
+                          final entry = _filteredSubjects[index];
+                          return ListTile(
+                            dense: true,
+                            title: Row(
+                              children: [
+                                Text(
+                                  entry.key,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    entry.value,
+                                    style: const TextStyle(color: Colors.grey),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: ListView.builder(
-                          itemCount: _filteredSubjects.length,
-                          itemBuilder: (context, index) {
-                            final entry = _filteredSubjects[index];
-                            return ListTile(
-                              dense: true,
-                              title: Row(
-                                children: [
-                                  Text(
-                                    entry.key,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      entry.value,
-                                      style: const TextStyle(color: Colors.grey),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  _subjectCodeController.text = entry.key;
-                                  _selectedSubjectName = entry.value;
-                                  _showDropdown = false;
-                                });
-                              },
-                            );
-                          },
-                        ),
+                            onTap: () {
+                              setState(() {
+                                _subjectCodeController.text = entry.key;
+                                _selectedSubjectName = entry.value;
+                                _showDropdown = false;
+                              });
+                              _hideSubjectDropdown();
+                            },
+                          );
+                        },
                       ),
                     ),
                   if (_selectedSubjectName.isNotEmpty)
