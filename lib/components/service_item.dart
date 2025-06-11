@@ -30,7 +30,7 @@ class ServiceItem extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -66,7 +66,7 @@ class ServiceItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-            SizedBox(
+            Expanded(
               child: Text(
                 title,
                 style: const TextStyle(
