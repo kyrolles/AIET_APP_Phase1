@@ -49,17 +49,24 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
       ),
       body: Column(
         children: [
-          FilterWidget(
-            statusList: statusList,
-            initialDepartment: currentDepartment,
-            initialYear: currentYear,
-            initialType: currentType,
-            onFilterChanged: (department, year, type) {
-              currentDepartment = department;
-              currentYear = year;
-              currentType = type;
-              _refreshRequests();
-            },
+          Container(
+            margin: const EdgeInsets.only(right: 10, left: 10, top: 20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6.0),
+              color: const Color(0XFFFAFAFA),
+            ),
+            child: FilterWidget(
+              statusList: statusList,
+              initialDepartment: currentDepartment,
+              initialYear: currentYear,
+              initialType: currentType,
+              onFilterChanged: (department, year, type) {
+                currentDepartment = department;
+                currentYear = year;
+                currentType = type;
+                _refreshRequests();
+              },
+            ),
           ),
           Expanded(
             child: BlocBuilder<GetRequestsCubit, GetRequestsState>(
@@ -70,12 +77,11 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                   );
                 }
                 if (state is GetRequestsLoaded) {
-                  return state.requests.isEmpty
-                      ? const Center(child: Text('No requests found'))
-                      : ListContainer(
-                          title: 'Requests',
-                          listOfWidgets: showRequestsList(state.requests),
-                        );
+                  return ListContainer(
+                    title: 'Requests',
+                    emptyMessage: 'No requests found',
+                    listOfWidgets: showRequestsList(state.requests),
+                  );
                 }
                 if (state is GetRequestsError) {
                   return Center(
