@@ -1,0 +1,166 @@
+{
+  "M9": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Mohamed Ibrahim El Bouraidy"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Mohamed Ibrahim El Bouraidy"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME454",
+      "subject_name": "Introduction to Robotics",
+      "teachers": ["Dr. Hisham Ahmed Abdeen"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME454",
+      "subject_name": "Introduction to Robotics",
+      "teachers": ["Dr. Hisham Ahmed Abdeen"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME132",
+      "subject_name": "Electric Energy Sources",
+      "teachers": ["Dr. Fatma Ahmed Aly"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME454",
+      "subject_name": "Introduction to Robotics",
+      "teachers": ["Dr. Hisham Ahmed Abdeen"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME454",
+      "subject_name": "Introduction to Robotics",
+      "teachers": ["Dr. Hisham Ahmed Abdeen"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME422",
+      "subject_name": "Automotive Engineering",
+      "teachers": ["Dr. Amr Nasser Eldin AbdelGaber"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME422",
+      "subject_name": "Automotive Engineering",
+      "teachers": ["Dr. Amr Nasser Eldin AbdelGaber"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT132",
+      "subject_name": "Math 4",
+      "teachers": ["Dr. Somaya Ahmed Mohamed"],
+      "groups": ["1C1", "1I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT132",
+      "subject_name": "Math 4",
+      "teachers": ["Dr. Somaya Ahmed Mohamed"],
+      "groups": ["1C1", "1I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Mohamed Ibrahim El Bouraidy"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Mohamed Ibrahim El Bouraidy"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME252",
+      "subject_name": "Mechanical Engineering",
+      "teachers": ["Dr. Hassan Ahmed EL Shobashy"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME252",
+      "subject_name": "Mechanical Engineering",
+      "teachers": ["Dr. Hassan Ahmed EL Shobashy"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-ECE142",
+      "subject_name": "Basic Electronics Tut",
+      "teachers": ["Dr. Amr Fathy EL Gendy"],
+      "groups": ["1E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME222",
+      "subject_name": "Analog Integrated Circuit",
+      "teachers": ["Dr. Amr Fathy EL Gendy"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE142",
+      "subject_name": "Basic Electronics",
+      "teachers": ["Dr. Amr Fathy EL Gendy"],
+      "groups": ["1E1", "1E2", "1E3"]
+    }
+  ]
+}

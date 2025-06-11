@@ -1,0 +1,40 @@
+{
+  "A-3-17": [
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-EME342",
+      "subject_name": "Power Electronics Lab",
+      "teacher": ["Eng. Asmaa AbdelRehim", "Eng. Ahmed Reda"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-EME342",
+      "subject_name": "Power Electronics Lab",
+      "teacher": ["Eng Hoda Mohamed", "Eng. walaa"],
+      "group": ["3M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-EME342",
+      "subject_name": "Power Electronics Lab",
+      "teacher": ["Eng Tasneem Mohamed", "Eng. walaa"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-EME342",
+      "subject_name": "Power Electronics Lab",
+      "teacher": ["Eng Hoda Mohamed", "Eng Nora"],
+      "group": ["3M2"]
+    }
+  ]
+}

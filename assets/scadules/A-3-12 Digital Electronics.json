@@ -1,0 +1,79 @@
+{
+  "A-3-12": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": ["Eng. H Abou klil", "Eng Hams", "Eng Somaya"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": ["Dr Fatma ", "Eng. Fayrouz ", " Eng.sherin"],
+      "group": ["2E3"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": [
+        "Eng.sherin",
+        "Eng. Asmaa AbdelRehim ",
+        "Eng Mennalllah Abd El-satar"
+      ],
+      "group": ["2E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": ["Eng. sarah Ossama", "Eng Somaya"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": ["Eng Mennalllah Abd El-satar", "Eng Somaya"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": [
+        "Eng. Rana Abdel El Ghany ",
+        "Eng Mennalllah Abd El-satar",
+        "Eng. sarah Ossama"
+      ],
+      "group": ["2M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE212",
+      "subject_name": "Digital System Design Lab",
+      "teacher": [
+        "Eng. Rana Abdel El Ghany",
+        "Dr Ola",
+        "Eng. Asmaa AbdelRehim"
+      ],
+      "group": ["2M3"]
+    }
+  ]
+}

@@ -75,7 +75,11 @@ class _AnnouncementListState extends State<AnnouncementList> {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No announcements found.'));
+          return const Center(
+              child: Padding(
+            padding: EdgeInsets.all(64.0),
+            child: Text('No announcements found.'),
+          ));
         }
 
         final announcements = snapshot.data!.docs;

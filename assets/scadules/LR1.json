@@ -1,0 +1,130 @@
+{
+  "LR1": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME122",
+      "subject_name": "Manufacturing process",
+      "teacher": ["Dr. Mahmoud Samir El Waziry"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME122",
+      "subject_name": "Manufacturing process",
+      "teacher": ["Dr. Mahmoud Samir El Waziry"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE112",
+      "subject_name": "Logic Design",
+      "teacher": ["Dr. Marwa Samara Mohamed"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME222",
+      "subject_name": "Manufacturing Processes 2",
+      "teacher": ["Dr. Hany Mohamed Arnaoot"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE112",
+      "subject_name": "Logic Design",
+      "teacher": ["Dr. Marwa Samara Mohamed"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE102",
+      "subject_name": "Introduction to information technology",
+      "teacher": ["Dr. Nehal Ahmed Mabrook"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME222",
+      "subject_name": "Manufacturing Processes 2",
+      "teacher": ["Dr. Hany Mohamed Arnaoot"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM252",
+      "subject_name": "Industrial Accounting",
+      "teacher": ["Dr. Kassem Kadry Kassem"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM252",
+      "subject_name": "Industrial Accounting",
+      "teacher": ["Dr. Kassem Kadry Kassem"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM422",
+      "subject_name": "Industrial Marketing Management",
+      "teacher": ["Dr. Yousra Hamdy Farid"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "L-EM422",
+      "subject_name": "Industrial Marketing Management",
+      "teacher": ["Dr. Yousra Hamdy Farid"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE132",
+      "subject_name": "Electric Circuit 2",
+      "teacher": ["Dr. Marwa Samara Mohamed"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE132",
+      "subject_name": "Electric Circuit 2",
+      "teacher": ["Dr. Marwa Samara Mohamed"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM382",
+      "subject_name": "Industrial Procurement",
+      "teacher": ["Dr. Hassan Abdel Fattah Nawar"],
+      "group": ["3I1"]
+    }
+  ]
+}

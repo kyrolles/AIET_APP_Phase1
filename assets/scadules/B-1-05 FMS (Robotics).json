@@ -1,0 +1,40 @@
+{
+  "B-1-05": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-EME454",
+      "subject_name": "Introduction to Robotics Lab",
+      "teacher": ["Eng M Ayoub", "Eng. Gehad Khaled Hamza"],
+      "group": ["4M3"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-EME454",
+      "subject_name": "Introduction to Robotics Lab",
+      "teacher": ["Eng M Ayoub", "Eng. Gehad Khaled Hamza"],
+      "group": ["4M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-EME454",
+      "subject_name": "Introduction to Robotics Lab",
+      "teacher": ["Eng M Ayoub", "Eng. Gehad Khaled Hamza"],
+      "group": ["4M1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-EME454",
+      "subject_name": "Introduction to Robotics Lab",
+      "teacher": ["Eng M Ayoub"],
+      "group": ["4M4"]
+    }
+  ]
+}

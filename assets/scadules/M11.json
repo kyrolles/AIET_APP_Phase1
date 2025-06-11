@@ -1,0 +1,166 @@
+{
+  "M11": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE362",
+      "subject_name": "Introduction to Microwaves",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E1", "3E2", "3E3", "3E4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-ECE362",
+      "subject_name": "Introduction to Microwaves",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "L-ECE362",
+      "subject_name": "Introduction to Microwaves",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E1","3E2","3E3", "3E4"]
+    },
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-ECE362",
+      "subject_name": "Introduction to Microwaves Tut",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE102",
+      "subject_name": "Introduction to information technology",
+      "teachers": ["Dr. Nehal Ahmed Mabrook"],
+      "groups": ["1I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE352",
+      "subject_name": "Digital Communication",
+      "teachers": ["Dr. Rasha Said El Khamy"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE352",
+      "subject_name": "Digital Communication",
+      "teachers": ["Dr. Rasha Said El Khamy"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-E302",
+      "subject_name": "Formal Language",
+      "teachers": ["Dr. Heba Mohamed El Hadad"],
+      "groups": ["3I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-E332",
+      "subject_name": "Engineering Measurements",
+      "teachers": ["Dr. Marwa Ahmed Khodayr"],
+      "groups": ["3I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE382",
+      "subject_name": "Control System Theory & Design",
+      "teachers": ["Dr. Ahmed Mohamed Shata"],
+      "groups": ["3C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE482",
+      "subject_name": "Digital Control",
+      "teachers": ["Dr. Ahmed Mohamed Shata"],
+      "groups": ["4M1", "4M2", "4M3", "4M4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE142",
+      "subject_name": "Basic Electronics",
+      "teachers": ["Dr. Amr Fathy El Gendy"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-ECE142",
+      "subject_name": "Basic Electronics Tut",
+      "teachers": ["Dr. Amr Fathy El Gendy"],
+      "groups": ["1E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-ECE142",
+      "subject_name": "Basic Electronics Tut",
+      "teachers": ["Dr. Amr Fathy El Gendy"],
+      "groups": ["1E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE352",
+      "subject_name": "Digital Communication",
+      "teachers": ["Dr. Rasha Said El Khamy"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE212",
+      "subject_name": "Digital System Design",
+      "teachers": ["Dr. Fatma Ahmed Aly"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE112",
+      "subject_name": "Logic Design",
+      "teachers": ["Dr. Rasha Said El Khamy"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE352",
+      "subject_name": "Digital Communication",
+      "teachers": ["Dr. Rasha Said El Khamy"],
+      "groups": ["3E3", "3E4"]
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "CR6": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-ME222",
+      "subject_name": "Thermodynamics Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MED017",
+      "subject_name": "Engineering Mechanics II, Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["0GNC6"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME302",
+      "subject_name": "Engineering Vibrations Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["3M4"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME302",
+      "subject_name": "Engineering Vibrations Tut",
+      "teacher": ["Eng. Gehad Khaled Hamza"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-EME232",
+      "subject_name": "Electrical Power Engineering Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["2M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-CE414",
+      "subject_name": "Computer Network Tut",
+      "teacher": ["Eng. Menna Allah Ibraheem"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-CE414",
+      "subject_name": "Computer Network Tut",
+      "teacher": ["Eng. Menna Allah Ibraheem"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-EME232",
+      "subject_name": "Electrical Power Engineering Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-EM222",
+      "subject_name": "Quality Control Tut",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-IE232",
+      "subject_name": "Production & Inventory Cont. Tut",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD012",
+      "subject_name": "Engineering Math II, Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-CE212",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Asmaa AbdelRehim", "Eng. Fayrouz"],
+      "group": ["2M2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-ME222",
+      "subject_name": "Thermodynamics Tut",
+      "teacher": ["Dr. Amna Saeed Mohamed"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-EM202",
+      "subject_name": "Operation Research 2 Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["2I1"]
+    }
+  ]
+}

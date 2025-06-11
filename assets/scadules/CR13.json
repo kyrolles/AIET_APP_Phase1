@@ -1,0 +1,49 @@
+{
+  "CR13": [
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME452",
+      "subject_name": "Design of Microprocessor Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["4M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME452",
+      "subject_name": "Design of Microprocessor Tut",
+      "teacher": ["Eng. Tasneem Mohamed Ahmed"],
+      "group": ["4M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-CE312",
+      "subject_name": "Microprocessor Interfacing Tut",
+      "teacher": ["Eng. Mohamed Zein El Abdeen"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-CE312",
+      "subject_name": "Microprocessor Interfacing Tut",
+      "teacher": ["Eng. Mohamed Zein El Abdeen"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-ECE482",
+      "subject_name": "Digital Control Tut",
+      "teacher": ["Eng. Mohamed Zein El Abdeen"],
+      "group": ["4M1", "4M2", "4M3", "4M4"]
+    }
+  ]
+}

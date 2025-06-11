@@ -1,0 +1,76 @@
+{
+  "A-3-16": [
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-ECE452",
+      "subject_name": "Optical Information Processing Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng. Fayrouz"],
+      "group": ["4E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-ECE322",
+      "subject_name": "Optical Electronics Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng. Fayrouz"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-ECE452",
+      "subject_name": "Optical Information Processing Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng Mennallah Abd El-satar"],
+      "group": ["4E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-ECE322",
+      "subject_name": "Optical Electronics Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng. Fayrouz"],
+      "group": ["3E4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-ECE452",
+      "subject_name": "Optical Information Processing Lab",
+      "teacher": ["Eng. Fayrouz", "Eng. Rana Abdel El Ghany"],
+      "group": ["4E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-ECE362",
+      "subject_name": "Introduction to Microwaves Lab",
+      "teacher": ["Eng. Rana Mohamed Abdel El Ghany"],
+      "group": ["3E3", "3E4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "B-ECE322",
+      "subject_name": "Optical Electronics Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng. Ibraheem F"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-ECE322",
+      "subject_name": "Optical Electronics Lab",
+      "teacher": ["Eng. Rana Abdel El Ghany", "Eng Hams"],
+      "group": ["3E1"]
+    }
+  ]
+}

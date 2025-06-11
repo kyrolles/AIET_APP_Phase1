@@ -5,7 +5,7 @@ import 'package:graduation_project/screens/attendance/student_attendance/student
 import 'package:graduation_project/screens/attendance/student_attendance/qr_code_scanner_screen.dart';
 import 'activities_container.dart';
 import '../constants.dart';
-import '../screens/map_screen.dart';
+import '../screens/map/map_screen.dart';
 import '../screens/result_screen.dart';
 import '../screens/services_screen.dart';
 

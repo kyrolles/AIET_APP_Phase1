@@ -1,0 +1,418 @@
+{
+  "M1": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L-EME232",
+      "subject_name": "Electrical Power Engineering",
+      "teachers": [
+        "Dr. Amel Saleh Soliman"
+      ],
+      "groups": [
+        "3M1",
+        "3M2"
+      ]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-PHY012",
+      "subject_name": "Physics 2",
+      "teachers": [
+        "Dr. Amel Saleh Soliman"
+      ],
+      "groups": [
+        "0G1"
+      ]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L-EME232",
+      "subject_name": "Electrical Power Engineering",
+      "teachers": [
+        "Dr. Amel Saleh Soliman"
+      ],
+      "groups": [
+        "3M3",
+        "3M4"
+      ]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-EME232",
+      "subject_name": "Electrical Power Engineering",
+      "teachers": [
+        "Dr. Amel Saleh Soliman"
+      ],
+      "groups": [
+        "3C1"
+      ]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-ME252",
+      "subject_name": "Mechanical Engineering",
+      "teachers": [
+        "Dr. Hany Mohamed Arnaoot"
+      ],
+      "groups": [
+        "3M1",
+        "3M2",
+        "3M3",
+        "3M4"
+      ]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L-ME252",
+      "subject_name": "Mechanical Engineering",
+      "teachers": [
+        "Dr. Hany Mohamed Arnaoot"
+      ],
+      "groups": [
+        "3M1",
+        "3M2",
+        "3M3",
+        "3M4"
+      ]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L_CE002",
+      "subject_name": "Computer Programming",
+      "teachers": [
+        "Dr. Asmaa Mohamed Aly"
+      ],
+      "groups": [
+        "0G1"
+      ]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-ECE142",
+      "subject_name": "Basic Electronics",
+      "teachers": [
+        "Dr. Amira Salah Eldin El Batouty"
+      ],
+      "groups": [
+        "4E1",
+        "4E2",
+        "4E3"
+      ]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L_CE002",
+      "subject_name": "Computer Programming",
+      "teachers": [
+        "Dr. Asmaa Mohamed Aly"
+      ],
+      "groups": [
+        "0G1"
+      ]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L_CE002",
+      "subject_name": "Computer Programming",
+      "teachers": [
+        "Dr. Ahmed Mohamed Shata"
+      ],
+      "groups": [
+        "3C1"
+      ]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L_CE002",
+      "subject_name": "Computer Programming",
+      "teachers": [
+        "Dr. Ahmed Mohamed Shata"
+      ],
+      "groups": [
+        "4M1",
+        "4M2"
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-PMD022",
+      "subject_name": "Engineering Physics II",
+      "teachers": [
+        "Dr. Amel Saleh Soliman"
+      ],
+      "groups": [
+        "0GNC1",
+        "0GNC2",
+        "0GNC3"
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-PMD022",
+      "subject_name": "Engineering Physics II",
+      "teachers": [
+        "Dr. Amel Saleh Soliman"
+      ],
+      "groups": [
+        "0GNC4",
+        "0GNC5",
+        "0GNC6"
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-STC041",
+      "subject_name": "History of Engineering Sciences",
+      "teachers": [
+        "Dr. Soha"
+      ],
+      "groups": [
+        "4I1"
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-STC041",
+      "subject_name": "History of Engineering Sciences",
+      "teachers": [
+        "Dr. Soha"
+      ],
+      "groups": [
+        "0GNC4",
+        "0GNC5",
+        "0GNC6"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-EM442",
+      "subject_name": "Engineering Management",
+      "teachers": [
+        "Dr. Lamiaa Abdullah Mohamed"
+      ],
+      "groups": [
+        "4E1",
+        "4E2",
+        "4E3"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L-EM442",
+      "subject_name": "Engineering Management",
+      "teachers": [
+        "Dr. Lamiaa Abdullah Mohamed"
+      ],
+      "groups": [
+        "2I1"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": [
+        "Dr. Hassan Abdel Fattah Nawar"
+      ],
+      "groups": [
+        "2E1",
+        "2E2",
+        "2E3"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": [
+        "Dr. Hassan Abdel Fattah Nawar"
+      ],
+      "groups": [
+        "0G1"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": [
+        "Dr. Hassan Abdel Fattah Nawar"
+      ],
+      "groups": [
+        "3I1"
+      ]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-ME022",
+      "subject_name": "Production Technology",
+      "teachers": [
+        "Dr. Hassan Abdel Fattah Nawar"
+      ],
+      "groups": [
+        "0GNC4",
+        "0GNC5",
+        "0GNC6"
+      ]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "L-ME022",
+      "subject_name": "Production Technology",
+      "teachers": [
+        "Dr. Hassan Abdel Fattah Nawar"
+      ],
+      "groups": [
+        "0GNC1",
+        "0GNC2",
+        "0GNC3"
+      ]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-STC012",
+      "subject_name": "English Language 2",
+      "teachers": [
+        "Dr. AbdelKader AbdelKader El Bahrawy"
+      ],
+      "groups": [
+        "0GNC1",
+        "0GNC2",
+        "0GNC3"
+      ]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": [
+        "Odd"
+      ],
+      "subject": "L-STC012",
+      "subject_name": "English Language 2",
+      "teachers": [
+        "Dr. AbdelKader AbdelKader El Bahrawy"
+      ],
+      "groups": [
+        "0GNC4",
+        "0GNC5",
+        "0GNC6"
+      ]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": [
+        "Even"
+      ],
+      "subject": "L-STC012",
+      "subject_name": "English Language 2",
+      "teachers": [
+        "Dr. AbdelKader AbdelKader El Bahrawy"
+      ],
+      "groups": [
+        "0G1"
+      ]
+    }
+  ]
+}
