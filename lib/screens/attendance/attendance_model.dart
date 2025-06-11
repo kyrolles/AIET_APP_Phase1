@@ -12,6 +12,7 @@ class AttendanceModel {
   final String? approvalTimestamp; 
   final List<Map<String, dynamic>>? studentsList;
   final Map<String, dynamic>? data;
+  final String? className; 
 
   AttendanceModel({
     required this.id,
@@ -23,11 +24,11 @@ class AttendanceModel {
     this.approvalTimestamp, 
     this.studentsList,
     this.data,
+    this.className,  
   });
 
   factory AttendanceModel.fromJson(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    
     
     List<Map<String, dynamic>>? students;
     if (data.containsKey('studentsList')) {
@@ -46,6 +47,7 @@ class AttendanceModel {
       approvalTimestamp: data['approvalTimestamp'],
       studentsList: students,
       data: data,
+      className: data['className'] ?? '', 
     );
   }
 }

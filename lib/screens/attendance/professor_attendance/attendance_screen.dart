@@ -137,6 +137,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         startTime: _getStartTimeForPeriod(data['period'] ?? ''),
                         endTime: _getEndTimeForPeriod(data['period'] ?? ''),
                         total: studentCount,
+                        className: data['className'] ?? '', 
                         ontapOnReview: () {
                           Navigator.push(
                             context,
