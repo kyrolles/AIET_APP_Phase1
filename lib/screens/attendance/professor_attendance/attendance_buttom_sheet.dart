@@ -79,12 +79,22 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
       final String jsonString = await rootBundle.loadString('assets/attendance/all_subjects.json');
       final Map<String, dynamic> jsonData = json.decode(jsonString);
       setState(() {
-        
         _allSubjects = Map<String, String>.from(jsonData);
       });
-      debugPrint('Loaded ${_allSubjects.length} subjects'); 
     } catch (e) {
-      debugPrint('Error loading subjects: $e');
+      
+    }
+  }
+
+  Future<void> _loadClasses() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/attendance/all_classes.json');
+      final List<dynamic> jsonData = json.decode(jsonString);
+      setState(() {
+        _allClasses = List<String>.from(jsonData);
+      });
+    } catch (e) {
+    
     }
   }
 
@@ -99,7 +109,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0, -200), 
+          offset: const Offset(0, -200), 
           child: Material(
             elevation: 4,
             borderRadius: BorderRadius.circular(4),
@@ -175,12 +185,12 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
             .toList();
         if (_filteredSubjects.isNotEmpty) {
           bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-          _showDropdown = !keyboardVisible; // Only show normal dropdown when keyboard is hidden
+          _showDropdown = !keyboardVisible; 
           
           if (keyboardVisible) {
-            _showSubjectDropdown(); // Show overlay when keyboard is visible
+            _showSubjectDropdown(); 
           } else {
-            _hideSubjectDropdown(); // Hide overlay when keyboard is hidden
+            _hideSubjectDropdown(); 
           }
         } else {
           _showDropdown = false;
@@ -194,21 +204,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
     });
 }
 
-  // Add this method after _loadSubjects() method (around line 88)
-  Future<void> _loadClasses() async {
-    try {
-      final String jsonString = await rootBundle.loadString('assets/attendance/all_classes.json');
-      final List<dynamic> jsonData = json.decode(jsonString);
-      setState(() {
-        _allClasses = List<String>.from(jsonData);
-      });
-      debugPrint('Loaded ${_allClasses.length} classes');
-    } catch (e) {
-      debugPrint('Error loading classes: $e');
-    }
-  }
   
-  // Add this method after _showSubjectDropdown() method (around line 150)
   void _displayClassDropdown() {
     if (_classOverlayEntry != null) {
       _classOverlayEntry!.remove();
@@ -240,11 +236,15 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                 ],
               ),
               child: ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
                 itemCount: _filteredClasses.length,
                 itemBuilder: (context, index) {
                   final className = _filteredClasses[index];
                   return ListTile(
                     dense: true,
+                    visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                     title: Text(
                       className,
                       style: const TextStyle(fontWeight: FontWeight.bold),
@@ -266,11 +266,11 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
       ),
     );
     
-    // Add this line to insert the overlay entry
+    
     Overlay.of(context).insert(_classOverlayEntry!);
   }
   
-  // Add this method after _hideSubjectDropdown() method (around line 180)
+  
   void _hideClassDropdown() {
     if (_classOverlayEntry != null) {
       _classOverlayEntry!.remove();
@@ -278,7 +278,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
     }
   }
   
-  // Add this method after _onSearchChanged() method (around line 200)
+
   void _onClassSearchChanged(String query) {
       setState(() {
         if (query.length >= 2) {
@@ -288,12 +288,12 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
           
           if (_filteredClasses.isNotEmpty) {
             bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-            _showClassDropdown = !keyboardVisible; // Only show normal dropdown when keyboard is hidden
+            _showClassDropdown = !keyboardVisible;
             
             if (keyboardVisible) {
-              _displayClassDropdown(); // Show overlay when keyboard is visible
+              _displayClassDropdown(); 
             } else {
-              _hideClassDropdown(); // Hide overlay when keyboard is hidden
+              _hideClassDropdown(); 
             }
           } else {
             _showClassDropdown = false;
@@ -345,7 +345,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // For class number TextField, update the CompositedTransformTarget:
+                  
                   CompositedTransformTarget(
                     link: _classLayerLink,
                     child: Focus(
@@ -370,7 +370,9 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                   ),
                   if (_showClassDropdown && _filteredClasses.isNotEmpty && MediaQuery.of(context).viewInsets.bottom == 0)
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.3,
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border.all(color: Colors.grey[300]!),
@@ -385,11 +387,15 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                         ],
                       ),
                       child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
                         itemCount: _filteredClasses.length,
                         itemBuilder: (context, index) {
                           final className = _filteredClasses[index];
                           return ListTile(
                             dense: true,
+                            visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                             title: Text(
                               className,
                               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -413,7 +419,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // For subject code TextField, update the CompositedTransformTarget:
+                  
                   CompositedTransformTarget(
                     link: _layerLink,
                     child: Focus(
@@ -581,6 +587,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                       'profName': profName,
                       'email': userEmail,
                       'timestamp': DateTime.now().toIso8601String(),
+                      'className': _selectedClassName, 
                     });
 
                     
