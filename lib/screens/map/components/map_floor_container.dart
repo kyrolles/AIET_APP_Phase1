@@ -103,8 +103,8 @@ class FloorContainer extends StatelessWidget {
                                     onTap: () => _showRoomDetails(
                                       context,
                                       lec['name'],
-                                      lec['isEmpty'] ==
-                                          kGreyLight, // Empty if color is kGreyLight
+                                      !(lec['isOccupied'] ??
+                                          false), // Use isOccupied for empty status
                                       'Lecture',
                                     ),
                                   ))
@@ -141,7 +141,8 @@ class FloorContainer extends StatelessWidget {
                                     onTap: () => _showRoomDetails(
                                       context,
                                       section['name'],
-                                      section['isEmpty'] == kGreyLight,
+                                      !(section['isOccupied'] ??
+                                          false), // Use isOccupied for empty status
                                       'Section',
                                     ),
                                   ))
@@ -178,7 +179,8 @@ class FloorContainer extends StatelessWidget {
                                     onTap: () => _showRoomDetails(
                                       context,
                                       lab['name'],
-                                      lab['isEmpty'] == kGreyLight,
+                                      !(lab['isOccupied'] ??
+                                          false), // Use isOccupied for empty status
                                       'Lab',
                                     ),
                                   ))

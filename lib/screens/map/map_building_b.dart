@@ -79,7 +79,6 @@ class _BuildingBState extends State<BuildingB> {
             );
             newStatuses[roomName] = isOccupied;
           } catch (e) {
-            print('Error loading status for room $roomName: $e');
             newStatuses[roomName] = false; // Default to available
           }
         } else {
@@ -92,20 +91,28 @@ class _BuildingBState extends State<BuildingB> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading room statuses: $e');
       setState(() {
         isLoading = false;
       });
     }
   }
 
+  // Get the actual occupancy status without highlighting
+  bool _getRoomOccupancyStatus(String roomName) {
+    if (isLoading) return false;
+    return roomOccupancyStatus[roomName] == true;
+  }
+
+  // Get the visual color for the room (includes highlighting)
   Color _getRoomColor(String roomName) {
     if (isLoading) return kGreyLight;
 
+    // Highlight in yellow if this room is selected
     if (widget.highlightedRoom == roomName) {
       return Colors.yellow;
     }
 
+    // Normal room colors based on occupancy
     return roomOccupancyStatus[roomName] == true ? kOrange : kGreyLight;
   }
 
@@ -127,7 +134,11 @@ class _BuildingBState extends State<BuildingB> {
           floor: '0',
           selectedDate: widget.selectedDate,
           lectures: [
-            {'name': 'shbana', 'isEmpty': _getRoomColor('shbana')},
+            {
+              'name': 'shbana',
+              'isEmpty': _getRoomColor('shbana'),
+              'isOccupied': _getRoomOccupancyStatus('shbana')
+            },
           ],
         ),
         // Floor 1
@@ -135,12 +146,28 @@ class _BuildingBState extends State<BuildingB> {
           floor: '1',
           selectedDate: widget.selectedDate,
           lectures: [
-            {'name': 'M7', 'isEmpty': _getRoomColor('M7')},
-            {'name': 'M8', 'isEmpty': _getRoomColor('M8')},
+            {
+              'name': 'M7',
+              'isEmpty': _getRoomColor('M7'),
+              'isOccupied': _getRoomOccupancyStatus('M7')
+            },
+            {
+              'name': 'M8',
+              'isEmpty': _getRoomColor('M8'),
+              'isOccupied': _getRoomOccupancyStatus('M8')
+            },
           ],
           labs: [
-            {'name': 'B05', 'isEmpty': _getRoomColor('B05')},
-            {'name': 'B06', 'isEmpty': _getRoomColor('B06')},
+            {
+              'name': 'B05',
+              'isEmpty': _getRoomColor('B05'),
+              'isOccupied': _getRoomOccupancyStatus('B05')
+            },
+            {
+              'name': 'B06',
+              'isEmpty': _getRoomColor('B06'),
+              'isOccupied': _getRoomOccupancyStatus('B06')
+            },
           ],
         ),
         // Floor 2
@@ -148,12 +175,28 @@ class _BuildingBState extends State<BuildingB> {
           floor: '2',
           selectedDate: widget.selectedDate,
           lectures: [
-            {'name': 'M9', 'isEmpty': _getRoomColor('M9')},
-            {'name': 'M10', 'isEmpty': _getRoomColor('M10')},
+            {
+              'name': 'M9',
+              'isEmpty': _getRoomColor('M9'),
+              'isOccupied': _getRoomOccupancyStatus('M9')
+            },
+            {
+              'name': 'M10',
+              'isEmpty': _getRoomColor('M10'),
+              'isOccupied': _getRoomOccupancyStatus('M10')
+            },
           ],
           labs: [
-            {'name': 'B04', 'isEmpty': _getRoomColor('B04')},
-            {'name': 'B05', 'isEmpty': _getRoomColor('B05')},
+            {
+              'name': 'B04',
+              'isEmpty': _getRoomColor('B04'),
+              'isOccupied': _getRoomOccupancyStatus('B04')
+            },
+            {
+              'name': 'B05',
+              'isEmpty': _getRoomColor('B05'),
+              'isOccupied': _getRoomOccupancyStatus('B05')
+            },
           ],
         ),
         // Floor 3
@@ -161,12 +204,28 @@ class _BuildingBState extends State<BuildingB> {
           floor: '3',
           selectedDate: widget.selectedDate,
           lectures: [
-            {'name': 'M11', 'isEmpty': _getRoomColor('M11')},
+            {
+              'name': 'M11',
+              'isEmpty': _getRoomColor('M11'),
+              'isOccupied': _getRoomOccupancyStatus('M11')
+            },
           ],
           labs: [
-            {'name': 'B05', 'isEmpty': _getRoomColor('B05')},
-            {'name': 'B06', 'isEmpty': _getRoomColor('B06')},
-            {'name': 'B07', 'isEmpty': _getRoomColor('B07')},
+            {
+              'name': 'B05',
+              'isEmpty': _getRoomColor('B05'),
+              'isOccupied': _getRoomOccupancyStatus('B05')
+            },
+            {
+              'name': 'B06',
+              'isEmpty': _getRoomColor('B06'),
+              'isOccupied': _getRoomOccupancyStatus('B06')
+            },
+            {
+              'name': 'B07',
+              'isEmpty': _getRoomColor('B07'),
+              'isOccupied': _getRoomOccupancyStatus('B07')
+            },
           ],
         ),
         // Floor 4
@@ -174,12 +233,28 @@ class _BuildingBState extends State<BuildingB> {
           floor: '4',
           selectedDate: widget.selectedDate,
           lectures: [
-            {'name': 'LR2', 'isEmpty': _getRoomColor('LR2')},
+            {
+              'name': 'LR2',
+              'isEmpty': _getRoomColor('LR2'),
+              'isOccupied': _getRoomOccupancyStatus('LR2')
+            },
           ],
           labs: [
-            {'name': 'B06', 'isEmpty': _getRoomColor('B06')},
-            {'name': 'B07', 'isEmpty': _getRoomColor('B07')},
-            {'name': 'B08', 'isEmpty': _getRoomColor('B08')},
+            {
+              'name': 'B06',
+              'isEmpty': _getRoomColor('B06'),
+              'isOccupied': _getRoomOccupancyStatus('B06')
+            },
+            {
+              'name': 'B07',
+              'isEmpty': _getRoomColor('B07'),
+              'isOccupied': _getRoomOccupancyStatus('B07')
+            },
+            {
+              'name': 'B08',
+              'isEmpty': _getRoomColor('B08'),
+              'isOccupied': _getRoomOccupancyStatus('B08')
+            },
           ],
         ),
       ],
