@@ -28,7 +28,6 @@ class _ITAttendanceArchiveState extends State<ITAttendanceArchive> {
       ),
       body: ReusableOffline(
         child: StreamBuilder<QuerySnapshot>(
-          // Remove the orderBy clause to avoid requiring an index
           stream: _firestore
               .collection('attendance')
               .where('status', isEqualTo: 'approved')
@@ -51,12 +50,10 @@ class _ITAttendanceArchiveState extends State<ITAttendanceArchive> {
               );
             }
 
-            // Convert documents to AttendanceModel objects
             List<AttendanceModel> attendanceList = snapshot.data!.docs
                 .map((doc) => AttendanceModel.fromJson(doc))
                 .toList();
 
-            // Sort the list by approvalTimestamp (newest first)
             attendanceList.sort((a, b) {
               if (a.approvalTimestamp == null) return 1;
               if (b.approvalTimestamp == null) return -1;
@@ -102,13 +99,19 @@ class ArchivedAttendanceCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  attendance.subjectName,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    attendance.subjectName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    softWrap: true,
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -133,6 +136,17 @@ class ArchivedAttendanceCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   'Professor: ${attendance.profName ?? "Unknown"}',
+                  style: const TextStyle(color: kGrey),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.class_, size: 16, color: kGrey),
+                const SizedBox(width: 4),
+                Text(
+                  'Class: ${attendance.className ?? ""}',
                   style: const TextStyle(color: kGrey),
                 ),
               ],

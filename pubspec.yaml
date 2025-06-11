@@ -93,6 +93,7 @@ flutter:
     - assets/app_icon/
     - assets/scadules/
     - assets/attendance/all_subjects.json
+    - assets/attendance/all_classes.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
