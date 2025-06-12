@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:graduation_project/components/list_container.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/components/student_container.dart';
@@ -104,129 +103,185 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
         title: 'Student Training',
         onpressed: () => Navigator.pop(context),
       ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height, // Prevents shrinking
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 10),
-              CircularPercentIndicator(
-                animation: true,
-                animationDuration: 1000,
-                radius: 100,
-                lineWidth: 20,
-                percent:
-                    (totalTrainingScore / 60), // Use the state variable here
-                progressColor: kPrimaryColor,
-                backgroundColor: Colors.blue.shade50,
-                circularStrokeCap: CircularStrokeCap.round,
-                center: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Progress',
-                      style: TextStyle(fontSize: 33, color: Colors.blueGrey),
-                    ),
-                    Text('$totalTrainingScore of 60',
-                        style: const TextStyle(fontSize: 32)),
-                  ],
+      body: Column(
+        children: [
+          const SizedBox(height: 10),
+          CircularPercentIndicator(
+            animation: true,
+            animationDuration: 1000,
+            radius: 100,
+            lineWidth: 20,
+            percent: (totalTrainingScore / 60), // Use the state variable here
+            progressColor: kPrimaryColor,
+            backgroundColor: Colors.blue.shade50,
+            circularStrokeCap: CircularStrokeCap.round,
+            center: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Progress',
+                  style: TextStyle(fontSize: 33, color: Colors.blueGrey),
                 ),
-              ),
-              SizedBox(
-                  height: 350,
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: _requestsStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        requestsList = [];
-                        int currentTotal = 0; // Initialize a local sum variable
-
-                        for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                          var request =
-                              Request.fromJson(snapshot.data!.docs[i]);
-                          requestsList.add(request);
-
-                          // Only add to total if status is "Done"
-                          if (request.status == "Done") {
-                            currentTotal += request.trainingScore;
-                          }
-                        }
-
-                        // Update the state if the total has changed
-                        if (currentTotal != totalTrainingScore) {
-                          WidgetsBinding.instance.addPostFrameCallback(
-                            (_) {
-                              setState(() {
-                                totalTrainingScore = currentTotal;
-                              });
-                            },
-                          );
-                        }
-
-                        return ListContainer(
-                          title: 'Requests',
-                          listOfWidgets: uplodedfiles,
-                          emptyMessage: 'No Requests',
-                        );
-                      } else {
-                        return ListContainer(
-                          title: 'Requests',
-                          emptyMessage: 'No Requests',
-                          listOfWidgets: uplodedfiles,
-                        );
-                      }
-                      // else if (snapshot.hasError) {
-                      //   return Center(child: Text('Error: ${snapshot.error}'));
-                      // }
-                      // else {
-                      //   return const Center(child: CircularProgressIndicator());
-                      // }
-                    },
-                  )),
-              const Divider(
-                  color: kLightGrey, indent: 10, endIndent: 10, height: 10),
-              ServiceItem(
-                title: 'Announcement',
-                imageUrl: 'assets/project_image/loudspeaker.png',
-                backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
-                onPressed: () {
-                  showModalBottomSheet(
-                    backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(16)),
-                    ),
-                    builder: (BuildContext context) {
-                      return const AnnouncementButtomSheet();
-                    },
-                  );
-                },
-              ),
-              ServiceItem(
-                title: 'Submit Training',
-                imageUrl: 'assets/project_image/submit-training.png',
-                backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
-                onPressed: () {
-                  OfflineAwareBottomSheet.show(
-                    backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(16)),
-                    ),
-                    onlineContent: const UploadButtomSheet(),
-                  );
-                },
-              ),
-            ],
+                Text('$totalTrainingScore of 60',
+                    style: const TextStyle(fontSize: 32)),
+              ],
+            ),
           ),
-        ),
+          // Remove SizedBox and let the StreamBuilder expand naturally
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _requestsStream,
+              builder: (context, snapshot) {
+                // Handle different states properly
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error, color: Colors.red, size: 48),
+                        const SizedBox(height: 16),
+                        Text('Error: ${snapshot.error}'),
+                      ],
+                    ),
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  requestsList = [];
+                  int currentTotal = 0; // Initialize a local sum variable
+
+                  for (var i = 0; i < snapshot.data!.docs.length; i++) {
+                    var request = Request.fromJson(snapshot.data!.docs[i]);
+                    requestsList.add(request);
+
+                    // Only add to total if status is "Done"
+                    if (request.status == "Done") {
+                      currentTotal += request.trainingScore;
+                    }
+                  }
+
+                  // Update the state if the total has changed
+                  if (currentTotal != totalTrainingScore) {
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) {
+                        setState(() {
+                          totalTrainingScore = currentTotal;
+                        });
+                      },
+                    );
+                  }
+
+                  // Custom list container without root Expanded widget
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 20.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      color: const Color(0XFFFAFAFA),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          alignment: Alignment.topLeft,
+                          padding: const EdgeInsets.all(15.0),
+                          child: Text(
+                            'Requests',
+                            style: kTextStyleBold,
+                          ),
+                        ),
+                        Expanded(
+                          child: uplodedfiles.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    'No Requests',
+                                    style: TextStyle(color: kGrey),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: uplodedfiles.length,
+                                  itemBuilder: (context, index) {
+                                    return uplodedfiles[index];
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Default case - no data yet
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 20.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15.0),
+                    color: const Color(0XFFFAFAFA),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        padding: const EdgeInsets.all(15.0),
+                        child: Text(
+                          'Requests',
+                          style: kTextStyleBold,
+                        ),
+                      ),
+                      const Expanded(
+                        child: Center(
+                          child: Text(
+                            'No Requests',
+                            style: TextStyle(color: kGrey),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          const Divider(
+              color: kLightGrey, indent: 10, endIndent: 10, height: 10),
+          ServiceItem(
+            title: 'Announcement',
+            imageUrl: 'assets/project_image/loudspeaker.png',
+            backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
+            onPressed: () {
+              showModalBottomSheet(
+                backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (BuildContext context) {
+                  return const AnnouncementButtomSheet();
+                },
+              );
+            },
+          ),
+          ServiceItem(
+            title: 'Submit Training',
+            imageUrl: 'assets/project_image/submit-training.png',
+            backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
+            onPressed: () {
+              OfflineAwareBottomSheet.show(
+                backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                onlineContent: const UploadButtomSheet(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

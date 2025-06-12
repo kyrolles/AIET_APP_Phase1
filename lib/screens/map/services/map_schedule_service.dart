@@ -225,7 +225,7 @@ class DateTimeService {
   static String getWeekType(DateTime date) {
     final daysSinceStart = date.difference(academicYearStart).inDays;
     final weekNumber = (daysSinceStart / 7).floor();
-    return weekNumber % 2 == 0 ? 'Odd' : 'Even';
+    return weekNumber % 2 == 0 ? 'Even' : 'Odd';
   }
 
   /// Gets day name for schedule filtering
