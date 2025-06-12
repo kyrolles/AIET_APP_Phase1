@@ -1,0 +1,166 @@
+{
+  "M7": [
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME232",
+      "subject_name": "Electrical Power Engineering",
+      "teachers": ["Dr. Ahmed Hanea Khalil"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME342",
+      "subject_name": "Power Electronics",
+      "teachers": ["Dr. Ahmed Hanea Khalil"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Saturday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME342",
+      "subject_name": "Power Electronics",
+      "teachers": ["Dr. Ahmed Hanea Khalil"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE212",
+      "subject_name": "Digital System Design",
+      "teachers": ["Dr. Ola Hussain NeamatAllah"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE212",
+      "subject_name": "Digital System Design",
+      "teachers": ["Dr. Ola Hussain NeamatAllah"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME412",
+      "subject_name": "Refrigeration & Air Conditioning",
+      "teachers": ["Dr. Amr Nassr Eldin AbdelGaber"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME412",
+      "subject_name": "Refrigeration & Air Conditioning",
+      "teachers": ["Dr. Amr Nassr Eldin AbdelGaber"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME412",
+      "subject_name": "Refrigeration & Air Conditioning",
+      "teachers": ["Dr. Amr Nassr Eldin AbdelGaber"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME412",
+      "subject_name": "Refrigeration & Air Conditioning",
+      "teachers": ["Dr. Amr Nassr Eldin AbdelGaber"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME342",
+      "subject_name": "Power Electronics",
+      "teachers": ["Dr. Ahmed Hanea Khalil"],
+      "groups": ["3M1", "3M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME232",
+      "subject_name": "Electrical Power Engineering",
+      "teachers": ["Dr. Ahmed Hanea Khalil"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME342",
+      "subject_name": "Power Electronics",
+      "teachers": ["Dr. Ahmed Hanea Khalil"],
+      "groups": ["3M3", "3M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME132",
+      "subject_name": "Electric Energy Sources",
+      "teachers": ["Dr. Ola Hussain NeamatAllah"],
+      "groups": ["1E1", "1E2", "1E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Reda El Shishtawy Mohamed"],
+      "groups": ["3E1", "3E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE312",
+      "subject_name": "Microprocessor Interfacing",
+      "teachers": ["Dr. Reda El Shishtawy Mohamed"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME452",
+      "subject_name": "Design of Microprocessor",
+      "teachers": ["Dr. Ahmed Mohamed Shata"],
+      "groups": ["4M3", "4M4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "L-CE482",
+      "subject_name": "Digital Control",
+      "teachers": ["Dr. Ahmed Mohamed Shata"],
+      "groups": ["4M1", "4M2", "4M3", "4M4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME452",
+      "subject_name": "Design of Microprocessor",
+      "teachers": ["Dr. Ahmed Mohamed Shata"],
+      "groups": ["4M3", "4M4"]
+    }
+  ]
+}

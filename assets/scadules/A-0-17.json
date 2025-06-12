@@ -1,0 +1,85 @@
+{
+  "A-0-17": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-STC012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0GNC6"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-STC012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-STC012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-STC012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102 Lab",
+      "teacher": ["Eng. Shaimaa Helal Elsayed"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102 Lab",
+      "teacher": ["Eng. Shaimaa Helal Elsayed"],
+      "group": ["1M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-STC012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-ECE344",
+      "subject_name": "Integrated Circuits Lab",
+      "teacher": ["Eng. Hoda Mohamed Farid"],
+      "group": ["3M1", "3M2", "3M3", "3M4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-STC012",
+      "subject_name": "Physics 2 Lab",
+      "teacher": ["Mr. Mahmoud Mohamed Hegazy"],
+      "group": ["0GNC2"]
+    }
+  ]
+}

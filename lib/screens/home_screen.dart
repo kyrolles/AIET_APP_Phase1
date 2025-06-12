@@ -3,17 +3,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graduation_project/screens/announcement/all_announcement_appear_on_one_screen.dart';
 import 'dart:convert';
 import 'package:graduation_project/screens/drawer/app_drawer.dart';
-import 'package:graduation_project/screens/invoice/it_incoive/get_requests_cubit/get_requests_cubit.dart';
 import 'package:graduation_project/services/notification_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../components/activities_list_view.dart';
 import '../components/schedule/home_schedule_view.dart';
 import '../components/text_link.dart';
-import '../constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'announcement/announcement_list.dart';
 import 'package:graduation_project/screens/login_screen.dart';
@@ -105,16 +102,7 @@ class HomeScreenState extends State<HomeScreen> {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              child: TextField(
-                style: const TextStyle(
-                  color: Colors.black,
-                ),
-                decoration: kTextFeildInputDecoration,
-                onChanged: (value) {},
-              ),
-            ),
+            child: SizedBox(height: 20),
           ),
           const SliverToBoxAdapter(
             child: TextLink(
@@ -123,6 +111,28 @@ class HomeScreenState extends State<HomeScreen> {
           ),
           SliverToBoxAdapter(
             child: ActivitiesListView(userRule: userRule),
+          ),
+
+          // Schedule Section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextLink(
+                text: 'My Schedule',
+                onTap: () {
+                  // Navigate to full schedule view if needed
+                },
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: HomeScheduleView(),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 20),
           ),
           SliverToBoxAdapter(
             child: TextLink(
@@ -151,21 +161,8 @@ class HomeScreenState extends State<HomeScreen> {
               userRole: userRule, // Pass the user role here
             ),
           ),
-          // Schedule Section
           SliverToBoxAdapter(
-            child: TextLink(
-              text: 'My Schedule',
-              textLink: 'View All',
-              onTap: () {
-                // Navigate to full schedule view if needed
-              },
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: HomeScheduleView(),
-            ),
+            child: SizedBox(height: 20),
           ),
         ],
       ),

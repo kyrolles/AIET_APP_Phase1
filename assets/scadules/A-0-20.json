@@ -1,0 +1,184 @@
+{
+  "A-0-20": [
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102",
+      "teacher": ["Eng. Shimaa Helal Elsayed"],
+      "group": ["1E1"]
+    },
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102",
+      "teacher": ["Eng. Shimaa Helal Elsayed"],
+      "group": ["1E2"]
+    },
+    {
+      "day": "Saturday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "GNS102 Lab",
+      "subject_name": "GNS102",
+      "teacher": ["Eng. Shimaa Helal Elsayed"],
+      "group": ["1E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-ECE454",
+      "subject_name": "Image Processing Lab",
+      "teacher": ["Eng Mazen"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CE304",
+      "subject_name": "Information Technology Lab",
+      "teacher": ["Eng Mazen"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-CE314",
+      "subject_name": "Computer Architecture Lab",
+      "teacher": ["Eng Menna Allah Ibraheem"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CED072",
+      "subject_name": "Computer and Programming II, Lab",
+      "teacher": ["Eng. Noha / Eng Mazen"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-CE402",
+      "subject_name": "Computer Graphics Lab",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["4E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-CE402",
+      "subject_name": "Computer Graphics Lab",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["4E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-CE322",
+      "subject_name": "Operating System Lab",
+      "teacher": ["Eng Mazen"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-IE302",
+      "subject_name": "Management Information Sys Tut",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CED072",
+      "subject_name": "Computer and Programming II, Lab",
+      "teacher": ["Eng. Noha", " Eng. Amal zazok"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CED072",
+      "subject_name": "Computer and Programming II, Lab",
+      "teacher": ["Eng. Noha", "Eng. Amal zazok"],
+      "group": ["0GNC6"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CED072",
+      "subject_name": "Computer and Programming II, Lab",
+      "teacher": ["Eng. Noha ", "Eng. Amal zazok"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CED072",
+      "subject_name": "Computer and Programming II, Lab",
+      "teacher": ["Eng. Noha ", "Eng. Amal zazok"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-CED072",
+      "subject_name": "Computer and Programming II, Lab",
+      "teacher": ["Eng. Noha ", "Eng. Amal zazok"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-CE232",
+      "subject_name": "Database System Lab",
+      "teacher": ["Eng Ayman M Kamal"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-EM222",
+      "subject_name": "Analog Integrated Circuit Lab",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-CE414",
+      "subject_name": "Computer Network Lab",
+      "teacher": ["Eng Menna Allah Ibraheem"],
+      "group": ["4C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-EM222",
+      "subject_name": "Analog Integrated Circuit Lab",
+      "teacher": ["Eng. Ibraheem Abel Fattah Mohamed"],
+      "group": ["3E4"]
+    }
+  ]
+}

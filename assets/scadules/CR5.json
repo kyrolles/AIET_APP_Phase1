@@ -1,0 +1,175 @@
+{
+  "CR5": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME342",
+      "subject_name": "Automatic Control Tut",
+      "teacher": ["Eng. Ahmed Reda"],
+      "group": ["3M2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD022",
+      "subject_name": "Engineering Physics II, Tut",
+      "teacher": ["Eng. Shimaa Helal Elsayed"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD022",
+      "subject_name": "Engineering Physics II, Tut",
+      "teacher": ["Eng. Shimaa Helal Elsayed"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-CE212",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Sarah Ossama Abdelaziz"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-CE212",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Sarah Ossama Abdelaziz"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-EME412",
+      "subject_name": "Refrigeration & Air Conditioning Tut",
+      "teacher": ["Eng. Tasneem Mohamed El Rouby"],
+      "group": ["4M2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-CE112",
+      "subject_name": "Logic design Tut",
+      "teacher": ["Eng. Mennallah Abd El-satar"],
+      "group": ["1E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "T-CE402",
+      "subject_name": "Computer Graphics Tut",
+      "teacher": ["Dr. Amira Gamal Mohamed"],
+      "group": ["4E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "T-ECE322",
+      "subject_name": "Micro - Processor System Tut",
+      "teacher": ["Eng. Fayrouz Adel Emara"],
+      "group": ["3E4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-CE312",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Mohamed Zein EL Abdeen"],
+      "group": ["3M4"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-ECE482",
+      "subject_name": "Antennas and Wave Propagation Tut",
+      "teacher": ["Eng. Mohamed Zein EL Abdeen"],
+      "group": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-CE312",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Mohamed Zein EL Abdeen"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME312",
+      "subject_name": "Fluid Mechanics Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-ME252",
+      "subject_name": "Mechanical Engineering Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["2E2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-ME252",
+      "subject_name": "Mechanical Engineering Tut",
+      "teacher": ["Eng. Mohamed Ahmed EL Saadany"],
+      "group": ["2E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-ME122",
+      "subject_name": "Manufacturing process Tut",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["1I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-ME022",
+      "subject_name": "Production Technology Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-IED071",
+      "subject_name": "Engineering Drawing & Projection Tut",
+      "teacher": ["Eng. Shimaa Mohamed EL Hadad"],
+      "group": ["0GNC6"]
+    }
+  ]
+}

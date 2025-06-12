@@ -1,0 +1,130 @@
+{
+  "M4": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE452",
+      "subject_name": "Optical Information Processing",
+      "teachers": ["Dr. Amira Gamal Mohamed"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE452",
+      "subject_name": "Optical Information Processing",
+      "teachers": ["Dr. Amira Gamal Mohamed"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE352",
+      "subject_name": "Human Factors Engineering Lec",
+      "teachers": ["Dr. Soha"],
+      "groups": ["3I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-STC041",
+      "subject_name": "History of Engineering Sciences",
+      "teachers": ["Dr. Soha"],
+      "groups": ["0GNC1", "0GNC2", "0GNC3"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM442",
+      "subject_name": "Engineering Management",
+      "teachers": ["Dr. Lamiaa Abdullah Mohamed"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-EN212",
+      "subject_name": "Environment 2",
+      "teachers": ["Dr. Lamiaa Abdullah Mohamed"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EN212",
+      "subject_name": "Environment 2",
+      "teachers": ["Dr. Lamiaa Abdullah Mohamed"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE232",
+      "subject_name": "Production & Inventory Cont.",
+      "teachers": ["Dr. Omnia AbdelMageed Gawdat"],
+      "groups": ["2I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": ["Dr. Omnia AbdelMageed Gawdat"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic",
+      "teachers": ["Dr. Omnia AbdelMageed Gawdat"],
+      "groups": ["2E1", "2E2", "2E3"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT132",
+      "subject_name": "Math 4",
+      "teachers": ["Dr. M. Adel Hassan"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT132",
+      "subject_name": "Math 4",
+      "teachers": ["Dr. M. Adel Hassan"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE414",
+      "subject_name": "Computer Network",
+      "teachers": ["Dr. Amira Salah Eldin EL Batouty"],
+      "groups": ["4C1", "4C2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE414",
+      "subject_name": "Computer Network",
+      "teachers": ["Dr. Amira Salah Eldin EL Batouty"],
+      "groups": ["4C1", "4C2"]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "A-3-13": [
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng. Ibraheem F", "Eng Somaya", "Eng Asmaa AbdelRehim"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng. Ibraheem F", "Eng. Zein EL Abdeen", "Eng Somaya"],
+      "group": ["3M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng. Ibraheem F", "Eng Somaya", "Eng Asmaa AbdelRehim"],
+      "group": ["3M1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng Zein EL Abdeen", "Eng. Ibraheem F"],
+      "group": ["3E2"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng Zein EL Abdeen", "Eng. Ibraheem F"],
+      "group": ["3E1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng. Ibraheem F", "Eng. Zein EL Abdeen"],
+      "group": ["3M4"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng. Ibraheem F", "Eng. Zein EL Abdeen"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng. Zein EL Abdeen", "Eng Asmaa AbdelRehim"],
+      "group": ["3E3"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Even"],
+      "subject": "B-CE312",
+      "subject_name": "Microprocessor Interfacing Lab",
+      "teacher": ["Eng Hams", "Eng. Zein EL Abdeen", "Eng Asmaa AbdelRehim"],
+      "group": ["3E4"]
+    }
+  ]
+}

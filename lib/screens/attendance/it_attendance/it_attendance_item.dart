@@ -7,6 +7,7 @@ class ITAttendanceItem extends StatelessWidget {
   final String professor;
   final int total;
   final String timestamp;
+  final String className; 
   final Function() onEdit;
   final Function() onApprove;
 
@@ -17,6 +18,7 @@ class ITAttendanceItem extends StatelessWidget {
     required this.professor,
     required this.total,
     required this.timestamp,
+    required this.className,
     required this.onEdit,
     required this.onApprove,
   });
@@ -43,17 +45,21 @@ class ITAttendanceItem extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                subject,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  subject,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: kBlue.withOpacity(0.2), // Changed from kLightBlue to kBlue
+                  color: Colors.blue.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -66,14 +72,31 @@ class ITAttendanceItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             children: [
               const Icon(Icons.person, size: 16, color: kGrey),
               const SizedBox(width: 4),
-              Text(
-                'Professor: $professor',
-                style: const TextStyle(color: kGrey),
+              Expanded(
+                child: Text(
+                  'Professor: $professor',
+                  style: const TextStyle(color: kGrey),
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Icon(Icons.class_, size: 16, color: kGrey),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  'Class: $className',
+                  style: const TextStyle(color: kGrey),
+                  softWrap: true,
+                ),
               ),
             ],
           ),

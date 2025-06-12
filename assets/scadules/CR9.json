@@ -1,0 +1,103 @@
+{
+  "CR9": [
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-CE322",
+      "subject_name": "Operating System Tut",
+      "teacher": ["Eng. Mazen"],
+      "group": ["3C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-EME314",
+      "subject_name": "Heat Transfer Tut",
+      "teacher": ["Eng. Omar KabilAziz Keshk"],
+      "group": ["3M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-EM422",
+      "subject_name": "T-EM422 Tut",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-PMD012",
+      "subject_name": "Engineering Math II, Tut",
+      "teacher": ["Dr. Marwa Ahmed Khodary"],
+      "group": ["0GNC3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Even"],
+      "subject": "T-ECE454",
+      "subject_name": "Image Processing Tut",
+      "teacher": ["Eng Mazen"],
+      "group": ["4C2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "T-EME454",
+      "subject_name": "Introduction to Robotics Tut",
+      "teacher": ["Eng M Ayoub"],
+      "group": ["4M2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Even"],
+      "subject": "T-IE442",
+      "subject_name": "T-IE442 Tut",
+      "teacher": ["Eng M Ayoub"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "T-CIE202",
+      "subject_name": "Civil Engineering Tut",
+      "teacher": ["Eng. Mayar Moustafa"],
+      "group": ["2E1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-CE212",
+      "subject_name": "Digital System Design Tut",
+      "teacher": ["Eng. Fayrouz Adel Emara"],
+      "group": ["2E1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Caroulin Kamil Ishak"],
+      "group": ["1M2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "T-MAT132",
+      "subject_name": "Math4 Tut",
+      "teacher": ["Eng. Caroulin Kamil Ishak"],
+      "group": ["1M1"]
+    }
+  ]
+}

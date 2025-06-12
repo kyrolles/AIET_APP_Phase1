@@ -218,6 +218,7 @@ class RequestContainer extends StatelessWidget {
         Navigator.of(context, rootNavigator: false);
 
     return OfflineAwareBottomSheet.show(
+      isScrollControlled: true,
       backgroundColor: const Color(0XFFF1F1F2),
       context: context,
       onlineContent: ProofOfEnrollmentSheetScreen(
@@ -308,6 +309,7 @@ class RequestContainer extends StatelessWidget {
         Navigator.of(context, rootNavigator: false);
 
     return OfflineAwareBottomSheet.show(
+      isScrollControlled: true,
       backgroundColor: const Color(0XFFF1F1F2),
       context: context,
       onlineContent: GradesReportSheetScreen(
@@ -376,6 +378,7 @@ class RequestContainer extends StatelessWidget {
         Navigator.of(context, rootNavigator: false);
 
     return OfflineAwareBottomSheet.show(
+      isScrollControlled: true,
       backgroundColor: const Color(0XFFF1F1F2),
       context: context,
       onlineContent: CurriculumContentSheetScreen(

@@ -1,0 +1,148 @@
+{
+  "M5": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE442",
+      "subject_name": "Automation & Robotics",
+      "teachers": ["Dr. Hisham Ahmed Abdeen"],
+      "groups": ["4I1"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE442",
+      "subject_name": "Automation & Robotics",
+      "teachers": ["Dr. Hisham Ahmed Abdeen"],
+      "groups": ["4I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE402",
+      "subject_name": "Computer Graphics",
+      "teachers": ["Dr. Somaya Ahmed Mohamed"],
+      "groups": ["4C1", "4C2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd"],
+      "subject": "L-CE402",
+      "subject_name": "Computer Graphics",
+      "teachers": ["Dr. Somaya Ahmed Mohamed"],
+      "groups": ["4C1", "4C2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE322",
+      "subject_name": "Optical Electronics",
+      "teachers": ["Dr. Tarek Ahmed AbdelShahid"],
+      "groups": ["3E3", "3E4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME452",
+      "subject_name": "Design of Microprocessor",
+      "teachers": ["Dr. Ahmed Mohamed Shata"],
+      "groups": ["4M1", "4M2"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "L-ECE412",
+      "subject_name": "Data Transmission & Computer",
+      "teachers": ["Dr. Ola Hussain NeamatAllah"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE412",
+      "subject_name": "Data Transmission & Computer",
+      "teachers": ["Dr. Ola Hussain NeamatAllah"],
+      "groups": ["4E1", "4E2", "4E3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE134",
+      "subject_name": "Fundamentals of Electrical Engineering",
+      "teachers": ["Dr. Marwa Samara Mohamed"],
+      "groups": ["1I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE134",
+      "subject_name": "Fundamentals of Electrical Engineering",
+      "teachers": ["Dr. Marwa Samara Mohamed"],
+      "groups": ["1I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CIE202",
+      "subject_name": "Civil Engineering",
+      "teachers": ["Dr. Irini"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "L-CIE202",
+      "subject_name": "Civil Engineering",
+      "teachers": ["Dr. Irini"],
+      "groups": ["2M1", "2M2", "2M3"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "5",
+      "week_type": ["Odd"],
+      "subject": "L-CIE202",
+      "subject_name": "Civil Engineering",
+      "teachers": ["Dr. Irini"],
+      "groups": ["2C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EME132",
+      "subject_name": "Electric Energy Sources",
+      "teachers": ["Dr. Ola Hussain NeamatAllah"],
+      "groups": ["1C1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE132",
+      "subject_name": "Electric Circuit 2",
+      "teachers": ["Dr. Nehal Ahmed Mabrook"],
+      "groups": ["1M1", "1M2"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE132",
+      "subject_name": "Electric Circuit 2",
+      "teachers": ["Dr. Nehal Ahmed Mabrook"],
+      "groups": ["1M1", "1M2"]
+    }
+  ]
+}

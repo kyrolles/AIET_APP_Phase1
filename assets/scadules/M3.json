@@ -1,0 +1,138 @@
+{"M3": [
+  {
+    "day": "Sunday",
+    "period": "1",
+    "week_type": "Odd",
+    "subject": "MAT012",
+    "subject_name": "Math2",
+    "teachers": ["Dr. Marwa Ahmed Khodary"],
+    "groups": ["0G1"]
+  },
+  {
+    "day": "Sunday",
+    "period": "2",
+    "week_type": ["Odd","Even"],
+    "subject": "MAT012",
+    "subject_name": "Math2",
+    "teachers": ["Dr. Marwa Ahmed Khodary"],
+    "groups": ["0G1"]
+  },
+  {
+    "day": "Sunday",
+    "period": "3",
+    "week_type": ["Odd","Even"],
+    "subject": "L-EME262",
+    "subject_name": "Engineering Materials",
+    "teachers": ["Dr. Hadeer Ragab", "Dr. A. Shata"],
+    "groups": ["2M1", "2M2", "2M3"]
+  },
+  {
+    "day": "Monday",
+    "period": "1",
+    "week_type": ["Odd","Even"],
+    "subject": "L-PMD012",
+    "subject_name": "Physics 2",
+    "teachers": ["Dr. Marwa Ahmed Khodary"],
+    "groups": ["0GNC4", "0GNC5", "0GNC6"]
+  },
+  {
+    "day": "Monday",
+    "period": "2",
+    "week_type": ["Odd","Even"],
+    "subject": "L-PMD012",
+    "subject_name": "Physics 2",
+    "teachers": ["Dr. Marwa Ahmed Khodary"],
+    "groups": ["0GNC1", "0GNC2", "0GNC3"]
+  },
+  {
+    "day": "Monday",
+    "period": "4",
+    "week_type": ["Odd","Even"],
+    "subject": "L-ECE142",
+    "subject_name": "Basic Electronics",
+    "teachers": ["Dr. Ahmed Keshk"],
+    "groups": ["1M1", "1M2"]
+  },
+  {
+    "day": "Tuesday",
+    "period": "1",
+    "week_type": ["Odd","Even"],
+    "subject": "L-CIE202",
+    "subject_name": "Civil Engineering",
+    "teachers": ["Dr. Mona"],
+    "groups": ["2E1", "2E2", "2E3"]
+  },
+  {
+    "day": "Tuesday",
+    "period": "2",
+    "week_type": "Odd",
+    "subject": "L-CIE202",
+    "subject_name": "Civil Engineering",
+    "teachers": ["Dr. Mona"],
+    "groups": ["2E1", "2E2", "2E3"]
+  },
+  {
+    "day": "Tuesday",
+    "period": "2",
+    "week_type": "Even",
+    "subject": "L-CIE202",
+    "subject_name": "Civil Engineering",
+    "teachers": ["Dr. Mona"],
+    "groups": ["2C1"]
+  },
+  {
+    "day": "Wednesday",
+    "period": "1",
+    "week_type": ["Odd","Even"],
+    "subject": "L-EME262",
+    "subject_name": "Engineering Materials",
+    "teachers": ["Dr. Hadeer Ragab AbdelMonem"],
+    "groups": ["4C1", "4C2"]
+  },
+  {
+    "day": "Wednesday",
+    "period": "2",
+    "week_type": ["Odd","Even"],
+    "subject": "L-EME262",
+    "subject_name": "Engineering Materials",
+    "teachers": ["Dr. Hadeer Ragab AbdelMonem"],
+    "groups": ["2M1", "2M2", "2M3"]
+  },
+  {
+    "day": "Wednesday",
+    "period": "3",
+    "week_type": ["Odd","Even"],
+    "subject": "L-ECE132",
+    "subject_name": "Electric Circuit 2",
+    "teachers": ["Dr. Ahmed Keshk"],
+    "groups": ["1E1", "1E2", "1E3"]
+  },
+  {
+    "day": "Thursday",
+    "period": "1",
+    "week_type": ["Odd","Even"],
+    "subject": "L-EM442",
+    "subject_name": "Engineering Management",
+    "teachers": ["Dr. Lamiaa Abdullah Mohamed"],
+    "groups": ["4M3", "4M4", "M4"]
+  },
+  {
+    "day": "Thursday",
+    "period": "2",
+    "week_type": ["Odd","Even"],
+    "subject": "L-ME002",
+    "subject_name": "Mechanics 2",
+    "teachers": ["Dr. Yousra Hamdy Farid"],
+    "groups": ["0G1"]
+  },
+  {
+    "day": "Thursday",
+    "period": "3",
+    "week_type": "Odd",
+    "subject": "L-ME002",
+    "subject_name": "Mechanics 2",
+    "teachers": ["Dr. Yousra Hamdy Farid"],
+    "groups": ["0G1"]
+  }
+]
+}

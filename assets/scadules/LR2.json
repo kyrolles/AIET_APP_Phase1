@@ -1,0 +1,166 @@
+{
+  "LR2": [
+    {
+      "day": "Saturday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE232",
+      "subject_name": "Database System L",
+      "teacher": ["Dr. Hatem Mohamed Abdel Kader"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Saturday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE232",
+      "subject_name": "Database System L",
+      "teacher": ["Dr. Hatem Mohamed Abdel Kader"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Saturday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-CE406",
+      "subject_name": "Expert System Application L",
+      "teacher": ["Dr. Hatem Mohamed Abdel Kader"],
+      "group": ["4C1", "4C2"]
+    },
+    {
+      "day": "Saturday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "L-CE406",
+      "subject_name": "Expert System Application L",
+      "teacher": ["Dr. Hatem Mohamed Abdel Kader"],
+      "group": ["4C1", "4C2"]
+    },
+    {
+      "day": "Sunday",
+      "period": "1",
+      "week_type": ["Odd"],
+      "subject": "L-IE364",
+      "subject_name": "Information Technology L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ME424",
+      "subject_name": "Industrial Technology 2 L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Sunday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE344",
+      "subject_name": "Integrated Circuits L",
+      "teacher": ["Dr. M Adel Hassan"],
+      "group": ["3M1", "3M2", "3M3", "3M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "T-ECE344",
+      "subject_name": "Integrated Circuits Tut",
+      "teacher": ["Dr. M Adel Hassan"],
+      "group": ["3M1", "3M2", "3M3", "3M4"]
+    },
+    {
+      "day": "Sunday",
+      "period": "4",
+      "week_type": ["Even"],
+      "subject": "T-ECE344",
+      "subject_name": "Integrated Circuits Tut",
+      "teacher": ["Dr. M Adel Hassan"],
+      "group": ["3M1", "3M2", "3M3", "3M4"]
+    },
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-MAT252",
+      "subject_name": "Probability and statistic L",
+      "teacher": ["Dr. Omnia AbdelMageed Gawdat"],
+      "group": ["2C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE142",
+      "subject_name": "Basic Electronics L",
+      "teacher": ["Dr. Amira Salah Eldin EL Batouty"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Monday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM202",
+      "subject_name": "Operation Research 2 L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-ECE142",
+      "subject_name": "Basic Electronics L",
+      "teacher": ["Dr. Amira Salah Eldin EL Batouty"],
+      "group": ["1C1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE332",
+      "subject_name": "Engineering Measurements L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-EM202",
+      "subject_name": "Operation Research 2 L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["2I1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "L-ME424",
+      "subject_name": "Industrial Technology 2 L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["4I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE332",
+      "subject_name": "Engineering Measurements L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["3I1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "L-IE364",
+      "subject_name": "Facility Planning & Design L",
+      "teacher": ["Dr. Heba Mohamed El Hadad"],
+      "group": ["3I1"]
+    }
+  ]
+}

@@ -134,9 +134,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       return CurrentAttendanceItem(
                         subject: data['subjectName'] ?? '',
                         period: data['period'] ?? '',
-                        startTime: '9:00',
-                        endTime: '10:30',
+                        startTime: _getStartTimeForPeriod(data['period'] ?? ''),
+                        endTime: _getEndTimeForPeriod(data['period'] ?? ''),
                         total: studentCount,
+                        className: data['className'] ?? '', 
                         ontapOnReview: () {
                           Navigator.push(
                             context,
@@ -198,3 +199,33 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 }
+
+  String _getStartTimeForPeriod(String period) {
+    switch (period) {
+      case '1':
+        return '9:00';
+      case '2':
+        return '10:40';
+      case '3':
+        return '12:20';
+      case '4':
+        return '2:00';
+      default:
+        return '9:00';
+    }
+  }
+
+  String _getEndTimeForPeriod(String period) {
+    switch (period) {
+      case '1':
+        return '10:30';
+      case '2':
+        return '12:10';
+      case '3':
+        return '1:50';
+      case '4':
+        return '3:30';
+      default:
+        return '10:30';
+    }
+  }

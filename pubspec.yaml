@@ -32,8 +32,9 @@ dependencies:
   cloud_firestore: ^5.6.0
   cupertino_icons: ^1.0.8
   device_info_plus: ^11.3.0
+  easy_date_timeline: ^1.0.3
   excel: ^4.0.6
-  file_picker: ^8.1.7
+  file_picker: ^10.1.9
   firebase_auth: ^5.3.4
   firebase_core: ^3.9.0
   firebase_messaging: ^15.2.5
@@ -44,7 +45,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_local_notifications: ^19.1.0
-  flutter_offline: ^4.0.0
+  flutter_offline: ^5.0.0
   flutter_pdfview: ^1.4.0
   flutter_riverpod: ^2.5.1
   flutter_secure_storage: ^9.2.2
@@ -53,11 +54,11 @@ dependencies:
   google_nav_bar: ^5.0.6
   image_picker: ^1.1.2
   # intl: ^0.18.0
-  mobile_scanner: ^3.5.5
+  mobile_scanner: ^7.0.1
   open_file: ^3.5.10
   path_provider: ^2.1.5
   percent_indicator: ^4.2.4
-  permission_handler: ^11.4.0
+  permission_handler: ^12.0.0+1
   qr_flutter: ^4.1.0
   rename: ^3.0.2
   share_plus: ^11.0.0
@@ -68,7 +69,7 @@ dependencies:
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
 
@@ -94,6 +95,9 @@ flutter:
     - assets/images/
     - assets/project_image/
     - assets/app_icon/
+    - assets/scadules/
+    - assets/attendance/all_subjects.json
+    - assets/attendance/all_classes.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

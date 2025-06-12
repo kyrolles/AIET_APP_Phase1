@@ -1,0 +1,85 @@
+{
+  "A-0-11": [
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-ME022",
+      "subject_name": "Production Technology Lab",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["0G1"]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IED071",
+      "subject_name": "Production Technology, Lab",
+      "teacher": ["Eng. Norhan Mohamed Ahmed"],
+      "group": ["0GNC1"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "1",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IED071",
+      "subject_name": "Production Technology, Lab",
+      "teacher": ["Eng. Dina mokhtar", "Eng. shimaa El Hadad"],
+      "group": ["0GNC6"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IED071",
+      "subject_name": "Production Technology, Lab",
+      "teacher": ["Eng. Dina mokhtar", "Eng Norhan"],
+      "group": ["0GNC2"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IED071",
+      "subject_name": "Production Technology, Lab",
+      "teacher": ["Eng. Dina mokhtar", "Eng Norhan"],
+      "group": ["0GNC5"]
+    },
+    {
+      "day": "Wednesday",
+      "period": "4",
+      "week_type": ["Odd"],
+      "subject": "B-ME122",
+      "subject_name": "Manufacturing process Lab",
+      "teacher": ["Eng. Dina Mokhtar Hassan"],
+      "group": ["1l1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "2",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IED071",
+      "subject_name": "Production Technology, Lab",
+      "teacher": ["Eng. Dina mokhtar", "Eng. shimaa El Hadad"],
+      "group": ["0GNC4"]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": ["Odd"],
+      "subject": "B-ME222",
+      "subject_name": "Manufacturing Processes 2 Lab",
+      "teacher": ["Eng. Dina Mokhtar Hassan"],
+      "group": ["2l1"]
+    },
+    {
+      "day": "Thursday",
+      "period": "4",
+      "week_type": ["Odd", "Even"],
+      "subject": "B-IED071",
+      "subject_name": "Production Technology, Lab",
+      "teacher": ["Eng. Dina Mokhtar Hassan"],
+      "group": ["0GNC3"]
+    }
+  ]
+}

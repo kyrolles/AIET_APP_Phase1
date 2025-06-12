@@ -4,16 +4,20 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 
 class Period {
   String number;
+  String timeRange;
   bool isSelected;
   Color color;
 
   Period({
     required this.number,
+    required this.timeRange,
     required this.isSelected,
-    this.color = Colors.red,
+    required this.color,
   });
 }
 
@@ -31,23 +35,286 @@ class AttendanceButtomSheet extends StatefulWidget {
 
 class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
   final TextEditingController _subjectCodeController = TextEditingController();
-  List<Period> periods = [
-    Period(number: 'P1', isSelected: false, color: const Color(0xFFEB8991)),
-    Period(number: 'P2', isSelected: false, color: const Color(0xFF978ECB)),
-    Period(number: 'P3', isSelected: false, color: const Color(0xFF0ED290)),
-    Period(number: 'P4', isSelected: false, color: const Color(0xFFFFDD29)),
+  final TextEditingController _classNumberController = TextEditingController();
+  Map<String, String> _allSubjects = {};
+  List<String> _allClasses = [];
+  List<MapEntry<String, String>> _filteredSubjects = [];
+  List<String> _filteredClasses = [];
+  bool _showDropdown = false;
+  bool _showClassDropdown = false;
+  String _selectedSubjectName = '';
+  String _selectedClassName = '';
+  OverlayEntry? _overlayEntry;
+  OverlayEntry? _classOverlayEntry;
+  final LayerLink _layerLink = LayerLink();
+  final LayerLink _classLayerLink = LayerLink();
+
+  
+  final List<Period> periods = [
+    Period(number: '1', timeRange: '9:00-10:30', isSelected: false, color: const Color(0xFFEB8991)),
+    Period(number: '2', timeRange: '10:40-12:10', isSelected: false, color: const Color(0xFF978ECB)),
+    Period(number: '3', timeRange: '12:20-1:50', isSelected: false, color: const Color(0xFF0ED290)),
+    Period(number: '4', timeRange: '2:00-3:30', isSelected: false, color: const Color(0xFFFFDD29)),
   ];
 
+  
   String? getSelectedPeriod() {
-    for (var period in periods) {
-      if (period.isSelected) return period.number;
-    }
-    return null;
+    final selectedPeriod = periods.firstWhere(
+      (period) => period.isSelected,
+      orElse: () => Period(number: '', timeRange: '', isSelected: false, color: Colors.grey),
+    );
+    return selectedPeriod.number.isEmpty ? null : selectedPeriod.number;
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadSubjects();
+    _loadClasses();
+  }
+
+  
+  Future<void> _loadSubjects() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/attendance/all_subjects.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      setState(() {
+        _allSubjects = Map<String, String>.from(jsonData);
+      });
+    } catch (e) {
+      
+    }
+  }
+
+  Future<void> _loadClasses() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/attendance/all_classes.json');
+      final List<dynamic> jsonData = json.decode(jsonString);
+      setState(() {
+        _allClasses = List<String>.from(jsonData);
+      });
+    } catch (e) {
+    
+    }
+  }
+
+  void _showSubjectDropdown() {
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
+    }
+    
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: MediaQuery.of(context).size.width - 32,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: const Offset(0, -200), 
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                itemCount: _filteredSubjects.length,
+                itemBuilder: (context, index) {
+                  final entry = _filteredSubjects[index];
+                  return ListTile(
+                    dense: true,
+                    title: Row(
+                      children: [
+                        Text(
+                          entry.key,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            entry.value,
+                            style: const TextStyle(color: Colors.grey),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _subjectCodeController.text = entry.key;
+                        _selectedSubjectName = entry.value;
+                        _showDropdown = false;
+                      });
+                      _hideSubjectDropdown();
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _hideSubjectDropdown() {
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
+      _overlayEntry = null;
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      if (query.length >= 2) {
+        _filteredSubjects = _allSubjects.entries
+            .where((entry) => entry.key.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+        if (_filteredSubjects.isNotEmpty) {
+          bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+          _showDropdown = !keyboardVisible; 
+          
+          if (keyboardVisible) {
+            _showSubjectDropdown(); 
+          } else {
+            _hideSubjectDropdown(); 
+          }
+        } else {
+          _showDropdown = false;
+          _hideSubjectDropdown();
+        }
+      } else {
+        _filteredSubjects = [];
+        _showDropdown = false;
+        _hideSubjectDropdown();
+      }
+    });
+}
+
+  
+  void _displayClassDropdown() {
+    if (_classOverlayEntry != null) {
+      _classOverlayEntry!.remove();
+    }
+    
+    _classOverlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: MediaQuery.of(context).size.width - 32,
+        child: CompositedTransformFollower(
+          link: _classLayerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0, -200),
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: _filteredClasses.length,
+                itemBuilder: (context, index) {
+                  final className = _filteredClasses[index];
+                  return ListTile(
+                    dense: true,
+                    visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    title: Text(
+                      className,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _classNumberController.text = className;
+                        _selectedClassName = className;
+                        _showClassDropdown = false;
+                      });
+                      _hideClassDropdown();
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    
+    Overlay.of(context).insert(_classOverlayEntry!);
+  }
+  
+  
+  void _hideClassDropdown() {
+    if (_classOverlayEntry != null) {
+      _classOverlayEntry!.remove();
+      _classOverlayEntry = null;
+    }
+  }
+  
+
+  void _onClassSearchChanged(String query) {
+      setState(() {
+        if (query.length >= 2) {
+          _filteredClasses = _allClasses
+              .where((className) => className.toLowerCase().contains(query.toLowerCase()))
+              .toList();
+          
+          if (_filteredClasses.isNotEmpty) {
+            bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+            _showClassDropdown = !keyboardVisible;
+            
+            if (keyboardVisible) {
+              _displayClassDropdown(); 
+            } else {
+              _hideClassDropdown(); 
+            }
+          } else {
+            _showClassDropdown = false;
+            _hideClassDropdown();
+          }
+        } else {
+          _filteredClasses = [];
+          _showClassDropdown = false;
+          _hideClassDropdown();
+        }
+      });
+  }
+
+ 
+
+  @override
   void dispose() {
+    _hideSubjectDropdown();
+    _hideClassDropdown();
     _subjectCodeController.dispose();
+    _classNumberController.dispose();
     super.dispose();
   }
 
@@ -74,14 +341,169 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                 ),
               ),
               const SizedBox(height: 20),
+              const Text('Class Number'),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  
+                  CompositedTransformTarget(
+                    link: _classLayerLink,
+                    child: Focus(
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus) {
+                          setState(() {
+                            _showClassDropdown = false;
+                            _hideClassDropdown();
+                          });
+                        }
+                      },
+                      child: TextField(
+                        controller: _classNumberController,
+                        onChanged: _onClassSearchChanged,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'example 4C2',
+                          labelStyle: TextStyle(color: kGrey),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_showClassDropdown && _filteredClasses.isNotEmpty && MediaQuery.of(context).viewInsets.bottom == 0)
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: _filteredClasses.length,
+                        itemBuilder: (context, index) {
+                          final className = _filteredClasses[index];
+                          return ListTile(
+                            dense: true,
+                            visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                            title: Text(
+                              className,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _classNumberController.text = className;
+                                _selectedClassName = className;
+                                _showClassDropdown = false;
+                              });
+                              _hideClassDropdown();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
               const Text('Subject Code'),
-              TextField(
-                controller: _subjectCodeController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter the subject code',
-                  labelStyle: TextStyle(color: kGrey),
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  
+                  CompositedTransformTarget(
+                    link: _layerLink,
+                    child: Focus(
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus) {
+                          setState(() {
+                            _showDropdown = false;
+                            _hideSubjectDropdown();
+                          });
+                        }
+                      },
+                      child: TextField(
+                        controller: _subjectCodeController,
+                        onChanged: _onSearchChanged,
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Enter the subject code',
+                          labelStyle: TextStyle(color: kGrey),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_showDropdown && _filteredSubjects.isNotEmpty && MediaQuery.of(context).viewInsets.bottom == 0)
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ListView.builder(
+                        itemCount: _filteredSubjects.length,
+                        itemBuilder: (context, index) {
+                          final entry = _filteredSubjects[index];
+                          return ListTile(
+                            dense: true,
+                            title: Row(
+                              children: [
+                                Text(
+                                  entry.key,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    entry.value,
+                                    style: const TextStyle(color: Colors.grey),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _subjectCodeController.text = entry.key;
+                                _selectedSubjectName = entry.value;
+                                _showDropdown = false;
+                              });
+                              _hideSubjectDropdown();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  if (_selectedSubjectName.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        _selectedSubjectName,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 10),
               const Text('Period'),
@@ -119,6 +541,14 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     return;
                   }
 
+                  if (_selectedSubjectName.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Please select a subject from the dropdown')),
+                    );
+                    return;
+                  }
+
                   if (selectedPeriod == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please select a period')),
@@ -150,13 +580,14 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                     
                     
                     DocumentReference docRef = await FirebaseFirestore.instance.collection('attendance').add({
-                      'subjectName': subjectCode,
+                      'subjectName': _selectedSubjectName, 
                       'period': selectedPeriod,
                       'studentsList': [],
                       'status': widget.defaultStatus,
                       'profName': profName,
                       'email': userEmail,
                       'timestamp': DateTime.now().toIso8601String(),
+                      'className': _selectedClassName, 
                     });
 
                     
@@ -166,7 +597,7 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => AttendanceArchive(
-                            subjectName: subjectCode,
+                            subjectName: _selectedSubjectName, 
                             period: selectedPeriod,
                             existingDocId: docRef.id,
                           ),
@@ -190,6 +621,8 @@ class _AttendanceButtomSheetState extends State<AttendanceButtomSheet> {
       ),
     );
   }
+
+ 
 }
 
 class PeriodButton extends StatelessWidget {
@@ -208,15 +641,15 @@ class PeriodButton extends StatelessWidget {
       onTap: ontap,
       child: period.isSelected
           ? Container(
-              height: 60,
-              width: 80,
+              height: 60, 
+              width: 85,
               decoration: const BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.all(Radius.circular(14))),
               child: Center(
                 child: Container(
-                  height: 56,
-                  width: 76,
+                  height: 56, 
+                  width: 81,
                   decoration: BoxDecoration(
                       color: period.color,
                       borderRadius:
@@ -233,15 +666,15 @@ class PeriodButton extends StatelessWidget {
 
   Widget unPressedSmallButton() {
     return Container(
-      height: 50,
-      width: 70,
+      height: 50, 
+      width: 75,
       decoration: BoxDecoration(
           color: period.color,
           borderRadius: const BorderRadius.all(Radius.circular(12))),
       child: Center(
         child: Text(
-          period.number,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          'P${period.number}',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
     );
