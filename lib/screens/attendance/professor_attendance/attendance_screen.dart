@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/constants.dart';
@@ -26,18 +27,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
   List<AttendanceModel> periods = [];
-
   void _showDeleteConfirmation(BuildContext context, String documentId) {
+    final localizations = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Delete Attendance'),
-        content: const Text(
+        title: Text(localizations?.deleteAttendance ?? 'Delete Attendance'),
+        content: Text(localizations?.deleteAttendanceConfirmation ??
             'Are you sure you want to delete this attendance record? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(localizations?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -45,7 +47,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               _deleteAttendance(documentId);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(localizations?.delete ?? 'Delete'),
           ),
         ],
       ),
@@ -53,18 +55,23 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _deleteAttendance(String documentId) async {
+    final localizations = AppLocalizations.of(context);
+
     try {
       await attendance.doc(documentId).delete();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Attendance record deleted successfully')),
+          SnackBar(
+              content: Text(localizations?.attendanceDeletedSuccess ??
+                  'Attendance record deleted successfully')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting attendance record: $e')),
+          SnackBar(
+              content: Text(
+                  '${localizations?.errorDeletingAttendance ?? "Error deleting attendance record"}: $e')),
         );
       }
     }
@@ -92,9 +99,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-          title: 'Attendance', onpressed: () => Navigator.pop(context)),
+          title: localizations?.attendance ?? 'Attendance',
+          onpressed: () => Navigator.pop(context)),
       body: ReusableOffline(
         child: Column(
           children: [
@@ -107,10 +117,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return showLoadingIndicator();
                 }
-
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text('Error: ${snapshot.error}'),
+                    child: Text(
+                        '${localizations?.error ?? "Error"}: ${snapshot.error}'),
                   );
                 }
 
@@ -118,7 +128,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   final docs = snapshot.data!.docs;
 
                   return ListContainer(
-                    title: 'Current attendance',
+                    title: localizations?.currentAttendance ??
+                        'Current attendance',
                     listOfWidgets: docs.map((doc) {
                       final data = doc.data() as Map<String, dynamic>;
 
@@ -137,7 +148,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         startTime: _getStartTimeForPeriod(data['period'] ?? ''),
                         endTime: _getEndTimeForPeriod(data['period'] ?? ''),
                         total: studentCount,
-                        className: data['className'] ?? '', 
+                        className: data['className'] ?? '',
                         ontapOnReview: () {
                           Navigator.push(
                             context,
@@ -155,7 +166,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             _showDeleteConfirmation(context, doc.id),
                       );
                     }).toList(),
-                    emptyMessage: 'No recent attendance found',
+                    emptyMessage: localizations?.noRecentAttendance ??
+                        'No recent attendance found',
                   );
                 } else {
                   return showLoadingIndicator();
@@ -181,11 +193,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Column generateQRcodeButton(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ServiceItem(
-          title: 'Generate QR Code',
+          title: localizations?.generateQRCode ?? 'Generate QR Code',
           imageUrl: 'assets/project_image/qr-code.png',
           backgroundColor: kDarkBlue,
           onPressed: () {
@@ -200,32 +214,32 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 }
 
-  String _getStartTimeForPeriod(String period) {
-    switch (period) {
-      case '1':
-        return '9:00';
-      case '2':
-        return '10:40';
-      case '3':
-        return '12:20';
-      case '4':
-        return '2:00';
-      default:
-        return '9:00';
-    }
+String _getStartTimeForPeriod(String period) {
+  switch (period) {
+    case '1':
+      return '9:00';
+    case '2':
+      return '10:40';
+    case '3':
+      return '12:20';
+    case '4':
+      return '2:00';
+    default:
+      return '9:00';
   }
+}
 
-  String _getEndTimeForPeriod(String period) {
-    switch (period) {
-      case '1':
-        return '10:30';
-      case '2':
-        return '12:10';
-      case '3':
-        return '1:50';
-      case '4':
-        return '3:30';
-      default:
-        return '10:30';
-    }
+String _getEndTimeForPeriod(String period) {
+  switch (period) {
+    case '1':
+      return '10:30';
+    case '2':
+      return '12:10';
+    case '3':
+      return '1:50';
+    case '4':
+      return '3:30';
+    default:
+      return '10:30';
   }
+}

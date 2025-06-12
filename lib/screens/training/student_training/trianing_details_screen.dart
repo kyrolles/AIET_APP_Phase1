@@ -93,7 +93,9 @@ class TrianingDetailsScreen extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(child: Text('Error loading details'));
+            return Center(
+                child: Text(localizations?.errorLoadingDetails ??
+                    'Error loading details'));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -127,13 +129,17 @@ class TrianingDetailsScreen extends StatelessWidget {
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Important Links:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  localizations?.importantLinks ?? 'Important Links:',
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 _buildClickableLinks(
-                    context, data['links'] ?? 'No links available'),
+                    context,
+                    data['links'] ??
+                        (localizations?.noLinksAvailable ??
+                            'No links available')),
                 if (data['image'] != null) ...[
                   const SizedBox(height: 16),
                   Center(

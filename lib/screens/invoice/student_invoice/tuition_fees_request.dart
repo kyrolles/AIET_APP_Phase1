@@ -5,6 +5,7 @@ import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/services/storage_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TuitionFeesPreview extends StatefulWidget {
   const TuitionFeesPreview({super.key, required this.requestsList});
@@ -40,6 +41,8 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return SizedBox(
       height: 300,
       child: Column(
@@ -49,9 +52,9 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
             padding: const EdgeInsets.all(16.0),
             child: Stack(
               children: [
-                const Center(
+                Center(
                   child: Text(
-                    'Tuition Fees',
+                    localizations?.tuitionFeesTitle ?? 'Tuition Fees',
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
@@ -68,14 +71,15 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
               ],
             ),
           ),
-          const SizedBox(
+          SizedBox(
             width: double.infinity,
             child: Row(
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 16),
                   child: Text(
-                    'Do you want to pay in installments ?',
+                    localizations?.payInInstallments ??
+                        'Do you want to pay in installments?',
                     style: TextStyle(fontSize: 18),
                   ),
                 ),
@@ -92,7 +96,7 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
                     payInInstallments = true;
                   });
                 },
-                text: 'Yes',
+                text: localizations?.yes ?? 'Yes',
                 isSelected: payInInstallments,
                 color: const Color.fromARGB(255, 197, 200, 206),
               ),
@@ -102,7 +106,7 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
                     payInInstallments = false;
                   });
                 },
-                text: 'No',
+                text: localizations?.no ?? 'No',
                 isSelected: !payInInstallments,
                 color: const Color.fromARGB(255, 197, 200, 206),
               ),
@@ -112,7 +116,9 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
             padding: const EdgeInsets.all(16.0),
             child: KButton(
               onPressed: _isLoading ? null : () => _submitTuitionFeesRequest(),
-              text: _isLoading ? 'Processing...' : 'Request',
+              text: _isLoading
+                  ? (localizations?.processing ?? 'Processing...')
+                  : (localizations?.request ?? 'Request'),
               fontSize: 21.7,
               textColor: Colors.white,
               backgroundColor: kBlue,
@@ -194,7 +200,6 @@ class _TuitionFeesPreviewState extends State<TuitionFeesPreview> {
         'stamp_type': '',
         'department': snapshot.docs.first['department']
       });
-
       _showCustomSnackBar('Request sent successfully');
       Navigator.pop(context);
     } catch (e) {

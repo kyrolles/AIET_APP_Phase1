@@ -498,6 +498,273 @@
   "week5": "الأسبوع الخامس",
   "week10": "الأسبوع العاشر",
   "courseWork": "أعمال المقرر",
-  "labExam": "امتحان المعمل",
-  "finalExam": "الامتحان النهائي"
+  "labExam": "امتحان المعمل",  "finalExam": "الامتحان النهائي",
+  
+  "lec": "محاضرة",
+  "section": "قسم",
+  "lab": "معمل",  "lecture": "محاضرة",
+  "floorNumber": "الطابق {number}",
+  "@floorNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String",
+        "example": "1"
+      }
+    }
+  },
+  
+  "dismiss": "إغلاق",
+  "announcementPostedSuccessfully": "تم نشر الإعلان بنجاح!",
+  "createAnnouncement": "إنشاء إعلان",
+  "title": "العنوان",
+  "enterAnnouncementTitle": "أدخل عنوان الإعلان",  "description": "الوصف",
+  "writeAnnouncementHere": "اكتب إعلانك هنا...",
+  "shareOnlyTo": "مشاركة فقط مع",
+  "selectYears": "اختر السنوات",
+  "selectPrograms": "اختر البرامج",
+  "pdfViewer": "عارض PDF",
+  
+  "id": "الهوية",
+  "scheduleManagement": "إدارة الجدول",
+  "academics": "الأكاديميات",
+  "studyPrograms": "برامج الدراسة",
+  "programs": "البرامج",
+  "academicCalendar": "التقويم الأكاديمي",
+  "students": "الطلاب",
+  "announcements": "الإعلانات",
+  "timeTables": "جداول المواعيد",
+  "studentActivities": "أنشطة الطلاب",
+  "industrialTraining": "التدريب الصناعي",
+  "graduationProjects": "مشاريع التخرج",
+  "studentPortal": "بوابة الطلاب",
+  "alumni": "الخريجون",
+  "staffMembers": "أعضاء هيئة التدريس",
+  "academicStaff": "الهيئة الأكاديمية",
+  "assistingStaff": "الهيئة المساعدة",
+  "careers": "الوظائف",
+  "aboutAIET": "عن AIET",
+  "welcome": "مرحباً",
+  "founder": "المؤسس",
+  "visionMission": "الرؤية والرسالة",
+  "governance": "الحوكمة",
+  "accreditations": "الاعتمادات",
+  "boardOfDirectors": "مجلس الإدارة",
+  "qAndA": "أسئلة وأجوبة",  "codeOfEthics": "قواعد الأخلاق",
+  "factsAndFigures": "حقائق وأرقام",  "logout": "تسجيل الخروج",
+  
+  "loading": "جارٍ التحميل...",
+  "noIdAvailable": "لا يوجد رقم هوية متاح",
+  
+  "noClassesScheduled": "لا توجد فصول مجدولة لهذا اليوم",
+  "noClass": "لا يوجد فصل",
+  "noSessionsFound": "لا توجد جلسات لـ",  "inThe": "في",
+  "odd": "فردي",
+  "even": "زوجي",
+  "week": "الأسبوع",
+  "viewFullWeek": "عرض الأسبوع كاملاً",
+  "dayOff": "يوم راحة",
+  
+  "attendance": "الحضور",
+  "deleteAttendance": "حذف الحضور",
+  "deleteAttendanceConfirmation": "هل أنت متأكد من حذف سجل الحضور هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "attendanceDeletedSuccess": "تم حذف سجل الحضور بنجاح",
+  "errorDeletingAttendance": "خطأ في حذف سجل الحضور",
+  "currentAttendance": "الحضور الحالي",  "noRecentAttendance": "لا يوجد حضور حديث",
+  "generateQRCode": "إنشاء رمز QR",
+  "error": "خطأ",
+  "hi": "مرحباً",
+    "noClassesScheduledForRoom": "لا توجد فصول مجدولة",
+  "roomAvailableAllDay": "هذه الغرفة متاحة طوال اليوم",
+  "schedule": "الجدول",
+    "available": "متاح",
+  "occupied": "مشغول",
+  "errorLoadingSchedule": "خطأ في تحميل الجدول",
+  "room": "غرفة",
+  
+  "organization": "المؤسسة",
+  "phoneNumber": "رقم الهاتف",
+  "language": "اللغة",
+  "dateOfBirth": "تاريخ الميلاد",
+  "locationOfBirth": "مكان الولادة",
+  "year": "السنة",
+  "department": "القسم",  "theCause": "السبب",
+  "rejected": "مرفوض",
+  "pending": "قيد الانتظار",
+  "done": "تم",
+  
+  "buildingStatus": "حالة المبنى {building}",
+  "@buildingStatus": {
+    "placeholders": {
+      "building": {
+        "type": "String",
+        "example": "A"
+      }
+    }
+  },
+  "occupancyRate": "معدل الاشغال",
+  "totalRooms": "إجمالي الغرف",
+  "occupiedRooms": "مشغولة",
+  "availableRooms": "متاحة",  "currentPeriod": "الفترة الحالية",
+  "errorLoadingStatus": "خطأ في تحميل الحالة",
+  
+  "attendanceList": "قائمة الحضور",  "addStudent": "إضافة طالب +",
+  "confirm": "تأكيد",
+  "studentRemovedSuccessfully": "تم حذف الطالب بنجاح",
+  "errorConfirmingAttendance": "خطأ في تأكيد الحضور",
+  
+  "errorLoadingDetails": "خطأ في تحميل التفاصيل",
+  "companyName": "اسم الشركة",
+  "description": "الوصف",
+  "trainingRequirements": "متطلبات التدريب",  "importantLinks": "روابط مهمة",
+  "noLinksAvailable": "لا توجد روابط متاحة",
+  "couldNotOpenLink": "لا يمكن فتح الرابط",
+    "searchHint": "البحث عن الأساتذة، المجموعات، المواد...",
+  "searchDate": "تاريخ البحث",  "searchResults": "نتائج البحث",
+  "noResultsFound": "لم يتم العثور على نتائج",
+  "foundRoom": "تم العثور على الغرفة",
+  "startTypingToSearch": "ابدأ بالكتابة للبحث...",
+  
+  "floor": "الطابق",
+  "building": "المبنى",
+  "foundRoomMessage": "تم العثور على الغرفة: {roomName}",
+  "@foundRoomMessage": {
+    "placeholders": {
+      "roomName": {
+        "type": "String",
+        "example": "B17"
+      }
+    }
+  },
+  "buildingA": "المبنى أ",
+  "buildingB": "المبنى ب",
+  "loading": "جارٍ التحميل...",
+  "period": "الفترة",
+  "currentlyActive": "نشط حالياً",
+  "close": "إغلاق",  "selectBuilding": "اختر المبنى",
+  
+  "tuitionFeesTitle": "الرسوم الدراسية",
+  "payInInstallments": "هل تريد الدفع على أقساط؟",
+  "yes": "نعم",
+  "no": "لا",
+  "request": "طلب",
+  "processing": "جارٍ المعالجة...",
+  "requestSentSuccessfully": "تم إرسال الطلب بنجاح",
+  "personalInformation": "المعلومات الشخصية",
+  "fullName": "الاسم الكامل",
+  "organizationName": "اسم المؤسسة",
+  "address": "العنوان",
+  "enterYourAddress": "أدخل عنوانك",
+  "enterYourPhoneNumber": "أدخل رقم هاتفك",
+  "countryOfBirth": "بلد الميلاد",
+  "theCause": "السبب",
+  "enterTheCause": "أدخل السبب",
+  "documentLanguage": "لغة الوثيقة",
+  "arabic": "العربية",
+  "english": "الإنجليزية",
+  "stampType": "نوع الختم",
+  "institute": "المعهد",
+  "ministry": "الوزارة",
+  "submit": "إرسال",
+  "requestSubmitted": "تم إرسال الطلب بنجاح",
+  "fieldRequired": "هذا الحقل مطلوب",
+  "pleaseEnterTextInArabic": "يرجى إدخال النص باللغة العربية",
+  "pleaseEnterTextInEnglish": "يرجى إدخال النص باللغة الإنجليزية",
+  "pleaseTypeInArabic": "يرجى الكتابة باللغة العربية",
+  "pleaseTypeInEnglish": "يرجى الكتابة باللغة الإنجليزية",
+  "uploadPDF": "ارفع ملف PDF الخاص بك",
+  "selectedFile": "الملف المحدد",
+  "done": "تم",
+  "uploading": "جارٍ الرفع...",
+  "pdfUploadedSuccessfully": "تم رفع ملف PDF بنجاح!",
+  "view": "عرض",
+  "download": "تحميل",
+  "downloading": "جارٍ التحميل",
+  "downloadComplete": "اكتمل التحميل!",
+  "downloadFailed": "فشل التحميل",
+  "downloadProgress": "تم تحميل {progress}%",
+  "@downloadProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },  "openDownloadedFile": "فتح الملف المحمل",
+  "close": "إغلاق",
+  "noFileUploadedYet": "لم يتم رفع ملف بعد",
+  "archive": "الأرشيف",
+  
+  "activities": "الأنشطة",
+  "mySchedule": "جدولي",
+  "viewAll": "عرض الكل",
+  "hi": "مرحبا",
+  
+  "studentTraining": "تدريب الطلاب",
+  "trainingScore": "نتيجة التدريب",
+  "totalScore": "النتيجة الإجمالية: {score}",
+  "@totalScore": {
+    "placeholders": {
+      "score": {
+        "type": "String",
+        "example": "85"
+      }
+    }
+  },
+  "myRequests": "طلباتي",
+  "submitTraining": "تقديم التدريب",
+  "announcement": "إعلان",
+  "companyName": "اسم الشركة",
+  "enterCompanyName": "أدخل اسم الشركة",
+  "importantLinks": "روابط مهمة",  "enterCompanyDescription": "أدخل وصف الشركة...",
+  "uploadLogo": "تحميل الشعار",
+  "uploadImage": "تحميل صورة",
+  "shareAnnouncementToDepartment": "مشاركة الإعلان للقسم",
+  "computer": "حاسوب",
+  "mechatronics": "ميكاترونيك",
+  "communicationElectronics": "اتصالات وإلكترونيات",
+  "industrial": "صناعي",
+  "post": "نشر",
+  "companyNameRequired": "اسم الشركة مطلوب",
+  "logoRequired": "الشعار مطلوب",
+  "announcementSavedSuccessfully": "تم حفظ الإعلان بنجاح!",
+  "selectedFile": "الملف المحدد",
+  "uploading": "جارٍ التحميل...",
+  "enterImportantLinks": "أدخل الروابط المهمة...",
+  
+  "review": "مراجعة",
+  "scoreInDays": "النتيجة (بالأيام)",
+  "comment": "تعليق",
+  "commentRequiredForRejected": "يجب ملء التعليق لوضع علامة مرفوض",
+  "scoreCannotBeZero": "لا يمكن أن تكون النتيجة صفراً للحالة المكتملة",
+  "downloading": "جارٍ التحميل...",
+  "errorViewingPDF": "خطأ في عرض PDF",
+  "fileDownloadedToDownloads": "تم تحميل الملف إلى مجلد Downloads/AIETApp",
+  "openFile": "فتح الملف",
+  "requestApproved": "تم قبول الطلب. سيتم إشعار الطالب.",
+  "requestRejected": "تم رفض الطلب. سيتم إشعار الطالب.",
+  "requestStatusUpdated": "تم تحديث حالة الطلب.",
+  "errorSelectingPDF": "خطأ في اختيار PDF",
+  "trainingDays": "هذا التدريب استغرق {days} أيام من سجلك",
+  "@trainingDays": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "5"
+      }
+    }
+  },
+    "programs": "البرامج",
+  "ce": "هندسة حاسوب",
+  "eme": "ميكاترونيك",
+  "ece": "اتصالات وإلكترونيات",
+  "ie": "هندسة صناعية",
+  "gn": "عام",
+  "first": "أولى",
+  "second": "ثانية",
+  "third": "ثالثة",
+  "fourth": "رابعة",
+  
+  "info": "معلومات"
 }

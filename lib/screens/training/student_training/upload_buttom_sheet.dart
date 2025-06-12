@@ -7,6 +7,7 @@ import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UploadButtomSheet extends StatefulWidget {
   const UploadButtomSheet({super.key});
@@ -67,18 +68,19 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
     try {
       // Generate a unique file path in Firebase Storage
       final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final String storagePath = 'training_pdfs/$studentId/$timestamp-${path.basename(file.path)}';
-      
+      final String storagePath =
+          'training_pdfs/$studentId/$timestamp-${path.basename(file.path)}';
+
       // Create a reference to the file location in Firebase Storage
       final storageRef = FirebaseStorage.instance.ref().child(storagePath);
-      
+
       // Upload the file
       final uploadTask = storageRef.putFile(file);
-      
+
       // Wait for the upload to complete and get the download URL
       final TaskSnapshot taskSnapshot = await uploadTask;
       final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-      
+
       return downloadUrl;
     } catch (e) {
       throw 'Failed to upload file: $e';
@@ -118,10 +120,11 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       if (academicYear.isEmpty) {
         throw 'Academic year not found';
       }
-      
+
       // Upload file to Firebase Storage and get download URL
-      final String downloadUrl = await _uploadFileToStorage(pdfFile!, studentId);
-      
+      final String downloadUrl =
+          await _uploadFileToStorage(pdfFile!, studentId);
+
       // Save to Firestore
       await FirebaseFirestore.instance.collection('requests').add({
         'file_name': fileName,
@@ -143,7 +146,9 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
         'department': department,
       });
       Navigator.pop(context);
-      _showCustomSnackBar('PDF uploaded successfully!');
+      _showCustomSnackBar(
+          AppLocalizations.of(context)?.pdfUploadedSuccessfully ??
+              'PDF uploaded successfully!');
     } catch (e) {
       _showCustomSnackBar('Error: $e', isError: true);
     } finally {
@@ -155,6 +160,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -171,10 +177,10 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
+              Center(
                 child: Text(
-                  'Submit Training',
-                  style: TextStyle(
+                  localizations?.submitTraining ?? 'Submit Training',
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color(0XFF6C7072),
@@ -186,7 +192,7 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
                 height: 350,
                 width: double.infinity,
                 allowedExtensions: const ['pdf'],
-                buttonText: "Upload Your PDF",
+                buttonText: localizations?.uploadPDF ?? "Upload Your PDF",
                 onFileSelected: (file) async {
                   try {
                     if (file.path != null) {
@@ -195,24 +201,28 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
                         fileName = path.basename(file.path!);
                         pdfFile = File(file.path!);
                       });
-                      _showCustomSnackBar('Selected file: $fileName');
+                      _showCustomSnackBar(
+                          '${AppLocalizations.of(context)?.selectedFile ?? 'Selected file'}: $fileName');
                     }
                   } catch (e) {
-                    _showCustomSnackBar('Error selecting PDF: $e', isError: true);
+                    _showCustomSnackBar('Error selecting PDF: $e',
+                        isError: true);
                   }
                 },
               ),
               if (fileName != null) ...[
                 const SizedBox(height: 10),
                 Text(
-                  'Selected file: $fileName',
+                  '${localizations?.selectedFile ?? 'Selected file'}: $fileName',
                   style: const TextStyle(fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
               ],
               const SizedBox(height: 15),
               KButton(
-                text: _isLoading ? 'Uploading...' : 'Done',
+                text: _isLoading
+                    ? (localizations?.uploading ?? 'Uploading...')
+                    : (localizations?.done ?? 'Done'),
                 backgroundColor: kgreen,
                 onPressed: _isLoading ? null : _saveAnnouncement,
               ),

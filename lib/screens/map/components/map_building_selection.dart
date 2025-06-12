@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BuildingSelection extends StatelessWidget {
   final void Function(int)? onTabChange;
@@ -10,9 +11,10 @@ class BuildingSelection extends StatelessWidget {
     required this.onTabChange,
     this.tabController, // Add this
   });
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Container(
       width: 180,
       height: 45,
@@ -42,7 +44,7 @@ class BuildingSelection extends StatelessWidget {
           fontSize: 15,
         ),
         dividerHeight: 0,
-        tabs: const [
+        tabs: [
           Tab(
             child: Row(
               mainAxisSize: MainAxisSize.min,

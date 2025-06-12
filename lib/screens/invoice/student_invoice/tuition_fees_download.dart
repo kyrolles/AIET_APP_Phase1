@@ -11,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:open_file/open_file.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TuitionFeesDownload extends StatefulWidget {
   const TuitionFeesDownload({super.key, required this.request});
@@ -225,6 +226,8 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return SizedBox(
       // height: 400,
       child: Column(
@@ -234,9 +237,9 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
             padding: const EdgeInsets.all(16.0),
             child: Stack(
               children: [
-                const Center(
+                Center(
                   child: Text(
-                    'Tuition Fees',
+                    localizations?.tuitionFeesTitle ?? 'Tuition Fees',
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
@@ -272,7 +275,7 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                     children: [
                       KButton(
                         onPressed: _canViewPdf ? () => _viewPdf(context) : null,
-                        text: 'View',
+                        text: localizations?.view ?? 'View',
                         backgroundColor: _canViewPdf
                             ? const Color.fromRGBO(6, 147, 241, 1)
                             : Colors.grey,
@@ -285,7 +288,9 @@ class _TuitionFeesDownloadState extends State<TuitionFeesDownload> {
                         onPressed: _canDownloadPdf && !_isDownloading
                             ? _downloadFile
                             : null,
-                        text: _isDownloading ? 'Downloading' : 'Download',
+                        text: _isDownloading
+                            ? (localizations?.downloading ?? 'Downloading')
+                            : (localizations?.download ?? 'Download'),
                         backgroundColor: _canDownloadPdf ? kgreen : Colors.grey,
                         width: 115,
                         height: 50,

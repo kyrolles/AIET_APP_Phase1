@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Widget displayed when there's an error loading the schedule
 class ErrorStateWidget extends StatelessWidget {
@@ -8,16 +9,17 @@ class ErrorStateWidget extends StatelessWidget {
     super.key,
     required this.error,
   });
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Center(
       child: Column(
         children: [
           const Icon(Icons.error_outline, color: Colors.red, size: 48),
           const SizedBox(height: 8),
           Text(
-            'Error loading schedule',
+            localizations?.errorLoadingSchedule ?? 'Error loading schedule',
             style: TextStyle(
               fontFamily: 'Lexend',
               color: Colors.red[700],

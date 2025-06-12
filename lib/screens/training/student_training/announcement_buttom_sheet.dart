@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AnnouncementButtomSheet extends StatelessWidget {
   const AnnouncementButtomSheet({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -13,11 +14,11 @@ class AnnouncementButtomSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
             child: Text(
-              'Programs',
-              style: TextStyle(
+              localizations?.programs ?? 'Programs',
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Color(0XFF6C7072),
@@ -33,7 +34,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
                 arguments: 'Computer',
               );
             },
-            text: 'CE',
+            text: localizations?.ce ?? 'CE',
             fontSize: 36,
             height: 70,
             textColor: Colors.black,
@@ -53,7 +54,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
                 arguments: 'Mechatronics',
               );
             },
-            text: 'EME',
+            text: localizations?.eme ?? 'EME',
             fontSize: 36,
             height: 70,
             textColor: Colors.white,
@@ -73,7 +74,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
                 arguments: 'Communication & Electronics',
               );
             },
-            text: 'ECE',
+            text: localizations?.ece ?? 'ECE',
             fontSize: 36,
             height: 70,
             textColor: Colors.black,
@@ -93,7 +94,7 @@ class AnnouncementButtomSheet extends StatelessWidget {
                 arguments: 'Industrial',
               );
             },
-            text: 'IE',
+            text: localizations?.ie ?? 'IE',
             fontSize: 36,
             height: 70,
             textColor: Colors.white,

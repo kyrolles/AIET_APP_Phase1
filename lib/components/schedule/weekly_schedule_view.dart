@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../constants.dart';
 import '../../models/schedule_model.dart';
 import 'class_session_card.dart';
@@ -8,7 +9,7 @@ class WeeklyScheduleView extends StatelessWidget {
   final ClassIdentifier classIdentifier;
   final List<ClassSession> sessions;
   final String semesterName;
-  
+
   const WeeklyScheduleView({
     Key? key,
     required this.weekType,
@@ -16,7 +17,7 @@ class WeeklyScheduleView extends StatelessWidget {
     required this.sessions,
     this.semesterName = '',
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -37,7 +38,7 @@ class WeeklyScheduleView extends StatelessWidget {
                 ),
               ),
             ),
-            
+
           // Tab bar for days
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -60,18 +61,20 @@ class WeeklyScheduleView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Tab content
           Expanded(
             child: TabBarView(
-              children: DayOfWeek.values.map((day) => _buildDaySchedule(day)).toList(),
+              children: DayOfWeek.values
+                  .map((day) => _buildDaySchedule(day, context))
+                  .toList(),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildDayTab(DayOfWeek day) {
     return Tab(
       child: Text(
@@ -83,21 +86,23 @@ class WeeklyScheduleView extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildDaySchedule(DayOfWeek day) {
+
+  Widget _buildDaySchedule(DayOfWeek day, BuildContext context) {
     // Filter sessions for this day
     final daySessions = sessions.where((s) => s.day == day).toList()
       ..sort((a, b) => a.periodNumber.compareTo(b.periodNumber));
-    
+
     if (daySessions.isEmpty) {
-      return const Center(
+      final localizations = AppLocalizations.of(context);
+      return Center(
         child: Text(
-          'No classes scheduled for this day',
-          style: TextStyle(color: kGrey),
+          localizations?.noClassesScheduled ??
+              'No classes scheduled for this day',
+          style: const TextStyle(color: kGrey),
         ),
       );
     }
-    
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: daySessions.length,
@@ -107,23 +112,24 @@ class WeeklyScheduleView extends StatelessWidget {
       },
     );
   }
-  
+
   // Helper method to get a beautiful visual schedule layout
   Widget _buildVisualSchedule(DayOfWeek day) {
     // Get all periods
     final periods = Period.getPeriods();
-    
+
     // Filter sessions for this day
     final daySessions = sessions.where((s) => s.day == day).toList();
-    
+
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: periods.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final period = periods[index];
-        final sessionsForPeriod = daySessions.where((s) => s.periodNumber == period.number).toList();
-        
+        final sessionsForPeriod =
+            daySessions.where((s) => s.periodNumber == period.number).toList();
+
         return Container(
           height: 80,
           margin: const EdgeInsets.symmetric(vertical: 8),
@@ -159,7 +165,7 @@ class WeeklyScheduleView extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              
+
               // Session column
               Expanded(
                 child: sessionsForPeriod.isEmpty
@@ -170,10 +176,10 @@ class WeeklyScheduleView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.grey[300]!),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            'No class',
-                            style: TextStyle(color: kGrey),
+                            AppLocalizations.of(context)?.noClass ?? 'No class',
+                            style: const TextStyle(color: kGrey),
                           ),
                         ),
                       )
@@ -188,8 +194,10 @@ class WeeklyScheduleView extends StatelessWidget {
                                     ),
                                     padding: const EdgeInsets.all(8),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           session.courseName,
@@ -219,16 +227,16 @@ class WeeklyScheduleView extends StatelessWidget {
       },
     );
   }
-  
+
   Color _getSessionColor(ClassSession session) {
     if (session.isLab) {
       return const Color(0xFFFFF9C4); // Light yellow for labs
     }
-    
+
     if (session.isTutorial) {
       return const Color(0xFFE1F5FE); // Light blue for tutorials
     }
-    
+
     return Colors.white;
   }
-} 
+}

@@ -395,7 +395,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       ),
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(AppLocalizations.of(context)?.createAccount ??
+                          : Text(
+                              AppLocalizations.of(context)?.createAccount ??
+                                  " Create Account",
                               style: TextStyle(color: Colors.white),
                             ),
                     ),

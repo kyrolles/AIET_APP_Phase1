@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterBottomSheet extends StatefulWidget {
   final Function(String?) onYearSelected;
@@ -27,6 +28,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -87,7 +89,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   vertical: VisualDensity.minimumDensity,
                   horizontal: VisualDensity.minimumDensity,
                 ),
-                title: Text('GN',
+                title: Text(localizations?.gn ?? 'GN',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -117,7 +119,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   vertical: VisualDensity.minimumDensity,
                   horizontal: VisualDensity.minimumDensity,
                 ),
-                title: Text('1st',
+                title: Text(localizations?.first ?? '1st',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -147,7 +149,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   vertical: VisualDensity.minimumDensity,
                   horizontal: VisualDensity.minimumDensity,
                 ),
-                title: Text('2nd',
+                title: Text(localizations?.second ?? '2nd',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -177,7 +179,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   vertical: VisualDensity.minimumDensity,
                   horizontal: VisualDensity.minimumDensity,
                 ),
-                title: Text('3rd',
+                title: Text(localizations?.third ?? '3rd',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -207,7 +209,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   vertical: VisualDensity.minimumDensity,
                   horizontal: VisualDensity.minimumDensity,
                 ),
-                title: Text('4th',
+                title: Text(localizations?.fourth ?? '4th',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,

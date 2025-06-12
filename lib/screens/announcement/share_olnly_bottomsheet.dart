@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/multiselect_widget.dart';
 import 'package:graduation_project/constants.dart';
@@ -33,6 +34,8 @@ class _SharingOptionsBottomSheetState extends State<SharingOptionsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
@@ -44,9 +47,9 @@ class _SharingOptionsBottomSheetState extends State<SharingOptionsBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Share Only To',
-            style: TextStyle(
+          Text(
+            localizations?.shareOnlyTo ?? 'Share Only To',
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0XFF6C7072),
@@ -57,7 +60,7 @@ class _SharingOptionsBottomSheetState extends State<SharingOptionsBottomSheet> {
           // Years MultiSelect
           MultiSelectWidget(
             options: const ['GN', '1st', '2nd', '3rd', '4th'],
-            title: 'Select Years',
+            title: localizations?.selectYears ?? 'Select Years',
             initialSelection: _selectedYears,
             onSelectionChanged: (selectedYears) {
               setState(() {
@@ -69,7 +72,7 @@ class _SharingOptionsBottomSheetState extends State<SharingOptionsBottomSheet> {
           // Programs MultiSelect
           MultiSelectWidget(
             options: const ['CE', 'ECE', 'EME', 'IE'],
-            title: 'Select Programs',
+            title: localizations?.selectPrograms ?? 'Select Programs',
             initialSelection: _selectedDepartments,
             onSelectionChanged: (selectedDepartments) {
               setState(() {
@@ -79,7 +82,7 @@ class _SharingOptionsBottomSheetState extends State<SharingOptionsBottomSheet> {
           ),
           const SizedBox(height: 24),
           KButton(
-            text: 'Apply',
+            text: localizations?.apply ?? 'Apply',
             backgroundColor: kBlue,
             onPressed: () {
               widget.onApply(_selectedYears, _selectedDepartments);

@@ -10,6 +10,7 @@ import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
 import 'package:graduation_project/services/storage_service.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TuitionFeesSheet extends StatefulWidget {
   const TuitionFeesSheet({
@@ -180,6 +181,8 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -196,9 +199,9 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
+              Center(
                 child: Text(
-                  'Tuition Fees',
+                  localizations?.tuitionFeesTitle ?? 'Tuition Fees',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -211,7 +214,7 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
                 height: 350,
                 width: double.infinity,
                 allowedExtensions: const ['pdf'],
-                buttonText: "Upload Your PDF",
+                buttonText: localizations?.uploadPDF ?? "Upload Your PDF",
                 onFileSelected: (file) async {
                   try {
                     if (file.path != null) {
@@ -229,7 +232,8 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
                       });
 
                       // Show filename in a snackbar
-                      _showCustomSnackBar('Selected file: $fileName');
+                      _showCustomSnackBar(
+                          '${localizations?.selectedFile ?? "Selected file"}: $fileName');
                     }
                   } catch (e) {
                     _showCustomSnackBar('Error processing file: $e',
@@ -240,14 +244,15 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
               if (fileName != null) ...[
                 const SizedBox(height: 10),
                 Text(
-                  'Selected file: $fileName',
+                  '${localizations?.selectedFile ?? "Selected file"}: $fileName',
                   style: const TextStyle(fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
               ],
               const SizedBox(height: 15),
-              const Text(
-                'Do you want to pay in installments ?',
+              Text(
+                localizations?.payInInstallments ??
+                    'Do you want to pay in installments?',
                 style: TextStyle(fontSize: 18),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -267,7 +272,9 @@ class _TuitionFeesSheetState extends State<TuitionFeesSheet> {
                     ),
               const SizedBox(height: 15),
               KButton(
-                  text: _isLoading ? 'Uploading...' : 'Done',
+                  text: _isLoading
+                      ? (localizations?.uploading ?? 'Uploading...')
+                      : (localizations?.done ?? 'Done'),
                   backgroundColor: kgreen,
                   onPressed: _isLoading ? null : updatePdfForTuitionFees),
             ],

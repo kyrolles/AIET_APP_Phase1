@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UploadPdf extends StatefulWidget {
   const UploadPdf({super.key, this.pdfBase64, this.pdfFileName});
@@ -42,7 +43,8 @@ class _UploadPdfState extends State<UploadPdf> {
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: const Text('PDF Viewer'),
+            title:
+                Text(AppLocalizations.of(context)?.pdfViewer ?? 'PDF Viewer'),
           ),
           body: PDFView(
             filePath: tempFile.path,

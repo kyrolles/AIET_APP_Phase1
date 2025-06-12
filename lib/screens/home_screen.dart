@@ -96,6 +96,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: homeScreenAppBar(context),
       drawer: AppDrawer(_logout, userRole: userRule),
@@ -104,9 +105,9 @@ class HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(
             child: SizedBox(height: 20),
           ),
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: TextLink(
-              text: 'Activities',
+              text: localizations?.activities ?? 'Activities',
             ),
           ),
           SliverToBoxAdapter(
@@ -118,7 +119,7 @@ class HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextLink(
-                text: 'My Schedule',
+                text: localizations?.mySchedule ?? 'My Schedule',
                 onTap: () {
                   // Navigate to full schedule view if needed
                 },
@@ -136,8 +137,8 @@ class HomeScreenState extends State<HomeScreen> {
           ),
           SliverToBoxAdapter(
             child: TextLink(
-              text: 'Announcements',
-              textLink: 'View All',
+              text: localizations?.announcements ?? 'Announcements',
+              textLink: localizations?.viewAll ?? 'View All',
               onTap: () {
                 Navigator.push(
                   context,

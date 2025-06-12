@@ -66,6 +66,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
       print('Error checking staff status: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
@@ -81,9 +82,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
           } else if (userRole == 'Student') {
             Navigator.pushNamed(context, '/clinicStudentScreen');
           } else {
-            // Show message for users with other roles            ScaffoldMessenger.of(context).showSnackBar(
+            // Show message for users with other roles
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(localizations?.noPermission ?? 'You do not have access to this feature'),
+                content: Text(localizations?.noPermission ??
+                    'You do not have access to this feature'),
               ),
             );
           }
@@ -96,9 +99,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
         onPressed: () {
           Navigator.pushNamed(context, '/studentTraining');
         },
-      ),      if (isStaff)
+      ),
+      if (isStaff)
         ServiceItem(
-          title: localizations?.staffStudentTraining ?? 'Staff-Student\nTraining',
+          title:
+              localizations?.staffStudentTraining ?? 'Staff-Student\nTraining',
           imageUrl: 'assets/project_image/analysis.png',
           backgroundColor: const Color(0xFFED1C24),
           onPressed: () {
@@ -116,7 +121,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
       //   imageUrl: 'assets/project_image/transcription.png',
       //   backgroundColor: const Color(0xFF0ED290),
       //   onPressed: () {},
-      // ),      ServiceItem(
+      // ),
+      ServiceItem(
         title: localizations?.gpaCalculator ?? 'GPA Calculator',
         imageUrl: 'assets/project_image/gpa.png',
         backgroundColor: const Color(0xFF006DF0),
@@ -217,7 +223,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
             if (result == true) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text(localizations?.announcementPosted ?? 'Announcement posted successfully!')),
+                    content: Text(localizations?.announcementPosted ??
+                        'Announcement posted successfully!')),
               );
             }
           },
@@ -250,8 +257,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 18),          ...serviceItems
-              .where((item) => item.title != localizations?.staffStudentAffairs && item.title != 'Staff Student Affairs' || isStaff)
+          const SizedBox(height: 18),
+          ...serviceItems
+              .where((item) =>
+                  item.title != localizations?.staffStudentAffairs &&
+                      item.title != 'Staff Student Affairs' ||
+                  isStaff)
               .map((item) => ServiceItem(
                     title: item.title,
                     imageUrl: item.imageUrl,

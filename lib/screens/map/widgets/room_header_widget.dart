@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../constants.dart';
 
 /// Widget that displays the room header information
@@ -13,9 +14,10 @@ class RoomHeaderWidget extends StatelessWidget {
     required this.roomType,
     required this.isEmpty,
   });
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Row(
       children: [
         // Room icon
@@ -45,7 +47,7 @@ class RoomHeaderWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "$roomType Room: $roomName",
+                "${roomType} ${localizations?.room ?? 'Room'}: $roomName",
                 style: const TextStyle(
                   fontFamily: 'Lexend',
                   fontWeight: FontWeight.bold,
@@ -53,7 +55,9 @@ class RoomHeaderWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                isEmpty ? "Available" : "Occupied",
+                isEmpty
+                    ? (localizations?.available ?? "Available")
+                    : (localizations?.occupied ?? "Occupied"),
                 style: TextStyle(
                   fontFamily: 'Lexend',
                   fontSize: 14,

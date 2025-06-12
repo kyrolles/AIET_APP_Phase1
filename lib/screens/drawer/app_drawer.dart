@@ -4,7 +4,6 @@ import 'package:graduation_project/language_clases/language_constants.dart';
 import 'package:graduation_project/screens/drawer/academic_webview_screen.dart';
 import '../admin/schedule_management_screen.dart';
 import 'package:graduation_project/language_clases/language.dart';
-import 'package:graduation_project/language_clases/language_constants.dart';
 import 'package:graduation_project/main.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -13,9 +12,10 @@ class AppDrawer extends StatelessWidget {
   final String userRole;
 
   const AppDrawer(this.onLogout, {required this.userRole, super.key});
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Drawer(
       backgroundColor: kbabyblue,
       child: Column(
@@ -39,7 +39,8 @@ class AppDrawer extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 25.0),
                     child: ListTile(
                       leading: const Icon(Icons.person_outline, size: 30),
-                      title: const Text("ID", style: kTextStyleBold),
+                      title: Text(localizations?.id ?? "ID",
+                          style: kTextStyleBold),
                       onTap: () {
                         Navigator.pushNamed(context, '/id');
                       },
@@ -56,8 +57,9 @@ class AppDrawer extends StatelessWidget {
                           Icons.schedule,
                           size: 30,
                         ),
-                        title: const Text(
-                          "Schedule Management",
+                        title: Text(
+                          localizations?.scheduleManagement ??
+                              "Schedule Management",
                           style: kTextStyleBold,
                         ),
                         onTap: () {
@@ -81,64 +83,63 @@ class AppDrawer extends StatelessWidget {
                         Icons.school_outlined,
                         size: 30,
                       ),
-                      title: const Text(
-                        "Academics",
+                      title: Text(
+                        localizations?.academics ?? "Academics",
                         style: kTextStyleBold,
                       ),
                       iconColor: kBlue,
                       children: [
                         ListTile(
-                          title: const Text(
-                            "Study Programms",
+                          title: Text(
+                            localizations?.studyPrograms ?? "Study Programs",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/programms.asp?R=3',
-                                  title: 'Programs',
+                                  title: localizations?.programs ?? 'Programs',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Programs",
+                          title: Text(
+                            localizations?.programs ?? "Programs",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/department.asp?R=3',
-                                  title: 'Programs',
+                                  title: localizations?.programs ?? 'Programs',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Academic Calendar",
+                          title: Text(
+                            localizations?.academicCalendar ??
+                                "Academic Calendar",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/calendar.asp?R=3',
-                                  title: 'Academic Calendar',
+                                  title: localizations?.academicCalendar ??
+                                      'Academic Calendar',
                                 ),
                               ),
                             );
@@ -148,8 +149,7 @@ class AppDrawer extends StatelessWidget {
                         // Add more links here if needed
                       ],
                     ),
-                  ),
-                  // Student section code...
+                  ), // Student section code...
                   Padding(
                     padding: const EdgeInsets.only(left: 25.0),
                     child: ExpansionTile(
@@ -157,140 +157,142 @@ class AppDrawer extends StatelessWidget {
                         Icons.person_search_outlined,
                         size: 30,
                       ),
-                      title: const Text(
-                        "Students",
+                      title: Text(
+                        localizations?.students ?? "Students",
                         style: kTextStyleBold,
                       ),
                       iconColor: kBlue,
                       children: [
                         ListTile(
-                          title: const Text(
-                            "Announcements",
+                          title: Text(
+                            localizations?.announcements ?? "Announcements",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/annoucements.asp?R=4',
-                                  title: 'Announcements',
+                                  title: localizations?.announcements ??
+                                      'Announcements',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Time Tables",
+                          title: Text(
+                            localizations?.timeTables ?? "Time Tables",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/timetables.asp?R=4',
-                                  title: 'Time Tables',
+                                  title: localizations?.timeTables ??
+                                      'Time Tables',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Student Activities",
+                          title: Text(
+                            localizations?.studentActivities ??
+                                "Student Activities",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/activity.asp?R=4',
-                                  title: 'Student Activities',
+                                  title: localizations?.studentActivities ??
+                                      'Student Activities',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Industrial Training",
+                          title: Text(
+                            localizations?.industrialTraining ??
+                                "Industrial Training",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/training.asp?R=4',
-                                  title: 'Industrial Training',
+                                  title: localizations?.industrialTraining ??
+                                      'Industrial Training',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Graduation Projects",
+                          title: Text(
+                            localizations?.graduationProjects ??
+                                "Graduation Projects",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/projects.asp?R=4',
-                                  title: 'Graduation Projects',
+                                  title: localizations?.graduationProjects ??
+                                      'Graduation Projects',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Student Portal",
+                          title: Text(
+                            localizations?.studentPortal ?? "Student Portal",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/portal.asp?R=4',
-                                  title: 'Student Portal',
+                                  title: localizations?.studentPortal ??
+                                      'Student Portal',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Alumni",
+                          title: Text(
+                            localizations?.alumni ?? "Alumni",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/testimonial.asp?R=4',
-                                  title: 'Alumni',
+                                  title: localizations?.alumni ?? 'Alumni',
                                 ),
                               ),
                             );
@@ -306,64 +308,63 @@ class AppDrawer extends StatelessWidget {
                         Icons.people_outline,
                         size: 30,
                       ),
-                      title: const Text(
-                        "Staff Members",
+                      title: Text(
+                        localizations?.staffMembers ?? "Staff Members",
                         style: kTextStyleBold,
                       ),
                       iconColor: kBlue,
                       children: [
                         ListTile(
-                          title: const Text(
-                            "Academic Staff",
+                          title: Text(
+                            localizations?.academicStaff ?? "Academic Staff",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/academic-staff.asp?R=5',
-                                  title: 'Academic Staff',
+                                  title: localizations?.academicStaff ??
+                                      'Academic Staff',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Assisting Staff",
+                          title: Text(
+                            localizations?.assistingStaff ?? "Assisting Staff",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/assisting-staff.asp?R=5',
-                                  title: 'Assisting Staff',
+                                  title: localizations?.assistingStaff ??
+                                      'Assisting Staff',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Careers",
+                          title: Text(
+                            localizations?.careers ?? "Careers",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/careers.asp?R=5',
-                                  title: 'Careers',
+                                  title: localizations?.careers ?? 'Careers',
                                 ),
                               ),
                             );
@@ -380,176 +381,174 @@ class AppDrawer extends StatelessWidget {
                         size: 30,
                       ),
                       title: Text(
-                        AppLocalizations.of(context)?.aboutUs ?? "About AIET",
+                        localizations?.aboutAIET ?? "About AIET",
                         style: kTextStyleBold,
                       ),
                       iconColor: kBlue,
                       children: [
                         ListTile(
-                          title: const Text(
-                            "Welcome",
+                          title: Text(
+                            localizations?.welcome ?? "Welcome",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/about-welcome.asp?R=1',
-                                  title: 'Welcome',
+                                  title: localizations?.welcome ?? 'Welcome',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Founder",
+                          title: Text(
+                            localizations?.founder ?? "Founder",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/about-aiet.asp?R=1',
-                                  title: 'Founder',
+                                  title: localizations?.founder ?? 'Founder',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Vision & Mission",
+                          title: Text(
+                            localizations?.visionMission ?? "Vision & Mission",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/vision.asp?R=1',
-                                  title: 'Vision & Mission',
+                                  title: localizations?.visionMission ??
+                                      'Vision & Mission',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Governance",
+                          title: Text(
+                            localizations?.governance ?? "Governance",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/organizational.asp?R=1',
-                                  title: 'Governance',
+                                  title:
+                                      localizations?.governance ?? 'Governance',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Accreditations",
+                          title: Text(
+                            localizations?.accreditations ?? "Accreditations",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/Accreditations.asp?R=1',
-                                  title: 'Accreditations',
+                                  title: localizations?.accreditations ??
+                                      'Accreditations',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Board of Directors",
+                          title: Text(
+                            localizations?.boardOfDirectors ??
+                                "Board of Directors",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/directors.asp?R=1',
-                                  title: 'Board of Directors',
+                                  title: localizations?.boardOfDirectors ??
+                                      'Board of Directors',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Q&A",
+                          title: Text(
+                            localizations?.qAndA ?? "Q&A",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url: 'https://www.aiet.edu.eg/FAQ?R=1',
-                                  title: 'Q&A',
+                                  title: localizations?.qAndA ?? 'Q&A',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Code of Ethics",
+                          title: Text(
+                            localizations?.codeOfEthics ?? "Code of Ethics",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/pages/CodeofEthics.asp',
-                                  title: 'Code of Ethics',
+                                  title: localizations?.codeOfEthics ??
+                                      'Code of Ethics',
                                 ),
                               ),
                             );
                           },
                         ),
                         ListTile(
-                          title: const Text(
-                            "Facts & Figures",
+                          title: Text(
+                            localizations?.factsAndFigures ?? "Facts & Figures",
                             style: kTextStyleNormal,
                           ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AcademicWebViewScreen(
+                                builder: (context) => AcademicWebViewScreen(
                                   url:
                                       'https://www.aiet.edu.eg/facts-and-figures/',
-                                  title: 'Facts & Figures',
+                                  title: localizations?.factsAndFigures ??
+                                      'Facts & Figures',
                                 ),
                               ),
                             );
@@ -628,14 +627,13 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-
-          // Logout button - keep outside the scrollable area
+          ), // Logout button - keep outside the scrollable area
           Padding(
             padding: const EdgeInsets.only(left: 25.0, bottom: 25),
             child: ListTile(
               leading: const Icon(Icons.logout, size: 30),
-              title: const Text("Logout", style: kTextStyleBold),
+              title: Text(localizations?.logout ?? "Logout",
+                  style: kTextStyleBold),
               onTap: onLogout,
             ),
           ),

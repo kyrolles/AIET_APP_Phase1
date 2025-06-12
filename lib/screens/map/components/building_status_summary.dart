@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../constants.dart';
 import '../services/map_schedule_service.dart';
 import '../services/room_mapping_service.dart';
@@ -83,6 +84,8 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       elevation: 4,
@@ -97,7 +100,8 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
                 Icon(Icons.business, color: kPrimaryColor, size: 24),
                 const SizedBox(width: 8),
                 Text(
-                  'Building ${widget.buildingName} Status',
+                  localizations?.buildingStatus(widget.buildingName) ??
+                      'Building ${widget.buildingName} Status',
                   style: const TextStyle(
                     fontFamily: 'Lexend',
                     fontSize: 18,
@@ -108,10 +112,16 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
             ),
             const SizedBox(height: 16),
             if (_isLoading)
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: CircularProgressIndicator(),
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 8),
+                      Text(localizations?.loading ?? 'Loading...'),
+                    ],
+                  ),
                 ),
               )
             else if (_error != null)
@@ -122,7 +132,8 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
                         color: Colors.red, size: 32),
                     const SizedBox(height: 8),
                     Text(
-                      'Error loading status',
+                      localizations?.errorLoadingStatus ??
+                          'Error loading status',
                       style: TextStyle(color: Colors.red[700]),
                     ),
                   ],
@@ -137,6 +148,7 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
   }
 
   Widget _buildStatusContent() {
+    final localizations = AppLocalizations.of(context);
     final occupancyRate =
         _totalRooms > 0 ? (_occupiedRooms / _totalRooms) : 0.0;
 
@@ -150,7 +162,7 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Occupancy Rate',
+                    localizations?.occupancyRate ?? 'Occupancy Rate',
                     style: TextStyle(
                       fontFamily: 'Lexend',
                       fontSize: 14,
@@ -195,7 +207,7 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
           children: [
             Expanded(
               child: _buildStatCard(
-                'Total Rooms',
+                localizations?.totalRooms ?? 'Total Rooms',
                 _totalRooms.toString(),
                 kPrimaryColor,
                 Icons.meeting_room,
@@ -204,7 +216,7 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
             const SizedBox(width: 8),
             Expanded(
               child: _buildStatCard(
-                'Occupied',
+                localizations?.occupiedRooms ?? 'Occupied',
                 _occupiedRooms.toString(),
                 Colors.red,
                 Icons.person,
@@ -213,7 +225,7 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
             const SizedBox(width: 8),
             Expanded(
               child: _buildStatCard(
-                'Available',
+                localizations?.availableRooms ?? 'Available',
                 _availableRooms.toString(),
                 Colors.green,
                 Icons.check_circle,
@@ -222,11 +234,9 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
           ],
         ),
 
-        const SizedBox(height: 12),
-
-        // Current period info
+        const SizedBox(height: 12), // Current period info
         Text(
-          'Current Period: ${DateTimeService.getPeriodString(MapScheduleService.getCurrentPeriod(DateTime.now()))}',
+          '${localizations?.currentPeriod ?? "Current Period"}: ${_getCurrentPeriodString()}',
           style: TextStyle(
             fontFamily: 'Lexend',
             fontSize: 12,
@@ -236,6 +246,11 @@ class _BuildingStatusSummaryState extends State<BuildingStatusSummary> {
         ),
       ],
     );
+  }
+
+  String _getCurrentPeriodString() {
+    final currentPeriod = MapScheduleService.getCurrentPeriod(DateTime.now());
+    return 'Period $currentPeriod';
   }
 
   Widget _buildStatCard(

@@ -2,50 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/student_container.dart';
 import '../../../components/list_container.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class InvoiceArchiveScreen extends StatelessWidget {
   const InvoiceArchiveScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Archive',
+        title: localizations?.archive ?? 'Archive',
         onpressed: () {
           Navigator.pop(context);
         },
       ),
-      body: const ListContainer(
-        title: 'Status',
+      body: ListContainer(
+        title: localizations?.status ?? 'Status',
         listOfWidgets: [
           StudentContainer(
-            title: 'Proof of enrollment',
+            title: localizations?.proofOfEnrollment ?? 'Proof of enrollment',
             image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-            status: 'Done',
+            status: localizations?.done ?? 'Done',
             statusColor: Colors.green,
           ),
           StudentContainer(
-            title: 'Tuition fees',
+            title: localizations?.tuitionFees ?? 'Tuition fees',
             image: 'assets/images/9e1e8dc1064bb7ac5550ad684703fb30.png',
-            status: 'Done',
+            status: localizations?.done ?? 'Done',
             statusColor: Colors.green,
           ),
           StudentContainer(
-            title: 'Proof of enrollment',
+            title: localizations?.proofOfEnrollment ?? 'Proof of enrollment',
             image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-            status: 'Rejected',
+            status: localizations?.rejected ?? 'Rejected',
             statusColor: Colors.red,
           ),
           StudentContainer(
-            title: 'Proof of enrollment',
+            title: localizations?.proofOfEnrollment ?? 'Proof of enrollment',
             image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-            status: 'Rejected',
+            status: localizations?.rejected ?? 'Rejected',
             statusColor: Colors.red,
           ),
           StudentContainer(
-            title: 'Proof of enrollment',
+            title: localizations?.proofOfEnrollment ?? 'Proof of enrollment',
             image: 'assets/images/daca1c3b78a2c352c89eabda54e640ce.png',
-            status: 'Done',
+            status: localizations?.done ?? 'Done',
             statusColor: Colors.green,
           ),
           // statusTile(

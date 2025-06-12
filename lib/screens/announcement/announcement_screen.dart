@@ -87,7 +87,7 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
               // Optional: Allow dismissing the error
-              label: 'Dismiss',
+              label: localizations?.dismiss ?? 'Dismiss',
               onPressed: () => controller.clearError(),
             ),
           ),
@@ -99,7 +99,7 @@ class _AnnouncementScreenState extends ConsumerState<AnnouncementScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.green,
-            content: Text(localizations?.announcementPosted ??
+            content: Text(localizations?.announcementPostedSuccessfully ??
                 'Announcement posted successfully!'),
             duration: const Duration(seconds: 2),
           ),

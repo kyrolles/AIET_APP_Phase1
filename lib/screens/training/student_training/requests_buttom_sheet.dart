@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RequestsButtomSheet extends StatelessWidget {
   const RequestsButtomSheet({super.key, required this.request});
   final Request request;
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -20,17 +21,18 @@ class RequestsButtomSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 10,
             children: [
-              const Center(
+              Center(
                 child: Text(
-                  'Info',
-                  style: TextStyle(
+                  localizations?.info ?? 'Info',
+                  style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Color(0XFF6C7072)),
                 ),
               ),
               Text(
-                'This training has taken ${request.trainingScore} Days of your record',
+                localizations?.trainingDays(request.trainingScore.toString()) ??
+                    'This training has taken ${request.trainingScore} Days of your record',
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -39,10 +41,10 @@ class RequestsButtomSheet extends StatelessWidget {
               if (request.comment.isNotEmpty) ...[
                 const Divider(
                     color: kLightGrey, indent: 10, endIndent: 10, height: 10),
-                const Center(
+                Center(
                   child: Text(
-                    'Comment',
-                    style: TextStyle(
+                    localizations?.comment ?? 'Comment',
+                    style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Color(0XFF6C7072)),

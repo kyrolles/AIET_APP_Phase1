@@ -491,6 +491,273 @@
   "week5": "5th Week",
   "week10": "10th Week",
   "courseWork": "Course Work",
-  "labExam": "Lab Exam",
-  "finalExam": "Final Exam"
+  "labExam": "Lab Exam",  "finalExam": "Final Exam",
+  
+  "lec": "Lec",
+  "section": "Section",
+  "lab": "Lab",  "lecture": "Lecture",
+  "floorNumber": "Floor {number}",
+  "@floorNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String",
+        "example": "1"
+      }
+    }
+  },
+  
+  "dismiss": "Dismiss",
+  "announcementPostedSuccessfully": "Announcement posted successfully!",
+  "createAnnouncement": "Create Announcement",
+  "title": "Title",
+  "enterAnnouncementTitle": "Enter announcement title",
+  "description": "Description",
+  "writeAnnouncementHere": "Write your announcement here...",  "shareOnlyTo": "Share Only To",
+  "selectYears": "Select Years",
+  "selectPrograms": "Select Programs",
+  "pdfViewer": "PDF Viewer",
+  
+  "id": "ID",
+  "scheduleManagement": "Schedule Management",
+  "academics": "Academics",
+  "studyPrograms": "Study Programs",
+  "programs": "Programs",
+  "academicCalendar": "Academic Calendar",
+  "students": "Students",
+  "announcements": "Announcements",
+  "timeTables": "Time Tables",
+  "studentActivities": "Student Activities",
+  "industrialTraining": "Industrial Training",
+  "graduationProjects": "Graduation Projects",
+  "studentPortal": "Student Portal",
+  "alumni": "Alumni",
+  "staffMembers": "Staff Members",
+  "academicStaff": "Academic Staff",
+  "assistingStaff": "Assisting Staff",
+  "careers": "Careers",
+  "aboutAIET": "About AIET",
+  "welcome": "Welcome",
+  "founder": "Founder",
+  "visionMission": "Vision & Mission",
+  "governance": "Governance",
+  "accreditations": "Accreditations",
+  "boardOfDirectors": "Board of Directors",
+  "qAndA": "Q&A",  "codeOfEthics": "Code of Ethics",
+  "factsAndFigures": "Facts & Figures",  "logout": "Logout",
+  
+  "loading": "Loading...",
+  "noIdAvailable": "No ID available",
+    "noClassesScheduled": "No classes scheduled for this day",
+  "noClass": "No class",
+  "noSessionsFound": "No sessions found for",
+  "inThe": "in the",
+  "odd": "Odd",
+  "even": "Even",
+  "week": "week",
+  "viewFullWeek": "View Full Week",
+  "dayOff": "DAY OFF",
+  
+  "attendance": "Attendance",
+  "deleteAttendance": "Delete Attendance",
+  "deleteAttendanceConfirmation": "Are you sure you want to delete this attendance record? This action cannot be undone.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "attendanceDeletedSuccess": "Attendance record deleted successfully",
+  "errorDeletingAttendance": "Error deleting attendance record",
+  "currentAttendance": "Current attendance",  "noRecentAttendance": "No recent attendance found",
+  "generateQRCode": "Generate QR Code",
+  "error": "Error",
+  "hi": "Hi",
+    "noClassesScheduledForRoom": "No classes scheduled",
+  "roomAvailableAllDay": "This room is available all day",
+  "schedule": "Schedule",
+    "available": "Available",
+  "occupied": "Occupied",
+  "errorLoadingSchedule": "Error loading schedule",
+  "room": "Room",
+  
+  "organization": "Organization",
+  "phoneNumber": "Phone Number",
+  "language": "Language",
+  "dateOfBirth": "Date of Birth",
+  "locationOfBirth": "Location of birth",
+  "year": "Year",
+  "department": "Department",  "theCause": "The Cause",
+  "rejected": "Rejected",
+  "pending": "Pending",
+  "done": "Done",
+  
+  "buildingStatus": "Building {building} Status",
+  "@buildingStatus": {
+    "placeholders": {
+      "building": {
+        "type": "String",
+        "example": "A"
+      }
+    }
+  },
+  "occupancyRate": "Occupancy Rate",
+  "totalRooms": "Total Rooms",
+  "occupiedRooms": "Occupied",
+  "availableRooms": "Available",  "currentPeriod": "Current Period",
+  "errorLoadingStatus": "Error loading status",
+  
+  "attendanceList": "Attendance List",  "addStudent": "Add Stu +",
+  "confirm": "Confirm",
+  "studentRemovedSuccessfully": "Student removed successfully",
+  "errorConfirmingAttendance": "Error confirming attendance",
+  
+  "errorLoadingDetails": "Error loading details",
+  "companyName": "Company Name",
+  "description": "Description",
+  "trainingRequirements": "Training Requirements",  "importantLinks": "Important Links",
+  "noLinksAvailable": "No links available",
+  "couldNotOpenLink": "Could not open link",
+    "searchHint": "Search professors, groups, subjects...",
+  "searchDate": "Search date",  "searchResults": "Search Results",
+  "noResultsFound": "No results found",
+  "foundRoom": "Found room",
+  "startTypingToSearch": "Start typing to search...",
+  
+  "floor": "Floor",
+  "building": "Building",
+  "foundRoomMessage": "Found room: {roomName}",
+  "@foundRoomMessage": {
+    "placeholders": {
+      "roomName": {
+        "type": "String",
+        "example": "B17"
+      }
+    }
+  },
+  "buildingA": "Building A",
+  "buildingB": "Building B",
+  "loading": "Loading...",
+  "period": "Period",
+  "currentlyActive": "Currently Active",
+  "close": "Close",  "selectBuilding": "Select Building",
+  
+  "tuitionFeesTitle": "Tuition Fees",
+  "payInInstallments": "Do you want to pay in installments?",
+  "yes": "Yes",
+  "no": "No",
+  "request": "Request",
+  "processing": "Processing...",
+  "requestSentSuccessfully": "Request sent successfully",
+  "personalInformation": "Personal Information",
+  "fullName": "Full Name",
+  "organizationName": "Organization Name",
+  "address": "Address",
+  "enterYourAddress": "Enter your address",
+  "enterYourPhoneNumber": "Enter your phone number",
+  "countryOfBirth": "Country of Birth",
+  "theCause": "The Cause",
+  "enterTheCause": "Enter the cause",
+  "documentLanguage": "Document Language",
+  "arabic": "Arabic",
+  "english": "English",
+  "stampType": "Stamp Type",
+  "institute": "Institute",
+  "ministry": "Ministry",
+  "submit": "Submit",
+  "requestSubmitted": "Request submitted successfully",
+  "fieldRequired": "Field is required",
+  "pleaseEnterTextInArabic": "Please enter text in Arabic",
+  "pleaseEnterTextInEnglish": "Please enter text in English",
+  "pleaseTypeInArabic": "Please type in Arabic",
+  "pleaseTypeInEnglish": "Please type in English",
+  "uploadPDF": "Upload Your PDF",
+  "selectedFile": "Selected file",
+  "done": "Done",
+  "uploading": "Uploading...",
+  "pdfUploadedSuccessfully": "PDF uploaded successfully!",
+  "view": "View",
+  "download": "Download",
+  "downloading": "Downloading",
+  "downloadComplete": "Download complete!",
+  "downloadFailed": "Download failed",
+  "downloadProgress": "{progress}% downloaded",
+  "@downloadProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },  "openDownloadedFile": "Open Downloaded File",
+  "close": "Close",
+  "noFileUploadedYet": "No file uploaded yet",
+  "archive": "Archive",
+  
+  "activities": "Activities",
+  "mySchedule": "My Schedule",
+  "viewAll": "View All",
+  "hi": "Hi",
+  
+  "studentTraining": "Student Training",
+  "trainingScore": "Training Score",
+  "totalScore": "Total Score: {score}",
+  "@totalScore": {
+    "placeholders": {
+      "score": {
+        "type": "String",
+        "example": "85"
+      }
+    }
+  },
+  "myRequests": "My Requests",
+  "submitTraining": "Submit Training",
+  "announcement": "Announcement",
+  "companyName": "Company Name",
+  "enterCompanyName": "Enter Company Name",
+  "importantLinks": "Important Links",
+  "enterCompanyDescription": "Enter company description....",
+  "uploadLogo": "Upload Logo",
+  "uploadImage": "Upload Image",
+  "shareAnnouncementToDepartment": "Share Announcement to Department",
+  "computer": "Computer",
+  "mechatronics": "Mechatronics",
+  "communicationElectronics": "Communication & Electronics",  "industrial": "Industrial",
+  "post": "Post",
+  "companyNameRequired": "Company name is required",
+  "logoRequired": "Logo is required",
+  "announcementSavedSuccessfully": "Announcement saved successfully!",
+  "selectedFile": "Selected file",
+  "uploading": "Uploading...",
+  "enterImportantLinks": "Enter important links...",
+  
+  "review": "Review",
+  "scoreInDays": "Score(in Days)",
+  "comment": "Comment",
+  "commentRequiredForRejected": "Comment must be filled to mark as Rejected",
+  "scoreCannotBeZero": "Score cannot be zero for Done status",
+  "downloading": "Downloading...",
+  "errorViewingPDF": "Error viewing PDF",
+  "fileDownloadedToDownloads": "File downloaded to Downloads/AIETApp folder",
+  "openFile": "Open File",
+  "requestApproved": "Request approved. Student will be notified.",
+  "requestRejected": "Request rejected. Student will be notified.",
+  "requestStatusUpdated": "Request status updated.",
+  "errorSelectingPDF": "Error selecting PDF",
+  "trainingDays": "This training has taken {days} Days of your record",
+  "@trainingDays": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "5"
+      }
+    }
+  },
+    "programs": "Programs",
+  "ce": "CE",
+  "eme": "EME",
+  "ece": "ECE",
+  "ie": "IE",
+  "gn": "GN",
+  "first": "1st",
+  "second": "2nd",
+  "third": "3rd",
+  "fourth": "4th",
+  
+  "info": "Info"
 }

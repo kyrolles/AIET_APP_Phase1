@@ -5,6 +5,7 @@ import 'package:graduation_project/screens/drawer/uplod_image_buttom_sheet.dart'
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:convert';
 
 class QrcodeScreen extends StatefulWidget {
@@ -30,10 +31,11 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
           ...doc.data()!,
           'uid': user.uid,
         };
-        
+
         // Check if we need to generate and store a new QR code
         String studentId = userData['id']?.toString() ?? '';
-        if (studentId.isNotEmpty && (userData['qrCode'] == null || userData['qrCode'] != studentId)) {
+        if (studentId.isNotEmpty &&
+            (userData['qrCode'] == null || userData['qrCode'] != studentId)) {
           if (!_isGeneratingQR) {
             _isGeneratingQR = true;
             // Generate and store the QR code
@@ -43,27 +45,24 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
             return _getUserData();
           }
         }
-        
+
         return userData;
       }
     }
     return null;
   }
-  
+
   Future<void> _generateAndStoreQRCode(String uid, String studentId) async {
     try {
       if (studentId.isEmpty) {
         throw 'Student ID is empty';
       }
-      
+
       // Store the student ID as the QR code data
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update({
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
         'qrCode': studentId,
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('QR Code updated successfully')),
@@ -80,6 +79,8 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Stack(
@@ -105,11 +106,11 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
-                const Expanded(
+                Expanded(
                   child: Center(
                     child: Text(
-                      'ID',
-                      style: TextStyle(
+                      localizations?.id ?? 'ID',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontFamily: 'Lexend',
                         fontWeight: FontWeight.w600,
@@ -130,13 +131,19 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                   return const CircularProgressIndicator();
                 }
 
+                final localizations = AppLocalizations.of(context);
                 final userData = snapshot.data;
-                final firstName = userData?['firstName'] ?? "Loading...";
-                final lastName = userData?['lastName'] ?? "Loading...";
+                final firstName = userData?['firstName'] ??
+                    (localizations?.loading ?? "Loading...");
+                final lastName = userData?['lastName'] ??
+                    (localizations?.loading ?? "Loading...");
                 final name = "$firstName $lastName";
-                final department = userData?['department'] ?? "Loading...";
-                final studentId = userData?['id'] ?? "Loading...";
-                final year = "${userData?['academicYear'] ?? 'Loading...'}";
+                final department = userData?['department'] ??
+                    (localizations?.loading ?? "Loading...");
+                final studentId =
+                    userData?['id'] ?? (localizations?.loading ?? "Loading...");
+                final year =
+                    "${userData?['academicYear'] ?? (localizations?.loading ?? 'Loading...')}";
                 final imageBase64 = userData?['profileImage'];
 
                 return Column(
@@ -249,9 +256,12 @@ class _QrcodeScreenState extends State<QrcodeScreen> {
                       ),
                       child: QrImageView(
                         // Make sure we always have valid data for the QR code
-                        data: (userData?['qrCode'] ?? studentId).toString().isNotEmpty 
+                        data: (userData?['qrCode'] ?? studentId)
+                                .toString()
+                                .isNotEmpty
                             ? (userData?['qrCode'] ?? studentId).toString()
-                            : "No ID available",
+                            : (localizations?.noIdAvailable ??
+                                "No ID available"),
                         version: QrVersions.auto,
                         size: 200.0,
                         backgroundColor: Colors.white,

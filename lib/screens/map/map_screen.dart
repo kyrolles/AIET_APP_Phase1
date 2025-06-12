@@ -4,6 +4,7 @@ import 'map_building_a.dart';
 import 'components/map_app_bar.dart';
 import 'components/map_date_timeline.dart';
 import '../../constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -72,12 +73,12 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     if (_selectedindex != targetIndex) {
       // Just update the tab index - that's it!
       _tabController.animateTo(targetIndex);
-    }
-
-    // Show room found message
+    } // Show room found message
+    final localizations = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Found room: $roomName'),
+        content: Text(localizations?.foundRoomMessage(roomName) ??
+            'Found room: $roomName'),
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
       ),
@@ -129,9 +130,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           highlightedRoom: _highlightedRoom, // Add this
         )
       ];
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MapAppBar(
         onTabChange: (index) => navigateBottomBar(index),
@@ -150,10 +152,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 });
               },
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(14.0),
               child: Text(
-                'Floor',
+                localizations?.floor ?? 'Floor',
                 style: kTextStyleNormal,
               ),
             ),

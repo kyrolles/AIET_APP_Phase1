@@ -3,6 +3,7 @@ import 'components/map_floor_container.dart';
 import '../../constants.dart';
 import 'services/map_schedule_service.dart';
 import 'services/room_mapping_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BuildingB extends StatefulWidget {
   final DateTime selectedDate;
@@ -118,11 +119,20 @@ class _BuildingBState extends State<BuildingB> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     if (isLoading) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: CircularProgressIndicator(),
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(localizations?.loading ?? 'Loading...'),
+            ],
+          ),
         ),
       );
     }

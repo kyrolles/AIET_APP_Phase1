@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/constants.dart';
@@ -192,7 +193,6 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
         await _firestore.collection('attendance').doc(currentDocId).update({
           'studentList': FieldValue.arrayRemove([studentToRemove])
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Student removed successfully'),
@@ -241,10 +241,12 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: MyAppBar(
-        title: 'Attendance',
+        title: localizations?.attendance ?? 'Attendance',
         onpressed: () => Navigator.pop(context),
       ),
       body: ReusableOffline(
@@ -285,7 +287,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Attendance List',
+                localizations?.attendanceList ?? 'Attendance List',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -355,7 +357,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                           },
                         );
                       },
-                      text: 'Add Stu +',
+                      text: localizations?.addStudent ?? 'Add Stu +',
                       fontSize: 20,
                       textColor: Colors.black87,
                       backgroundColor: Colors.black12,
@@ -366,7 +368,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
                   Expanded(
                     child: KButton(
                       onPressed: confirmAttendance,
-                      text: 'Confirm',
+                      text: localizations?.confirm ?? 'Confirm',
                       fontSize: 20,
                       textColor: Colors.white,
                       backgroundColor: kBlue,

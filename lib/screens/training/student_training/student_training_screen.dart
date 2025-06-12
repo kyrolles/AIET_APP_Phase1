@@ -10,6 +10,7 @@ import 'package:graduation_project/screens/training/student_training/requests_bu
 import 'package:graduation_project/screens/training/student_training/upload_buttom_sheet.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:graduation_project/models/request_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../offline_feature/reusable_offline_bottom_sheet.dart';
 
@@ -98,9 +99,10 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
   // the value of the progressbar
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Student Training',
+        title: localizations?.studentTraining ?? 'Student Training',
         onpressed: () => Navigator.pop(context),
       ),
       body: Column(
@@ -118,11 +120,13 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
             center: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Progress',
-                  style: TextStyle(fontSize: 33, color: Colors.blueGrey),
+                Text(
+                  localizations?.trainingScore ?? 'Progress',
+                  style: const TextStyle(fontSize: 33, color: Colors.blueGrey),
                 ),
-                Text('$totalTrainingScore of 60',
+                Text(
+                    localizations?.totalScore(totalTrainingScore.toString()) ??
+                        '$totalTrainingScore of 60',
                     style: const TextStyle(fontSize: 32)),
               ],
             ),
@@ -189,16 +193,16 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
                           alignment: Alignment.topLeft,
                           padding: const EdgeInsets.all(15.0),
                           child: Text(
-                            'Requests',
+                            localizations?.myRequests ?? 'Requests',
                             style: kTextStyleBold,
                           ),
                         ),
                         Expanded(
                           child: uplodedfiles.isEmpty
-                              ? const Center(
+                              ? Center(
                                   child: Text(
-                                    'No Requests',
-                                    style: TextStyle(color: kGrey),
+                                    localizations?.noRequests ?? 'No Requests',
+                                    style: const TextStyle(color: kGrey),
                                   ),
                                 )
                               : ListView.builder(
@@ -227,15 +231,15 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
                         alignment: Alignment.topLeft,
                         padding: const EdgeInsets.all(15.0),
                         child: Text(
-                          'Requests',
+                          localizations?.myRequests ?? 'Requests',
                           style: kTextStyleBold,
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Center(
                           child: Text(
-                            'No Requests',
-                            style: TextStyle(color: kGrey),
+                            localizations?.noRequests ?? 'No Requests',
+                            style: const TextStyle(color: kGrey),
                           ),
                         ),
                       ),
@@ -248,7 +252,7 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
           const Divider(
               color: kLightGrey, indent: 10, endIndent: 10, height: 10),
           ServiceItem(
-            title: 'Announcement',
+            title: localizations?.announcement ?? 'Announcement',
             imageUrl: 'assets/project_image/loudspeaker.png',
             backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {
@@ -266,7 +270,7 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
             },
           ),
           ServiceItem(
-            title: 'Submit Training',
+            title: localizations?.submitTraining ?? 'Submit Training',
             imageUrl: 'assets/project_image/submit-training.png',
             backgroundColor: const Color.fromRGBO(41, 128, 185, 1),
             onPressed: () {

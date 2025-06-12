@@ -7,6 +7,7 @@ import 'package:graduation_project/components/file_upload_with_progress.dart';
 import 'package:graduation_project/components/kbutton.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CreateAnnouncement extends StatefulWidget {
   const CreateAnnouncement({super.key});
@@ -27,15 +28,15 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
     'Communication & Electronics': false,
     'Industrial': false,
   };
-
   Future<void> _saveAnnouncement() async {
+    final localizations = AppLocalizations.of(context);
     try {
       if (_companyNameController.text.isEmpty) {
-        throw 'Company name is required';
+        throw localizations?.companyNameRequired ?? 'Company name is required';
       }
 
       if (_logoBase64 == null) {
-        throw 'Logo is required';
+        throw localizations?.logoRequired ?? 'Logo is required';
       }
 
       print('Logo base64: ${_logoBase64?.substring(0, 50)}...'); // Debug print
@@ -57,7 +58,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
 
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Announcement saved successfully!')),
+        SnackBar(
+            content: Text(localizations?.announcementSavedSuccessfully ??
+                'Announcement saved successfully!')),
       );
     } catch (e) {
       print('Error saving announcement: $e'); // Debug print
@@ -69,9 +72,10 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
         appBar: MyAppBar(
-          title: 'Create Announcement',
+          title: localizations?.createAnnouncement ?? 'Create Announcement',
           onpressed: () => Navigator.pop(context),
         ),
         body: ReusableOffline(
@@ -85,9 +89,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         width: double.infinity, // Full width
                         alignment:
                             Alignment.topLeft, // Align text to the top-left
-                        child: const Text(
-                          '1. Company Name',
-                          style: TextStyle(
+                        child: Text(
+                          '1. ${localizations?.companyName ?? 'Company Name'}',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -98,8 +102,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                       ),
                       TextField(
                         controller: _companyNameController,
-                        decoration: const InputDecoration(
-                          hintText: 'Enter Company Name',
+                        decoration: InputDecoration(
+                          hintText: localizations?.enterCompanyName ??
+                              'Enter Company Name',
                         ),
                       ),
                       const SizedBox(
@@ -109,9 +114,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         width: double.infinity, // Full width
                         alignment:
                             Alignment.topLeft, // Align text to the top-left
-                        child: const Text(
-                          '2. Description',
-                          style: TextStyle(
+                        child: Text(
+                          '2. ${localizations?.description ?? 'Description'}',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -126,7 +131,8 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                           controller: _descriptionController,
                           maxLines: 8, // Adjust for height
                           decoration: InputDecoration(
-                            hintText: "Enter company description....",
+                            hintText: localizations?.enterCompanyDescription ??
+                                "Enter company description....",
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.circular(8), // Rounded corners
@@ -145,9 +151,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         width: double.infinity, // Full width
                         alignment:
                             Alignment.topLeft, // Align text to the top-left
-                        child: const Text(
-                          '3. Important links:',
-                          style: TextStyle(
+                        child: Text(
+                          '3. ${localizations?.importantLinks ?? 'Important links'}:',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -162,7 +168,8 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                           controller: _linksController,
                           maxLines: 5, // Adjust for height
                           decoration: InputDecoration(
-                            hintText: "Enter company description....",
+                            hintText: localizations?.enterImportantLinks ??
+                                "Enter important links...",
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.circular(8), // Rounded corners
@@ -181,9 +188,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         width: double.infinity, // Full width
                         alignment:
                             Alignment.topLeft, // Align text to the top-left
-                        child: const Text(
-                          '4. Upload Logo:',
-                          style: TextStyle(
+                        child: Text(
+                          '4. ${localizations?.uploadLogo ?? 'Upload Logo'}:',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -196,7 +203,8 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         height: 350,
                         width: double.infinity,
                         allowedExtensions: const ['jpg', 'jpeg', 'png'],
-                        buttonText: "Upload Image",
+                        buttonText:
+                            localizations?.uploadImage ?? "Upload Image",
                         onFileSelected: (file) async {
                           try {
                             if (file.path != null) {
@@ -220,9 +228,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         width: double.infinity, // Full width
                         alignment:
                             Alignment.topLeft, // Align text to the top-left
-                        child: const Text(
-                          '5. Upload Image(Optionalfor the profile):',
-                          style: TextStyle(
+                        child: Text(
+                          '5. ${localizations?.uploadImage ?? 'Upload Image'}(Optional for the profile):',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -235,7 +243,8 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         height: 350,
                         width: double.infinity, // Full width
                         allowedExtensions: const ['jpg', 'jpeg', 'png'],
-                        buttonText: "Upload Image",
+                        buttonText:
+                            localizations?.uploadImage ?? "Upload Image",
                         onFileSelected: (file) async {
                           final bytes = await File(file.path!).readAsBytes();
                           setState(() {
@@ -250,9 +259,9 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         width: double.infinity, // Full width
                         alignment:
                             Alignment.topLeft, // Align text to the top-left
-                        child: const Text(
-                          '6. Share Announcement to Department:',
-                          style: TextStyle(
+                        child: Text(
+                          '6. ${localizations?.shareAnnouncementToDepartment ?? 'Share Announcement to Department'}:',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -262,28 +271,29 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                         height: 20,
                       ),
                       CustomCheckbox(
-                        label: "Computer",
+                        label: localizations?.computer ?? "Computer",
                         onChanged: (value) {
                           setState(
                               () => _selectedDepartments['Computer'] = value);
                         },
                       ),
                       CustomCheckbox(
-                        label: "Mechatronics",
+                        label: localizations?.mechatronics ?? "Mechatronics",
                         onChanged: (value) {
                           setState(() =>
                               _selectedDepartments['Mechatronics'] = value);
                         },
                       ),
                       CustomCheckbox(
-                        label: "Communication & Electronics",
+                        label: localizations?.communicationElectronics ??
+                            "Communication & Electronics",
                         onChanged: (value) {
                           setState(() => _selectedDepartments[
                               'Communication & Electronics'] = value);
                         },
                       ),
                       CustomCheckbox(
-                        label: "Industrial",
+                        label: localizations?.industrial ?? "Industrial",
                         onChanged: (value) {
                           setState(
                               () => _selectedDepartments['Industrial'] = value);
@@ -294,7 +304,7 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                       ),
                       KButton(
                         backgroundColor: const Color.fromRGBO(6, 147, 241, 1),
-                        text: 'post',
+                        text: localizations?.post ?? 'post',
                         padding: const EdgeInsets.all(0),
                         onPressed: _saveAnnouncement,
                       )

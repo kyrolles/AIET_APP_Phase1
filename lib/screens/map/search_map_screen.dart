@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:async';
 import 'services/map_search_service.dart';
 
@@ -71,6 +72,8 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -82,8 +85,9 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
         title: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
-          decoration: const InputDecoration(
-            hintText: 'Search professors, groups, subjects...',
+          decoration: InputDecoration(
+            hintText: localizations?.searchHint ??
+                'Search professors, groups, subjects...',
             border: InputBorder.none,
           ),
         ),
@@ -96,7 +100,7 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
             padding: EdgeInsets.all(16),
             color: Colors.blue.withOpacity(0.1),
             child: Text(
-              'Search date: ${_formatDate(widget.selectedDate)}',
+              '${localizations?.searchDate ?? "Search date"}: ${_formatDate(widget.selectedDate)}',
               style: TextStyle(color: Colors.blue[700]),
             ),
           ),
@@ -113,21 +117,24 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
   }
 
   Widget _buildResults() {
+    final localizations = AppLocalizations.of(context);
+
     if (_searchController.text.isEmpty) {
       return Center(
-        child: Text('Start typing to search...'),
+        child: Text(
+            localizations?.startTypingToSearch ?? 'Start typing to search...'),
       );
     }
 
     if (_isSearching) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
     if (_results.isEmpty) {
       return Center(
-        child: Text('No results found'),
+        child: Text(localizations?.noResultsFound ?? 'No results found'),
       );
     }
 

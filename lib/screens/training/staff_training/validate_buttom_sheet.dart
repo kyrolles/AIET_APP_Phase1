@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ValidateButtomSheet extends StatefulWidget {
   const ValidateButtomSheet({super.key, required this.request});
@@ -80,7 +81,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
       if (querySnapshot.docs.isNotEmpty) {
         final docRef = querySnapshot.docs.first.reference;
         final String documentId = docRef.id;
-        
+
         // If the status is Done or Rejected, use the notification service
         if (newData['status'] == 'Done' || newData['status'] == 'Rejected') {
           await TrainingNotificationService().updateTrainingRequestStatus(
@@ -132,8 +133,8 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
 
       if (hasStorageUrl) {
         await _downloadFromUrl();
-      } else if (widget.request.pdfBase64 != null && 
-                widget.request.pdfBase64!.isNotEmpty) {
+      } else if (widget.request.pdfBase64 != null &&
+          widget.request.pdfBase64!.isNotEmpty) {
         await _downloadFromBase64();
       } else {
         throw Exception('No valid PDF source found');
@@ -151,49 +152,49 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   Future<void> _downloadFromUrl() async {
     final url = widget.request.fileStorageUrl!;
     final fileName = widget.request.fileName ?? 'training_document.pdf';
-    
+
     try {
       // Get download directory
       final Directory? downloadDir = await _getDownloadDirectory();
       if (downloadDir == null) {
         throw Exception('Cannot access download directory');
       }
-      
+
       // Clean filename and add timestamp to avoid overwriting
       final safeFileName = fileName.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
       final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final filePath = '${downloadDir.path}/${timestamp}_$safeFileName';
-      
+
       final file = File(filePath);
-      
+
       // Show initial progress
       if (mounted) {
         setState(() {
           _downloadProgress = 0.05;
         });
       }
-      
+
       // Use a simpler approach with ByteStream to avoid stream closure issues
       final httpClient = http.Client();
       try {
         final response = await httpClient.get(Uri.parse(url));
-        
+
         if (response.statusCode != 200) {
-          throw Exception('Failed to download file: HTTP ${response.statusCode}');
+          throw Exception(
+              'Failed to download file: HTTP ${response.statusCode}');
         }
-        
+
         // Update progress to indicate download has started
         if (mounted) {
           setState(() {
             _downloadProgress = 0.2;
           });
         }
-        
+
         // Write the file all at once
         await file.writeAsBytes(response.bodyBytes);
-        
         log('File downloaded to: ${file.path}');
-        
+
         // Ensure we're still mounted before updating UI
         if (mounted) {
           setState(() {
@@ -201,9 +202,11 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
             _downloadProgress = 1.0;
             _downloadedFilePath = filePath;
           });
-          
-          _showSnackBar('File downloaded to Downloads/AIETApp folder');
-          
+
+          final localizations = AppLocalizations.of(context);
+          _showSnackBar(localizations?.fileDownloadedToDownloads ??
+              'File downloaded to Downloads/AIETApp folder');
+
           // Force a rebuild after a short delay to ensure UI updates
           Future.delayed(const Duration(milliseconds: 300), () {
             if (mounted) {
@@ -227,49 +230,50 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
 
   Future<void> _downloadFromBase64() async {
     try {
-      if (widget.request.pdfBase64 == null || widget.request.pdfBase64!.isEmpty) {
+      if (widget.request.pdfBase64 == null ||
+          widget.request.pdfBase64!.isEmpty) {
         throw Exception('Invalid base64 data');
       }
-      
+
       final fileName = widget.request.fileName ?? 'training_document.pdf';
-      
+
       // Get download directory
       final Directory? downloadDir = await _getDownloadDirectory();
       if (downloadDir == null) {
         throw Exception('Cannot access download directory');
       }
-      
+
       // Generate a unique filename to avoid overwriting
       final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final filePath = '${downloadDir.path}/${timestamp}_$fileName';
-      
+
       final file = File(filePath);
-      
+
       // Simulate progress for base64 conversion
       setState(() {
         _downloadProgress = 0.3;
       });
-      
+
       // Decode base64
       final bytes = base64Decode(widget.request.pdfBase64!);
-      
+
       setState(() {
         _downloadProgress = 0.6;
       });
-      
+
       // Write to file
       await file.writeAsBytes(bytes);
-      
+
       if (mounted) {
         setState(() {
           _isDownloading = false;
           _downloadProgress = 1.0;
           _downloadedFilePath = filePath;
         });
-        
+
         _showSnackBar('File downloaded successfully');
         log('File saved to: $filePath');
-        
+
         // Force a rebuild after a short delay to ensure UI updates
         Future.delayed(const Duration(milliseconds: 300), () {
           if (mounted) {
@@ -289,7 +293,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
 
   Future<bool> _requestStoragePermission() async {
     bool hasPermission = false;
-    
+
     // Request storage permissions with more comprehensive approach
     if (Platform.isAndroid) {
       // For Android 13+ (API level 33+)
@@ -310,7 +314,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
           Permission.photos,
           Permission.videos,
         ].request();
-        
+
         hasPermission = permissions.values.any((status) => status.isGranted);
         log('Multiple permissions requested, granted: $hasPermission');
       }
@@ -318,12 +322,12 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
       // For iOS
       hasPermission = await Permission.storage.request().isGranted;
     }
-    
+
     if (!hasPermission) {
       _showSnackBar(
           'Storage permission is required. Please grant permission in app settings.');
     }
-    
+
     return hasPermission;
   }
 
@@ -336,22 +340,22 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
           // Try to get common public Downloads directory - most accessible
           final downloadPath = '/storage/emulated/0/Download';
           final downloadDir = Directory('$downloadPath/AIETApp');
-          
+
           // Test if we can access and write to this directory
           if (!await downloadDir.exists()) {
             await downloadDir.create(recursive: true);
           }
-          
+
           // Verify we can write to it
           final testFile = File('${downloadDir.path}/test.txt');
           await testFile.writeAsString('test');
           await testFile.delete();
-          
+
           log('Using public Download directory: ${downloadDir.path}');
           return downloadDir;
         } catch (e) {
           log('Error accessing public Downloads directory: $e');
-          
+
           // Fallback to app-specific external storage
           directory = await getExternalStorageDirectory();
           if (directory != null) {
@@ -363,7 +367,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
             return downloadDir;
           }
         }
-        
+
         // Final fallback to application documents directory
         directory = await getApplicationDocumentsDirectory();
       } else {
@@ -375,7 +379,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
       // Final fallback
       directory = await getTemporaryDirectory();
     }
-    log('Using fallback directory: ${directory?.path}');
+    log('Using fallback directory: ${directory.path}');
     return directory;
   }
 
@@ -385,38 +389,37 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
         _showSnackBar('No downloaded file to open');
         return;
       }
-      
+
       final file = File(_downloadedFilePath!);
       if (await file.exists()) {
         log('Opening file: $_downloadedFilePath');
-        
+
         if (Platform.isAndroid) {
           // Show a more descriptive message about where to find the file
           _showSnackBar('File location: ${path.dirname(_downloadedFilePath!)}');
-          
+
           // Try multiple approaches to open the file
           try {
             // First attempt - standard open with default viewer
             final result = await OpenFile.open(_downloadedFilePath!);
-            
+
             if (result.type != ResultType.done) {
               log('First attempt failed: ${result.message}');
-              
+
               // Second attempt - open the Downloads folder
               await OpenFile.open('/storage/emulated/0/Download');
             }
           } catch (e) {
             log('Error in file opening sequence: $e');
-            
+
             // Fallback to showing the exact file path
-            _showSnackBar(
-                'File saved to Downloads/AIETApp folder.\n'
+            _showSnackBar('File saved to Downloads/AIETApp folder.\n'
                 'Please open your file manager app and navigate to that location.');
           }
         } else {
           // For iOS and other platforms
           final result = await OpenFile.open(_downloadedFilePath!);
-          
+
           if (result.type != ResultType.done) {
             _showSnackBar('Could not open file: ${result.message}');
           }
@@ -432,7 +435,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
 
   void _showSnackBar(String message) {
     if (!mounted) return;
-    
+
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(
@@ -463,21 +466,25 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
         },
       ).then((_) {
         Navigator.pop(context);
-        
+
         // Show a snackbar to confirm the status change
-        final String message = status == 'Done' 
-            ? 'Request approved. Student will be notified.' 
+        final localizations = AppLocalizations.of(context);
+        final String message = status == 'Done'
+            ? (localizations?.requestApproved ??
+                'Request approved. Student will be notified.')
             : status == 'Rejected'
-                ? 'Request rejected. Student will be notified.'
-                : 'Request status updated.';
-                
+                ? (localizations?.requestRejected ??
+                    'Request rejected. Student will be notified.')
+                : (localizations?.requestStatusUpdated ??
+                    'Request status updated.');
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
-            backgroundColor: status == 'Done' 
-                ? kgreen 
-                : status == 'Rejected' 
-                    ? Colors.red 
+            backgroundColor: status == 'Done'
+                ? kgreen
+                : status == 'Rejected'
+                    ? Colors.red
                     : Colors.blue,
           ),
         );
@@ -506,14 +513,18 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
       );
     } catch (e) {
       log('Error viewing PDF: $e');
+      final localizations = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error viewing PDF: $e')),
+        SnackBar(
+            content: Text(
+                '${localizations?.errorViewingPDF ?? 'Error viewing PDF'}: $e')),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -527,10 +538,10 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Center(
+                Center(
                   child: Text(
-                    'Review',
-                    style: TextStyle(
+                    localizations?.review ?? 'Review',
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Color(0XFF6C7072),
@@ -543,7 +554,8 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         KButton(
-                          onPressed: _canViewPdf ? () => _viewPdf(context) : null,
+                          onPressed:
+                              _canViewPdf ? () => _viewPdf(context) : null,
                           text: 'View',
                           backgroundColor: _canViewPdf
                               ? const Color.fromRGBO(6, 147, 241, 1)
@@ -551,10 +563,13 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                           width: 90,
                           height: 50,
                           fontSize: 16,
-                          margin: const EdgeInsets.only(top: 8, bottom: 8, right: 8),
+                          margin: const EdgeInsets.only(
+                              top: 8, bottom: 8, right: 8),
                         ),
                         KButton(
-                          onPressed: _canViewPdf && !_isDownloading ? _downloadPdf : null,
+                          onPressed: _canViewPdf && !_isDownloading
+                              ? _downloadPdf
+                              : null,
                           text: _isDownloading ? 'Downloading...' : 'Download',
                           backgroundColor: _canViewPdf && !_isDownloading
                               ? kgreen
@@ -570,9 +585,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                   title: widget.request.fileName,
                   image: 'assets/project_image/pdf.png',
                 ),
-                
+
                 // Download progress indicator
-                if (_isDownloading) 
+                if (_isDownloading)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Column(
@@ -582,7 +597,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Downloading... ${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                              '${localizations?.downloading ?? 'Downloading'}... ${(_downloadProgress * 100).toStringAsFixed(0)}%',
                               style: const TextStyle(fontSize: 12),
                             ),
                             if (_isDownloading)
@@ -604,7 +619,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                       ],
                     ),
                   ),
-                
+
                 // Open file button - shown only when download is complete
                 if (_downloadedFilePath != null && !_isDownloading)
                   Container(
@@ -612,9 +627,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                     child: ElevatedButton.icon(
                       onPressed: _openFileLocation,
                       icon: const Icon(Icons.folder_open, size: 20),
-                      label: const Text(
-                        'Open File',
-                        style: TextStyle(fontSize: 16),
+                      label: Text(
+                        localizations?.openFile ?? 'Open File',
+                        style: const TextStyle(fontSize: 16),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kBlue,
@@ -639,7 +654,8 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                         return 'Please enter a valid number';
                       }
                       if (number == 0) {
-                        return 'Score cannot be zero for Done status';
+                        return localizations?.scoreCannotBeZero ??
+                            'Score cannot be zero for Done status';
                       }
                     }
                     return null;
@@ -649,9 +665,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                       score = int.tryParse(value);
                     });
                   },
-                  decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Score(in Days)',
+                  decoration: InputDecoration(
+                    border: const UnderlineInputBorder(),
+                    labelText: localizations?.scoreInDays ?? 'Score(in Days)',
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -659,7 +675,8 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                   validator: (value) {
                     if (currentStatus == 'Rejected') {
                       if (value == null || value.isEmpty) {
-                        return 'Comment must be filled to mark as Rejected';
+                        return localizations?.commentRequiredForRejected ??
+                            'Comment must be filled to mark as Rejected';
                       }
                     }
                     return null;
@@ -669,9 +686,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                       comment = value;
                     });
                   },
-                  decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Comment',
+                  decoration: InputDecoration(
+                    border: const UnderlineInputBorder(),
+                    labelText: localizations?.comment ?? 'Comment',
                   ),
                 ),
                 const SizedBox(height: 29),

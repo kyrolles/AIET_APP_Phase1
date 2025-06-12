@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/screens/offline_feature/offline_refresh_icon.dart';
 import 'package:intl/intl.dart';
 import '../../constants.dart';
@@ -121,7 +122,7 @@ class HomeScheduleView extends ConsumerWidget {
             _buildScheduleHeader(weekType, scheduleState, context, ref),
             const SizedBox(height: 16),
             Text(
-              'No sessions found for ${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section} in the ${weekType == WeekType.ODD ? "Odd" : "Even"} week.',
+              '${AppLocalizations.of(context)?.noSessionsFound ?? "No sessions found for"} ${scheduleState.classIdentifier!.year}${scheduleState.classIdentifier!.department.name}${scheduleState.classIdentifier!.section} ${AppLocalizations.of(context)?.inThe ?? "in the"} ${weekType == WeekType.ODD ? (AppLocalizations.of(context)?.odd ?? "Odd") : (AppLocalizations.of(context)?.even ?? "Even")} ${AppLocalizations.of(context)?.week ?? "week"}.',
               style: const TextStyle(color: kGrey),
               textAlign: TextAlign.center,
             ),
@@ -134,7 +135,8 @@ class HomeScheduleView extends ConsumerWidget {
                 backgroundColor: kPrimaryColor,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('View Full Week'),
+              child: Text(AppLocalizations.of(context)?.viewFullWeek ??
+                  'View Full Week'),
             ),
           ],
         ),
@@ -419,12 +421,13 @@ class HomeScheduleView extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: kPrimaryColor.withOpacity(0.3)),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'View Full Week',
-                    style: TextStyle(
+                    AppLocalizations.of(context)?.viewFullWeek ??
+                        'View Full Week',
+                    style: const TextStyle(
                       color: kPrimaryColor,
                       fontWeight: FontWeight.w600,
                     ),
