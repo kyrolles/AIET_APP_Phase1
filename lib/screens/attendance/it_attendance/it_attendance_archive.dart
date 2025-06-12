@@ -120,7 +120,7 @@ class ArchivedAttendanceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    attendance.period,
+                    'P${attendance.period}',
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
@@ -157,7 +157,7 @@ class ArchivedAttendanceCard extends StatelessWidget {
                 const Icon(Icons.people, size: 16, color: kGrey),
                 const SizedBox(width: 4),
                 Text(
-                  'Students: ${attendance.studentsList?.length ?? 0}',
+                  'Students: ${attendance.studentList?.length ?? 0}',
                   style: const TextStyle(color: kGrey),
                 ),
               ],
@@ -189,14 +189,14 @@ class ArchivedAttendanceCard extends StatelessWidget {
             ExpansionTile(
               title: const Text('View Student List'),
               children: [
-                if (attendance.studentsList != null &&
-                    attendance.studentsList!.isNotEmpty)
+                if (attendance.studentList != null &&
+                    attendance.studentList!.isNotEmpty)
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: attendance.studentsList!.length,
+                    itemCount: attendance.studentList!.length,
                     itemBuilder: (context, index) {
-                      final student = attendance.studentsList![index];
+                      final student = attendance.studentList![index];
                       return ListTile(
                         dense: true,
                         title: Text(student['name'] ?? 'Unknown'),
