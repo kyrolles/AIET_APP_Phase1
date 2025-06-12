@@ -212,31 +212,7 @@ class _AttendanceArchiveState extends State<AttendanceArchive> {
   }
 
   Future<void> confirmAttendance() async {
-    try {
-      if (currentDocId != null) {
-        await _firestore.collection('attendance').doc(currentDocId).update({
-          'status': 'confirmed',
-          'confirmationTimestamp': DateTime.now().toIso8601String(),
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Attendance confirmed successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      print('Error confirming attendance: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error confirming attendance'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    Navigator.pop(context);
   }
 
   @override

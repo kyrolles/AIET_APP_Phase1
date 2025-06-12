@@ -123,7 +123,7 @@ class _ITAttendanceScreenState extends State<ITAttendanceScreen> {
                         subject: attendance.subjectName,
                         period: attendance.period,
                         professor: attendance.profName ?? 'Unknown',
-                        total: attendance.studentsList?.length ?? 0,
+                        total: attendance.studentList?.length ?? 0,
                         timestamp: attendance.timestamp ?? '',
                         className: attendance.className ?? '',
                         onEdit: () {
@@ -302,7 +302,7 @@ class AttendanceCard extends StatelessWidget {
                     attendance.profName ?? "Unknown"),
                 const SizedBox(height: 12),
                 _buildInfoRow(Icons.people, 'Students',
-                    '${attendance.studentsList?.length ?? 0}'),
+                    '${attendance.studentList?.length ?? 0}'),
                 const SizedBox(height: 12),
                 _buildInfoRow(Icons.access_time, 'Submitted',
                     _formatTimestamp(attendance.timestamp ?? "")),

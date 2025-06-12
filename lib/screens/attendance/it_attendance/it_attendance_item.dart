@@ -63,7 +63,7 @@ class ITAttendanceItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  period,
+                  'P$period',
                   style: const TextStyle(
                     color: kDarkBlue,
                     fontWeight: FontWeight.bold,
