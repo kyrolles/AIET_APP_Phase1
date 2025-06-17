@@ -70,7 +70,7 @@ class GradesReportSheetScreen extends StatelessWidget {
             TextAndDataWidget(
                 text: 'Language : ', data: request.documentLanguage),
             TextAndDataWidget(
-                text: 'Date Oof birth : ', data: request.birthDate),
+                text: 'Date of birth : ', data: request.birthDate),
             TextAndDataWidget(
                 text: 'Location of birth : ', data: request.loctionOfBirth),
             TextAndDataWidget(text: 'Year : ', data: request.year),
