@@ -85,7 +85,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Attendance status updated to pending')),
+          SnackBar(content: Text('Attendance status updated to pending')),
         );
       }
     } catch (e) {

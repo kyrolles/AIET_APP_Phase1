@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline_bottom_sheet.dart';
 import 'package:file_picker/file_picker.dart';
@@ -112,7 +113,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           credits = int.tryParse(subject["credits"]) ?? 4;
         }
       }
-      
+
       return {
         "code": subject["code"],
         "name": subject["name"],
@@ -132,19 +133,32 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
 
   double _gradeToPoints(String grade) {
     switch (grade.toUpperCase()) {
-      case 'A+': return 4.0;
-      case 'A': return 4.0;
-      case 'A-': return 3.7;
-      case 'B+': return 3.3;
-      case 'B': return 3.0;
-      case 'B-': return 2.7;
-      case 'C+': return 2.3;
-      case 'C': return 2.0;
-      case 'C-': return 1.7;
-      case 'D+': return 1.3;
-      case 'D': return 1.0;
-      case 'D-': return 0.7;
-      default: return 0.0;
+      case 'A+':
+        return 4.0;
+      case 'A':
+        return 4.0;
+      case 'A-':
+        return 3.7;
+      case 'B+':
+        return 3.3;
+      case 'B':
+        return 3.0;
+      case 'B-':
+        return 2.7;
+      case 'C+':
+        return 2.3;
+      case 'C':
+        return 2.0;
+      case 'C-':
+        return 1.7;
+      case 'D+':
+        return 1.3;
+      case 'D':
+        return 1.0;
+      case 'D-':
+        return 0.7;
+      default:
+        return 0.0;
     }
   }
 
@@ -225,7 +239,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         userId,
         selectedSemester.toString(),
       );
-      
+
       // Extract subject codes from the data
       final List<String> currentSubjectCodes = currentSubjectsData
           .map((subject) => subject['code'] as String)
@@ -317,8 +331,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                   onPressed: () async {
                     // Use TemplateDownloader from services
                     final templateDownloader = TemplateDownloader();
-                    final success = await templateDownloader.generateAndSaveTemplate();
-                    
+                    final success =
+                        await templateDownloader.generateAndSaveTemplate();
+
                     if (!success && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -381,7 +396,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       });
 
       // Process the Excel file and assign results to students
-      final successCount = await _resultsService.processAndAssignResultsFromExcel(
+      final successCount =
+          await _resultsService.processAndAssignResultsFromExcel(
         file,
         selectedSemester,
       );
@@ -393,18 +409,19 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       });
 
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Successfully processed grades for $successCount students'),
+          content:
+              Text('Successfully processed grades for $successCount students'),
           backgroundColor: kgreen,
           duration: const Duration(seconds: 2),
         ),
       );
-      
+
       // Add a small delay to ensure Firebase updates are complete
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Trigger a rebuild of the entire screen to refresh data
       if (mounted) {
         setState(() {
@@ -534,7 +551,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Bulk mode activated. Select students to perform operations.'),
+                  content: Text(
+                      'Bulk mode activated. Select students to perform operations.'),
                   backgroundColor: kBlue,
                 ),
               );
@@ -555,7 +573,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
       key: _scaffoldKey,
       backgroundColor: Colors.white,
       appBar: MyAppBar(
-        title: 'Results Management',
+        title: AppLocalizations.of(context)?.resultsManagement ??
+            'Results Management',
         onpressed: () => Navigator.pop(context),
         actions: [
           IconButton(
@@ -571,7 +590,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
               icon: const Icon(Icons.close, color: Colors.white),
               label: Text(
                 _processingMessage,
-                style: const TextStyle(color: Colors.white, fontFamily: 'Lexend'),
+                style:
+                    const TextStyle(color: Colors.white, fontFamily: 'Lexend'),
               ),
             )
           : _isBulkMode
@@ -1203,7 +1223,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     );
   }
 
-  Future<void> _viewStudentResults(String studentId, Map<String, dynamic> studentData) async {
+  Future<void> _viewStudentResults(
+      String studentId, Map<String, dynamic> studentData) async {
     // Force refresh from Firestore to get latest data
     // Skip cache to ensure we get the latest data
     final results = await _resultsService.getSemesterResults(
@@ -1544,17 +1565,17 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
   Future<void> _bulkAssignSubjects() async {
     int successCount = 0;
     int failCount = 0;
-    
+
     // Get the students' department and subjects
     final List<Map<String, dynamic>> studentsData = [];
-    
+
     for (String studentId in selectedStudentIds) {
       try {
         final userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(studentId)
             .get();
-            
+
         if (userDoc.exists) {
           final userData = userDoc.data()!;
           studentsData.add({
@@ -1567,24 +1588,24 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         failCount++;
       }
     }
-    
+
     // Show dialog to select subjects by department
     final List<String> uniqueDepartments = studentsData
-      .map((data) => data['department'] as String)
-      .toSet()
-      .toList();
-      
+        .map((data) => data['department'] as String)
+        .toSet()
+        .toList();
+
     // If there are multiple departments, we need to handle each separately
     for (String department in uniqueDepartments) {
       final studentsInDepartment = studentsData
-        .where((data) => data['department'] == department)
-        .toList();
-        
+          .where((data) => data['department'] == department)
+          .toList();
+
       if (studentsInDepartment.isEmpty) continue;
-      
+
       // Show dialog to select subjects for this department
       if (!mounted) break;
-      
+
       // Get existing subject codes for the first student to use as initial selection
       List<String> initialSelectedSubjectCodes = [];
       try {
@@ -1592,7 +1613,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           studentsInDepartment.first['id'],
           selectedSemester.toString(),
         );
-        
+
         initialSelectedSubjectCodes = currentSubjectsData
             .map((subject) => subject['code'] as String)
             .toList();
@@ -1600,7 +1621,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         debugPrint('Error getting initial subjects: $e');
         // Continue with empty initial selection
       }
-      
+
       final bool? shouldContinue = await showDialog<bool>(
         context: context,
         builder: (context) => SubjectSelectionDialog(
@@ -1610,9 +1631,9 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           initiallySelectedSubjects: initialSelectedSubjectCodes,
         ),
       );
-      
+
       if (shouldContinue != true) continue;
-      
+
       // Apply subjects to all students in this department
       for (var studentData in studentsInDepartment) {
         try {
@@ -1621,19 +1642,19 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
             studentsInDepartment.first['id'],
             selectedSemester.toString(),
           );
-          
+
           // Get the department subjects in the proper format for other students
           final subjects = await _getDepartmentSubjects(department);
-          
+
           // Filter to only include the selected subjects
           final List<String> selectedCodes = updatedSubjectsData
               .map((subject) => subject['code'] as String)
               .toList();
-              
+
           final List<Map<String, dynamic>> selectedSubjects = subjects
               .where((subject) => selectedCodes.contains(subject['code']))
               .toList();
-          
+
           // Update the student's semester with these subjects
           DocumentReference resultDoc = FirebaseFirestore.instance
               .collection('results')
@@ -1647,7 +1668,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
             "lastUpdated": FieldValue.serverTimestamp(),
             "subjects": selectedSubjects,
           }, SetOptions(merge: true));
-          
+
           successCount++;
         } catch (e) {
           debugPrint('Error assigning subjects to student: $e');
@@ -1655,39 +1676,40 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         }
       }
     }
-    
+
     setState(() {
-      _processingMessage = 'Completed: $successCount successful, $failCount failed';
+      _processingMessage =
+          'Completed: $successCount successful, $failCount failed';
     });
   }
-  
+
   // Bulk reset scores for all selected students
   Future<void> _bulkResetScores() async {
     int successCount = 0;
     int failCount = 0;
-    
+
     for (String studentId in selectedStudentIds) {
       try {
         // Get current student results
         final results = await _resultsService.getSemesterResults(
-          studentId, 
-          selectedSemester.toString()
-        );
-        
-        if (results == null || (results['subjects'] as List?)?.isEmpty == true) {
+            studentId, selectedSemester.toString());
+
+        if (results == null ||
+            (results['subjects'] as List?)?.isEmpty == true) {
           continue; // Skip if no results exist
         }
-        
+
         // Reset scores for each subject
-        List<Map<String, dynamic>> subjects = 
-          List<Map<String, dynamic>>.from(results['subjects'] as List);
-        
+        List<Map<String, dynamic>> subjects =
+            List<Map<String, dynamic>>.from(results['subjects'] as List);
+
         for (int i = 0; i < subjects.length; i++) {
           final subject = subjects[i];
-          
+
           // Reset the scores while maintaining the structure
-          Map<String, dynamic> scores = Map<String, dynamic>.from(subject['scores'] as Map);
-          
+          Map<String, dynamic> scores =
+              Map<String, dynamic>.from(subject['scores'] as Map);
+
           // Reset scores to 0.0
           if (scores.containsKey('week5')) scores['week5'] = 0.0;
           if (scores.containsKey('week10')) scores['week10'] = 0.0;
@@ -1696,33 +1718,34 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
           if (scores.containsKey('labExam')) scores['labExam'] = 0.0;
           if (scores.containsKey('lab')) scores['lab'] = 0.0;
           if (scores.containsKey('finalExam')) scores['finalExam'] = 0.0;
-          
+
           // Reset grade and points
           subjects[i]['grade'] = 'F';
           subjects[i]['points'] = 0.0;
           subjects[i]['scores'] = scores;
         }
-        
+
         // Update the document with reset scores
         await FirebaseFirestore.instance
-          .collection('results')
-          .doc(studentId)
-          .collection('semesters')
-          .doc(selectedSemester.toString())
-          .update({
-            'subjects': subjects,
-            'lastUpdated': FieldValue.serverTimestamp(),
-          });
-          
+            .collection('results')
+            .doc(studentId)
+            .collection('semesters')
+            .doc(selectedSemester.toString())
+            .update({
+          'subjects': subjects,
+          'lastUpdated': FieldValue.serverTimestamp(),
+        });
+
         successCount++;
       } catch (e) {
         debugPrint('Error resetting scores: $e');
         failCount++;
       }
     }
-    
+
     setState(() {
-      _processingMessage = 'Completed: $successCount successful, $failCount failed';
+      _processingMessage =
+          'Completed: $successCount successful, $failCount failed';
     });
   }
 
@@ -1743,7 +1766,8 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
         return;
       }
 
-      final subjects = List<Map<String, dynamic>>.from(results['subjects'] ?? []);
+      final subjects =
+          List<Map<String, dynamic>>.from(results['subjects'] ?? []);
 
       if (!context.mounted) return;
       await showDialog(
@@ -1762,7 +1786,7 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
                     title: Text(subject['name'] ?? 'Unknown Subject'),
                     subtitle: Text(
                         'Code: ${subject['code']} | Grade: ${subject['grade']}'),
-                    trailing: _canModifyResults 
+                    trailing: _canModifyResults
                         ? IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
@@ -1797,4 +1821,3 @@ class _AssignResultsScreenState extends State<AssignResultsScreen> {
     }
   }
 }
-

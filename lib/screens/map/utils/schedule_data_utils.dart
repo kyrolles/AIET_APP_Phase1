@@ -1,7 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 /// Utility functions for processing schedule data
 class ScheduleDataUtils {
   /// Extract instructor name from schedule entry, handling both singular and plural field names
-  static String extractInstructor(Map<String, dynamic> scheduleEntry) {
+  static String extractInstructor(Map<String, dynamic> scheduleEntry,
+      [BuildContext? context]) {
     // Check for 'teachers' (plural) field first
     dynamic teachersField = scheduleEntry['teachers'];
     // If not found, check for 'teacher' (singular) field
@@ -17,7 +21,10 @@ class ScheduleDataUtils {
       }
     }
 
-    return 'Unknown Instructor';
+    return context != null
+        ? AppLocalizations.of(context)?.unknownInstructor ??
+            'Unknown Instructor'
+        : 'Unknown Instructor';
   }
 
   /// Extract groups from schedule entry, handling both singular and plural field names
@@ -41,8 +48,16 @@ class ScheduleDataUtils {
   }
 
   /// Extract subject name from schedule entry
-  static String extractSubjectName(Map<String, dynamic> scheduleEntry) {
-    return scheduleEntry['subject_name'] ?? 'Unknown Subject';
+  static String extractSubjectName(Map<String, dynamic> scheduleEntry,
+      [BuildContext? context]) {
+    final subjectName = scheduleEntry['subject_name'];
+    if (subjectName != null && subjectName.toString().isNotEmpty) {
+      return subjectName.toString();
+    }
+
+    return context != null
+        ? AppLocalizations.of(context)?.unknownSubject ?? 'Unknown Subject'
+        : 'Unknown Subject';
   }
 
   /// Check if a period has a scheduled class

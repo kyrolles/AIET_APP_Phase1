@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewAppointmentScreen extends StatefulWidget {
   const NewAppointmentScreen({super.key});
@@ -189,6 +190,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: MyAppBar(
         title: 'New Appointment',
@@ -349,7 +351,9 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text('Full name'),
+                      Text(
+                        localizations?.fullName ?? 'Full name',
+                      ),
                       const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -362,7 +366,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                         child: Text(fullName),
                       ),
                       const SizedBox(height: 15),
-                      const Text('Age'),
+                      Text(localizations?.age ?? 'Age'),
                       const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -381,7 +385,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      const Text('Gender'),
+                      Text(localizations?.gender ?? 'Gender'),
                       const SizedBox(height: 5),
                       Row(
                         children: [
@@ -408,7 +412,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
-                                  'Male',
+                                  localizations?.male ?? 'Male',
                                   style: TextStyle(
                                     color: selectedGender == 'Male'
                                         ? Colors.white
@@ -442,7 +446,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
-                                  'Female',
+                                  localizations?.female ?? 'Female',
                                   style: TextStyle(
                                     color: selectedGender == 'Female'
                                         ? Colors.white
@@ -455,13 +459,15 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                         ],
                       ),
                       const SizedBox(height: 15),
-                      const Text('Write your problem'),
+                      Text(localizations?.writeYourProblem ??
+                          'Write your problem'),
                       const SizedBox(height: 5),
                       TextField(
                         controller: _problemController,
                         maxLines: 5,
                         decoration: InputDecoration(
-                          hintText: 'Write your problem',
+                          hintText: localizations?.writeYourProblem ??
+                              'Write your problem',
                           filled: true,
                           fillColor: Colors.blue.shade50,
                           border: OutlineInputBorder(
@@ -478,17 +484,20 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
                           onPressed: () async {
                             if (selectedTime == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Please select a time slot')),
+                                SnackBar(
+                                    content: Text(
+                                        localizations?.pleaseSelectTimeSlot ??
+                                            'Please select a time slot')),
                               );
                               return;
                             }
 
                             if (_problemController.text.trim().isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Please describe your problem')),
+                                SnackBar(
+                                    content: Text(
+                                        localizations?.pleaseDescribeProblem ??
+                                            'Please describe your problem')),
                               );
                               return;
                             }
@@ -506,15 +515,17 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
 
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Appointment set successfully')),
+                                SnackBar(
+                                    content: Text(localizations
+                                            ?.appointmentSetSuccessfully ??
+                                        'Appointment set successfully')),
                               );
                               Navigator.pop(context);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
+                                SnackBar(
+                                    content: Text(localizations
+                                            ?.timeSlotAlreadyBooked ??
                                         'This time slot is already booked. Please select another time.')),
                               );
                               _fetchBookedAppointments();

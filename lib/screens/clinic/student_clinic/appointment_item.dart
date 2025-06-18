@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppointmentItem extends StatelessWidget {
   final String date;
@@ -26,7 +27,7 @@ class AppointmentItem extends StatelessWidget {
           .collection('clinic_appointments')
           .doc(appointmentId)
           .update({'status': 'cancelled'});
-      
+
       onCancelled();
     } catch (e) {
       print('Error cancelling appointment: $e');
@@ -35,6 +36,7 @@ class AppointmentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     Color statusColor;
     switch (status) {
       case 'pending':
@@ -119,19 +121,21 @@ class AppointmentItem extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Cancel Appointment'),
-                    content: const Text('Are you sure you want to cancel this appointment?'),
+                    title: Text(localizations?.cancelAppointment ??
+                        'Cancel Appointment'),
+                    content: Text(localizations?.areYouSureCancelAppointment ??
+                        'Are you sure you want to cancel this appointment?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('No'),
+                        child: Text(localizations?.no ?? 'No'),
                       ),
                       TextButton(
                         onPressed: () {
                           _cancelAppointment();
                           Navigator.pop(context);
                         },
-                        child: const Text('Yes'),
+                        child: Text(localizations?.yes ?? 'Yes'),
                       ),
                     ],
                   ),
@@ -143,7 +147,8 @@ class AppointmentItem extends StatelessWidget {
                 minimumSize: const Size(0, 0),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text('Cancel Appointment'),
+              child: Text(
+                  localizations?.cancelAppointment ?? 'Cancel Appointment'),
             ),
         ],
       ),

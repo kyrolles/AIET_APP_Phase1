@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../services/map_search_service.dart';
 import 'search_result_card.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MapSearchAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback onClose;
@@ -85,8 +86,11 @@ class _MapSearchAppBarState extends State<MapSearchAppBar> {
           _isSearching = false;
         });
         if (mounted) {
+          final localizations = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Search error: $e')),
+            SnackBar(
+                content: Text(
+                    '${localizations?.searchError ?? 'Search error'}: $e')),
           );
         }
       }
@@ -94,13 +98,15 @@ class _MapSearchAppBarState extends State<MapSearchAppBar> {
   }
 
   void _navigateToRoom(SearchResult result) {
+    final localizations = AppLocalizations.of(context);
     // Close search and show result
     widget.onClose();
 
     // Show room details
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Found: ${result.roomName} - Period ${result.period}'),
+        content: Text(
+            '${localizations?.found ?? 'Found'}: ${result.roomName} - ${localizations?.period ?? 'Period'} ${result.period}'),
         backgroundColor: Colors.blue,
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
@@ -115,20 +121,24 @@ class _MapSearchAppBarState extends State<MapSearchAppBar> {
   }
 
   void _showRoomDetails(BuildContext context, SearchResult result) {
+    final localizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Room ${result.roomName}'),
+        title: Text('${localizations?.roomLabel ?? 'Room'} ${result.roomName}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Period: ${result.period}'),
-            Text('Subject: ${result.subjectName}'),
+            Text('${localizations?.periodLabel ?? 'Period'}: ${result.period}'),
+            Text(
+                '${localizations?.subjectLabel ?? 'Subject'}: ${result.subjectName}'),
             if (result.teachers.isNotEmpty)
-              Text('Teachers: ${result.teachers.join(', ')}'),
+              Text(
+                  '${localizations?.teachersLabel ?? 'Teachers'}: ${result.teachers.join(', ')}'),
             if (result.groups.isNotEmpty)
-              Text('Groups: ${result.groups.join(', ')}'),
+              Text(
+                  '${localizations?.groupsLabel ?? 'Groups'}: ${result.groups.join(', ')}'),
             if (result.isCurrentPeriod)
               Container(
                 margin: const EdgeInsets.only(top: 8),
@@ -137,15 +147,16 @@ class _MapSearchAppBarState extends State<MapSearchAppBar> {
                   color: Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text('Currently Active',
-                    style: TextStyle(color: Colors.green)),
+                child: Text(
+                    localizations?.currentlyActive ?? 'Currently Active',
+                    style: const TextStyle(color: Colors.green)),
               ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(localizations?.close ?? 'Close'),
           ),
         ],
       ),
@@ -154,6 +165,7 @@ class _MapSearchAppBarState extends State<MapSearchAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return AppBar(
       surfaceTintColor: Colors.white,
       backgroundColor: Colors.white,

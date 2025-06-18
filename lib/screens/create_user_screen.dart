@@ -172,10 +172,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       'Student Affair',
       'Doctor' // Added Doctor to roles with no extra fields
     ].contains(selectedRole);
-
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Create User',
+        title: AppLocalizations.of(context)?.createUser ?? 'Create User',
         onpressed: () => Navigator.pop(context),
       ),
       body: ReusableOffline(

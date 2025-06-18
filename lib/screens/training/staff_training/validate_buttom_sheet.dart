@@ -556,7 +556,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                         KButton(
                           onPressed:
                               _canViewPdf ? () => _viewPdf(context) : null,
-                          text: 'View',
+                          text: localizations?.view ?? 'View',
                           backgroundColor: _canViewPdf
                               ? const Color.fromRGBO(6, 147, 241, 1)
                               : Colors.grey,
@@ -570,7 +570,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                           onPressed: _canViewPdf && !_isDownloading
                               ? _downloadPdf
                               : null,
-                          text: _isDownloading ? 'Downloading...' : 'Download',
+                          text: _isDownloading
+                              ? '${localizations?.downloading ?? 'Downloading'}...'
+                              : localizations?.downloadPDF ?? 'Download',
                           backgroundColor: _canViewPdf && !_isDownloading
                               ? kgreen
                               : Colors.grey,
@@ -647,11 +649,13 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                   validator: (value) {
                     if (currentStatus == 'Done') {
                       if (value == null || value.isEmpty) {
-                        return 'Score must be filled to mark as Done';
+                        return localizations?.scoreMustBeFilled ??
+                            'Score must be filled to mark as Done';
                       }
                       final number = int.tryParse(value);
                       if (number == null) {
-                        return 'Please enter a valid number';
+                        return localizations?.pleaseEnterValidNumber ??
+                            'Please enter a valid number';
                       }
                       if (number == 0) {
                         return localizations?.scoreCannotBeZero ??

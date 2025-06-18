@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/screens/announcement/announcement_list.dart';
 
@@ -13,12 +14,11 @@ class AllAnnouncementAppearOnOneScreen extends StatelessWidget {
     this.userDepartment = '',
     required this.userRole, // Make it required
   });
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Announcements',
+        title: AppLocalizations.of(context)?.announcements ?? 'Announcements',
         onpressed: () => Navigator.pop(context),
       ),
       body: AnnouncementList(

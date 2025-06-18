@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -7,10 +8,12 @@ class CompletedAppointmentsScreen extends StatefulWidget {
   const CompletedAppointmentsScreen({super.key});
 
   @override
-  State<CompletedAppointmentsScreen> createState() => _CompletedAppointmentsScreenState();
+  State<CompletedAppointmentsScreen> createState() =>
+      _CompletedAppointmentsScreenState();
 }
 
-class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScreen> {
+class _CompletedAppointmentsScreenState
+    extends State<CompletedAppointmentsScreen> {
   bool isLoading = true;
   List<Map<String, dynamic>> appointments = [];
 
@@ -24,20 +27,20 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
     setState(() {
       isLoading = true;
     });
-  
+
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('clinic_appointments')
           .where('status', isEqualTo: 'completed')
           .get();
-  
+
       List<Map<String, dynamic>> tempAppointments = [];
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
         tempAppointments.add(data);
       }
-  
+
       setState(() {
         appointments = tempAppointments;
         isLoading = false;
@@ -52,9 +55,11 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Approved Appointments',
+        title: localizations?.completedAppointments ?? 'Approved Appointments',
         onpressed: () {
           Navigator.pop(context);
         },
@@ -62,20 +67,23 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : appointments.isEmpty
-              ? const Center(
-                  child: Text('No approved appointments'),
+              ? Center(
+                  child: Text(localizations?.noAppointmentsFound ??
+                      'No approved appointments'),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: appointments.length,
                   itemBuilder: (context, index) {
                     final appointment = appointments[index];
-                    
-                    DateTime appointmentDate = DateTime.parse(appointment['date']);
+
+                    DateTime appointmentDate =
+                        DateTime.parse(appointment['date']);
                     String dayNumber = DateFormat('d').format(appointmentDate);
                     String dayName = DateFormat('EEEE').format(appointmentDate);
-                    String monthName = DateFormat('MMMM').format(appointmentDate);
-                    
+                    String monthName =
+                        DateFormat('MMMM').format(appointmentDate);
+
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
@@ -110,19 +118,20 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                               ],
                             ),
                           ),
-                          
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
                                 showModalBottomSheet(
                                   context: context,
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20)),
                                   ),
                                   builder: (context) => Container(
                                     padding: const EdgeInsets.all(24),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
@@ -142,15 +151,18 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          appointment['problem'] ?? 'No details provided',
+                                          appointment['problem'] ??
+                                              'No details provided',
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                         const SizedBox(height: 24),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             TextButton(
-                                              onPressed: () => Navigator.pop(context),
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
                                               child: const Text('Close'),
                                             ),
                                           ],
@@ -178,7 +190,6 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    
                                     Row(
                                       children: [
                                         Text(
@@ -190,7 +201,8 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                                         ),
                                         const SizedBox(width: 16),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               dayName,
@@ -211,7 +223,6 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                                       ],
                                     ),
                                     const SizedBox(height: 16),
-                                    
                                     Row(
                                       children: [
                                         const Icon(
@@ -232,7 +243,6 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    
                                     Row(
                                       children: [
                                         const Icon(
@@ -253,10 +263,10 @@ class _CompletedAppointmentsScreenState extends State<CompletedAppointmentsScree
                                         ),
                                       ],
                                     ),
-                                    
                                     const SizedBox(height: 16),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
                                         color: Colors.green.shade100,
                                         borderRadius: BorderRadius.circular(8),

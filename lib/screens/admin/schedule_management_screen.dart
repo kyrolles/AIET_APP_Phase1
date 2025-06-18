@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controllers/admin_schedule_controller.dart';
 import '../../models/schedule_model.dart';
@@ -6,15 +7,15 @@ import '../../widgets/loading_indicator.dart';
 
 class ScheduleManagementScreen extends ConsumerWidget {
   const ScheduleManagementScreen({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = AppLocalizations.of(context);
     final state = ref.watch(adminScheduleControllerProvider);
     final controller = ref.read(adminScheduleControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Schedule Management'),
+        title: Text(localizations?.scheduleManagement ?? 'Schedule Management'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

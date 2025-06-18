@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:graduation_project/components/service_item.dart';
 import 'package:graduation_project/constants.dart';
@@ -9,18 +10,21 @@ class StudentAttendanceScreen extends StatelessWidget {
   StudentAttendanceScreen({super.key});
 
   final List<Widget> periods = [];
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-          title: 'Attendance', onpressed: () => Navigator.pop(context)),
+          title: localizations?.attendance ?? 'Attendance',
+          onpressed: () => Navigator.pop(context)),
       body: Column(
         children: [
           ListContainer(
             title: 'Current attendance',
             listOfWidgets: periods,
-            emptyMessage: 'No recent attendance found',
+            emptyMessage:
+                localizations?.noRequests ?? 'No recent attendance found',
           ),
           const Divider(
             color: kLightGrey,

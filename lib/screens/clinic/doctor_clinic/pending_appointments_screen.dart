@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +9,8 @@ class PendingAppointmentsScreen extends StatefulWidget {
   const PendingAppointmentsScreen({super.key});
 
   @override
-  State<PendingAppointmentsScreen> createState() => _PendingAppointmentsScreenState();
+  State<PendingAppointmentsScreen> createState() =>
+      _PendingAppointmentsScreenState();
 }
 
 class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
@@ -21,7 +23,6 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
     fetchPendingAppointments();
   }
 
-  
   Future<void> fetchPendingAppointments() async {
     setState(() {
       isLoading = true;
@@ -34,7 +35,8 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
           .where('status', isEqualTo: 'pending')
           .get();
 
-      print('Found ${querySnapshot.docs.length} pending appointments'); // Debug print
+      print(
+          'Found ${querySnapshot.docs.length} pending appointments'); // Debug print
 
       List<Map<String, dynamic>> tempAppointments = [];
       for (var doc in querySnapshot.docs) {
@@ -55,13 +57,14 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
     }
   }
 
-  Future<void> updateAppointmentStatus(String appointmentId, String status) async {
+  Future<void> updateAppointmentStatus(
+      String appointmentId, String status) async {
     try {
       await FirebaseFirestore.instance
           .collection('clinic_appointments')
           .doc(appointmentId)
           .update({'status': status});
-      
+
       // Refresh the list
       fetchPendingAppointments();
     } catch (e) {
@@ -71,9 +74,11 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Pending Appointments',
+        title: localizations?.pendingAppointments ?? 'Pending Appointments',
         onpressed: () {
           Navigator.pop(context);
         },
@@ -81,21 +86,24 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : appointments.isEmpty
-              ? const Center(
-                  child: Text('No pending appointments'),
+              ? Center(
+                  child: Text(localizations?.noPendingAppointments ??
+                      'No pending appointments'),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: appointments.length,
                   itemBuilder: (context, index) {
                     final appointment = appointments[index];
-                    
+
                     // Parse date for formatting
-                    DateTime appointmentDate = DateTime.parse(appointment['date']);
+                    DateTime appointmentDate =
+                        DateTime.parse(appointment['date']);
                     String dayNumber = DateFormat('d').format(appointmentDate);
                     String dayName = DateFormat('EEEE').format(appointmentDate);
-                    String monthName = DateFormat('MMMM').format(appointmentDate);
-                    
+                    String monthName =
+                        DateFormat('MMMM').format(appointmentDate);
+
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
@@ -105,7 +113,6 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          
                           Container(
                             width: 100,
                             padding: const EdgeInsets.all(16),
@@ -128,25 +135,23 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                
                               ],
                             ),
                           ),
-                          
-                          
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                
                                 showModalBottomSheet(
                                   context: context,
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20)),
                                   ),
                                   builder: (context) => Container(
                                     padding: const EdgeInsets.all(24),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
@@ -166,15 +171,18 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          appointment['problem'] ?? 'No details provided',
+                                          appointment['problem'] ??
+                                              'No details provided',
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                         const SizedBox(height: 24),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             TextButton(
-                                              onPressed: () => Navigator.pop(context),
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
                                               child: const Text('Close'),
                                             ),
                                           ],
@@ -203,7 +211,7 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    
+
                                     // Day number and name
                                     Row(
                                       children: [
@@ -216,7 +224,8 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                         ),
                                         const SizedBox(width: 16),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               dayName,
@@ -237,7 +246,7 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: 16),
-                                    
+
                                     // Patient information
                                     Row(
                                       children: [
@@ -259,7 +268,7 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    
+
                                     Row(
                                       children: [
                                         const Icon(
@@ -280,25 +289,31 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                         ),
                                       ],
                                     ),
-                                    
+
                                     // Action buttons
                                     const SizedBox(height: 16),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
                                         // Approve button
                                         Expanded(
                                           child: ElevatedButton(
                                             onPressed: () {
-                                              updateAppointmentStatus(appointment['id'], 'completed');
+                                              updateAppointmentStatus(
+                                                  appointment['id'],
+                                                  'completed');
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: kPrimaryColor,
                                               foregroundColor: Colors.white,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
-                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12),
                                             ),
                                             child: const Text('Approve'),
                                           ),
@@ -308,15 +323,21 @@ class _PendingAppointmentsScreenState extends State<PendingAppointmentsScreen> {
                                         Expanded(
                                           child: OutlinedButton(
                                             onPressed: () {
-                                              updateAppointmentStatus(appointment['id'], 'cancelled');
+                                              updateAppointmentStatus(
+                                                  appointment['id'],
+                                                  'cancelled');
                                             },
                                             style: OutlinedButton.styleFrom(
                                               foregroundColor: Colors.red,
-                                              side: const BorderSide(color: Colors.red),
+                                              side: const BorderSide(
+                                                  color: Colors.red),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
-                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12),
                                             ),
                                             child: const Text('Reject'),
                                           ),
