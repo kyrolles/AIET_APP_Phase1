@@ -162,6 +162,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     // Determine if the selected role is IT, Professor, Assistant, Secretary, Training Unit, or Student Affair
     bool isRoleWithNoExtraFields = [
       'IT',
@@ -174,7 +176,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     ].contains(selectedRole);
     return Scaffold(
       appBar: MyAppBar(
-        title: AppLocalizations.of(context)?.createUser ?? 'Create User',
+        title: localizations?.createUser ?? 'Create User',
         onpressed: () => Navigator.pop(context),
       ),
       body: ReusableOffline(
@@ -203,42 +205,44 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           const EdgeInsets.symmetric(horizontal: 12),
                     ),
                     value: selectedRole,
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: 'IT',
-                        child: Text('IT'),
+                        child: Text(localizations?.it ?? 'IT'),
                       ),
                       DropdownMenuItem(
                         value: 'Professor',
-                        child: Text('Professor'),
+                        child: Text(localizations?.professor ?? 'Professor'),
                       ),
                       DropdownMenuItem(
                         value: 'Assistant',
-                        child: Text('Assistant'),
+                        child: Text(localizations?.assistant ?? 'Assistant'),
                       ),
                       DropdownMenuItem(
                         value: 'Student',
-                        child: Text('Student'),
+                        child: Text(localizations?.student ?? 'Student'),
                       ),
                       DropdownMenuItem(
                         value: 'Secretary',
-                        child: Text('Secretary'),
+                        child: Text(localizations?.secretary ?? 'Secretary'),
                       ),
                       DropdownMenuItem(
                         value: 'Training Unit',
-                        child: Text('Training Unit'),
+                        child: Text(
+                            localizations?.trainingUnit ?? 'Training Unit'),
                       ),
                       DropdownMenuItem(
                         value: 'Student Affair',
-                        child: Text('Student Affair'),
+                        child: Text(
+                            localizations?.studentAffair ?? 'Student Affair'),
                       ),
                       DropdownMenuItem(
                         value: 'Doctor',
-                        child: Text('Doctor'),
+                        child: Text(localizations?.doctor ?? 'Doctor'),
                       ),
                       DropdownMenuItem(
                         value: 'Admin',
-                        child: Text('Admin'),
+                        child: Text(localizations?.admin ?? 'Admin'),
                       ),
                     ],
                     onChanged: (value) {
@@ -250,25 +254,27 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   const SizedBox(height: 16),
                   _buildTextField(
                       controller: _firstNameController,
-                      label: 'First name',
-                      hintText: 'enter First name'),
+                      label: localizations?.firstName ?? 'First name',
+                      hintText:
+                          localizations?.enterFirstName ?? 'Enter first name'),
                   const SizedBox(height: 16),
                   _buildTextField(
                       controller: _lastNameController,
-                      label: 'Last name',
-                      hintText: 'enter Last name'),
+                      label: localizations?.lastName ?? 'Last name',
+                      hintText:
+                          localizations?.enterLastName ?? 'Enter last name'),
                   const SizedBox(height: 16),
                   _buildTextField(
                       controller: _emailController,
-                      label: 'Email',
-                      hintText: 'enter Email'),
+                      label: localizations?.email ?? 'Email',
+                      hintText: localizations?.enterEmail ?? 'Enter email'),
                   const SizedBox(height: 16),
                   _buildPasswordField(controller: _passwordController),
                   const SizedBox(height: 16),
                   _buildTextField(
                       controller: _phoneController,
-                      label: 'Phone',
-                      hintText: 'enter Phone'),
+                      label: localizations?.phoneNumber ?? 'Phone',
+                      hintText: localizations?.enterPhone ?? 'Enter phone'),
                   const SizedBox(height: 16),
                   // Conditionally show Department dropdown
                   Visibility(
@@ -276,9 +282,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Program',
-                          style: TextStyle(
+                        Text(
+                          localizations?.program ?? 'Program',
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         const SizedBox(height: 8),
@@ -306,7 +312,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Program is required';
+                              return localizations?.programRequired ??
+                                  'Program is required';
                             }
                             return null;
                           },

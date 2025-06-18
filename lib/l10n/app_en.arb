@@ -695,7 +695,7 @@
   "hi": "Hi",
   
   "studentTraining": "Student Training",
-  "trainingScore": "Training Score",
+  "trainingScore": "Progress",
   "totalScore": "Total Score: {score}",
   "@totalScore": {
     "placeholders": {
@@ -794,10 +794,20 @@
   "userMustBeAtLeast18": "User must be at least 18 years old",
   "organizingStudentsIntoSections": "Organizing students into sections...",
   "allStudentsOrganizedIntoSections": "All students have been organized into sections!",
-  "errorOrganizingSections": "Error organizing sections",
-  "type": "Type",
+  "errorOrganizingSections": "Error organizing sections",  "type": "Type",
   "department": "Department",
   "year": "Year",
+  "pleaseUploadPDFFile": "Please upload a PDF file",
+  "fileNameRequired": "File name is required",
+  "userDataNotAvailable": "User data not available",
+  "studentIdNotFound": "Student ID not found",
+  "studentNameNotFound": "Student name not found",
+  "academicYearNotFound": "Academic year not found",
+  "noPDFFileAvailableToDownload": "No PDF file available to download",
+  "noValidPDFSourceFound": "No valid PDF source found",
+  "cannotAccessDownloadDirectory": "Cannot access download directory",
+  "fileDownloadedSuccessfully": "File downloaded successfully",
+  "noDownloadedFileToOpen": "No downloaded file to open",
   "error": "Error",
   "failedToUpdate": "Failed to update",
   "fullName": "Full name",
@@ -851,13 +861,11 @@
   "pleaseSelectAPeriod": "Please select a period",
   
   "currentAttendance": "Current attendance",
-  "noRecentAttendanceFound": "No recent attendance found",
-  "scanQRCode": "Scan QR Code",
+  "noRecentAttendanceFound": "No recent attendance found",  "scanQRCode": "Scan QR Code",
   "attendanceStatusUpdatedToPending": "Attendance status updated to pending",
   "errorUpdatingAttendanceStatus": "Error updating attendance status",
   
   "errorUpdatingRequest": "Error updating request",
-  "noPDFFileAvailable": "No PDF file available to download",
   "noValidPDFSourceFound": "No valid PDF source found",
   "cannotAccessDownloadDirectory": "Cannot access download directory",
   "fileDownloadedSuccessfully": "File downloaded successfully",
@@ -945,8 +953,16 @@
   "scheduleNotFound": "Schedule not found",
   "loadingSchedule": "Loading schedule...",
   "errorLoadingSchedule": "Error loading schedule",
-  
-  "male": "Male",
+    "male": "Male",
   "female": "Female",
-  "timeSlotAlreadyBooked": "This time slot is already booked. Please select another time."
+  "timeSlotAlreadyBooked": "This time slot is already booked. Please select another time.",
+  "firstName": "First name",
+  "lastName": "Last name",
+  "enterFirstName": "Enter first name",
+  "enterLastName": "Enter last name",
+  "enterEmail": "Enter email",
+  "enterPhone": "Enter phone",
+  "program": "Program",
+  "programRequired": "Program is required",
+  "password": "Password"
 }

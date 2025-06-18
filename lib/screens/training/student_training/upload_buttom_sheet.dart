@@ -88,6 +88,8 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
   }
 
   Future<void> _saveAnnouncement() async {
+    final localizations = AppLocalizations.of(context);
+
     if (_isLoading) return;
     setState(() {
       _isLoading = true;
@@ -95,13 +97,13 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
     try {
       // Validate inputs
       if (pdfFile == null) {
-        throw 'Please upload a PDF file';
+        throw localizations?.pleaseUploadPDFFile ?? 'Please upload a PDF file';
       }
       if (fileName == null || fileName!.isEmpty) {
-        throw 'File name is required';
+        throw localizations?.fileNameRequired ?? 'File name is required';
       }
       if (userData == null) {
-        throw 'User data not available';
+        throw localizations?.userDataNotAvailable ?? 'User data not available';
       }
       // Get user data
       final String studentId = userData!['id'] ?? '';
@@ -109,16 +111,16 @@ class _UploadButtomSheetState extends State<UploadButtomSheet> {
       final String lastName = userData!['lastName'] ?? '';
       final String studentName = '$firstName $lastName'.trim();
       final String academicYear = userData!['academicYear'] ?? '';
-      final String department = userData!['department'] ?? '';
-      // Validate required fields
+      final String department =
+          userData!['department'] ?? ''; // Validate required fields
       if (studentId.isEmpty) {
-        throw 'Student ID not found';
+        throw localizations?.studentIdNotFound ?? 'Student ID not found';
       }
       if (studentName.isEmpty) {
-        throw 'Student name not found';
+        throw localizations?.studentNameNotFound ?? 'Student name not found';
       }
       if (academicYear.isEmpty) {
-        throw 'Academic year not found';
+        throw localizations?.academicYearNotFound ?? 'Academic year not found';
       }
 
       // Upload file to Firebase Storage and get download URL

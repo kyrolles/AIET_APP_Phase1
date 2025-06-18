@@ -702,7 +702,7 @@
   "hi": "مرحبا",
   
   "studentTraining": "تدريب الطلاب",
-  "trainingScore": "نتيجة التدريب",
+  "trainingScore": "التقدم",
   "totalScore": "النتيجة الإجمالية: {score}",
   "@totalScore": {
     "placeholders": {
@@ -801,10 +801,20 @@
   "userMustBeAtLeast18": "يجب أن يكون عمر المستخدم 18 عاماً على الأقل",
   "organizingStudentsIntoSections": "جاري تنظيم الطلاب في أقسام...",
   "allStudentsOrganizedIntoSections": "تم تنظيم جميع الطلاب في أقسام!",
-  "errorOrganizingSections": "خطأ في تنظيم الأقسام",
-  "type": "النوع",
+  "errorOrganizingSections": "خطأ في تنظيم الأقسام",  "type": "النوع",
   "department": "القسم",
   "year": "السنة",
+  "pleaseUploadPDFFile": "يرجى تحميل ملف PDF",
+  "fileNameRequired": "اسم الملف مطلوب",
+  "userDataNotAvailable": "بيانات المستخدم غير متوفرة",
+  "studentIdNotFound": "الرقم الجامعي للطالب غير موجود",
+  "studentNameNotFound": "اسم الطالب غير موجود",
+  "academicYearNotFound": "السنة الأكاديمية غير موجودة",
+  "noPDFFileAvailableToDownload": "لا يوجد ملف PDF متاح للتحميل",
+  "noValidPDFSourceFound": "لم يتم العثور على مصدر PDF صالح",
+  "cannotAccessDownloadDirectory": "لا يمكن الوصول إلى مجلد التحميل",
+  "fileDownloadedSuccessfully": "تم تحميل الملف بنجاح",
+  "noDownloadedFileToOpen": "لا يوجد ملف محمل للفتح",
   "error": "خطأ",
   "failedToUpdate": "فشل في التحديث",
   "fullName": "الاسم الكامل",
@@ -951,8 +961,16 @@
   "scheduleNotFound": "لم يتم العثور على الجدول الزمني",
   "loadingSchedule": "جاري تحميل الجدول الزمني...",
   "errorLoadingSchedule": "خطأ في تحميل الجدول الزمني",
-  
-  "male": "ذكر",
+    "male": "ذكر",
   "female": "أنثى",
-  "timeSlotAlreadyBooked": "هذا الوقت محجوز بالفعل. يرجى اختيار وقت آخر."
+  "timeSlotAlreadyBooked": "هذا الوقت محجوز بالفعل. يرجى اختيار وقت آخر.",
+  "firstName": "الاسم الأول",
+  "lastName": "الاسم الأخير",
+  "enterFirstName": "أدخل الاسم الأول",
+  "enterLastName": "أدخل الاسم الأخير",
+  "enterEmail": "أدخل البريد الإلكتروني",
+  "enterPhone": "أدخل رقم الهاتف",
+  "program": "البرنامج",
+  "programRequired": "البرنامج مطلوب",
+  "password": "كلمة المرور"
 }
