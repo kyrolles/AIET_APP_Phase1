@@ -10,8 +10,9 @@ class AttendanceModel {
   final String? timestamp;
   final String? status;
   final String? approvalTimestamp; 
-  final List<Map<String, dynamic>>? studentsList;
+  final List<Map<String, dynamic>>? studentList;
   final Map<String, dynamic>? data;
+  final String? className; 
 
   AttendanceModel({
     required this.id,
@@ -21,18 +22,16 @@ class AttendanceModel {
     this.timestamp,
     this.status,
     this.approvalTimestamp, 
-    this.studentsList,
+    this.studentList,
     this.data,
+    this.className,  
   });
 
   factory AttendanceModel.fromJson(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     
-    
     List<Map<String, dynamic>>? students;
-    if (data.containsKey('studentsList')) {
-      students = List<Map<String, dynamic>>.from(data['studentsList']);
-    } else if (data.containsKey('studentList')) {
+    if (data.containsKey('studentList')) {  // Changed to match your Firebase field name
       students = List<Map<String, dynamic>>.from(data['studentList']);
     }
     
@@ -44,8 +43,9 @@ class AttendanceModel {
       timestamp: data['timestamp'],
       status: data['status'],
       approvalTimestamp: data['approvalTimestamp'],
-      studentsList: students,
+      studentList: students,
       data: data,
+      className: data['className'] ?? '', 
     );
   }
 }

@@ -28,7 +28,6 @@ class _ITAttendanceArchiveState extends State<ITAttendanceArchive> {
       ),
       body: ReusableOffline(
         child: StreamBuilder<QuerySnapshot>(
-          // Remove the orderBy clause to avoid requiring an index
           stream: _firestore
               .collection('attendance')
               .where('status', isEqualTo: 'approved')
@@ -51,12 +50,10 @@ class _ITAttendanceArchiveState extends State<ITAttendanceArchive> {
               );
             }
 
-            // Convert documents to AttendanceModel objects
             List<AttendanceModel> attendanceList = snapshot.data!.docs
                 .map((doc) => AttendanceModel.fromJson(doc))
                 .toList();
 
-            // Sort the list by approvalTimestamp (newest first)
             attendanceList.sort((a, b) {
               if (a.approvalTimestamp == null) return 1;
               if (b.approvalTimestamp == null) return -1;
@@ -90,6 +87,7 @@ class ArchivedAttendanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
+      color: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -102,13 +100,19 @@ class ArchivedAttendanceCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  attendance.subjectName,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    attendance.subjectName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    softWrap: true,
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -117,7 +121,7 @@ class ArchivedAttendanceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    attendance.period,
+                    'P${attendance.period}',
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
@@ -140,10 +144,21 @@ class ArchivedAttendanceCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
+                const Icon(Icons.class_, size: 16, color: kGrey),
+                const SizedBox(width: 4),
+                Text(
+                  'Class: ${attendance.className ?? ""}',
+                  style: const TextStyle(color: kGrey),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
                 const Icon(Icons.people, size: 16, color: kGrey),
                 const SizedBox(width: 4),
                 Text(
-                  'Students: ${attendance.studentsList?.length ?? 0}',
+                  'Students: ${attendance.studentList?.length ?? 0}',
                   style: const TextStyle(color: kGrey),
                 ),
               ],
@@ -175,14 +190,14 @@ class ArchivedAttendanceCard extends StatelessWidget {
             ExpansionTile(
               title: const Text('View Student List'),
               children: [
-                if (attendance.studentsList != null &&
-                    attendance.studentsList!.isNotEmpty)
+                if (attendance.studentList != null &&
+                    attendance.studentList!.isNotEmpty)
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: attendance.studentsList!.length,
+                    itemCount: attendance.studentList!.length,
                     itemBuilder: (context, index) {
-                      final student = attendance.studentsList![index];
+                      final student = attendance.studentList![index];
                       return ListTile(
                         dense: true,
                         title: Text(student['name'] ?? 'Unknown'),

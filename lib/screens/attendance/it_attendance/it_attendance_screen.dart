@@ -5,6 +5,7 @@ import 'package:graduation_project/screens/attendance/attendance_model.dart';
 import 'package:graduation_project/screens/attendance/professor_attendance/attendance_archive.dart';
 import 'package:graduation_project/screens/attendance/it_attendance/it_attendance_archive.dart';
 import 'package:graduation_project/screens/offline_feature/reusable_offline.dart';
+import 'package:graduation_project/screens/attendance/it_attendance/it_attendance_item.dart';
 
 class ITAttendanceScreen extends StatefulWidget {
   const ITAttendanceScreen({Key? key}) : super(key: key);
@@ -118,8 +119,13 @@ class _ITAttendanceScreenState extends State<ITAttendanceScreen> {
                     itemCount: attendanceList.length,
                     itemBuilder: (context, index) {
                       final attendance = attendanceList[index];
-                      return AttendanceCard(
-                        attendance: attendance,
+                      return ITAttendanceItem(
+                        subject: attendance.subjectName,
+                        period: attendance.period,
+                        professor: attendance.profName ?? 'Unknown',
+                        total: attendance.studentList?.length ?? 0,
+                        timestamp: attendance.timestamp ?? '',
+                        className: attendance.className ?? '',
                         onEdit: () {
                           Navigator.push(
                             context,
@@ -132,8 +138,7 @@ class _ITAttendanceScreenState extends State<ITAttendanceScreen> {
                             ),
                           );
                         },
-                        onApprove: () =>
-                            _showApproveConfirmation(context, attendance),
+                        onApprove: () => _showApproveConfirmation(context, attendance),
                       );
                     },
                   );
@@ -297,7 +302,7 @@ class AttendanceCard extends StatelessWidget {
                     attendance.profName ?? "Unknown"),
                 const SizedBox(height: 12),
                 _buildInfoRow(Icons.people, 'Students',
-                    '${attendance.studentsList?.length ?? 0}'),
+                    '${attendance.studentList?.length ?? 0}'),
                 const SizedBox(height: 12),
                 _buildInfoRow(Icons.access_time, 'Submitted',
                     _formatTimestamp(attendance.timestamp ?? "")),

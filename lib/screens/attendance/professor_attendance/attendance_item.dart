@@ -11,7 +11,8 @@ class CurrentAttendanceItem extends StatelessWidget {
     required this.total,
     required this.ontapOnReview,
     required this.ontapOnSend,
-    this.onDelete,  
+    this.onDelete,
+    required this.className, 
   });
 
   final String subject;
@@ -21,7 +22,8 @@ class CurrentAttendanceItem extends StatelessWidget {
   final int total;
   final Function() ontapOnReview;
   final Function() ontapOnSend;
-  final Function()? onDelete;  
+  final Function()? onDelete;
+  final String className;  
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class CurrentAttendanceItem extends StatelessWidget {
                 color: const Color(0xFFEB8991),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Center(child: Text(period, style: kTextStyleBold)),
+              child: Center(child: Text('P$period', style: kTextStyleBold)), 
             ),
             Text(startTime, style: kTextStyleNormal),
             Text(
@@ -63,9 +65,29 @@ class CurrentAttendanceItem extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(subject, style: kTextStyleBold),
-                      
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              subject,
+                              style: kTextStyleBold,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                            ),
+                            Text(
+                              className,
+                              style: const TextStyle(
+                                fontFamily: 'Lexend',
+                                fontSize: 14,
+                                color: kGrey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       InkWell(
                         onTap: onDelete,
                         child: const Icon(Icons.close, color: kGrey),
