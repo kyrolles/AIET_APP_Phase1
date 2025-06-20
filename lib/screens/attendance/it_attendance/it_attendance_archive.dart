@@ -205,7 +205,7 @@ class ArchivedAttendanceCard extends StatelessWidget {
                         trailing: Icon(
                           student['status'] == 'present'
                               ? Icons.check_circle
-                              : Icons.cancel,
+                              :null,
                           color: student['status'] == 'present'
                               ? Colors.green
                               : Colors.red,
