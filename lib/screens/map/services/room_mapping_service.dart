@@ -1,60 +1,97 @@
 /// Service for mapping display room names to schedule file identifiers
 class RoomMappingService {
   /// Maps display room names (as shown on the map) to schedule file names
+  /// Organized by building and floor for better maintainability
   static const Map<String, String> _roomMapping = {
-    // Building A - Floor 0
+    // =====================================================
+    // BUILDING A - GROUND FLOOR (Floor 0)
+    // =====================================================
+    // Meeting Rooms
     'M1': 'M1',
     'M2': 'M2',
     'M3': 'M3',
+
+    // Classrooms Ground Floor
     'CR1': 'CR1',
     'CR2': 'CR2',
     'CR3': 'CR3',
     'CR4': 'CR4',
-    'DH': 'DH', // Assuming there's a DH.json file
+
+    // Labs Ground Floor (B prefix rooms)
+    'B11': 'A-0-11', // Available schedule file
     'B17': 'A-0-17',
     'B19': 'A-0-19',
     'B20': 'A-0-20',
-    'B23': 'A-0-23', // Assuming this exists
-    'B24': 'A-0-24', // Assuming this exists
-    'B31': 'A-0-31',
     'B21': 'A-0-21',
+    'B31': 'A-0-31',
 
-    // Building A - Floor M (Mezzanine)
+    // =====================================================
+    // BUILDING A - MEZZANINE FLOOR (Floor M)
+    // =====================================================
+    // Lecture Room
     'LR1': 'LR1',
+
+    // Classrooms Mezzanine Floor
     'CR5': 'CR5',
     'CR6': 'CR6',
     'CR7': 'CR7',
     'CR8': 'CR8',
-    'B12': 'A-M-12', // Assuming M floor labs use A-M prefix
-    'B14': 'A-M-14', // Assuming this exists
+
+    // Labs Mezzanine Floor
+    'B12': 'A-M-12',
     'B13': 'A-M-13',
 
-    // Building A - Floor 3
+    // =====================================================
+    // BUILDING A - THIRD FLOOR (Floor 3)
+    // =====================================================
+    // Meeting Rooms
     'M4': 'M4',
     'M5': 'M5',
     'M6': 'M6',
+
+    // Classrooms Third Floor
     'CR9': 'CR9',
     'CR10': 'CR10',
     'CR11': 'CR11',
     'CR12': 'CR12',
     'CR13': 'CR13',
-    'B4': 'A-3-04', // Assuming this exists
-    // Note: B12, B13, B14, B16, B17, B18 on floor 3 may need different mapping
+
+    // Labs Third Floor
+    'B12_F3': 'A-3-12', // Different B12 on floor 3
+    'B13_F3': 'A-3-13', // Different B13 on floor 3
+    'B14': 'A-3-14',
     'B16': 'A-3-16',
+    'B17_F3': 'A-3-17', // Different B17 on floor 3
     'B18': 'A-3-18',
 
-    // Building B rooms
-    'shbana': 'B-0-shbana', // Assuming this exists
+    // =====================================================
+    // BUILDING B - ALL FLOORS
+    // =====================================================
+    // Meeting Rooms in Building B
     'M7': 'M7',
     'M8': 'M8',
-    'B05': 'B-1-05',
-    'B06': 'B-1-06',
     'M9': 'M9',
     'M10': 'M10',
     'M11': 'M11',
-    'B04': 'B-2-04',
+
+    // Lecture Room in Building B
     'LR2': 'LR2',
+
+    // Labs Building B - Floor 1
+    'B05': 'B-1-05',
+    'B06': 'B-1-06',
+
+    // Labs Building B - Floor 2
+    'B04': 'B-2-04',
+    'B05_F2': 'B-2-05', // Different B05 on floor 2
+
+    // Labs Building B - Floor 3
+    'B06_F3': 'B-3-06', // Different B06 on floor 3
     'B07': 'B-3-07',
+
+    // Labs Building B - Floor 4
+    'B06_F4': 'B-4-06', // Different B06 on floor 4
+    'B07_F4': 'B-4-07', // Different B07 on floor 4
     'B08': 'B-4-08',
   };
 
@@ -91,19 +128,27 @@ class RoomMappingService {
 
   /// List of available schedule files (based on assets/scadules directory)
   static const Set<String> _availableScheduleFiles = {
+    // Building A - Ground Floor Labs
+    'A-0-11',
     'A-0-17',
     'A-0-19',
     'A-0-20',
     'A-0-21',
     'A-0-31',
+
+    // Building A - Mezzanine Floor Labs
+    'A-M-12',
+    'A-M-13',
+
+    // Building A - Third Floor Labs
     'A-3-12',
     'A-3-13',
     'A-3-14',
     'A-3-16',
     'A-3-17',
     'A-3-18',
-    'A-M-12',
-    'A-M-13',
+
+    // Building B Labs
     'B-1-05',
     'B-1-06',
     'B-2-04',
@@ -113,6 +158,8 @@ class RoomMappingService {
     'B-4-06',
     'B-4-07',
     'B-4-08',
+
+    // Classrooms
     'CR1',
     'CR2',
     'CR3',
@@ -126,8 +173,12 @@ class RoomMappingService {
     'CR11',
     'CR12',
     'CR13',
+
+    // Lecture Rooms
     'LR1',
     'LR2',
+
+    // Meeting Rooms
     'M1',
     'M2',
     'M3',
@@ -147,17 +198,21 @@ class RoomMappingService {
   /// Returns a list of display names for rooms in that building
   static List<String> getRoomsForBuilding(String building) {
     if (building == 'A') {
-      return _roomMapping.keys
-          .where((room) =>
-              _roomMapping[room]!.startsWith('A-') ||
-              _roomMapping[room]!.startsWith('M') ||
-              _roomMapping[room]!.startsWith('CR') ||
-              _roomMapping[room]!.startsWith('LR'))
-          .toList();
+      return _roomMapping.keys.where((room) {
+        final scheduleId = _roomMapping[room]!;
+        return scheduleId.startsWith('A-') ||
+            scheduleId.startsWith('M') ||
+            scheduleId.startsWith('CR') ||
+            scheduleId == 'LR1';
+      }).toList();
     } else if (building == 'B') {
-      return _roomMapping.keys
-          .where((room) => _roomMapping[room]!.startsWith('B-'))
-          .toList();
+      return _roomMapping.keys.where((room) {
+        final scheduleId = _roomMapping[room]!;
+        return scheduleId.startsWith('B-') ||
+            (scheduleId.startsWith('M') &&
+                ['M7', 'M8', 'M9', 'M10', 'M11'].contains(scheduleId)) ||
+            scheduleId == 'LR2';
+      }).toList();
     }
     return [];
   }

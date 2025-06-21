@@ -1,0 +1,108 @@
+{
+  "A-M-13": [
+    {
+      "day": "Monday",
+      "period": "1",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "B-ECE142",
+      "subject_name": "Basic Electronics Lab",
+      "teacher": [
+        "Eng. walaa",
+        "Eng. sarah Ossama"
+      ],
+      "group": [
+        "1E1"
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "period": "1",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "B-ECE142",
+      "subject_name": "Basic Electronics Lab",
+      "teacher": [
+        "Dr. Ahmed Keshk",
+        "Eng. Fayrouz"
+      ],
+      "group": [
+        "1M2"
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "period": "2",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "B-ECE142",
+      "subject_name": "Basic Electronics Lab",
+      "teacher": [
+        "Eng. walaa",
+        "Eng. sarah Ossama"
+      ],
+      "group": [
+        "1E2"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "2",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "B-ECE142",
+      "subject_name": "Basic Electronics Lab",
+      "teacher": [
+        "Eng. sarah Ossama",
+        "Eng. Fayrouz",
+        "Eng Nora"
+      ],
+      "group": [
+        "1E3"
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "period": "3",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "B-ECE142",
+      "subject_name": "Basic Electronics Lab",
+      "teacher": [
+        "Eng. walaa",
+        "Eng Nora"
+      ],
+      "group": [
+        "1M1"
+      ]
+    },
+    {
+      "day": "Thursday",
+      "period": "3",
+      "week_type": [
+        "Odd",
+        "Even"
+      ],
+      "subject": "B-ECE142",
+      "subject_name": "Basic Electronics Lab",
+      "teacher": [
+        "Eng Hams",
+        "Eng.sherin",
+        "Eng Nora"
+      ],
+      "group": [
+        "1C1"
+      ]
+    }
+  ]
+}
