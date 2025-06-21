@@ -109,8 +109,11 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   }
 
   Future<void> _downloadPdf() async {
+    final localizations = AppLocalizations.of(context);
+
     if (!_canViewPdf) {
-      _showSnackBar('No PDF file available to download');
+      _showSnackBar(localizations?.noPDFFileAvailableToDownload ??
+          'No PDF file available to download');
       return;
     }
 
@@ -130,14 +133,14 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
 
       final hasStorageUrl = widget.request.fileStorageUrl != null &&
           widget.request.fileStorageUrl!.isNotEmpty;
-
       if (hasStorageUrl) {
-        await _downloadFromUrl();
+        await _downloadFromUrl(localizations);
       } else if (widget.request.pdfBase64 != null &&
           widget.request.pdfBase64!.isNotEmpty) {
-        await _downloadFromBase64();
+        await _downloadFromBase64(localizations);
       } else {
-        throw Exception('No valid PDF source found');
+        throw Exception(localizations?.noValidPDFSourceFound ??
+            'No valid PDF source found');
       }
     } catch (e) {
       setState(() {
@@ -149,15 +152,15 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
     }
   }
 
-  Future<void> _downloadFromUrl() async {
+  Future<void> _downloadFromUrl(AppLocalizations? localizations) async {
     final url = widget.request.fileStorageUrl!;
     final fileName = widget.request.fileName ?? 'training_document.pdf';
-
     try {
       // Get download directory
       final Directory? downloadDir = await _getDownloadDirectory();
       if (downloadDir == null) {
-        throw Exception('Cannot access download directory');
+        throw Exception(localizations?.cannotAccessDownloadDirectory ??
+            'Cannot access download directory');
       }
 
       // Clean filename and add timestamp to avoid overwriting
@@ -228,19 +231,19 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
     }
   }
 
-  Future<void> _downloadFromBase64() async {
+  Future<void> _downloadFromBase64(AppLocalizations? localizations) async {
     try {
       if (widget.request.pdfBase64 == null ||
           widget.request.pdfBase64!.isEmpty) {
         throw Exception('Invalid base64 data');
       }
 
-      final fileName = widget.request.fileName ?? 'training_document.pdf';
-
-      // Get download directory
+      final fileName = widget.request.fileName ??
+          'training_document.pdf'; // Get download directory
       final Directory? downloadDir = await _getDownloadDirectory();
       if (downloadDir == null) {
-        throw Exception('Cannot access download directory');
+        throw Exception(localizations?.cannotAccessDownloadDirectory ??
+            'Cannot access download directory');
       }
 
       // Generate a unique filename to avoid overwriting
@@ -271,7 +274,8 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
           _downloadedFilePath = filePath;
         });
 
-        _showSnackBar('File downloaded successfully');
+        _showSnackBar(localizations?.fileDownloadedSuccessfully ??
+            'File downloaded successfully');
         log('File saved to: $filePath');
 
         // Force a rebuild after a short delay to ensure UI updates
@@ -384,9 +388,12 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
   }
 
   void _openFileLocation() async {
+    final localizations = AppLocalizations.of(context);
+
     try {
       if (_downloadedFilePath == null) {
-        _showSnackBar('No downloaded file to open');
+        _showSnackBar(localizations?.noDownloadedFileToOpen ??
+            'No downloaded file to open');
         return;
       }
 
@@ -556,7 +563,7 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                         KButton(
                           onPressed:
                               _canViewPdf ? () => _viewPdf(context) : null,
-                          text: 'View',
+                          text: localizations?.view ?? 'View',
                           backgroundColor: _canViewPdf
                               ? const Color.fromRGBO(6, 147, 241, 1)
                               : Colors.grey,
@@ -570,7 +577,9 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                           onPressed: _canViewPdf && !_isDownloading
                               ? _downloadPdf
                               : null,
-                          text: _isDownloading ? 'Downloading...' : 'Download',
+                          text: _isDownloading
+                              ? '${localizations?.downloading ?? 'Downloading'}...'
+                              : localizations?.downloadPDF ?? 'Download',
                           backgroundColor: _canViewPdf && !_isDownloading
                               ? kgreen
                               : Colors.grey,
@@ -647,11 +656,13 @@ class _ValidateButtomSheetState extends State<ValidateButtomSheet> {
                   validator: (value) {
                     if (currentStatus == 'Done') {
                       if (value == null || value.isEmpty) {
-                        return 'Score must be filled to mark as Done';
+                        return localizations?.scoreMustBeFilled ??
+                            'Score must be filled to mark as Done';
                       }
                       final number = int.tryParse(value);
                       if (number == null) {
-                        return 'Please enter a valid number';
+                        return localizations?.pleaseEnterValidNumber ??
+                            'Please enter a valid number';
                       }
                       if (number == 0) {
                         return localizations?.scoreCannotBeZero ??

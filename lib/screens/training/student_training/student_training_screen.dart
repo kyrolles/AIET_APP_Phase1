@@ -124,10 +124,17 @@ class _StudentTrainingScreenState extends State<StudentTrainingScreen> {
                   localizations?.trainingScore ?? 'Progress',
                   style: const TextStyle(fontSize: 33, color: Colors.blueGrey),
                 ),
-                Text(
-                    localizations?.totalScore(totalTrainingScore.toString()) ??
-                        '$totalTrainingScore of 60',
-                    style: const TextStyle(fontSize: 32)),
+
+                // This text will not be affected by locale changes
+                Localizations.override(
+                    context: context,
+                    locale: const Locale('en'),
+                    child: Text(
+                      '$totalTrainingScore of 60',
+                      style: const TextStyle(fontSize: 32),
+                    )
+                    // Override locale by using a direct string instead of localized text
+                    ),
               ],
             ),
           ),

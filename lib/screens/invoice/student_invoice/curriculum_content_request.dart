@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../constants.dart';
 
 // Define the enum for language selection
@@ -707,7 +708,8 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
                     children: [
                       // Document Language Selection
                       _buildSelectionSection(
-                        title: 'Document Language',
+                        title: AppLocalizations.of(context)?.documentLanguage ??
+                            'Document Language',
                         icon: Icons.translate_outlined,
                         child: Row(
                           children: [
@@ -730,7 +732,8 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
 
                       // Stamp Type Selection
                       _buildSelectionSection(
-                        title: 'Stamp Type',
+                        title: AppLocalizations.of(context)?.stampType ??
+                            'Stamp Type',
                         icon: Icons.verified_outlined,
                         child: Row(
                           children: [
@@ -810,21 +813,22 @@ class _CurriculumContentRequest extends State<CurriculumContentRequest> {
 
   // Submit form method
   void _submitForm() async {
+    final localizations = AppLocalizations.of(context);
     if (formKey.currentState!.validate()) {
       // Show loading indicator
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              CircularProgressIndicator(
+              const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
-              SizedBox(width: 16),
-              Text('Submitting request...'),
+              const SizedBox(width: 16),
+              Text(localizations?.submittingRequest ?? 'Submitting request...'),
             ],
           ),
-          backgroundColor: Color(0xFF0693F1),
-          duration: Duration(seconds: 2),
+          backgroundColor: const Color(0xFF0693F1),
+          duration: const Duration(seconds: 2),
         ),
       );
 

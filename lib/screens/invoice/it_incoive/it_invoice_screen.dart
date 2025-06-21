@@ -81,8 +81,10 @@ class _ItInvoiceScreenState extends State<ItInvoiceScreen> {
                 }
                 if (state is GetRequestsLoaded) {
                   return ListContainer(
-                    title: 'Requests',
-                    emptyMessage: 'No requests found',
+                    title: AppLocalizations.of(context)?.requests ?? 'Requests',
+                    emptyMessage:
+                        AppLocalizations.of(context)?.noRequestsFound ??
+                            'No requests found',
                     listOfWidgets: showRequestsList(state.requests),
                   );
                 }

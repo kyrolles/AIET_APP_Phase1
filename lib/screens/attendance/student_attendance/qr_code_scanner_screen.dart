@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:graduation_project/components/my_app_bar.dart';
 import 'dart:convert';
@@ -41,7 +42,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           .get();
 
       if (userDoc.docs.isNotEmpty) {
-        Map<String, dynamic> userData = userDoc.docs.first.data() as Map<String, dynamic>;
+        Map<String, dynamic> userData =
+            userDoc.docs.first.data() as Map<String, dynamic>;
         return {
           'name': '${userData['firstName']} ${userData['lastName']}'.trim(),
           'id': userData['id']?.toString(),
@@ -79,14 +81,16 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       }
 
       final attendanceData = docSnapshot.data() as Map<String, dynamic>;
-      final studentList = List<Map<String, dynamic>>.from(attendanceData['studentList'] ?? []);
+      final studentList =
+          List<Map<String, dynamic>>.from(attendanceData['studentList'] ?? []);
 
       // Check if this specific student (using email) has already recorded attendance
-      bool isAlreadyPresent = studentList.any((student) =>
-      student['email']?.toString() == userData['email']);
+      bool isAlreadyPresent = studentList
+          .any((student) => student['email']?.toString() == userData['email']);
 
       if (isAlreadyPresent) {
-        throw Exception('You have already recorded your attendance for this session');
+        throw Exception(
+            'You have already recorded your attendance for this session');
       }
 
       // Add student to attendance list with all details
@@ -134,11 +138,12 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: 'Scan QR Code',
+        title: AppLocalizations.of(context)?.scanQRCode ?? 'Scan QR Code',
         onpressed: () => Navigator.pop(context),
       ),
       body: Column(

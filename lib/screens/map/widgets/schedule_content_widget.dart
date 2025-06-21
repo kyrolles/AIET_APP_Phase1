@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'time_coursedetails_component.dart';
 import '../utils/schedule_data_utils.dart';
 import '../utils/time_utils.dart';
@@ -39,11 +40,10 @@ class ScheduleContentWidget extends StatelessWidget {
 
     // Create a schedule showing only periods with scheduled classes
     List<Widget> schedulePeriods = [];
-
     for (int period = 1; period <= 4; period++) {
       // Only add periods that have scheduled classes
       if (ScheduleDataUtils.hasPeriodScheduled(daySchedule, period)) {
-        schedulePeriods.add(_buildPeriodSlot(period));
+        schedulePeriods.add(_buildPeriodSlot(context, period));
         if (period < 4) {
           // Don't add spacing after the last item
           schedulePeriods.add(const SizedBox(height: 16));
@@ -58,7 +58,7 @@ class ScheduleContentWidget extends StatelessWidget {
     return Column(children: schedulePeriods);
   }
 
-  Widget _buildPeriodSlot(int period) {
+  Widget _buildPeriodSlot(BuildContext context, int period) {
     final scheduleEntry =
         ScheduleDataUtils.getScheduleForPeriod(daySchedule, period);
     final hasClass = scheduleEntry.isNotEmpty;
@@ -67,9 +67,11 @@ class ScheduleContentWidget extends StatelessWidget {
 
     // Only show periods that have scheduled classes
     if (hasClass) {
-      final instructor = ScheduleDataUtils.extractInstructor(scheduleEntry);
+      final instructor =
+          ScheduleDataUtils.extractInstructor(scheduleEntry, context);
       final groups = ScheduleDataUtils.extractGroups(scheduleEntry);
-      final subjectName = ScheduleDataUtils.extractSubjectName(scheduleEntry);
+      final subjectName =
+          ScheduleDataUtils.extractSubjectName(scheduleEntry, context);
 
       return ClassSchedule(
         period: "P$period",
